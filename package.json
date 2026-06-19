@@ -1,1 +1,10 @@
-
+npm install express
+npm install mongoose
+npm install bcryptjs
+npm install jsonwebtoken
+npm install socket.io
+npm install dotenv
+npm install cors
+npm install multer
+npm install cloudinary
+npm install cookie-parser
