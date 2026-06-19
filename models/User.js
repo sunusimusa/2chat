@@ -1,1 +1,11 @@
-
+{
+ username,
+ fullName,
+ email,
+ password,
+ avatar,
+ bio,
+ followers,
+ following,
+ createdAt
+}
