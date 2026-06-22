@@ -13,3 +13,14 @@ router.post("/register", register);
 router.post("/login", login);
 
 module.exports = router;
+
+router.get("/test-user", async (req, res) => {
+  const User = require("../models/User");
+
+  const count = await User.countDocuments();
+
+  res.json({
+    success: true,
+    users: count
+  });
+});
