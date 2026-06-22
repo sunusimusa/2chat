@@ -2,18 +2,25 @@ const router = require("express").Router();
 
 const {
   register,
-  login
+  login,
+  updateProfile
 } = require("../controllers/authController");
 
+// Test
 router.get("/", (req, res) => {
   res.send("✅ Auth API Working");
 });
 
+// Register
 router.post("/register", register);
+
+// Login
 router.post("/login", login);
 
-module.exports = router;
+// Update Profile
+router.put("/profile", updateProfile);
 
+// User Count Test
 router.get("/test-user", async (req, res) => {
   const User = require("../models/User");
 
@@ -25,25 +32,4 @@ router.get("/test-user", async (req, res) => {
   });
 });
 
-router.get("/create-test-user", async (req, res) => {
-  const User = require("../models/User");
-  const bcrypt = require("bcryptjs");
-
-  const hashedPassword = await bcrypt.hash("123456", 10);
-
-  const user = await User.create({
-    username: "sunusi",
-    email: "sunusi@gmail.com",
-    password: hashedPassword
-  });
-
-  res.json(user);
-});
-
-const {
-  register,
-  login,
-  updateProfile
-} = require("../controllers/authController");
-
-router.put("/profile", updateProfile);
+module.exports = router;
