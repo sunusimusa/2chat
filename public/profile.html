@@ -1,4 +1,24 @@
-<input id="newUsername" placeholder="New Username">
+<!DOCTYPE html>
+<html>
+<head>
+  <title>2Chat Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<h1>My Profile</h1>
+
+<h2 id="username"></h2>
+
+<p id="email"></p>
+
+<p id="bio"></p>
+
+<hr>
+
+<input
+id="newUsername"
+placeholder="New Username">
 
 <br><br>
 
@@ -12,3 +32,84 @@ placeholder="Write your bio">
 <button onclick="saveProfile()">
 Save Profile
 </button>
+
+<br><br>
+
+<button onclick="logout()">
+Logout
+</button>
+
+<script>
+
+const user =
+JSON.parse(localStorage.getItem("user"));
+
+if(!user){
+  location.href="/login.html";
+}
+
+document.getElementById("username")
+.innerText = user.username;
+
+document.getElementById("email")
+.innerText = user.email;
+
+document.getElementById("bio")
+.innerText = user.bio || "No bio yet";
+
+async function saveProfile(){
+
+  const username =
+  document.getElementById("newUsername").value;
+
+  const bio =
+  document.getElementById("newBio").value;
+
+  const res = await fetch(
+    "/api/auth/profile",
+    {
+      method:"PUT",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        email:user.email,
+        username,
+        bio
+      })
+    }
+  );
+
+  const data = await res.json();
+
+  if(data.success){
+
+    localStorage.setItem(
+      "user",
+      JSON.stringify(data.user)
+    );
+
+    alert("✅ Profile Updated");
+
+    location.reload();
+
+  }else{
+
+    alert(data.message);
+
+  }
+
+}
+
+function logout(){
+
+  localStorage.clear();
+
+  location.href="/login.html";
+
+}
+
+</script>
+
+</body>
+</html>
