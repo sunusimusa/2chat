@@ -1,90 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>2Chat Profile</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<input id="newUsername" placeholder="New Username">
 
-  <style>
-    body{
-      font-family:Arial,sans-serif;
-      background:#f5f5f5;
-      margin:0;
-      padding:20px;
-    }
+<br><br>
 
-    .card{
-      max-width:400px;
-      margin:auto;
-      background:#fff;
-      padding:20px;
-      border-radius:15px;
-      box-shadow:0 0 10px rgba(0,0,0,.1);
-      text-align:center;
-    }
+<textarea
+id="newBio"
+placeholder="Write your bio">
+</textarea>
 
-    .avatar{
-      width:100px;
-      height:100px;
-      border-radius:50%;
-      background:#ddd;
-      margin:auto;
-      margin-bottom:15px;
-    }
+<br><br>
 
-    button{
-      padding:10px 20px;
-      border:none;
-      border-radius:8px;
-      cursor:pointer;
-      margin-top:10px;
-    }
-  </style>
-</head>
-<body>
-
-<div class="card">
-
-  <div class="avatar"></div>
-
-  <h2 id="username">Loading...</h2>
-
-  <p id="email"></p>
-
-  <p id="bio">No bio yet</p>
-
-  <button onclick="logout()">
-    Logout
-  </button>
-
-</div>
-
-<script>
-
-const user =
-JSON.parse(localStorage.getItem("user"));
-
-if(!user){
-  location.href="/login.html";
-}
-
-document.getElementById("username")
-.innerText = user.username;
-
-document.getElementById("email")
-.innerText = user.email;
-
-document.getElementById("bio")
-.innerText = user.bio || "No bio yet";
-
-function logout(){
-
-  localStorage.clear();
-
-  location.href="/login.html";
-
-}
-
-</script>
-
-</body>
-</html>
+<button onclick="saveProfile()">
+Save Profile
+</button>
