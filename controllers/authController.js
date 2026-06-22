@@ -18,8 +18,7 @@ exports.register = async (req, res) => {
       });
     }
 
-    const hashedPassword =
-      await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
       username,
@@ -55,11 +54,10 @@ exports.login = async (req, res) => {
       });
     }
 
-    const match =
-      await bcrypt.compare(
-        password,
-        user.password
-      );
+    const match = await bcrypt.compare(
+      password,
+      user.password
+    );
 
     if (!match) {
       return res.status(400).json({
