@@ -2,20 +2,27 @@
 <html>
 <head>
 <title>2Chat Home</title>
+<meta name="viewport"
+content="width=device-width,initial-scale=1">
 </head>
 <body>
 
-<h1>🎉 Welcome To 2Chat</h1>
+<h1>🏠 2Chat Feed</h1>
 
-<h3 id="username"></h3>
+<textarea
+id="postText"
+placeholder="What's happening?">
+</textarea>
 
- <button onclick="location.href='/profile.html'">
-Profile
+<br><br>
+
+<button onclick="createPost()">
+Post
 </button>
 
-<button onclick="logout()">
-Logout
-</button>
+<hr>
+
+<div id="feed"></div>
 
 <script>
 
@@ -24,22 +31,71 @@ JSON.parse(
 localStorage.getItem("user")
 );
 
-if(user){
+async function createPost(){
 
- document.getElementById(
-  "username"
- ).innerText =
- "Hello, " + user.username;
+const text =
+document.getElementById(
+"postText"
+).value;
+
+const res =
+await fetch(
+"/api/posts/create",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+userId:user._id,
+username:user.username,
+text
+})
+}
+);
+
+const data =
+await res.json();
+
+if(data.success){
+
+alert("✅ Posted");
+
+loadPosts();
 
 }
 
-function logout(){
+}
 
- localStorage.clear();
+async function loadPosts(){
 
- location.href="/login.html";
+const res =
+await fetch("/api/posts");
+
+const data =
+await res.json();
+
+let html = "";
+
+data.posts.forEach(post=>{
+
+html += `
+<div>
+<h3>${post.username}</h3>
+<p>${post.text}</p>
+<hr>
+</div>
+`;
+
+});
+
+document.getElementById(
+"feed"
+).innerHTML = html;
 
 }
+
+loadPosts();
 
 </script>
 
