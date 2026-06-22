@@ -24,3 +24,18 @@ router.get("/test-user", async (req, res) => {
     users: count
   });
 });
+
+router.get("/create-test-user", async (req, res) => {
+  const User = require("../models/User");
+  const bcrypt = require("bcryptjs");
+
+  const hashedPassword = await bcrypt.hash("123456", 10);
+
+  const user = await User.create({
+    username: "sunusi",
+    email: "sunusi@gmail.com",
+    password: hashedPassword
+  });
+
+  res.json(user);
+});
