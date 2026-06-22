@@ -39,3 +39,11 @@ router.get("/create-test-user", async (req, res) => {
 
   res.json(user);
 });
+
+const {
+  register,
+  login,
+  updateProfile
+} = require("../controllers/authController");
+
+router.put("/profile", updateProfile);
