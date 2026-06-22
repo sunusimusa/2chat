@@ -6,6 +6,11 @@ const app = express();
 
 app.use(express.json());
 
+const authRoutes =
+require("./routes/authRoutes");
+
+app.use("/api/auth", authRoutes);
+
 // Home Route
 app.get("/", (req, res) => {
   res.send("🚀 2Chat Server Running Successfully");
