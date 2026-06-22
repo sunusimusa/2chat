@@ -81,9 +81,17 @@ data.posts.forEach(post=>{
 
 html += `
 <div>
+
 <h3>${post.username}</h3>
+
 <p>${post.text}</p>
+
+<button onclick="likePost('${post._id}')">
+❤️ Like (${post.likes ? post.likes.length : 0})
+</button>
+
 <hr>
+
 </div>
 `;
 
