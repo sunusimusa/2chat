@@ -32,6 +32,12 @@ placeholder="Write your bio">
 <button onclick="saveProfile()">
 Save Profile
 </button>
+  
+  <button onclick="goHome()">
+🏠 Back To Home
+</button>
+
+<br><br>
 
 <br><br>
 
@@ -106,6 +112,12 @@ function logout(){
   localStorage.clear();
 
   location.href="/login.html";
+
+}
+
+  function goHome(){
+
+  location.href = "/home.html";
 
 }
 
