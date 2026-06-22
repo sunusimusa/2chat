@@ -1,13 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>2Chat</title>
+<title>2Chat Home</title>
 </head>
 <body>
 
 <h1>🎉 Welcome To 2Chat</h1>
 
-<p>Account created successfully.</p>
+<h3 id="username"></h3>
+
+<button onclick="logout()">
+Logout
+</button>
+
+<script>
+
+const user =
+JSON.parse(
+localStorage.getItem("user")
+);
+
+if(user){
+
+ document.getElementById(
+  "username"
+ ).innerText =
+ "Hello, " + user.username;
+
+}
+
+function logout(){
+
+ localStorage.clear();
+
+ location.href="/login.html";
+
+}
+
+</script>
 
 </body>
 </html>
