@@ -1,7 +1,11 @@
 const router = require("express").Router();
 
-router.get("/", (req, res) => {
-  res.send("Auth Route Working");
-});
+const {
+  register,
+  login
+} = require("../controllers/authController");
+
+router.post("/register", register);
+router.post("/login", login);
 
 module.exports = router;
