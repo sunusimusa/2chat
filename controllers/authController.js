@@ -79,3 +79,37 @@ exports.login = async (req, res) => {
     });
   }
 };
+
+exports.updateProfile = async (req, res) => {
+  try {
+
+    const { email, username, bio } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        success:false,
+        message:"User not found"
+      });
+    }
+
+    user.username = username || user.username;
+    user.bio = bio || user.bio;
+
+    await user.save();
+
+    res.json({
+      success:true,
+      user
+    });
+
+  } catch(err) {
+
+    res.status(500).json({
+      success:false,
+      message:err.message
+    });
+
+  }
+};
