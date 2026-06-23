@@ -2,8 +2,7 @@
 <html>
 <head>
 <title>2Chat Home</title>
-<meta name="viewport"
-content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
 <body>
 
@@ -31,6 +30,11 @@ JSON.parse(
 localStorage.getItem("user")
 );
 
+if(!user){
+  location.href="/login.html";
+}
+
+// CREATE POST
 async function createPost(){
 
 const text =
@@ -59,14 +63,54 @@ await res.json();
 
 if(data.success){
 
-alert("✅ Posted");
+document.getElementById(
+"postText"
+).value = "";
 
 loadPosts();
 
-}
+}else{
+
+alert(data.message);
 
 }
 
+}
+
+// LIKE POST
+async function likePost(postId){
+
+const res =
+await fetch(
+"/api/posts/like",
+{
+method:"PUT",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+postId,
+username:user.username
+})
+}
+);
+
+const data =
+await res.json();
+
+if(data.success){
+
+loadPosts();
+
+}else{
+
+alert(data.message);
+
+}
+
+}
+
+// LOAD POSTS
 async function loadPosts(){
 
 const res =
@@ -80,7 +124,7 @@ let html = "";
 data.posts.forEach(post=>{
 
 html += `
-<div>
+<div style="border:1px solid #ccc;padding:10px;margin:10px;">
 
 <h3>${post.username}</h3>
 
@@ -89,8 +133,6 @@ html += `
 <button onclick="likePost('${post._id}')">
 ❤️ Like (${post.likes ? post.likes.length : 0})
 </button>
-
-<hr>
 
 </div>
 `;
