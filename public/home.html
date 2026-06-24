@@ -45,6 +45,10 @@ JSON.parse(
 localStorage.getItem("user")
 );
 
+if(!user){
+  location.href="/login.html";
+}
+
 document.getElementById("userName")
 .innerText = user.username;
 
@@ -52,6 +56,15 @@ function goProfile(){
 
 location.href =
 "/profile.html";
+
+}
+
+function logout(){
+
+localStorage.clear();
+
+location.href =
+"/login.html";
 
 }
 
