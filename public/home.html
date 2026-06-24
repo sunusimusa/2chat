@@ -8,6 +8,21 @@
 
 <h1>🏠 2Chat Feed</h1>
 
+  <p>
+👤 Logged in as:
+<b id="userName"></b>
+</p>
+
+<button onclick="goProfile()">
+👤 My Profile
+</button>
+
+<button onclick="logout()">
+🚪 Logout
+</button>
+
+<hr>
+
 <textarea
 id="postText"
 placeholder="What's happening?">
@@ -29,6 +44,25 @@ const user =
 JSON.parse(
 localStorage.getItem("user")
 );
+
+document.getElementById("userName")
+.innerText = user.username;
+
+function goProfile(){
+
+location.href =
+"/profile.html";
+
+}
+
+function logout(){
+
+localStorage.clear();
+
+location.href =
+"/login.html";
+
+}  
 
 if(!user){
   location.href="/login.html";
