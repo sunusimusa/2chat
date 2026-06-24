@@ -135,9 +135,13 @@ message:"Post not found"
 
 }
 
+if(!post.comments){
+  post.comments = [];
+}
+
 post.comments.push({
-username,
-text
+  username,
+  text
 });
 
 await post.save();
