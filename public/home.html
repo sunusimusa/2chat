@@ -195,6 +195,46 @@ alert(data.message);
 
 }
 
+async function deletePost(postId){
+
+const confirmDelete =
+confirm("Delete this post?");
+
+if(!confirmDelete){
+return;
+}
+
+const res =
+await fetch(
+"/api/posts/delete",
+{
+method:"DELETE",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+postId
+})
+}
+);
+
+const data =
+await res.json();
+
+if(data.success){
+
+alert("🗑️ Post Deleted");
+
+loadPosts();
+
+}else{
+
+alert(data.message);
+
+}
+
+}  
+
 // LOAD POSTS
 async function loadPosts(){
 
