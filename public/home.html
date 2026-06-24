@@ -213,11 +213,17 @@ html += `
 
 <h3>${post.username}</h3>
 
-<p>${post.text}</p>
-
-<button onclick="likePost('${post._id}')">
-❤️ Like (${post.likes ? post.likes.length : 0})
+${
+post.username === user.username
+?
+`
+<button onclick="deletePost('${post._id}')">
+🗑️ Delete
 </button>
+`
+:
+""
+}
 
 <br><br>
 
