@@ -84,10 +84,11 @@ headers:{
 "Content-Type":"application/json"
 },
 body:JSON.stringify({
-postId,
+userId:user._id,
 username:user.username,
+avatar:user.avatar,
 text
-})
+})  
 }
 );
 
