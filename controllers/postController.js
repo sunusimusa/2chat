@@ -110,3 +110,49 @@ message:err.message
 }
 
 };
+
+// COMMENT POST
+
+exports.commentPost = async (req,res)=>{
+
+try{
+
+const {
+postId,
+username,
+text
+} = req.body;
+
+const post =
+await Post.findById(postId);
+
+if(!post){
+
+return res.status(404).json({
+success:false,
+message:"Post not found"
+});
+
+}
+
+post.comments.push({
+username,
+text
+});
+
+await post.save();
+
+res.json({
+success:true
+});
+
+}catch(err){
+
+res.status(500).json({
+success:false,
+message:err.message
+});
+
+}
+
+};
