@@ -294,7 +294,18 @@ ${
 post.username === user.username
 ?
 `
-<button onclick="deletePost('${post._id}')">
+<button
+onclick="editPost(
+'${post._id}',
+\`${post.text}\`
+)">
+✏️ Edit
+</button>
+
+<button
+onclick="deletePost(
+'${post._id}'
+)">
 🗑️ Delete
 </button>
 `
