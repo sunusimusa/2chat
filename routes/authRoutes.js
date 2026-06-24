@@ -1,11 +1,13 @@
 const router = require("express").Router();
+
 const upload =
 require("../middleware/upload");
 
 const {
   register,
   login,
-  updateProfile
+  updateProfile,
+  uploadAvatar
 } = require("../controllers/authController");
 
 // Test
@@ -22,22 +24,27 @@ router.post("/login", login);
 // Update Profile
 router.put("/profile", updateProfile);
 
+// Upload Avatar
+router.post(
+  "/avatar",
+  upload.single("avatar"),
+  uploadAvatar
+);
+
 // User Count Test
 router.get("/test-user", async (req, res) => {
-  const User = require("../models/User");
 
-  const count = await User.countDocuments();
+  const User =
+  require("../models/User");
+
+  const count =
+  await User.countDocuments();
 
   res.json({
     success: true,
     users: count
   });
-});
 
-router.post(
-"/avatar",
-upload.single("avatar"),
-uploadAvatar
-);
+});
 
 module.exports = router;
