@@ -106,6 +106,50 @@ alert(data.message);
 
 }  
 
+async function editPost(postId,currentText){
+
+const newText =
+prompt(
+"Edit your post:",
+currentText
+);
+
+if(!newText){
+return;
+}
+
+const res =
+await fetch(
+"/api/posts/edit",
+{
+method:"PUT",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+postId,
+text:newText
+})
+}
+);
+
+const data =
+await res.json();
+
+if(data.success){
+
+alert("✏️ Post Updated");
+
+loadPosts();
+
+}else{
+
+alert(data.message);
+
+}
+
+}  
+
 // CREATE POST
 async function createPost(){
 
