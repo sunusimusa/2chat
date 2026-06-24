@@ -23,4 +23,6 @@ router.get("/", getPosts);
 
 router.put("/like", likePost);
 
+router.put("/comment", commentPost);
+
 module.exports = router;
