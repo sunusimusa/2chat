@@ -6,7 +6,8 @@ createPost,
 getPosts,
 likePost,
 commentPost,
-deletePost
+deletePost,
+editPost
 }
 =
 require("../controllers/postController");
@@ -18,6 +19,8 @@ router.get("/", getPosts);
 router.put("/like", likePost);
 
 router.put("/comment", commentPost);
+
+router.put("/edit", editPost);
 
 router.delete("/delete", deletePost);
 
