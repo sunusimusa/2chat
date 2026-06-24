@@ -68,6 +68,44 @@ if(!user){
   location.href="/login.html";
 }
 
+async function commentPost(postId){
+
+const text =
+document.getElementById(
+`comment-${postId}`
+).value;
+
+const res =
+await fetch(
+"/api/posts/comment",
+{
+method:"PUT",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+postId,
+username:user.username,
+text
+})
+}
+);
+
+const data =
+await res.json();
+
+if(data.success){
+
+loadPosts();
+
+}else{
+
+alert(data.message);
+
+}
+
+}  
+
 // CREATE POST
 async function createPost(){
 
@@ -167,6 +205,23 @@ html += `
 <button onclick="likePost('${post._id}')">
 ❤️ Like (${post.likes ? post.likes.length : 0})
 </button>
+
+<br><br>
+
+<input
+id="comment-${post._id}"
+placeholder="Write comment">
+
+<button
+onclick="commentPost('${post._id}')">
+💬 Comment
+</button>
+
+<p>
+Comments:
+${post.comments ?
+post.comments.length : 0}
+</p>
 
 </div>
 `;
