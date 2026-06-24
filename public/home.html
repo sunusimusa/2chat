@@ -274,6 +274,30 @@ Comments:
 ${post.comments ? post.comments.length : 0}
 </p>
 
+<div>
+
+${
+post.comments
+?
+post.comments.map(comment => `
+<div style="
+border-left:3px solid #ccc;
+padding-left:10px;
+margin:5px 0;
+">
+
+<b>${comment.username}</b>
+
+<br>
+
+${comment.text}
+
+</div>
+`).join("")
+:
+""
+}
+
 </div>
 `;
 
