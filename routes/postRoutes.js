@@ -1,3 +1,11 @@
+const {
+createPost,
+getPosts,
+likePost,
+commentPost
+}
+=
+require("../controllers/postController");
 const router =
 require("express").Router();
 
