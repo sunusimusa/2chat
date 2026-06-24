@@ -1,18 +1,11 @@
-const {
-createPost,
-getPosts,
-likePost,
-commentPost
-}
-=
-require("../controllers/postController");
 const router =
 require("express").Router();
 
 const {
 createPost,
 getPosts,
-likePost
+likePost,
+commentPost
 }
 =
 require("../controllers/postController");
