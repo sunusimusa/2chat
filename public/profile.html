@@ -8,6 +8,12 @@
 
 <h1>My Profile</h1>
 
+  document.getElementById(
+"avatar"
+).src =
+user.avatar ||
+"https://via.placeholder.com/120";
+
  <img
 id="avatar"
 width="120"
@@ -138,6 +144,68 @@ function logout(){
   location.href = "/home.html";
 
 }
+
+async function uploadAvatar(){
+
+const file =
+document.getElementById(
+"avatarFile"
+).files[0];
+
+if(!file){
+return alert(
+"Select image"
+);
+}
+
+const formData =
+new FormData();
+
+formData.append(
+"avatar",
+file
+);
+
+formData.append(
+"email",
+user.email
+);
+
+const res =
+await fetch(
+"/api/auth/avatar",
+{
+method:"POST",
+body:formData
+}
+);
+
+const data =
+await res.json();
+
+if(data.success){
+
+user.avatar =
+data.avatar;
+
+localStorage.setItem(
+"user",
+JSON.stringify(user)
+);
+
+alert(
+"✅ Avatar Updated"
+);
+
+location.reload();
+
+}else{
+
+alert(data.message);
+
+}
+
+}  
 
 </script>
 
