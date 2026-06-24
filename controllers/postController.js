@@ -198,3 +198,44 @@ message:err.message
 }
 
 };
+
+// EDIT POST
+
+exports.editPost = async (req,res)=>{
+
+try{
+
+const { postId, text } = req.body;
+
+const post =
+await Post.findById(postId);
+
+if(!post){
+
+return res.status(404).json({
+success:false,
+message:"Post not found"
+});
+
+}
+
+post.text = text;
+
+await post.save();
+
+res.json({
+success:true,
+post
+});
+
+}catch(err){
+
+res.status(500).json({
+success:false,
+message:err.message
+});
+
+}
+
+};
+
