@@ -27,5 +27,16 @@ const postSchema = new mongoose.Schema(
 }
 );
 
+comments: [
+{
+  username: String,
+  text: String,
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+}
+]
+
 module.exports =
 mongoose.model("Post", postSchema);
