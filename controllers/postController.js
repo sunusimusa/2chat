@@ -7,15 +7,19 @@ async(req,res)=>{
 
 try{
 
-const {userId,username,text}
-= req.body;
-
+const {
+userId,
+username,
+avatar,
+text
+} = req.body;
 const post =
 await Post.create({
 userId,
 username,
+avatar,
 text
-});
+}); 
 
 res.json({
 success:true,
