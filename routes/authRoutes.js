@@ -1,4 +1,15 @@
 const router = require("express").Router();
+const upload =
+require("../middleware/upload");
+
+const {
+register,
+login,
+updateProfile,
+uploadAvatar
+}
+=
+require("../controllers/authController");
 
 const {
   register,
@@ -31,5 +42,11 @@ router.get("/test-user", async (req, res) => {
     users: count
   });
 });
+
+router.post(
+"/avatar",
+upload.single("avatar"),
+uploadAvatar
+);
 
 module.exports = router;
