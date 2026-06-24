@@ -3,15 +3,6 @@ const upload =
 require("../middleware/upload");
 
 const {
-register,
-login,
-updateProfile,
-uploadAvatar
-}
-=
-require("../controllers/authController");
-
-const {
   register,
   login,
   updateProfile
