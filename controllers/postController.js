@@ -160,3 +160,41 @@ message:err.message
 }
 
 };
+
+// DELETE POST
+
+exports.deletePost = async (req,res)=>{
+
+try{
+
+const { postId } = req.body;
+
+const post =
+await Post.findById(postId);
+
+if(!post){
+
+return res.status(404).json({
+success:false,
+message:"Post not found"
+});
+
+}
+
+await Post.findByIdAndDelete(postId);
+
+res.json({
+success:true,
+message:"Post deleted"
+});
+
+}catch(err){
+
+res.status(500).json({
+success:false,
+message:err.message
+});
+
+}
+
+};
