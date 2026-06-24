@@ -283,7 +283,27 @@ data.posts.forEach(post=>{
 html += `
 <div style="border:1px solid #ccc;padding:10px;margin:10px;">
 
+<div style="
+display:flex;
+align-items:center;
+gap:10px;
+">
+
+<img
+src="${
+post.avatar ||
+'https://cdn-icons-png.flaticon.com/512/149/149071.png'
+}"
+style="
+width:45px;
+height:45px;
+border-radius:50%;
+object-fit:cover;
+">
+
 <h3>${post.username}</h3>
+
+</div>
 
 <p>${post.text}</p>
 
