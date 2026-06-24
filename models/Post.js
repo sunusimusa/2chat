@@ -11,6 +11,11 @@ const postSchema = new mongoose.Schema({
     type:String
   },
 
+  avatar:{
+    type:String,
+    default:""
+  },
+
   text:{
     type:String
   },
