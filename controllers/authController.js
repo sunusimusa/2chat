@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const generateToken = require("../utils/generateToken");
+const cloudinary =
+require("../services/cloudinary");
 
 // REGISTER
 exports.register = async (req, res) => {
@@ -112,4 +114,57 @@ exports.updateProfile = async (req, res) => {
     });
 
   }
+};
+
+exports.uploadAvatar =
+async (req,res)=>{
+
+try{
+
+const User =
+require("../models/User");
+
+const {
+email
+} = req.body;
+
+const user =
+await User.findOne({ email });
+
+if(!user){
+
+return res.status(404).json({
+success:false,
+message:"User not found"
+});
+
+}
+
+const result =
+await cloudinary.uploader.upload(
+req.file.path,
+{
+folder:"2chat-avatar"
+}
+);
+
+user.avatar =
+result.secure_url;
+
+await user.save();
+
+res.json({
+success:true,
+avatar:user.avatar
+});
+
+}catch(err){
+
+res.status(500).json({
+success:false,
+message:err.message
+});
+
+}
+
 };
