@@ -66,15 +66,6 @@ localStorage.clear();
 location.href =
 "/login.html";
 
-}
-
-function logout(){
-
-localStorage.clear();
-
-location.href =
-"/login.html";
-
 }  
 
 if(!user){
@@ -253,6 +244,12 @@ html += `
 
 <h3>${post.username}</h3>
 
+<p>${post.text}</p>
+
+<button onclick="likePost('${post._id}')">
+❤️ Like (${post.likes ? post.likes.length : 0})
+</button>
+
 ${
 post.username === user.username
 ?
@@ -278,8 +275,7 @@ onclick="commentPost('${post._id}')">
 
 <p>
 Comments:
-${post.comments ?
-post.comments.length : 0}
+${post.comments ? post.comments.length : 0}
 </p>
 
 </div>
