@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>2Chat Chat</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body>
+
+<h1>💬 2Chat Chat</h1>
+
+<input
+id="receiver"
+placeholder="Receiver Username">
+
+<br><br>
+
+<textarea
+id="message"
+placeholder="Write message">
+</textarea>
+
+<br><br>
+
+<button onclick="sendMessage()">
+Send
+</button>
+
+<hr>
+
+<div id="chat"></div>
+
+<script>
+
+const user =
+JSON.parse(
+localStorage.getItem("user")
+);
+
+async function sendMessage(){
+
+const receiver =
+document.getElementById(
+"receiver"
+).value;
+
+const text =
+document.getElementById(
+"message"
+).value;
+
+const res =
+await fetch(
+"/api/messages/send",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+sender:user.username,
+receiver,
+text
+})
+}
+);
+
+const data =
+await res.json();
+
+if(data.success){
+
+alert("✅ Message Sent");
+
+}else{
+
+alert(data.message);
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
