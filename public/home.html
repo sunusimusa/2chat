@@ -291,15 +291,17 @@ let html = "";
 data.posts.forEach(post=>{
 
 html += `
-<div style="border:1px solid #ccc;padding:10px;margin:10px;">
 
 <div style="
+border:1px solid #ccc;
+padding:10px;
+margin:10px;
+border-radius:10px;
+"><div style="
 display:flex;
 align-items:center;
 gap:10px;
-">
-
-<img
+"><img
 src="${
 post.avatar ||
 'https://cdn-icons-png.flaticon.com/512/149/149071.png'
@@ -311,83 +313,51 @@ border-radius:50%;
 object-fit:cover;
 ">
 
-<h3>${post.username}</h3>
-
-</div>
-
-<p>${post.text}</p>
-
-<button onclick="likePost('${post._id}')">
+<h3>${post.username}</h3></div><p>${post.text}</p><button onclick="likePost('${post._id}')">
 ❤️ Like (${post.likes ? post.likes.length : 0})
-</button>
-
-${
+</button>${
 post.username === user.username
 ?
-`
-<button
-onclick="editPost(
-'${post._id}',
-\`${post.text}\`
-)">
+" <button onclick="editPost('${post._id}', \"${post.text}`)">
 ✏️ Edit
 </button>
 
-<button
-onclick="deletePost(
-'${post._id}'
-)">
+<button onclick="deletePost('${post._id}')">
 🗑️ Delete
 </button>
 `
 :
 ""
-}
-
-<br><br>
+}<br><br>
 
 <input
 id="comment-${post._id}"
 placeholder="Write comment">
 
-<button
-onclick="commentPost('${post._id}')">
+<button onclick="commentPost('${post._id}')">
 💬 Comment
-</button>
-
-<p>
+</button><p>
 Comments:
 ${post.comments ? post.comments.length : 0}
-</p>
-
-<div>
-
-${
+</p>${
 post.comments
 ?
 post.comments.map(comment => `
+
 <div style="
 border-left:3px solid #ccc;
 padding-left:10px;
 margin:5px 0;
-">
-
-<b>${comment.username}</b>
-
+"><b>${comment.username}</b>
 <br>
-
 ${comment.text}
 
 </div>
 `).join("")
 :
 ""
-}
-
-</div>
-`;
-
-});
+}</div>
+`;});
 
 document.getElementById(
 "feed"
