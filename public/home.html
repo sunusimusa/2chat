@@ -84,11 +84,10 @@ headers:{
 "Content-Type":"application/json"
 },
 body:JSON.stringify({
-userId:user._id,
+postId,
 username:user.username,
-avatar:user.avatar,
 text
-})  
+})
 }
 );
 
@@ -105,7 +104,7 @@ alert(data.message);
 
 }
 
-}  
+}
 
 async function editPost(postId,currentText){
 
