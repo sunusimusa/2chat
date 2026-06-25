@@ -38,10 +38,18 @@ localStorage.getItem("user")
 
 async function loadMessages(){
 
+const receiver =
+document.getElementById(
+"receiver"
+).value;
+
+if(!receiver){
+return;
+}
+
 const res =
 await fetch(
-"/api/messages/" +
-user.username
+`/api/messages/chat?sender=${user.username}&receiver=${receiver}`
 );
 
 const data =
@@ -58,8 +66,7 @@ padding:10px;
 margin:10px;
 ">
 
-<b>From:</b>
-${msg.sender}
+<b>${msg.sender}</b>
 
 <br><br>
 
@@ -76,13 +83,6 @@ document.getElementById(
 
 }
 
-loadMessages();
-
-setInterval(
-loadMessages,
-3000
-);
-
 async function sendMessage(){
 
 const receiver =
@@ -94,6 +94,16 @@ const text =
 document.getElementById(
 "message"
 ).value;
+
+if(!receiver || !text){
+
+alert(
+"Please fill all fields"
+);
+
+return;
+
+}
 
 const res =
 await fetch(
@@ -116,17 +126,21 @@ await res.json();
 
 if(data.success){
 
-alert("✅ Message Sent");
-
 document.getElementById(
 "message"
 ).value = "";
+
+alert(
+"✅ Message Sent"
+);
 
 loadMessages();
 
 }else{
 
-alert(data.message);
+alert(
+data.message
+);
 
 }
 
