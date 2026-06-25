@@ -6,6 +6,9 @@ require("dotenv").config();
 const postRoutes =
 require("./routes/postRoutes");
 
+const messageRoutes =
+require("./routes/messageRoutes");
+
 const authRoutes = require("./routes/authRoutes");
 
 const app = express();
