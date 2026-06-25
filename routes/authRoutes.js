@@ -31,6 +31,11 @@ router.post(
   uploadAvatar
 );
 
+router.get(
+"/users",
+getUsers
+);
+
 // User Count Test
 router.get("/test-user", async (req, res) => {
 
