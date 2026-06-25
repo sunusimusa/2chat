@@ -22,6 +22,10 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/posts",postRoutes);
+app.use(
+"/api/messages",
+messageRoutes
+);
 
 app.get("/", (req, res) => {
   res.send("🚀 2Chat Server Running Successfully");
