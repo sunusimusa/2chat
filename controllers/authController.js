@@ -168,3 +168,31 @@ message:err.message
 }
 
 };
+
+// GET ALL USERS
+
+exports.getUsers = async (req,res)=>{
+
+try{
+
+const users =
+await User.find(
+{},
+"username avatar bio"
+);
+
+res.json({
+success:true,
+users
+});
+
+}catch(err){
+
+res.status(500).json({
+success:false,
+message:err.message
+});
+
+}
+
+};
