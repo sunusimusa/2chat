@@ -4,11 +4,14 @@ const upload =
 require("../middleware/upload");
 
 const {
-  register,
-  login,
-  updateProfile,
-  uploadAvatar
-} = require("../controllers/authController");
+register,
+login,
+updateProfile,
+uploadAvatar,
+getUsers
+}
+=
+require("../controllers/authController");
 
 // Test
 router.get("/", (req, res) => {
