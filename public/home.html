@@ -17,6 +17,10 @@
 👤 My Profile
 </button>
 
+ <button onclick="goChat()">
+💬 Messages
+</button>   
+
 <button onclick="logout()">
 🚪 Logout
 </button>
@@ -58,6 +62,13 @@ location.href =
 "/profile.html";
 
 }
+
+function goChat(){
+
+location.href =
+"/chat.html";
+
+}  
 
 function logout(){
 
@@ -377,10 +388,6 @@ ${comment.text}
 `;
 
 });
-
-<button onclick="goChat()">
-💬 Messages
-</button>  
 
 document.getElementById(
 "feed"
