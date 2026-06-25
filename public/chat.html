@@ -111,7 +111,26 @@ text
 }
 );
 
+const data =
+await res.json();
+
+if(data.success){
+
+alert("✅ Message Sent");
+
+document.getElementById(
+"message"
+).value = "";
+
 loadMessages();
+
+}else{
+
+alert(data.message);
+
+}
+
+}
 
 const data =
 await res.json();
