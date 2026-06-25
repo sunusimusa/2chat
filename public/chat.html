@@ -36,6 +36,53 @@ JSON.parse(
 localStorage.getItem("user")
 );
 
+async function loadMessages(){
+
+const res =
+await fetch(
+"/api/messages/" +
+user.username
+);
+
+const data =
+await res.json();
+
+let html = "";
+
+data.messages.forEach(msg=>{
+
+html += `
+<div style="
+border:1px solid #ccc;
+padding:10px;
+margin:10px;
+">
+
+<b>From:</b>
+${msg.sender}
+
+<br><br>
+
+${msg.text}
+
+</div>
+`;
+
+});
+
+document.getElementById(
+"chat"
+).innerHTML = html;
+
+}
+
+loadMessages();
+
+setInterval(
+loadMessages,
+3000
+);
+
 async function sendMessage(){
 
 const receiver =
@@ -63,6 +110,8 @@ text
 })
 }
 );
+
+loadMessages();
 
 const data =
 await res.json();
