@@ -3,10 +3,9 @@ require("express").Router();
 
 const {
 sendMessage,
-getMessages
-}
-=
-require("../controllers/messageController");
+getMessages,
+getChats
+} = require("../controllers/messageController");
 
 // Send Message
 router.post(
@@ -18,6 +17,11 @@ sendMessage
 router.get(
 "/chat",
 getMessages
+);
+
+router.get(
+"/list/:username",
+getChats
 );
 
 module.exports = router;
