@@ -90,22 +90,32 @@ border-radius:20px;
 </head>
 <body>
 
-<h1>💬 2Chat Chat</h1>
+<div class="header">
+
+<button onclick="history.back()">
+⬅
+</button>
+
+<span id="chatUser"></span>
+
+</div>
 
 <h3 id="chatUser"></h3>
 
 <br><br>
 
+<div class="bottom">
+
 <textarea
 id="message"
-placeholder="Write message">
+placeholder="Type message...">
 </textarea>
 
-<br><br>
-
 <button onclick="sendMessage()">
-Send
+📤
 </button>
+
+</div>
 
 <hr>
 
