@@ -88,6 +88,7 @@ border-radius:20px;
 </style>
 
 </head>
+  
 <body>
 
 <div class="header">
@@ -180,6 +181,8 @@ new URLSearchParams(window.location.search);
 
 const receiver =
 params.get("user"); 
+  
+alert(receiver);
 
 document.getElementById("chatUser").innerText =
 "Chat with: " + receiver; 
