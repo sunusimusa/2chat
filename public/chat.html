@@ -87,10 +87,8 @@ document.getElementById("chatUser").innerText =
 
 async function sendMessage(){
 
-const receiver =
-document.getElementById(
-"receiver"
-).value;
+const text =
+document.getElementById("message").value;
 
 const text =
 document.getElementById(
@@ -138,6 +136,8 @@ alert(
 
 loadMessages();
 
+setInterval(loadMessages,2000);
+
 }else{
 
 alert(
@@ -147,6 +147,7 @@ data.message
 }
 
 }
+
 
 </script>
 
