@@ -81,3 +81,53 @@ message:err.message
 }
 
 };
+
+exports.getChats = async (req, res) => {
+
+try {
+
+const { username } = req.params;
+
+const messages = await Message.find({
+$or: [
+{ sender: username },
+{ receiver: username }
+]
+}).sort({ createdAt: -1 });
+
+const chats = {};
+
+messages.forEach(msg => {
+
+const otherUser =
+msg.sender === username
+? msg.receiver
+: msg.sender;
+
+if (!chats[otherUser]) {
+
+chats[otherUser] = {
+username: otherUser,
+lastMessage: msg.text,
+time: msg.createdAt
+};
+
+}
+
+});
+
+res.json({
+success: true,
+chats: Object.values(chats)
+});
+
+} catch (err) {
+
+res.status(500).json({
+success: false,
+message: err.message
+});
+
+}
+
+};
