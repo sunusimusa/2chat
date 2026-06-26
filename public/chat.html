@@ -1,31 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <title>2Chat Chat</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <style>
 
-body{
+*{
 margin:0;
+padding:0;
+box-sizing:border-box;
 font-family:Arial,sans-serif;
+}
+
+body{
 background:#f0f2f5;
+height:100vh;
+display:flex;
+flex-direction:column;
 }
 
 .header{
-display:flex;
-align-items:center;
-gap:10px;
-padding:15px;
+height:60px;
 background:#1877f2;
 color:white;
+display:flex;
+align-items:center;
+padding:15px;
 font-size:20px;
 font-weight:bold;
 }
 
+.header button{
+margin-right:15px;
+border:none;
+background:white;
+padding:8px 12px;
+border-radius:8px;
+cursor:pointer;
+}
+
 #chat{
-height:65vh;
+flex:1;
 overflow-y:auto;
-padding:10px;
+padding:15px;
 }
 
 .me{
@@ -59,14 +78,11 @@ box-shadow:0 1px 3px rgba(0,0,0,.2);
 }
 
 .bottom{
-position:fixed;
-bottom:0;
-left:0;
-right:0;
 display:flex;
-gap:10px;
 padding:10px;
 background:white;
+border-top:1px solid #ddd;
+gap:10px;
 }
 
 .bottom textarea{
@@ -75,40 +91,39 @@ height:45px;
 resize:none;
 padding:10px;
 border-radius:20px;
+border:1px solid #ccc;
 }
 
 .bottom button{
 width:80px;
-border:none;
 background:#1877f2;
 color:white;
+border:none;
 border-radius:20px;
+font-size:18px;
+cursor:pointer;
 }
 
 </style>
 
 </head>
-  
 <body>
 
 <div class="header">
 
-<button onclick="history.back()">
-⬅
-</button>
+<button onclick="history.back()">⬅</button>
+
+<span id="chatUser"></span>
 
 </div>
 
-<h3 id="chatUser"></h3>
-
-<br><br>
+<div id="chat"></div>
 
 <div class="bottom">
 
 <textarea
 id="message"
-placeholder="Type message...">
-</textarea>
+placeholder="Type message..."></textarea>
 
 <button onclick="sendMessage()">
 📤
@@ -116,22 +131,23 @@ placeholder="Type message...">
 
 </div>
 
-<hr>
-
-<div id="chat"></div>
-
 <script>
 
 const user =
-JSON.parse(
-localStorage.getItem("user")
-);
+JSON.parse(localStorage.getItem("user"));
+
+const params =
+new URLSearchParams(window.location.search);
+
+const receiver =
+params.get("user");
+
+document.getElementById("chatUser").innerText =
+receiver;
 
 async function loadMessages(){
 
-if(!receiver){
-return;
-}
+if(!receiver) return;
 
 const res =
 await fetch(
@@ -141,22 +157,18 @@ await fetch(
 const data =
 await res.json();
 
-let html = "";
+let html="";
 
 data.messages.forEach(msg=>{
 
 const mine =
-msg.sender === user.username;
+msg.sender===user.username;
 
-html += `
+html+=`
 
-<div class="${
-mine ? "me" : "other"
-}">
+<div class="${mine?"me":"other"}">
 
-<div class="${
-mine ? "bubble-me" : "bubble-other"
-}">
+<div class="${mine?"bubble-me":"bubble-other"}">
 
 ${msg.text}
 
@@ -165,42 +177,25 @@ ${msg.text}
 </div>
 
 `;
-  
-});
 
-document.getElementById("chat").innerHTML = html;
+});
 
 const chat =
 document.getElementById("chat");
 
-chat.scrollTop =
+chat.innerHTML=html;
+
+chat.scrollTop=
 chat.scrollHeight;
 
-const params =
-new URLSearchParams(window.location.search);
-
-const receiver =
-params.get("user"); 
-  
-alert(receiver);
-
-document.getElementById("chatUser").innerText =
-"Chat with: " + receiver; 
+}
 
 async function sendMessage(){
 
 const text =
-document.getElementById("message").value;
+document.getElementById("message").value.trim();
 
-if(!receiver || !text){
-
-alert(
-"Please fill all fields"
-);
-
-return;
-
-}
+if(text==="") return;
 
 const res =
 await fetch(
@@ -212,8 +207,8 @@ headers:{
 },
 body:JSON.stringify({
 sender:user.username,
-receiver,
-text
+receiver:receiver,
+text:text
 })
 }
 );
@@ -223,19 +218,13 @@ await res.json();
 
 if(data.success){
 
-document.getElementById(
-"message"
-).value = "";
+document.getElementById("message").value="";
 
-alert(
-"✅ Message Sent"
-);
+loadMessages();
 
 }else{
 
-alert(
-data.message
-);
+alert(data.message);
 
 }
 
@@ -243,7 +232,7 @@ data.message
 
 loadMessages();
 
-setInterval(loadMessages,2000);  
+setInterval(loadMessages,2000);
 
 </script>
 
