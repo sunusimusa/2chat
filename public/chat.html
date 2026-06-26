@@ -96,8 +96,6 @@ border-radius:20px;
 ⬅
 </button>
 
-<span id="chatUser"></span>
-
 </div>
 
 <h3 id="chatUser"></h3>
@@ -169,17 +167,13 @@ ${msg.text}
   
 });
 
+document.getElementById("chat").innerHTML = html;
+
 const chat =
 document.getElementById("chat");
 
 chat.scrollTop =
-chat.scrollHeight;  
-
-document.getElementById(
-"chat"
-).innerHTML = html;
-
-}
+chat.scrollHeight;
 
 const params =
 new URLSearchParams(window.location.search);
@@ -194,11 +188,6 @@ async function sendMessage(){
 
 const text =
 document.getElementById("message").value;
-
-const text =
-document.getElementById(
-"message"
-).value;
 
 if(!receiver || !text){
 
@@ -240,8 +229,6 @@ alert(
 );
 
 loadMessages();
-
-setInterval(loadMessages,2000);
 
 }else{
 
