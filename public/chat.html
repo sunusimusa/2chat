@@ -85,7 +85,10 @@ const params =
 new URLSearchParams(window.location.search);
 
 const receiver =
-params.get("user");  
+params.get("user"); 
+
+document.getElementById("chatUser").innerText =
+"Chat with: " + receiver; 
 
 async function sendMessage(){
 
