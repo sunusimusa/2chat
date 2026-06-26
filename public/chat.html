@@ -8,11 +8,6 @@
 
 <h1>💬 2Chat Chat</h1>
 
-<input
-id="receiver"
-placeholder="Receiver Username"
-oninput="loadMessages()">
-
 <br><br>
 
 <textarea
@@ -37,6 +32,9 @@ JSON.parse(
 localStorage.getItem("user")
 );
 
+const user =
+JSON.parse(localStorage.getItem("user"));  
+  
 async function loadMessages(){
 
 const receiver =
@@ -83,6 +81,12 @@ document.getElementById(
 ).innerHTML = html;
 
 }
+
+const params =
+new URLSearchParams(window.location.search);
+
+const receiver =
+params.get("user");  
 
 async function sendMessage(){
 
