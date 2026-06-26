@@ -146,22 +146,27 @@ let html = "";
 
 data.messages.forEach(msg=>{
 
+const mine =
+msg.sender === user.username;
+
 html += `
-<div style="
-border:1px solid #ccc;
-padding:10px;
-margin:10px;
-">
 
-<b>${msg.sender}</b>
+<div class="${
+mine ? "me" : "other"
+}">
 
-<br><br>
+<div class="${
+mine ? "bubble-me" : "bubble-other"
+}">
 
 ${msg.text}
 
 </div>
-`;
 
+</div>
+
+`;
+  
 });
 
 document.getElementById(
