@@ -24,6 +24,16 @@ const userSchema = new mongoose.Schema(
       default: ""
     },
 
+    online:{
+type:Boolean,
+default:false
+},
+
+lastSeen:{
+type:Date,
+default:Date.now
+}
+
     bio: {
       type: String,
       default: ""
