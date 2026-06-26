@@ -228,8 +228,6 @@ alert(
 "✅ Message Sent"
 );
 
-loadMessages();
-
 }else{
 
 alert(
@@ -240,6 +238,9 @@ data.message
 
 }
 
+loadMessages();
+
+setInterval(loadMessages,2000);  
 
 </script>
 
