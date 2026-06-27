@@ -8,6 +8,7 @@ register,
 login,
 updateProfile,
 uploadAvatar,
+getUsers,
 getStatus
 } = require("../controllers/authController");
 
