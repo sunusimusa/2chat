@@ -50,13 +50,51 @@ mongoose
 
     io.on("connection",(socket)=>{
 
-console.log("🟢 User Connected");
+let currentUser = null;
 
-socket.on("join",(username)=>{
+socket.on("join", async(username)=>{
+
+currentUser = username;
 
 socket.join(username);
 
-console.log(username + " joined");
+const User = require("./models/User");
+
+await User.findOneAndUpdate(
+{ username },
+{
+online:true,
+lastSeen:new Date()
+}
+);
+
+io.emit("statusChange",{
+username,
+online:true
+});
+
+});
+
+socket.on("disconnect", async()=>{
+
+if(currentUser){
+
+const User = require("./models/User");
+
+await User.findOneAndUpdate(
+{ username: currentUser },
+{
+online:false,
+lastSeen:new Date()
+}
+);
+
+io.emit("statusChange",{
+username:currentUser,
+online:false
+});
+
+}
 
 });
 
@@ -67,18 +105,10 @@ io.to(msg.receiver).emit(
 msg
 );
 
-// Ka kuma aika wa wanda ya tura saƙon,
-// domin shi ma ya ga saƙon nan take.
 io.to(msg.sender).emit(
 "receiveMessage",
 msg
 );
-
-});
-
-socket.on("disconnect",()=>{
-
-console.log("🔴 User Disconnected");
 
 });
 
