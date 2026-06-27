@@ -15,17 +15,18 @@ const messageSchema = new mongoose.Schema(
   text:{
     type:String,
     required:true
-  }
-},
+  },
 
   seen:{
-type:Boolean,
-default:false
-},
+    type:Boolean,
+    default:false
+  },
 
-seenAt:{
-type:Date
-}
+  seenAt:{
+    type:Date
+  }
+
+},
 {
   timestamps:true
 }
