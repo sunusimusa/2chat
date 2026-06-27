@@ -48,10 +48,30 @@ mongoose
 
     const PORT = process.env.PORT || 3000;
 
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+    io.on("connection",(socket)=>{
+
+console.log("🟢 User Connected");
+
+socket.on("join",(username)=>{
+
+socket.join(username);
+
+console.log(username + " joined");
+
+});
+
+socket.on("disconnect",()=>{
+
+console.log("🔴 User Disconnected");
+
+});
+
+});
+    
+    server.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
     });
-  })
+    
   .catch((err) => {
     console.error("❌ MongoDB Error:", err.message);
   });
