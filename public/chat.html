@@ -137,6 +137,10 @@ placeholder="Type message..."></textarea>
 const user =
 JSON.parse(localStorage.getItem("user"));
 
+const socket = io();
+
+socket.emit("join", user.username);
+
 const params =
 new URLSearchParams(window.location.search);
 
