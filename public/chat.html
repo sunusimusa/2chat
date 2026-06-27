@@ -245,6 +245,19 @@ loadMessages();
 
 setInterval(loadMessages,2000);
 
+socket.on("receiveMessage",(msg)=>{
+
+if(
+msg.sender===receiver ||
+msg.receiver===receiver
+){
+
+loadMessages();
+
+}
+
+});
+
 </script>
 
 </body>
