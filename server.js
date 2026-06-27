@@ -15,6 +15,14 @@ const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
+const server = http.createServer(app);
+
+const io = new Server(server,{
+cors:{
+origin:"*"
+}
+});
+
 const path = require("path");
 
 app.use(express.static(path.join(__dirname, "public")));
