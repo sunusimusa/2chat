@@ -8,10 +8,8 @@ register,
 login,
 updateProfile,
 uploadAvatar,
-getUsers
-}
-=
-require("../controllers/authController");
+getStatus
+} = require("../controllers/authController");
 
 // Test
 router.get("/", (req, res) => {
@@ -37,6 +35,11 @@ router.post(
 router.get(
 "/users",
 getUsers
+);
+
+router.get(
+"/status/:username",
+getStatus
 );
 
 // User Count Test
