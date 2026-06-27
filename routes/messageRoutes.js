@@ -24,9 +24,4 @@ router.get(
 getChats
 );
 
-router.get(
-"/status/:username",
-getStatus
-);
-
 module.exports = router;
