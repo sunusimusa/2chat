@@ -196,3 +196,27 @@ message:err.message
 }
 
 };
+
+exports.getStatus = async(req,res)=>{
+
+try{
+
+const user =
+await User.findOne({
+username:req.params.username
+});
+
+res.json({
+online:user.online,
+lastSeen:user.lastSeen
+});
+
+}catch(err){
+
+res.status(500).json({
+message:err.message
+});
+
+}
+
+};
