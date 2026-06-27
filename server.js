@@ -60,6 +60,22 @@ console.log(username + " joined");
 
 });
 
+socket.on("newMessage",(msg)=>{
+
+io.to(msg.receiver).emit(
+"receiveMessage",
+msg
+);
+
+// Ka kuma aika wa wanda ya tura saƙon,
+// domin shi ma ya ga saƙon nan take.
+io.to(msg.sender).emit(
+"receiveMessage",
+msg
+);
+
+});
+
 socket.on("disconnect",()=>{
 
 console.log("🔴 User Disconnected");
@@ -67,6 +83,7 @@ console.log("🔴 User Disconnected");
 });
 
 });
+
     
     server.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
