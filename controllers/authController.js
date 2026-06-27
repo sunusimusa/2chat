@@ -68,6 +68,11 @@ exports.login = async (req, res) => {
       });
     }
 
+    user.online = true;
+    user.lastSeen = new Date();
+
+    await user.save();
+
     res.json({
       success: true,
       token: generateToken(user._id),
