@@ -223,6 +223,12 @@ await res.json();
 
 if(data.success){
 
+socket.emit("newMessage",{
+sender:user.username,
+receiver,
+text
+});
+
 document.getElementById("message").value="";
 
 loadMessages();
