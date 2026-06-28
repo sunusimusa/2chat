@@ -177,7 +177,6 @@ data.messages.forEach(msg=>{
 
 const mine =
 msg.sender===user.username;
-
 html+=`
 
 <div class="${mine?"me":"other"}">
@@ -185,6 +184,17 @@ html+=`
 <div class="${mine?"bubble-me":"bubble-other"}">
 
 ${msg.text}
+
+${
+mine
+?
+`<br>
+<small style="font-size:11px;opacity:.8;">
+${msg.seen ? "👁 Seen" : "✓ Sent"}
+</small>`
+:
+""
+}
 
 </div>
 
