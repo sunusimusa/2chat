@@ -66,6 +66,18 @@ receiver:sender
 createdAt:1
 });
 
+  await Message.updateMany(
+{
+sender:receiver,
+receiver:sender,
+seen:false
+},
+{
+seen:true,
+seenAt:new Date()
+}
+);
+
 res.json({
 success:true,
 messages
