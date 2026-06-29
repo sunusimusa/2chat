@@ -103,36 +103,39 @@ async function sendMessage(){
 const text =
 document.getElementById("message").value.trim();
 
-if(text==="") return;
+const image =
+document.getElementById("image").files[0];
 
-const res =
-await fetch(
+if(text==="" && !image){
+return;
+}
+
+const formData = new FormData();
+
+formData.append("sender",user.username);
+formData.append("receiver",receiver);
+formData.append("text",text);
+
+if(image){
+formData.append("image",image);
+}
+
+const res = await fetch(
 "/api/messages/send",
 {
 method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-sender:user.username,
-receiver:receiver,
-text:text
-})
+body:formData
 }
 );
 
-const data =
-await res.json();
+const data = await res.json();
 
 if(data.success){
 
-socket.emit("newMessage",{
-sender:user.username,
-receiver,
-text
-});
+socket.emit("newMessage",data.message);
 
 document.getElementById("message").value="";
+document.getElementById("image").value="";
 
 loadMessages();
 
