@@ -67,18 +67,15 @@ html+=`
 
 <div class="${mine?"bubble-me":"bubble-other"}">
 
-${msg.text}
-
 ${
-mine
+msg.image
 ?
-`<br>
-<small style="font-size:11px;opacity:.8;">
-${msg.seen ? "👁 Seen" : "✓ Sent"}
-</small>`
+"<img src="${msg.image}" style=" max-width:220px; border-radius:12px; display:block; margin-bottom:8px; ">"
 :
 ""
 }
+
+${msg.text}
 
 </div>
 
