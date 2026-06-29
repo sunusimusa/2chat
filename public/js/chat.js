@@ -6,6 +6,11 @@ const socket = io();
 
 socket.emit("join", user.username);
 
+const messageBox =
+document.getElementById("message");
+
+let typingTimeout;
+
 const params =
 new URLSearchParams(window.location.search);
 
