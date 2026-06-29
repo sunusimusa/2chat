@@ -12,6 +12,7 @@ getChats
 // Send Message
 router.post(
 "/send",
+upload.single("image"),
 sendMessage
 );
 
