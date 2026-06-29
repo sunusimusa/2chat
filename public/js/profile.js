@@ -1,4 +1,3 @@
-<script>
 
 const user =
 JSON.parse(localStorage.getItem("user"));
@@ -142,4 +141,3 @@ alert(data.message);
 
 }  
 
-</scr
