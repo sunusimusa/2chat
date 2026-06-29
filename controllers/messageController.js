@@ -17,11 +17,28 @@ receiver,
 text
 } = req.body;
 
+let image = "";
+
+if(req.file){
+
+const result =
+await cloudinary.uploader.upload(
+req.file.path,
+{
+folder:"2chat-messages"
+}
+);
+
+image = result.secure_url;
+
+}
+
 const message =
 await Message.create({
 sender,
 receiver,
-text
+text,
+image
 });
 
 res.json({
