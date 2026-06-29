@@ -50,33 +50,39 @@ mongoose
 
     io.on("connection",(socket)=>{
 
-let currentUser = null;
+console.log("🟢 User Connected");
 
-socket.on("join", async(username)=>{
-
-currentUser = username;
+socket.on("join",(username)=>{
 
 socket.join(username);
 
-const User = require("./models/User");
+console.log(username + " joined");
 
-await User.findOneAndUpdate(
-{ username },
-{
-online:true,
-lastSeen:new Date()
-}
-);
+});
 
-io.emit("statusChange",{
-username,
-online:true
+// Typing Indicator
+socket.on("typing",(data)=>{
+
+socket.to(data.receiver).emit("typing",{
+sender:data.sender
 });
 
 });
 
-socket.on("disconnect", async()=>{
+socket.on("stopTyping",(data)=>{
 
+socket.to(data.receiver).emit("stopTyping");
+
+});
+
+socket.on("disconnect",()=>{
+
+console.log("🔴 User Disconnected");
+
+});
+
+});
+    
 if(currentUser){
 
 const User = require("./models/User");
