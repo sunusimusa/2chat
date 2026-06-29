@@ -138,6 +138,23 @@ loadMessages();
 
 });
 
+socket.on("typing",(data)=>{
+
+document.getElementById("typing").style.display =
+"block";
+
+document.getElementById("typing").innerText =
+"✍️ " + data.sender + " is typing...";
+
+});
+
+socket.on("stopTyping",()=>{
+
+document.getElementById("typing").style.display =
+"none";
+
+});
+
 
 messageBox.addEventListener("input",()=>{
 
