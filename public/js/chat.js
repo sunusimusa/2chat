@@ -5,6 +5,12 @@ const socket = io();
 
 socket.emit("join", user.username);
 
+const params =
+new URLSearchParams(window.location.search);
+
+const receiver =
+params.get("user");
+
 const messageBox =
 document.getElementById("message");
 
@@ -33,12 +39,6 @@ receiver
 });
 
 }
-
-const params =
-new URLSearchParams(window.location.search);
-
-const receiver =
-params.get("user");
 
 document.getElementById("chatUser").innerText =
 receiver;
