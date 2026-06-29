@@ -1,4 +1,3 @@
-<script>
 
 const user =
 JSON.parse(
@@ -411,4 +410,3 @@ document.getElementById("feed").innerHTML = html;
 
 loadPosts();
 
-</script>
