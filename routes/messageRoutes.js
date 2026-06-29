@@ -1,3 +1,5 @@
+const upload =
+require("../middleware/upload");
 const router =
 require("express").Router();
 
