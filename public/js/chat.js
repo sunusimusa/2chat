@@ -1,4 +1,3 @@
-
 const user =
 JSON.parse(localStorage.getItem("user"));
 
@@ -10,6 +9,30 @@ const messageBox =
 document.getElementById("message");
 
 let typingTimeout;
+
+if(messageBox){
+
+messageBox.addEventListener("input",()=>{
+
+socket.emit("typing",{
+sender:user.username,
+receiver
+});
+
+clearTimeout(typingTimeout);
+
+typingTimeout = setTimeout(()=>{
+
+socket.emit("stopTyping",{
+sender:user.username,
+receiver
+});
+
+},1000);
+
+});
+
+}
 
 const params =
 new URLSearchParams(window.location.search);
