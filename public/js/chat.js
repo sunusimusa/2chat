@@ -177,26 +177,3 @@ document.getElementById("typing").style.display =
 "none";
 
 });
-
-
-messageBox.addEventListener("input",()=>{
-
-socket.emit("typing",{
-sender:user.username,
-receiver:receiver
-});
-
-clearTimeout(typingTimeout);
-
-typingTimeout = setTimeout(()=>{
-
-socket.emit("stopTyping",{
-sender:user.username,
-receiver:receiver
-});
-
-},1000);
-
-});
-
-
