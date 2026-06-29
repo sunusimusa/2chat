@@ -1,7 +1,8 @@
-const upload =
-require("../middleware/upload");
 const router =
 require("express").Router();
+
+const upload =
+require("../middleware/upload");
 
 const {
 sendMessage,
