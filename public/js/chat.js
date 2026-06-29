@@ -84,6 +84,17 @@ margin-bottom:8px;
 
 ${msg.text}
 
+${
+mine
+?
+`<br>
+<small style="font-size:11px;opacity:.8;">
+${msg.seen ? "👁 Seen" : "✓ Sent"}
+</small>`
+:
+""
+}
+
 </div>
 
 </div>
