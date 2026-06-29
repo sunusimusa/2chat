@@ -1,4 +1,3 @@
-<script>
 
 const me =
 JSON.parse(
@@ -92,5 +91,4 @@ loadUsers();
 
 setInterval(loadUsers,5000);
 
-</script>
 
