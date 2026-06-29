@@ -70,7 +70,14 @@ html+=`
 ${
 msg.image
 ?
-"<img src="${msg.image}" style=" max-width:220px; border-radius:12px; display:block; margin-bottom:8px; ">"
+`<img
+src="${msg.image}"
+style="
+max-width:220px;
+border-radius:12px;
+display:block;
+margin-bottom:8px;
+">`
 :
 ""
 }
