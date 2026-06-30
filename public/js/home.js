@@ -166,6 +166,15 @@ await res.json();
 
 if(data.success){
 
+ document.getElementById(
+"postImage"
+).value = "";
+
+document.getElementById(
+"postPreview"
+).style.display = "none"; 
+  
+
 document.getElementById(
 "postText"
 ).value = "";
