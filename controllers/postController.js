@@ -1,4 +1,6 @@
 const Post = require("../models/Post");
+const cloudinary =
+require("../services/cloudinary");
 
 // CREATE POST
 
@@ -13,13 +15,31 @@ username,
 avatar,
 text
 } = req.body;
+
+let image = "";
+
+if(req.file){
+
+const result =
+await cloudinary.uploader.upload(
+req.file.path,
+{
+folder:"2chat-posts"
+}
+);
+
+image = result.secure_url;
+
+}
+
 const post =
 await Post.create({
 userId,
 username,
 avatar,
-text
-}); 
+text,
+image
+});
 
 res.json({
 success:true,
