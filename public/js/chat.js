@@ -226,3 +226,17 @@ document.getElementById("previewBox").style.display =
 "none";
 
 }
+
+function openImage(image){
+
+document.getElementById("fullImage").src = image;
+
+document.getElementById("imageViewer").style.display = "flex";
+
+}
+
+function closeImage(){
+
+document.getElementById("imageViewer").style.display = "none";
+
+}
