@@ -41,7 +41,7 @@ location.href =
 }  
 
 async function commentPost(postId){
-
+  
 const text =
 document.getElementById(
 "comment-${postId}"
