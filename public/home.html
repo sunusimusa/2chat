@@ -41,6 +41,41 @@ placeholder="What's happening?">
 
 <br><br>
 
+  <input
+type="file"
+id="postImage"
+accept="image/*"
+style="display:none;">
+
+<label
+for="postImage"
+class="image-btn">
+📷 Add Photo
+</label>
+
+<div
+id="postPreview"
+style="
+display:none;
+margin-top:10px;
+text-align:center;
+"><img
+id="postPreviewImage"
+style="
+max-width:220px;
+max-height:220px;
+border-radius:12px;
+">
+
+<br><br>
+
+<button
+onclick="removePostImage()">
+❌ Remove
+</button>
+
+</div>
+
 <button onclick="createPost()">
 Post
 </button>
