@@ -41,11 +41,15 @@ location.href =
 }  
 
 async function commentPost(postId){
-  
+
 const text =
 document.getElementById(
-"comment-${postId}"
-).value;
+`comment-${postId}`
+).value.trim();
+
+if(text===""){
+return;
+}
 
 const res =
 await fetch(
@@ -67,6 +71,8 @@ const data =
 await res.json();
 
 if(data.success){
+
+document.getElementById(`comment-${postId}`).value="";
 
 loadPosts();
 
