@@ -78,7 +78,6 @@ alert(data.message);
 
 }
 
-
 async function editPost(postId,currentText){
 
 const newText =
@@ -96,9 +95,10 @@ await fetch(
 "/api/posts/edit",
 {
 method:"PUT",
-
-body:formData
- 
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
 postId,
 text:newText
 })
@@ -120,7 +120,7 @@ alert(data.message);
 
 }
 
-}  
+}
 
 // CREATE POST
 async function createPost(){
