@@ -309,6 +309,30 @@ ${new Date(post.createdAt).toLocaleString()}
 
 </div>
 
+${
+post.image
+?
+
+`
+<img
+src="${post.image}"
+style="
+width:100%;
+max-height:500px;
+object-fit:cover;
+border-radius:12px;
+margin:10px 0;
+cursor:pointer;
+"
+onclick="window.open('${post.image}','_blank')">
+`
+
+:
+
+""
+
+}
+
 <p style="
 font-size:18px;
 margin:10px 0;
