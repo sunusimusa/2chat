@@ -151,6 +151,8 @@ socket.emit("newMessage",data.message);
 
 document.getElementById("message").value="";
 document.getElementById("image").value="";
+document.getElementById("previewBox").style.display =
+"none";
 
 loadMessages();
 
