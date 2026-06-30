@@ -152,14 +152,9 @@ await fetch(
 "/api/posts/create",
 {
 method:"POST",
-const res =
-await fetch(
-"/api/posts/create",
-{
-method:"POST",
 body:formData
 }
-);
+);              
 
 const data =
 await res.json();
