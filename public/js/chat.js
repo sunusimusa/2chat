@@ -67,17 +67,16 @@ html+=`
 
 <div class="${mine?"bubble-me":"bubble-other"}">
 
-${
-msg.image
-?
-`<img
+<img
 src="${msg.image}"
+onclick="openImage('${msg.image}')"
 style="
 max-width:220px;
 border-radius:12px;
 display:block;
 margin-bottom:8px;
-">`
+cursor:pointer;
+">
 :
 ""
 }
