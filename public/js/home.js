@@ -1,4 +1,3 @@
-
 const user =
 JSON.parse(
 localStorage.getItem("user")
@@ -410,3 +409,38 @@ document.getElementById("feed").innerHTML = html;
 
 loadPosts();
 
+const postImage =
+document.getElementById("postImage");
+
+postImage.addEventListener("change",()=>{
+
+const file =
+postImage.files[0];
+
+if(!file) return;
+
+const reader =
+new FileReader();
+
+reader.onload = function(e){
+
+document.getElementById("postPreviewImage").src =
+e.target.result;
+
+document.getElementById("postPreview").style.display =
+"block";
+
+};
+
+reader.readAsDataURL(file);
+
+});
+
+function removePostImage(){
+
+postImage.value = "";
+
+document.getElementById("postPreview").style.display =
+"none";
+
+}
