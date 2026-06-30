@@ -95,10 +95,9 @@ await fetch(
 "/api/posts/edit",
 {
 method:"PUT",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
+
+body:formData
+  
 postId,
 text:newText
 })
