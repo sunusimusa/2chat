@@ -44,7 +44,7 @@ async function commentPost(postId){
 
 const text =
 document.getElementById(
-`comment-${postId}`
+"comment-${postId}"
 ).value;
 
 const res =
@@ -52,9 +52,10 @@ await fetch(
 "/api/posts/comment",
 {
 method:"PUT",
-
-body:formData
-  
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
 postId,
 username:user.username,
 text
@@ -67,12 +68,7 @@ await res.json();
 
 if(data.success){
 
-document.getElementById("postImage").value = "";
-
-document.getElementById("postPreview").style.display =
-"none";
-
-lloadPosts);
+loadPosts();
 
 }else{
 
@@ -81,6 +77,7 @@ alert(data.message);
 }
 
 }
+
 
 async function editPost(postId,currentText){
 
