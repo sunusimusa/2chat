@@ -124,11 +124,28 @@ alert(data.message);
 
 // CREATE POST
 async function createPost(){
-
 const text =
-document.getElementById(
-"postText"
-).value;
+document.getElementById("postText").value.trim();
+
+const image =
+document.getElementById("postImage").files[0];
+
+if(text==="" && !image){
+return;
+}
+
+const formData =
+new FormData();
+
+formData.append("userId",user._id);
+formData.append("username",user.username);
+formData.append("text",text);
+
+if(image){
+
+formData.append("image",image);
+
+}
 
 const res =
 await fetch(
