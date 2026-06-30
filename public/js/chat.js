@@ -195,3 +195,39 @@ document.getElementById("typing").style.display =
 "none";
 
 });
+
+const imageInput =
+document.getElementById("image");
+
+imageInput.addEventListener("change",()=>{
+
+const file =
+imageInput.files[0];
+
+if(!file) return;
+
+const reader =
+new FileReader();
+
+reader.onload = function(e){
+
+document.getElementById("previewImage").src =
+e.target.result;
+
+document.getElementById("previewBox").style.display =
+"block";
+
+};
+
+reader.readAsDataURL(file);
+
+});
+
+function removeImage(){
+
+imageInput.value = "";
+
+document.getElementById("previewBox").style.display =
+"none";
+
+}
