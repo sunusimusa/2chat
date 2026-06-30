@@ -67,7 +67,12 @@ await res.json();
 
 if(data.success){
 
-loadPosts();
+document.getElementById("postImage").value = "";
+
+document.getElementById("postPreview").style.display =
+"none";
+
+lloadPosts);
 
 }else{
 
