@@ -52,10 +52,9 @@ await fetch(
 "/api/posts/comment",
 {
 method:"PUT",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
+
+body:formData
+  
 postId,
 username:user.username,
 text
