@@ -60,12 +60,16 @@ word-wrap:break-word;
 }
 
 .bubble-other{
+
 background:white;
-padding:10px 15px;
+padding:12px;
 border-radius:18px;
-max-width:70%;
-word-wrap:break-word;
-box-shadow:0 1px 3px rgba(0,0,0,.2);
+max-width:75%;
+display:flex;
+flex-direction:column;
+gap:8px;
+word-break:break-word;
+
 }
 
 .bottom{
@@ -163,4 +167,14 @@ cursor:pointer;
 font-weight:bold;
 
 }
-  
+
+.bubble-me img,
+.bubble-other img{
+
+width:100%;
+max-width:220px;
+height:auto;
+border-radius:12px;
+display:block;
+
+}
