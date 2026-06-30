@@ -152,14 +152,12 @@ await fetch(
 "/api/posts/create",
 {
 method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-userId:user._id,
-username:user.username,
-text
-})
+const res =
+await fetch(
+"/api/posts/create",
+{
+method:"POST",
+body:formData
 }
 );
 
