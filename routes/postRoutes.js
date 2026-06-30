@@ -12,7 +12,13 @@ editPost
 =
 require("../controllers/postController");
 
-router.post("/create", createPost);
+const upload = require("../middleware/upload");
+
+router.post(
+"/create",
+upload.single("image"),
+createPost
+);
 
 router.get("/", getPosts);
 
