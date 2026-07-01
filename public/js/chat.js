@@ -7,8 +7,10 @@ if (!user) {
 const socket = io();
 
 socket.emit("join", user.username);
-const receiver =
-params.get("user");
+
+const params = new URLSearchParams(window.location.search);
+
+const receiver = params.get("user");
 
 const messageBox =
 document.getElementById("message");
