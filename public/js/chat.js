@@ -1,13 +1,12 @@
-const user =
-JSON.parse(localStorage.getItem("user"));
+const user = JSON.parse(localStorage.getItem("user"));
+
+if (!user) {
+    location.href = "/login.html";
+}
 
 const socket = io();
 
 socket.emit("join", user.username);
-
-const params =
-new URLSearchParams(window.location.search);
-
 const receiver =
 params.get("user");
 
