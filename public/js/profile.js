@@ -1,11 +1,15 @@
 const user =
 JSON.parse(localStorage.getItem("user"));
 
-const params = new URLSearchParams(window.location.search);
+if(!user){
+location.href="/login.html";
+}
+
+const params =
+new URLSearchParams(window.location.search);
 
 const profileUsername =
 params.get("user") || user.username;
-
 async function loadProfile(){
 
 const res =
