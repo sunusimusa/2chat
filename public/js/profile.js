@@ -42,10 +42,6 @@ profile.bio || "No bio yet";
 
 }
 
-if(!user){
-  location.href="/login.html";
-}
-
 async function saveProfile(){
 
   const username =
@@ -170,7 +166,7 @@ async function loadMyPosts(){
 
 const res =
 await fetch(
-"/api/posts/user/" + profileUsername
+"/api/posts/user/" + profileUsername);
 
 const data =
 await res.json();
