@@ -263,3 +263,34 @@ message:err.message
 
 };
 
+// GET MY POSTS
+
+exports.getUserPosts = async (req,res)=>{
+
+try{
+
+const { username } = req.params;
+
+const posts = await Post.find({
+username
+}).sort({
+createdAt:-1
+});
+
+res.json({
+success:true,
+count:posts.length,
+posts
+});
+
+}catch(err){
+
+res.status(500).json({
+success:false,
+message:err.message
+});
+
+}
+
+};
+
