@@ -6,24 +6,40 @@ const params = new URLSearchParams(window.location.search);
 const profileUsername =
 params.get("user") || user.username;
 
+async function loadProfile(){
+
+const res =
+await fetch(
+"/api/users/profile/" + profileUsername
+);
+
+const data =
+await res.json();
+
+if(!data.success){
+return;
+}
+
+const profile = data.user;
+
+document.getElementById("avatar").src =
+profile.avatar ||
+"https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+document.getElementById("username").innerText =
+profile.username;
+
+document.getElementById("email").innerText =
+profile.email;
+
+document.getElementById("bio").innerText =
+profile.bio || "No bio yet";
+
+}
+
 if(!user){
   location.href="/login.html";
 }
-
-document.getElementById(
-"avatar"
-).src =
-user.avatar ||
-"https://cdn-icons-png.flaticon.com/512/149/149071.png" 
-
-document.getElementById("username")
-.innerText = user.username;
-
-document.getElementById("email")
-.innerText = user.email;
-
-document.getElementById("bio")
-.innerText = user.bio || "No bio yet";
 
 async function saveProfile(){
 
