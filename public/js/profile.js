@@ -56,6 +56,12 @@ profile.email;
 document.getElementById("bio").innerText =
 profile.bio || "No bio yet";
 
+document.getElementById("followers").innerText =
+profile.followers.length;
+
+document.getElementById("following").innerText =
+profile.following.length; 
+
 }
 
 async function saveProfile(){
