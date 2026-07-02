@@ -8,6 +8,7 @@ require("dotenv").config();
 const postRoutes = require("./routes/postRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 const server = http.createServer(app);
@@ -27,6 +28,7 @@ app.use(express.json());
 app.use("/api/auth",authRoutes);
 app.use("/api/posts",postRoutes);
 app.use("/api/messages",messageRoutes);
+app.use("/api/users",userRoutes);
 
 app.get("/",(req,res)=>{
   res.send("🚀 2Chat Server Running Successfully");
