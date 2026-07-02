@@ -27,6 +27,18 @@ return;
 
 const profile = data.user;
 
+const followBtn = document.getElementById("followBtn");
+
+if(profile.username !== user.username){
+
+followBtn.style.display = "block";
+
+}else{
+
+followBtn.style.display = "none";
+
+}
+
 document.getElementById("avatar").src =
 profile.avatar ||
 "https://cdn-icons-png.flaticon.com/512/149/149071.png";
