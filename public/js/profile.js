@@ -139,5 +139,48 @@ alert(data.message);
 
 }
 
-}  
+} 
 
+async function loadMyPosts(){
+
+const res =
+await fetch(
+"/api/posts/user/" + user.username
+);
+
+const data =
+await res.json();
+
+document.getElementById("postsCount").innerText =
+data.count;
+
+let html = "";
+
+data.posts.forEach(post=>{
+
+html += `
+<div class="post">
+
+${post.image ?
+`<img src="${post.image}" style="width:100%;border-radius:10px;">`
+: ""}
+
+<p>${post.text}</p>
+
+<small>
+❤️ ${post.likes.length}
+&nbsp;&nbsp;
+💬 ${post.comments.length}
+</small>
+
+</div>
+`;
+
+});
+
+document.getElementById("myPosts").innerHTML =
+html;
+
+}
+
+loadMyPosts();
