@@ -1,4 +1,3 @@
-
 const user =
 JSON.parse(localStorage.getItem("user"));
 
@@ -184,3 +183,38 @@ html;
 }
 
 loadMyPosts();
+
+
+async function followUser(targetUsername){
+
+const res =
+await fetch(
+"/api/users/follow",
+{
+method:"PUT",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+myUsername:user.username,
+targetUsername
+})
+}
+);
+
+const data =
+await res.json();
+
+if(data.success){
+
+alert("✅ Follow Updated");
+
+loadProfile();
+
+}else{
+
+alert(data.message);
+
+}
+
+}
