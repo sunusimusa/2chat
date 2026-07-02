@@ -165,8 +165,7 @@ async function loadMyPosts(){
 
 const res =
 await fetch(
-"/api/posts/user/" + user.username
-);
+"/api/posts/user/" + profileUsername
 
 const data =
 await res.json();
@@ -203,8 +202,9 @@ html;
 
 }
 
-loadMyPosts();
+loadProfile();
 
+loadMyPosts();
 
 async function followUser(targetUsername){
 
