@@ -33,6 +33,10 @@ if(profile.username !== user.username){
 
 followBtn.style.display = "block";
 
+followBtn.onclick = () => {
+    followUser(profile.username);
+};
+
 }else{
 
 followBtn.style.display = "none";
