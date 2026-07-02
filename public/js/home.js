@@ -303,7 +303,9 @@ border:2px solid #2196f3;
 
 <div>
 
-<h3 style="margin:0;">
+<h3
+style="margin:0;cursor:pointer;color:#1877f2;"
+onclick="openProfile('${post.username}')">
 ${post.username}
 </h3>
 
@@ -492,4 +494,8 @@ postImage.value = "";
 document.getElementById("postPreview").style.display =
 "none";
 
+}
+
+function openProfile(username){
+location.href = "/profile.html?user=" + username;
 }
