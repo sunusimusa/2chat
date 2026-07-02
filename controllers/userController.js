@@ -76,3 +76,40 @@ message:err.message
 }
 
 };
+
+// GET USER PROFILE
+
+exports.getUserProfile = async (req,res)=>{
+
+try{
+
+const username = req.params.username;
+
+const user = await User.findOne({
+username
+});
+
+if(!user){
+
+return res.json({
+success:false,
+message:"User not found"
+});
+
+}
+
+res.json({
+success:true,
+user
+});
+
+}catch(err){
+
+res.status(500).json({
+success:false,
+message:err.message
+});
+
+}
+
+};
