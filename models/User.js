@@ -34,6 +34,16 @@ type:Date,
 default:Date.now
 },
 
+   followers:{
+  type:[String],
+  default:[]
+},
+
+following:{
+  type:[String],
+  default:[]
+}, 
+
     bio: {
       type: String,
       default: ""
