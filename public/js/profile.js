@@ -10,6 +10,7 @@ new URLSearchParams(window.location.search);
 
 const profileUsername =
 params.get("user") || user.username;
+
 async function loadProfile(){
 
 const res =
