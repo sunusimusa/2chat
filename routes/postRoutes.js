@@ -4,6 +4,7 @@ require("express").Router();
 const {
 createPost,
 getPosts,
+getUserPosts,
 likePost,
 commentPost,
 deletePost,
@@ -21,6 +22,11 @@ createPost
 );
 
 router.get("/", getPosts);
+
+router.get(
+"/user/:username",
+getUserPosts
+);
 
 router.put("/like", likePost);
 
