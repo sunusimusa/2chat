@@ -9,31 +9,70 @@
 </head>
 <body>
 
-<h1>My Profile</h1>
+<div class="cover">
+
+<img
+id="coverImage"
+class="cover-image"
+src="https://via.placeholder.com/900x250">
+
+<input
+type="file"
+id="coverFile"
+hidden>
+
+<button
+class="cover-btn"
+onclick="document.getElementById('coverFile').click()">
+📷 Change Cover
+</button>
+
+</div>
+
+<div class="profile-box">
 
 <img
 id="avatar"
 class="avatar">
 
-
-<br><br>
-
 <input
 type="file"
-id="avatarFile">
-
-<br><br>
+id="avatarFile"
+hidden>
 
 <button
-onclick="uploadAvatar()">
-📷 Upload Avatar
-</button> 
+class="avatar-btn"
+onclick="document.getElementById('avatarFile').click()">
+📷 Change Photo
+</button>
 
 <h2 id="username"></h2>
 
 <p id="email"></p>
 
 <p id="bio"></p>
+
+<div class="stats">
+
+<div>
+<b id="postCount">0</b>
+<br>
+Posts
+</div>
+
+<div>
+<b id="followers">0</b>
+<br>
+Followers
+</div>
+
+<div>
+<b id="following">0</b>
+<br>
+Following
+</div>
+
+</div>
 
 <hr>
 
@@ -51,22 +90,37 @@ placeholder="Write your bio">
 <br><br>
 
 <button onclick="saveProfile()">
-Save Profile
-</button>
-  
-  <button onclick="goHome()">
-🏠 Back To Home
+💾 Save Profile
 </button>
 
-<br><br>
+<button onclick="uploadAvatar()">
+📷 Upload Avatar
+</button>
 
-<br><br>
+<button onclick="goHome()">
+🏠 Home
+</button>
 
 <button onclick="logout()">
-Logout
+🚪 Logout
 </button>
+
+</div>
+
+<div class="my-posts">
+
+<h2>
+🖼 My Posts
+</h2>
+
+<div id="myPosts">
+
+</div>
+
+</div>
 
 <script src="/js/profile.js"></script>
 
 </body>
+
 </html>
