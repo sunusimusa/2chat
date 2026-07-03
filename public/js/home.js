@@ -394,7 +394,7 @@ onclick="commentPost('${post._id}')">
 
 <p>
 <b>
-Comments (${post.comments ? post.comments.length : 0})
+💬 ${post.comments.length}
 </b>
 </p>
 
