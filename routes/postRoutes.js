@@ -28,6 +28,11 @@ router.get(
 getUserPosts
 );
 
+router.get(
+"/single/:id",
+getSinglePost
+);
+
 router.put("/like", likePost);
 
 router.put("/comment", commentPost);
