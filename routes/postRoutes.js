@@ -1,17 +1,15 @@
-const router =
-require("express").Router();
+const router = require("express").Router();
 
 const {
 createPost,
 getPosts,
-getUserPosts,
 likePost,
 commentPost,
+editPost,
 deletePost,
-editPost
-}
-=
-require("../controllers/postController");
+getUserPosts,
+getSinglePost
+} = require("../controllers/postController");
 
 const upload = require("../middleware/upload");
 
