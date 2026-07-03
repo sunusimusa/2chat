@@ -349,6 +349,11 @@ word-wrap:break-word;
 ${post.text}
 </p>
 
+<button
+onclick="viewPost('${post._id}')">
+💬 View all comments
+</button>
+
 <button onclick="likePost('${post._id}')">
 ❤️ Like (${post.likes ? post.likes.length : 0})
 </button>
@@ -498,4 +503,11 @@ document.getElementById("postPreview").style.display =
 
 function openProfile(username){
 location.href = "/profile.html?user=" + username;
+}
+
+function viewPost(postId){
+
+location.href =
+"/post.html?id=" + postId;
+
 }
