@@ -294,3 +294,34 @@ message:err.message
 
 };
 
+exports.getSinglePost = async (req,res)=>{
+
+try{
+
+const post =
+await Post.findById(req.params.id);
+
+if(!post){
+
+return res.json({
+success:false,
+message:"Post not found"
+});
+
+}
+
+res.json({
+success:true,
+post
+});
+
+}catch(err){
+
+res.status(500).json({
+success:false,
+message:err.message
+});
+
+}
+
+};
