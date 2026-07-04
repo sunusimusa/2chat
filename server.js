@@ -9,6 +9,8 @@ const postRoutes = require("./routes/postRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const notificationRoutes =
+require("./routes/notificationRoutes");
 
 const app = express();
 const server = http.createServer(app);
@@ -29,6 +31,10 @@ app.use("/api/auth",authRoutes);
 app.use("/api/posts",postRoutes);
 app.use("/api/messages",messageRoutes);
 app.use("/api/users",userRoutes);
+app.use("/api/notifications",
+notificationRoutes
+);
+
 
 app.get("/",(req,res)=>{
   res.send("🚀 2Chat Server Running Successfully");
