@@ -44,6 +44,18 @@ text,
 image
 });
 
+await Notification.create({
+
+receiver:receiver,
+
+sender:sender,
+
+type:"message",
+
+text:sender + " sent you a message 📨"
+
+});  
+
 res.json({
 success:true,
 message
