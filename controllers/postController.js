@@ -190,6 +190,24 @@ post.comments.push({
 
 await post.save();
 
+if(post.username !== username){
+
+await Notification.create({
+
+receiver:post.username,
+
+sender:username,
+
+type:"comment",
+
+postId:post._id,
+
+text:username + " commented on your post 💬"
+
+});
+
+}  
+
 res.json({
 success:true
 });
