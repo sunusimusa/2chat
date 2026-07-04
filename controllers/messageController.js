@@ -138,43 +138,63 @@ try {
 const { username } = req.params;
 
 const messages = await Message.find({
-$or: [
+$or:[
 { sender: username },
 { receiver: username }
 ]
-}).sort({ createdAt: -1 });
+}).sort({ createdAt:-1 });
 
 const chats = {};
 
-messages.forEach(msg => {
+for (const msg of messages){
 
 const otherUser =
 msg.sender === username
 ? msg.receiver
 : msg.sender;
 
-if (!chats[otherUser]) {
+if(!chats[otherUser]){
+
+const user = await User.findOne({
+username: otherUser
+});
 
 chats[otherUser] = {
-username: otherUser,
+
+username: user ? user.username : otherUser,
+
+avatar: user ? user.avatar : "",
+
+online: user ? user.online : false,
+
+lastSeen: user ? user.lastSeen : null,
+
 lastMessage: msg.text,
+
 time: msg.createdAt
+
 };
 
 }
 
-});
+}
 
 res.json({
-success: true,
-chats: Object.values(chats)
+
+success:true,
+
+chats:Object.values(chats)
+
 });
 
-} catch (err) {
+}catch(err){
 
 res.status(500).json({
-success: false,
-message: err.message
+
+success:false,
+
+message:err.message
+
 });
 
 }
