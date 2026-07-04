@@ -47,6 +47,21 @@ mongoose.connect(process.env.MONGO_URI)
 
   io.on("connection",(socket)=>{
 
+    socket.on("join", async (username) => {
+
+socket.username = username;
+
+await mongoose.model("User").updateOne(
+{ username },
+{
+online: true
+}
+);
+
+io.emit("userOnline", username);
+
+});
+
     console.log("🟢 User Connected");
 
     socket.on("join",(username)=>{
@@ -79,13 +94,25 @@ mongoose.connect(process.env.MONGO_URI)
 
     });
 
-    socket.on("disconnect",()=>{
+    socket.on("disconnect", async () => {
 
-      console.log("🔴 User Disconnected");
+if(socket.username){
 
-    });
+await mongoose.model("User").updateOne(
+{ username: socket.username },
+{
+online: false,
+lastSeen: new Date()
+}
+);
 
-  });
+io.emit("userOffline", socket.username);
+
+}
+
+console.log("🔴 User Disconnected");
+
+});
 
   const PORT = process.env.PORT || 3000;
 
