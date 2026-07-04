@@ -4,6 +4,9 @@ require("../models/Message");
 const cloudinary =
 require("../services/cloudinary");
 
+const Notification =
+require("../models/Notification");
+
 // SEND MESSAGE
 
 exports.sendMessage =
