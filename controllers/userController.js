@@ -58,6 +58,18 @@ me.following.push(targetUsername);
 
 target.followers.push(myUsername);
 
+await Notification.create({
+
+receiver:targetUsername,
+
+sender:myUsername,
+
+type:"follow",
+
+text:myUsername + " started following you 👤"
+
+});  
+
 }
 
 await me.save();
