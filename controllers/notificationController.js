@@ -54,3 +54,38 @@ message:err.message
 }
 
 };
+
+exports.getUnreadCount = async(req,res)=>{
+
+try{
+
+const count =
+await Notification.countDocuments({
+
+receiver:req.params.username,
+
+read:false
+
+});
+
+res.json({
+
+success:true,
+
+count
+
+});
+
+}catch(err){
+
+res.status(500).json({
+
+success:false,
+
+message:err.message
+
+});
+
+}
+
+};
