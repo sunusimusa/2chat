@@ -1,4 +1,3 @@
-
 const me =
 JSON.parse(
 localStorage.getItem("user")
@@ -26,8 +25,8 @@ onclick="openChat('${chat.username}')"
 >
 
 <img
-src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
->
+src="${chat.avatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}">
+
 
 <div style="flex:1;">
 
