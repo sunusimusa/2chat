@@ -44,6 +44,28 @@ receiver
 document.getElementById("chatUser").innerText =
 receiver;
 
+socket.on("userOnline",(username)=>{
+
+if(username===receiver){
+
+document.getElementById("status").innerText =
+"🟢 Online";
+
+}
+
+});
+
+socket.on("userOffline",(username)=>{
+
+if(username===receiver){
+
+document.getElementById("status").innerText =
+"⚫ Offline";
+
+}
+
+});
+
 async function loadMessages(){
 
 if(!receiver) return;
