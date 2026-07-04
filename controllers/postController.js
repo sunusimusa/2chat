@@ -2,6 +2,9 @@ const Post = require("../models/Post");
 const cloudinary =
 require("../services/cloudinary");
 
+const Notification =
+require("../models/Notification");
+
 // CREATE POST
 
 exports.createPost =
