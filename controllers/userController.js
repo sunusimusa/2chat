@@ -1,5 +1,8 @@
 const User = require("../models/User");
 
+const Notification =
+require("../models/Notification");
+
 // FOLLOW / UNFOLLOW USER
 
 exports.followUser = async (req,res)=>{
