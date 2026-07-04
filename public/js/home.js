@@ -263,6 +263,49 @@ alert(data.message);
 
 }  
 
+async function loadNotificationCount(){
+
+const res =
+await fetch(
+"/api/notifications/count/" + user.username
+);
+
+const data =
+await res.json();
+
+if(data.success){
+
+const badge =
+document.getElementById(
+"notificationCount"
+);
+
+if(data.count>0){
+
+badge.innerText =
+data.count;
+
+badge.style.display =
+"inline-block";
+
+}else{
+
+badge.style.display =
+"none";
+
+}
+
+}
+
+}
+
+loadNotificationCount();
+
+setInterval(
+loadNotificationCount,
+5000
+);
+
 // LOAD POSTS
   
 async function loadPosts(){
