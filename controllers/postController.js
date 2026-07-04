@@ -118,6 +118,23 @@ u => u !== username
 
 post.likes.push(username);
 
+  
+if(post.username !== username){
+
+await Notification.create({
+
+receiver:post.username,
+
+sender:username,
+
+type:"like",
+
+postId:post._id,
+
+text:username + " liked your post ❤️"
+
+});
+
 }
 
 await post.save();
