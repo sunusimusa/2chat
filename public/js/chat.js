@@ -60,7 +60,7 @@ socket.on("userOffline",(username)=>{
 if(username===receiver){
 
 document.getElementById("status").innerText =
-"⚫ Offline";
+"Last seen recently";
 
 }
 
