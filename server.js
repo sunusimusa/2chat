@@ -94,6 +94,14 @@ io.to(msg.sender).emit("receiveMessage", msg);
 
 });
 
+socket.on("messageSeen",(data)=>{
+
+io.to(data.sender).emit("messageSeen",{
+messageId:data.messageId
+});
+
+});    
+
 socket.on("disconnect", async () => {
 
 if(socket.username){
