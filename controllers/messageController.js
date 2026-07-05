@@ -206,3 +206,61 @@ message:err.message
 }
 
 };
+
+exports.reactMessage = async (req,res)=>{
+
+try{
+
+const {
+messageId,
+username,
+emoji
+} = req.body;
+
+const message =
+await Message.findById(messageId);
+
+if(!message){
+
+return res.json({
+success:false,
+message:"Message not found"
+});
+
+}
+
+const oldReaction =
+message.reactions.find(
+r=>r.username===username
+);
+
+if(oldReaction){
+
+oldReaction.emoji = emoji;
+
+}else{
+
+message.reactions.push({
+username,
+emoji
+});
+
+}
+
+await message.save();
+
+res.json({
+success:true,
+message
+});
+
+}catch(err){
+
+res.status(500).json({
+success:false,
+message:err.message
+});
+
+}
+
+};
