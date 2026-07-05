@@ -84,6 +84,10 @@ socket.to(data.receiver).emit("stopTyping");
 
 socket.on("newMessage", (msg) => {
 
+io.to(msg.receiver).emit("messageDelivered",{
+messageId:msg._id
+});
+
 io.to(msg.receiver).emit("receiveMessage", msg);
 
 io.to(msg.sender).emit("receiveMessage", msg);
