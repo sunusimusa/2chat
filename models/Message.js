@@ -22,6 +22,16 @@ type:String,
 default:""
 },
 
+  reactions:{
+type:[
+{
+username:String,
+emoji:String
+}
+],
+default:[]
+},
+
   seen:{
     type:Boolean,
     default:false
