@@ -355,3 +355,36 @@ function closeImage(){
 document.getElementById("imageViewer").style.display = "none";
 
 }
+
+async function reactMessage(messageId,emoji){
+
+const res =
+await fetch(
+"/api/messages/react",
+{
+method:"PUT",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+
+messageId,
+
+username:user.username,
+
+emoji
+
+})
+}
+);
+
+const data =
+await res.json();
+
+if(data.success){
+
+loadMessages();
+
+}
+
+}
