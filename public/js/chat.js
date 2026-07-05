@@ -78,6 +78,25 @@ await fetch(
 const data =
 await res.json();
 
+data.messages.forEach(msg=>{
+
+if(
+msg.receiver===user.username &&
+!msg.seen
+){
+
+socket.emit("messageSeen",{
+
+sender:msg.sender,
+
+messageId:msg._id
+
+});
+
+}
+
+});    
+
 let html="";
 
 data.messages.forEach(msg=>{
