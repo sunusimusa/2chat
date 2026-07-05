@@ -45,33 +45,52 @@ mongoose.connect(process.env.MONGO_URI)
 
   console.log("✅ MongoDB Connected");
 
-  io.on("connection",(socket)=>{
+  io.on("connection", (socket) => {
 
-    socket.on("join", async (username) => {
+console.log("🟢 User Connected");
 
-    socket.on("typing",(data)=>{
+socket.on("join", async (username) => {
 
-      socket.to(data.receiver).emit("typing",{
-        sender:data.sender
-      });
+socket.username = username;
 
-    });
+socket.join(username);
 
-    socket.on("stopTyping",(data)=>{
+await mongoose.model("User").updateOne(
+{ username },
+{
+online: true
+}
+);
 
-      socket.to(data.receiver).emit("stopTyping");
+io.emit("userOnline", username);
 
-    });
+console.log(username + " joined");
 
-    socket.on("newMessage",(msg)=>{
+});
 
-      io.to(msg.receiver).emit("receiveMessage",msg);
+socket.on("typing", (data) => {
 
-      io.to(msg.sender).emit("receiveMessage",msg);
+socket.to(data.receiver).emit("typing", {
+sender: data.sender
+});
 
-    });
+});
 
-    socket.on("disconnect", async () => {
+socket.on("stopTyping", (data) => {
+
+socket.to(data.receiver).emit("stopTyping");
+
+});
+
+socket.on("newMessage", (msg) => {
+
+io.to(msg.receiver).emit("receiveMessage", msg);
+
+io.to(msg.sender).emit("receiveMessage", msg);
+
+});
+
+socket.on("disconnect", async () => {
 
 if(socket.username){
 
@@ -91,12 +110,19 @@ console.log("🔴 User Disconnected");
 
 });
 
-}); // <-- KA ƘARA WANNAN. Yana rufe io.on()
+});
 
 const PORT = process.env.PORT || 3000;
 
-server.listen(PORT,()=>{
+server.listen(PORT, () => {
 
 console.log(`🚀 Server running on port ${PORT}`);
 
 });
+
+})
+.catch((err)=>{
+
+console.error("❌ MongoDB Error:", err.message);
+
+});  
