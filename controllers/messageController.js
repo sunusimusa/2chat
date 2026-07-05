@@ -46,6 +46,12 @@ text,
 image
 });
 
+message.delivered = true;
+
+message.deliveredAt = new Date();
+
+await message.save();  
+
 await Notification.create({
 
 receiver:receiver,
