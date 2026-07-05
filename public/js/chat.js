@@ -116,7 +116,27 @@ mine
 ?
 `<br>
 <small style="font-size:11px;opacity:.8;">
-${msg.seen ? "👁 Seen" : "✓ Sent"}
+
+${
+msg.seen
+?
+
+"✓✓ Seen"
+
+:
+
+msg.delivered
+
+?
+
+"✓✓ Delivered"
+
+:
+
+"✓ Sent"
+
+}
+
 </small>`
 :
 ""
