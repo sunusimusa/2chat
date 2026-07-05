@@ -211,6 +211,12 @@ alert(data.message);
 
 }
 
+socket.on("messageDelivered",()=>{
+
+loadMessages();
+
+});
+
 loadMessages();
 
 setInterval(loadMessages,2000);
