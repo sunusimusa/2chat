@@ -27,6 +27,15 @@ default:""
     default:false
   },
 
+  delivered:{
+type:Boolean,
+default:false
+},
+
+deliveredAt:{
+type:Date
+},
+
   seenAt:{
     type:Date
   }
