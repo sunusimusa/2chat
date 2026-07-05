@@ -49,29 +49,6 @@ mongoose.connect(process.env.MONGO_URI)
 
     socket.on("join", async (username) => {
 
-socket.username = username;
-
-await mongoose.model("User").updateOne(
-{ username },
-{
-online: true
-}
-);
-
-io.emit("userOnline", username);
-
-});
-
-    console.log("🟢 User Connected");
-
-    socket.on("join",(username)=>{
-
-      socket.join(username);
-
-      console.log(username + " joined");
-
-    });
-
     socket.on("typing",(data)=>{
 
       socket.to(data.receiver).emit("typing",{
@@ -114,17 +91,12 @@ console.log("🔴 User Disconnected");
 
 });
 
-  const PORT = process.env.PORT || 3000;
+}); // <-- KA ƘARA WANNAN. Yana rufe io.on()
 
-  server.listen(PORT,()=>{
+const PORT = process.env.PORT || 3000;
 
-    console.log(`🚀 Server running on port ${PORT}`);
+server.listen(PORT,()=>{
 
-  });
-
-})
-.catch((err)=>{
-
-  console.error("❌ MongoDB Error:",err.message);
+console.log(`🚀 Server running on port ${PORT}`);
 
 });
