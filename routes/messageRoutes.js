@@ -7,7 +7,8 @@ require("../middleware/upload");
 const {
 sendMessage,
 getMessages,
-getChats
+getChats,
+reactMessage
 } = require("../controllers/messageController");
 
 // Send Message
@@ -26,6 +27,11 @@ getMessages
 router.get(
 "/list/:username",
 getChats
+);
+
+router.put(
+"/react",
+reactMessage
 );
 
 module.exports = router;
