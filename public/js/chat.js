@@ -217,6 +217,12 @@ loadMessages();
 
 });
 
+socket.on("messageSeen",()=>{
+
+loadMessages();
+
+});
+
 loadMessages();
 
 setInterval(loadMessages,2000);
