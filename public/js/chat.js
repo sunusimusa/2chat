@@ -191,38 +191,6 @@ msg.delivered
 ""
 }
 
-<div style="margin-top:5px;">
-
-<button
-onclick="reactMessage('${msg._id}','❤️')">
-❤️
-</button>
-
-<button
-onclick="reactMessage('${msg._id}','👍')">
-👍
-</button>
-
-<button
-onclick="reactMessage('${msg._id}','😂')">
-😂
-</button>
-
-<button
-onclick="reactMessage('${msg._id}','😮')">
-😮
-</button>
-
-<button
-onclick="reactMessage('${msg._id}','😢')">
-😢
-</button>
-
-<button
-onclick="reactMessage('${msg._id}','😡')">
-😡
-</button>
-
 </div>
 
 </div>
