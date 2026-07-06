@@ -119,15 +119,6 @@ ontouchstart="startPress(event,'${msg._id}')"
 ontouchend="cancelPress()"
 >
 
-<div>
-
-${
-msg.reactions && msg.reactions.length
-
-?
-
-msg.reactions.map(r=>`
-
 <span
 style="
 font-size:22px;
@@ -169,6 +160,15 @@ cursor:pointer;
 }
 
 ${msg.text}
+
+<div>
+
+${
+msg.reactions && msg.reactions.length
+
+?
+
+msg.reactions.map(r=>`
 
 ${
 mine
@@ -361,9 +361,23 @@ document.getElementById("reactionPopup");
 
 popup.style.display="block";
 
-popup.style.left=e.pageX+"px";
+const x =
+e.touches
+?
+e.touches[0].pageX
+:
+e.pageX;
 
-popup.style.top=(e.pageY-60)+"px";
+const y =
+e.touches
+?
+e.touches[0].pageY
+:
+e.pageY;
+
+popup.style.left=x+"px";
+
+popup.style.top=(y-60)+"px";
 
 e.preventDefault();
 
