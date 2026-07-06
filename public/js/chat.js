@@ -1,5 +1,7 @@
 const user = JSON.parse(localStorage.getItem("user"));
 
+let selectedMessage = null;
+
 if (!user) {
     location.href = "/login.html";
 }
@@ -107,7 +109,15 @@ html+=`
 
 <div class="${mine?"me":"other"}">
 
-<div class="${mine?"bubble-me":"bubble-other"}">
+<div
+class="${mine?"bubble-me":"bubble-other"}"
+
+oncontextmenu="showReaction(event,'${msg._id}')"
+
+ontouchstart="startPress(event,'${msg._id}')"
+
+ontouchend="cancelPress()"
+>
 
 <div>
 
@@ -342,6 +352,31 @@ document.getElementById("previewBox").style.display =
 
 }
 
+function showReaction(e,id){
+
+selectedMessage=id;
+
+const popup=
+document.getElementById("reactionPopup");
+
+popup.style.display="block";
+
+popup.style.left=e.pageX+"px";
+
+popup.style.top=(e.pageY-60)+"px";
+
+e.preventDefault();
+
+}
+
+document.addEventListener("click",()=>{
+
+document.getElementById(
+"reactionPopup"
+).style.display="none";
+
+});
+
 function openImage(image){
 
 document.getElementById("fullImage").src = image;
@@ -353,6 +388,21 @@ document.getElementById("imageViewer").style.display = "flex";
 function closeImage(){
 
 document.getElementById("imageViewer").style.display = "none";
+
+}
+
+async function selectReaction(emoji){
+
+document.getElementById(
+"reactionPopup"
+).style.display="none";
+
+await reactMessage(
+selectedMessage,
+emoji
+);
+
+selectedMessage=null;
 
 }
 
@@ -386,5 +436,23 @@ if(data.success){
 loadMessages();
 
 }
+
+}
+
+let pressTimer;
+
+function startPress(e,id){
+
+pressTimer=setTimeout(()=>{
+
+showReaction(e,id);
+
+},600);
+
+}
+
+function cancelPress(){
+
+clearTimeout(pressTimer);
 
 }
