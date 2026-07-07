@@ -136,23 +136,6 @@ cursor:pointer;
 ""
 }
 
-${msg.image
-?
-`
-<img
-src="${msg.image}"
-onclick="openImage('${msg.image}')"
-style="
-width:100%;
-max-width:220px;
-border-radius:12px;
-margin-bottom:8px;
-">
-`
-:
-""
-}
-
 ${msg.voice
 ?
 `
