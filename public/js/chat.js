@@ -441,3 +441,60 @@ function cancelPress(){
 clearTimeout(pressTimer);
 
 }
+
+async function toggleRecording(){
+
+if(!recording){
+
+const stream =
+await navigator.mediaDevices.getUserMedia({
+audio:true
+});
+
+mediaRecorder =
+new MediaRecorder(stream);
+
+audioChunks=[];
+
+mediaRecorder.start();
+
+recording=true;
+
+document.getElementById("recordBtn").innerText="⏹";
+
+mediaRecorder.ondataavailable=(e)=>{
+
+audioChunks.push(e.data);
+
+};
+
+mediaRecorder.onstop=()=>{
+
+audioBlob =
+new Blob(audioChunks,{
+type:"audio/webm"
+});
+
+const url =
+URL.createObjectURL(audioBlob);
+
+const player =
+document.getElementById("voicePreview");
+
+player.src=url;
+
+player.style.display="block";
+
+};
+
+}else{
+
+mediaRecorder.stop();
+
+recording=false;
+
+document.getElementById("recordBtn").innerText="🎤";
+
+}
+
+}
