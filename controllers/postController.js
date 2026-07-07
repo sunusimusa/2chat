@@ -55,17 +55,17 @@ voice=result.secure_url;
 
 } 
 
-const message =
-await Message.create({
+const post =
+await Post.create({
 
-sender,
-receiver,
+userId,
+username,
+avatar,
 text,
-image,
-voice
+image
 
 });
-
+  
 res.json({
 success:true,
 post
