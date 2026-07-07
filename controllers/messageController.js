@@ -37,24 +37,10 @@ folder: "2chat-voice"
 }
 );
 
-voice = result.secure_url;  
+voice = result.secure_url; 
 
-}
-
-else if(req.file.mimetype.startsWith("audio")){
-
-const result =
-await cloudinary.uploader.upload(
-req.file.path,
-{
-resource_type:"video",
-folder:"2chat-voice"
-}
-);
-
-voice = result.secure_url;
-
-}
+console.log("VOICE URL:", voice);
+console.log("MIME:", req.file.mimetype);  
 
 }
   
