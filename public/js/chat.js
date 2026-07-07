@@ -211,7 +211,19 @@ formData.append("receiver",receiver);
 formData.append("text",text);
 
 if(image){
-formData.append("image",image);
+
+formData.append("file",image);
+
+}
+
+else if(voice){
+
+formData.append(
+"file",
+voice,
+"voice.webm"
+);
+
 }
 
 const res = await fetch(
