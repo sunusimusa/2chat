@@ -136,21 +136,42 @@ cursor:pointer;
 ""
 }
 
-${msg.text}
-
-${
-msg.reactions && msg.reactions.length
+${msg.image
 ?
-`<div style="margin-top:6px;">
-${msg.reactions.map(r=>`
-<span style="font-size:20px;margin-right:4px;">
-${r.emoji}
-</span>
-`).join("")}
-</div>`
+`
+<img
+src="${msg.image}"
+onclick="openImage('${msg.image}')"
+style="
+width:100%;
+max-width:220px;
+border-radius:12px;
+margin-bottom:8px;
+">
+`
 :
 ""
 }
+
+${msg.voice
+?
+`
+<audio
+controls
+style="
+width:220px;
+margin:8px 0;
+">
+<source
+src="${msg.voice}"
+type="audio/webm">
+</audio>
+`
+:
+""
+}
+
+${msg.text || ""}
 
 ${
 mine
