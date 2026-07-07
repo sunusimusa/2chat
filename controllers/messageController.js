@@ -25,41 +25,35 @@ text
 let image = "";
 let voice = "";
 
-if(req.file){
+if (req.file) {
 
-if(req.file.mimetype.startsWith("image")){
+    if (req.file.mimetype.startsWith("image")) {
 
-const result = await cloudinary.uploader.upload(
-req.file.path,
-{
-folder:"2chat-images"
-}
-);
+        const result = await cloudinary.uploader.upload(
+            req.file.path,
+            {
+                resource_type: "image",
+                folder: "2chat-images"
+            }
+        );
 
-image = result.secure_url;
+        image = result.secure_url;
 
-}
+    } else {
 
-else if(req.file.mimetype.startsWith("audio")){
+        const result = await cloudinary.uploader.upload(
+            req.file.path,
+            {
+                resource_type: "auto",
+                folder: "2chat-voice"
+            }
+        );
 
-const result = await cloudinary.uploader.upload(
-req.file.path,
-{
-resource_type:"auto",
-folder:"2chat-voice"
-}
-);
-
-voice = result.secure_url;
-
-console.log("VOICE URL:", voice);
-console.log("MIME:", req.file.mimetype);
-console.log(req.file);
+        voice = result.secure_url;
+    }
 
 }
 
-}
-  
 const message =
 await Message.create({
 sender,
