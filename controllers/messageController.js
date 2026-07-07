@@ -29,15 +29,15 @@ if(req.file){
 
 if(req.file.mimetype.startsWith("image")){
 
-const result =
-await cloudinary.uploader.upload(
+const result = await cloudinary.uploader.upload(
 req.file.path,
 {
-folder:"2chat-images"
+resource_type: "auto",
+folder: "2chat-voice"
 }
 );
 
-image = result.secure_url;
+voice = result.secure_url;  
 
 }
 
