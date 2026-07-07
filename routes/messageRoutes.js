@@ -14,7 +14,7 @@ reactMessage
 // Send Message
 router.post(
 "/send",
-upload.single("file")
+upload.single("file"),
 sendMessage
 );
 
