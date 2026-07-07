@@ -29,18 +29,38 @@ if(req.file){
 
 if(req.file.mimetype.startsWith("image")){
 
+
+if(req.file){
+
+if(req.file.mimetype.startsWith("image")){
+
 const result = await cloudinary.uploader.upload(
 req.file.path,
 {
-resource_type: "auto",
-folder: "2chat-voice"
+folder:"2chat-images"
 }
 );
 
-voice = result.secure_url; 
+image = result.secure_url;
+
+}
+
+else if(req.file.mimetype.startsWith("audio")){
+
+const result = await cloudinary.uploader.upload(
+req.file.path,
+{
+resource_type:"auto",
+folder:"2chat-voice"
+}
+);
+
+voice = result.secure_url;
 
 console.log("VOICE URL:", voice);
-console.log("MIME:", req.file.mimetype);  
+console.log("MIME:", req.file.mimetype);
+
+}
 
 }
   
