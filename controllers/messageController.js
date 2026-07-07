@@ -63,9 +63,10 @@ await Message.create({
 sender,
 receiver,
 text,
-image
+image,
+voice
 });
-
+  
 message.delivered = true;
 
 message.deliveredAt = new Date();
