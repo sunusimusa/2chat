@@ -197,6 +197,8 @@ document.getElementById("message").value.trim();
 
 const image =
 document.getElementById("image").files[0];
+    
+const voice = audioBlob;  
 
 if(text==="" && !image){
 return;
