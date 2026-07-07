@@ -511,19 +511,21 @@ audioChunks.push(e.data);
 
 };
 
-mediaRecorder.onstop = ()=>{
+mediaRecorder.onstop = () => {
 
-audioBlob = new Blob(audioChunks,{
-type:"audio/webm"
-});
+    audioBlob = new Blob(audioChunks, {
+        type: "audio/webm"
+    });
 
-const url = URL.createObjectURL(audioBlob);
+    const url = URL.createObjectURL(audioBlob);
 
-const player = document.getElementById("voicePreview");
+    const player = document.getElementById("voicePreview");
 
-player.src = url;
+    player.src = url;
 
-player.style.display = "block";
+    player.load(); // Muhimmi
+
+    player.style.display = "block";
 
 };
 
