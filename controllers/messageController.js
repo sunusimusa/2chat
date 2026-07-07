@@ -23,6 +23,7 @@ text
 } = req.body;
 
 let image = "";
+let voice = "";
 
 if(req.file){
 
