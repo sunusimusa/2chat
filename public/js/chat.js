@@ -245,8 +245,14 @@ document.getElementById("image").value="";
 document.getElementById("previewBox").style.display =
 "none";
 
-loadMessages();
+audioBlob = null;
 
+document.getElementById("voicePreview").style.display="none";
+
+document.getElementById("voicePreview").src="";    
+
+loadMessages();
+    
 }else{
 
 alert(data.message);
