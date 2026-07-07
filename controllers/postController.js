@@ -24,17 +24,36 @@ let voice = "";
   
 if(req.file){
 
+if(req.file.mimetype.startsWith("image")){
+
 const result =
 await cloudinary.uploader.upload(
 req.file.path,
 {
-folder:"2chat-posts"
+folder:"2chat-images"
 }
 );
 
-image = result.secure_url;
+image=result.secure_url;
 
 }
+
+else if(req.file.mimetype.startsWith("audio")){
+
+const result =
+await cloudinary.uploader.upload(
+req.file.path,
+{
+resource_type:"video",
+folder:"2chat-voice"
+}
+);
+
+voice=result.secure_url;
+
+}
+
+} 
 
 const post =
 await Post.create({
