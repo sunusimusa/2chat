@@ -88,60 +88,30 @@ msg.receiver===user.username &&
 ){
 
 socket.emit("messageSeen",{
-
 sender:msg.sender,
-
 messageId:msg._id
-
 });
 
 }
 
-});    
+});
 
 let html="";
 
 data.messages.forEach(msg=>{
 
-const mine =
-msg.sender===user.username;
-html+=`
+const mine = msg.sender===user.username;
 
-<div class="${mine?"me":"other"}">
+html += `
+
+<div class="${mine ? "me" : "other"}">
 
 <div
-class="${mine?"bubble-me":"bubble-other"}"
-
+class="${mine ? "bubble-me" : "bubble-other"}"
 oncontextmenu="showReaction(event,'${msg._id}')"
-
 ontouchstart="startPress(event,'${msg._id}')"
-
 ontouchend="cancelPress()"
 >
-
-<div>
-
-${
-msg.reactions && msg.reactions.length
-?
-
-msg.reactions.map(r => `
-<span
-style="
-font-size:22px;
-margin-right:5px;
-cursor:pointer;
-">
-${r.emoji}
-</span>
-`).join("")
-
-:
-
-""
-}
-
-</div>
 
 ${
 msg.image
@@ -152,7 +122,6 @@ onclick="openImage('${msg.image}')"
 style="
 width:100%;
 max-width:220px;
-height:auto;
 border-radius:12px;
 display:block;
 margin-bottom:8px;
@@ -164,41 +133,36 @@ cursor:pointer;
 
 ${msg.text}
 
-<div>
-
 ${
 msg.reactions && msg.reactions.length
-
 ?
-
-msg.reactions.map(r=>`
+`<div style="margin-top:6px;">
+${msg.reactions.map(r=>`
+<span style="font-size:20px;margin-right:4px;">
+${r.emoji}
+</span>
+`).join("")}
+</div>`
+:
+""
+}
 
 ${
 mine
 ?
 `<br>
 <small style="font-size:11px;opacity:.8;">
-
 ${
 msg.seen
 ?
-
 "✓✓ Seen"
-
 :
-
 msg.delivered
-
 ?
-
 "✓✓ Delivered"
-
 :
-
 "✓ Sent"
-
 }
-
 </small>`
 :
 ""
@@ -215,10 +179,9 @@ msg.delivered
 const chat =
 document.getElementById("chat");
 
-chat.innerHTML=html;
+chat.innerHTML = html;
 
-chat.scrollTop=
-chat.scrollHeight;
+chat.scrollTop = chat.scrollHeight;
 
 }
 
