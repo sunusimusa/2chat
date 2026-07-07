@@ -221,8 +221,8 @@ document.getElementById("image").files[0];
     
 const voice = audioBlob;  
 
-if(text==="" && !image){
-return;
+if(text==="" && !image && !voice){
+    return;
 }
 
 const formData = new FormData();
@@ -361,6 +361,10 @@ imageInput.value = "";
 
 document.getElementById("previewBox").style.display =
 "none";
+
+audioBlob = null;
+
+document.getElementById("voicePreview").src = "";    
 
 }
 
@@ -528,6 +532,10 @@ player.style.display="block";
 
 };
 
+audioBlob = new Blob(audioChunks, {
+    type: "audio/webm"
+});
+
 }else{
 
 mediaRecorder.stop();
@@ -535,6 +543,14 @@ mediaRecorder.stop();
 recording=false;
 
 document.getElementById("recordBtn").innerText="🎤";
+
+audioBlob = new Blob(audioChunks, {
+    type: "audio/webm"
+});
+
+const url = URL.createObjectURL(audioBlob);
+
+document.getElementById("voicePreview").src = url;     
 
 }
 
