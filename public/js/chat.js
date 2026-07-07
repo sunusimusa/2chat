@@ -515,11 +515,6 @@ audioChunks.push(e.data);
 
 mediaRecorder.onstop=()=>{
 
-audioBlob =
-new Blob(audioChunks,{
-type:"audio/webm"
-});
-
 const url =
 URL.createObjectURL(audioBlob);
 
