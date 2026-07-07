@@ -119,6 +119,8 @@ ontouchstart="startPress(event,'${msg._id}')"
 ontouchend="cancelPress()"
 >
 
+<div>
+
 <span
 style="
 font-size:22px;
