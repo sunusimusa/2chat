@@ -121,23 +121,24 @@ ontouchend="cancelPress()"
 
 <div>
 
+${
+msg.reactions && msg.reactions.length
+?
+
+msg.reactions.map(r => `
 <span
 style="
 font-size:22px;
 margin-right:5px;
 cursor:pointer;
 ">
-
 ${r.emoji}
-
 </span>
-
 `).join("")
 
 :
 
 ""
-
 }
 
 </div>
