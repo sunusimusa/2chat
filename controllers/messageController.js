@@ -29,11 +29,6 @@ if(req.file){
 
 if(req.file.mimetype.startsWith("image")){
 
-
-if(req.file){
-
-if(req.file.mimetype.startsWith("image")){
-
 const result = await cloudinary.uploader.upload(
 req.file.path,
 {
