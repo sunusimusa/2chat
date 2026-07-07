@@ -2,6 +2,11 @@ const user = JSON.parse(localStorage.getItem("user"));
 
 let selectedMessage = null;
 
+let mediaRecorder;
+let audioChunks = [];
+let audioBlob = null;
+let recording = false;
+
 if (!user) {
     location.href = "/login.html";
 }
