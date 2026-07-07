@@ -54,6 +54,7 @@ voice = result.secure_url;
 
 console.log("VOICE URL:", voice);
 console.log("MIME:", req.file.mimetype);
+console.log(req.file);
 
 }
 
