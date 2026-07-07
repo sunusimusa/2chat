@@ -491,61 +491,49 @@ async function toggleRecording(){
 
 if(!recording){
 
-const stream =
-await navigator.mediaDevices.getUserMedia({
+const stream = await navigator.mediaDevices.getUserMedia({
 audio:true
 });
 
-mediaRecorder =
-new MediaRecorder(stream);
+mediaRecorder = new MediaRecorder(stream);
 
-audioChunks=[];
+audioChunks = [];
 
 mediaRecorder.start();
 
-recording=true;
+recording = true;
 
-document.getElementById("recordBtn").innerText="⏹";
+document.getElementById("recordBtn").innerText = "⏹";
 
-mediaRecorder.ondataavailable=(e)=>{
+mediaRecorder.ondataavailable = (e)=>{
 
 audioChunks.push(e.data);
 
 };
 
-mediaRecorder.onstop=()=>{
+mediaRecorder.onstop = ()=>{
 
-const url =
-URL.createObjectURL(audioBlob);
+audioBlob = new Blob(audioChunks,{
+type:"audio/webm"
+});
 
-const player =
-document.getElementById("voicePreview");
+const url = URL.createObjectURL(audioBlob);
 
-player.src=url;
+const player = document.getElementById("voicePreview");
 
-player.style.display="block";
+player.src = url;
+
+player.style.display = "block";
 
 };
-
-audioBlob = new Blob(audioChunks, {
-    type: "audio/webm"
-});
 
 }else{
 
 mediaRecorder.stop();
 
-recording=false;
+recording = false;
 
-document.getElementById("recordBtn").innerText="🎤";
-
-audioBlob = new Blob(audioChunks, {
-    type: "audio/webm"
-});
-
-const url = URL.createObjectURL(audioBlob);
-
-document.getElementById("voicePreview").src = url;     
+document.getElementById("recordBtn").innerText = "🎤";
 
 }
 
