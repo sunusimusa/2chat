@@ -1,34 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>2Chat Chat</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
+
 <link rel="stylesheet" href="/css/chat.css">
- 
+
 </head>
 
- <div id="reactionPopup" class="reaction-popup">
+<body>
+
+<!-- Reaction Popup -->
+<div id="reactionPopup" class="reaction-popup">
 
 <span onclick="selectReaction('❤️')">❤️</span>
-
 <span onclick="selectReaction('👍')">👍</span>
-
 <span onclick="selectReaction('😂')">😂</span>
-
 <span onclick="selectReaction('😮')">😮</span>
-
 <span onclick="selectReaction('😢')">😢</span>
-
 <span onclick="selectReaction('😡')">😡</span>
 
 </div>
- 
-<body>
 
+<!-- Header -->
 <div class="header">
 
 <button onclick="history.back()">⬅</button>
+
 <div>
 
 <span id="chatUser"></span>
@@ -43,17 +42,21 @@
 
 <small
 id="typing"
-style="color:#fff;display:none;">
+style="display:none;color:white;">
+
 ✍️ Typing...
+
 </small>
 
 </div>
-  
+
 </div>
 
+<!-- Messages -->
 <div id="chat"></div>
 
- <div
+<!-- Image Preview -->
+<div
 id="previewBox"
 style="
 display:none;
@@ -66,21 +69,22 @@ text-align:center;
 <img
 id="previewImage"
 style="
-max-width:200px;
-max-height:200px;
+max-width:220px;
+max-height:220px;
 border-radius:12px;
 ">
 
 <br><br>
 
 <button onclick="removeImage()">
+
 ❌ Remove
+
 </button>
 
 </div>
 
-</div>
-
+<!-- Bottom -->
 <div class="bottom">
 
 <input
@@ -88,45 +92,64 @@ type="file"
 id="image"
 accept="image/*"
 style="display:none;">
- 
+
 <label
 for="image"
 class="image-btn">
+
 📷
+
 </label>
 
 <textarea
 id="message"
 placeholder="Type message..."></textarea>
 
- <button
+<button
 id="sendBtn"
 onclick="sendMessage()">
+
 📤
+
 </button>
 
- <button id="recordBtn" onclick="toggleRecording()">
+<button
+id="recordBtn"
+onclick="toggleRecording()">
+
 🎤
+
 </button>
 
 <audio
 id="voicePreview"
 controls
-style="display:none;width:100%;margin-top:10px;">
+preload="metadata"
+style="
+display:none;
+width:220px;
+margin-left:8px;
+">
+
 </audio>
 
 </div>
 
- <div
+<!-- Full Image Viewer -->
+<div
 id="imageViewer"
-class="image-viewer"><span
+class="image-viewer"
+style="display:none;">
+
+<span
 class="close-image"
 onclick="closeImage()">
+
 ✖
+
 </span>
 
-<img
-id="fullImage">
+<img id="fullImage">
 
 </div>
 
