@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Find Friends</title>
+
+<link rel="stylesheet" href="/css/feed.css">
+
+<style>
+.user-card{
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:12px;
+margin:10px;
+background:#fff;
+border-radius:12px;
+box-shadow:0 2px 5px rgba(0,0,0,.1);
+}
+
+.user-info{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.user-info img{
+width:50px;
+height:50px;
+border-radius:50%;
+object-fit:cover;
+}
+
+.add-btn{
+background:#1877f2;
+color:#fff;
+border:none;
+padding:10px 15px;
+border-radius:8px;
+cursor:pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<h2 style="text-align:center;">
+🔍 Find Friends
+</h2>
+
+<div id="users"></div>
+
+<script src="/js/users.js"></script>
+
+</body>
+</html>
