@@ -146,9 +146,7 @@ width:220px;
 margin:8px 0;
 ">
 <source
-src="${msg.voice}"
-type="audio/webm">
-</audio>
+src="${msg.voice}">
 `
 :
 ""
