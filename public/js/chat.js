@@ -147,7 +147,6 @@ margin:8px 0;
 ">
 <source
 src="${msg.voice}">
-console.log("VOICE LINK:", msg.voice);
 `
 :
 ""
