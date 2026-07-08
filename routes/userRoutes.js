@@ -2,7 +2,8 @@ const router = require("express").Router();
 
 const {
 followUser,
-getUserProfile
+getUserProfile,
+getAllUsers
 } = require("../controllers/userController");
 
 router.put(
@@ -14,5 +15,7 @@ router.get(
 "/profile/:username",
 getUserProfile
 );
+
+router.get("/all", getAllUsers);
 
 module.exports = router;
