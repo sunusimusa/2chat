@@ -11,6 +11,8 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const notificationRoutes =
 require("./routes/notificationRoutes");
+const friendRoutes =
+require("./routes/friendRoutes");
 
 const app = express();
 const server = http.createServer(app);
