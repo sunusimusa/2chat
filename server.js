@@ -34,6 +34,7 @@ app.use("/api/users",userRoutes);
 app.use("/api/notifications",
 notificationRoutes
 );
+app.use("/api/friends", friendRoutes);
 
 
 app.get("/",(req,res)=>{
