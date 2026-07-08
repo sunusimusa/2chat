@@ -55,6 +55,7 @@ console.log(req.file);
 console.log(result);
 
 }
+}
 
 const message =
 await Message.create({
