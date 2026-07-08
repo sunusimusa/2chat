@@ -41,16 +41,18 @@ if (req.file) {
 
     } else {
 
-        const result = await cloudinary.uploader.upload(
-            req.file.path,
-            {
-                resource_type: "auto",
-                folder: "2chat-voice"
-            }
-        );
+const result = await cloudinary.uploader.upload(
+req.file.path,
+{
+resource_type: "auto",
+folder: "2chat-voice"
+}
+);
 
-        voice = result.secure_url;
-    }
+voice = result.secure_url;
+
+console.log(req.file);
+console.log(result);
 
 }
 
