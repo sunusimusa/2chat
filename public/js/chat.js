@@ -200,7 +200,7 @@ document.getElementById("message").value.trim();
 const image =
 document.getElementById("image").files[0];
     
-const voice = audioBlob;  
+const voice = audioBlob;
 
 if(text==="" && !image && !voice){
     return;
@@ -228,6 +228,9 @@ voice,
 
 }
 
+console.log("VOICE:", voice);
+console.log("SIZE:", voice ? voice.size : 0);    
+
 const res = await fetch(
 "/api/messages/send",
 {
@@ -251,7 +254,7 @@ audioBlob = null;
 
 document.getElementById("voicePreview").style.display="none";
 
-document.getElementById("voicePreview").src="";    
+document.getElementById("voicePreview").src=""; 
 
 loadMessages();
     
