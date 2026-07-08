@@ -229,9 +229,13 @@ voice,
 
 }
 
-console.log("VOICE:", voice);
-console.log("SIZE:", voice ? voice.size : 0);    
+console.log("Voice Blob:", voice);
+console.log("Voice Size:", voice ? voice.size : 0);
 
+for (const pair of formData.entries()) {
+    console.log(pair[0], pair[1]);
+}
+ 
 const res = await fetch(
 "/api/messages/send",
 {
