@@ -64,7 +64,7 @@ console.log(err);
 
 async function sendFriendRequest(receiver){
 
-const res = await fetch("/api/friends/request",{
+const res = await fetch("/api/friends/send",{
 
 method:"POST",
 
