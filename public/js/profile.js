@@ -47,6 +47,12 @@ document.getElementById("avatar").src =
 profile.avatar ||
 "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
+const coverImage = document.getElementById("coverImage");
+
+if (coverImage) {
+    coverImage.src = profile.cover || "/images/default-cover.jpg";
+}
+    
 document.getElementById("username").innerText =
 profile.username;
 
