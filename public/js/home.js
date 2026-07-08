@@ -554,3 +554,29 @@ location.href =
 "/post.html?id=" + postId;
 
 }
+
+async function sendFriendRequest(){
+
+const res = await fetch("/api/friends/send",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+sender:user.username,
+
+receiver:profileUser
+
+})
+
+});
+
+const data = await res.json();
+
+alert(data.message || "Friend request sent.");
+
+}
