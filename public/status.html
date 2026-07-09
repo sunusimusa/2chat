@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width,initial-scale=1">
+
+<title>Status</title>
+
+<link rel="stylesheet" href="/css/status.css">
+
+</head>
+
+<body>
+
+<div class="header">
+<h2>🟢 Status</h2>
+</div>
+
+<div class="my-status">
+
+<img
+id="myAvatar"
+src="/images/default.png">
+
+<div>
+
+<h3>My Status</h3>
+
+<small>
+Tap to add status
+</small>
+
+</div>
+
+<button onclick="pickStatus()">
+
+➕
+
+</button>
+
+</div>
+
+<input
+type="file"
+id="statusFile"
+accept="image/*,video/*"
+style="display:none;">
+
+<div id="statusList">
+
+</div>
+
+<script src="/js/status.js"></script>
+
+</body>
+
+</html>
