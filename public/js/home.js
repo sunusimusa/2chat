@@ -580,3 +580,38 @@ const data = await res.json();
 alert(data.message || "Friend request sent.");
 
 }
+
+async function loadStatusBar(){
+
+const res = await fetch("/api/status/all");
+
+const data = await res.json();
+
+if(!data.success) return;
+
+const box = document.getElementById("friendsStatus");
+
+box.innerHTML = "";
+
+data.statuses.forEach(status=>{
+
+if(status.username===user.username) return;
+
+box.innerHTML += `
+
+<div class="friend-status"
+onclick="location.href='/status.html?user=${status.username}'">
+
+<img src="/images/default.png">
+
+<p>${status.username}</p>
+
+</div>
+
+`;
+
+});
+
+}
+
+loadStatusBar();
