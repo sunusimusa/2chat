@@ -1,1 +1,81 @@
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f2f2f2;
+}
 
+.header{
+background:#1877f2;
+color:#fff;
+padding:18px;
+text-align:center;
+font-size:20px;
+font-weight:bold;
+}
+
+.my-status{
+display:flex;
+align-items:center;
+justify-content:space-between;
+background:#fff;
+padding:15px;
+margin:12px;
+border-radius:12px;
+box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+.my-status img{
+width:60px;
+height:60px;
+border-radius:50%;
+object-fit:cover;
+border:3px solid #25D366;
+}
+
+.my-status h3{
+margin:0;
+font-size:18px;
+}
+
+.my-status small{
+color:#777;
+}
+
+.my-status button{
+width:45px;
+height:45px;
+border:none;
+border-radius:50%;
+background:#25D366;
+color:#fff;
+font-size:24px;
+cursor:pointer;
+}
+
+.status-card{
+display:flex;
+align-items:center;
+background:#fff;
+margin:10px 12px;
+padding:12px;
+border-radius:12px;
+box-shadow:0 2px 6px rgba(0,0,0,.08);
+cursor:pointer;
+}
+
+.status-card img{
+width:55px;
+height:55px;
+border-radius:50%;
+border:3px solid #25D366;
+margin-right:12px;
+}
+
+.status-card h4{
+margin:0;
+font-size:17px;
+}
+
+.status-card small{
+color:#666;
+}
