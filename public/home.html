@@ -38,40 +38,31 @@ class="friends-status">
 </div>
 
 <hr>
-
-<a href="/users.html" class="menu-btn">
-    ➕ Add Friend
-</a>
   
-<a href="/notification.html">
-🔔 Notifications
-</a>
+<div class="top-menu">
 
-<span id="notificationCount"></span>
+<button onclick="location.href='/status.html'">
+🟢 Status
+</button>
 
+<button onclick="location.href='/users.html'">
+👥 Friends
 </button>
 
 <button onclick="location.href='/notification.html'">
-🔔 Notifications
+🔔
+<span id="notificationCount"></span>
 </button>
 
 <button onclick="goProfile()">
-👤 My Profile
-</button>
-
-<button onclick="goChat()">
-💬 Messages 
-</button> 
-
-<button onclick="goMessenger()">
-💬 Messenger
+👤 Profile
 </button>
 
 <button onclick="logout()">
-🚪 Logout
+🚪
 </button>
 
-<hr>
+</div>
 
 <textarea
 id="postText"
