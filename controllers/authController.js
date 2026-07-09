@@ -225,3 +225,45 @@ message:err.message
 }
 
 };
+
+exports.uploadCover = async (req, res) => {
+
+try {
+
+const User = require("../models/User");
+const cloudinary = require("../config/cloudinary");
+
+const file = req.file;
+
+if (!file) {
+return res.json({
+success:false,
+message:"No image selected"
+});
+}
+
+const result = await cloudinary.uploader.upload(file.path,{
+folder:"2chat/covers"
+});
+
+const user = await User.findOneAndUpdate(
+{ email:req.body.email },
+{ cover:result.secure_url },
+{ new:true }
+);
+
+res.json({
+success:true,
+cover:user.cover
+});
+
+} catch(err){
+
+res.status(500).json({
+success:false,
+message:err.message
+});
+
+}
+
+};
