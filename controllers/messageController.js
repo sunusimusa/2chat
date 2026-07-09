@@ -15,11 +15,6 @@ let image = "";
 
 if(req.file){
 
-console.log("========== FILE RECEIVED ==========");
-console.log(req.file);
-
-if(req.file.mimetype.startsWith("image")){
-
 const result = await cloudinary.uploader.upload(
 req.file.path,
 {
@@ -42,6 +37,7 @@ delivered:true,
 deliveredAt:new Date()
 
 });
+
 
 await Notification.create({
 
@@ -168,9 +164,11 @@ username:user?user.username:otherUser,
 avatar:user?user.avatar:"",
 online:user?user.online:false,
 lastSeen:user?user.lastSeen:null,
-lastMessage:msg.text || (msg.voice?"🎤 Voice message":"📷 Image"),
-time:msg.createdAt
-
+lastMessage: msg.text
+  ? msg.text
+  : msg.image
+  ? "📷 Image"
+  : "Message",
 };
 
 }
