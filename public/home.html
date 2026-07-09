@@ -1,29 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>2Chat Home</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
+
 <link rel="stylesheet" href="/css/home.css">
 
 </head>
 
 <body>
 
-<h1>🏠 2Chat Feed</h1>
+<h1>2Chat</h1>
 
-  <p>
+<p>
 👤 Logged in as:
 <b id="userName"></b>
 </p>
 
-  <div class="status-bar">
+<!-- Status -->
+<div class="status-bar">
 
-<div class="my-status"
-onclick="location.href='/status.html'">
+<div class="my-status" onclick="location.href='/status.html'">
 
 <img
-src="/images/default.png"
-id="statusAvatar">
+id="statusAvatar"
+src="/images/default.png">
 
 <p>My Status</p>
 
@@ -38,12 +42,9 @@ class="friends-status">
 </div>
 
 <hr>
-  
-<div class="top-menu">
 
-<button onclick="location.href='/status.html'">
-🟢 Status
-</button>
+<!-- Top Menu -->
+<div class="top-menu">
 
 <button onclick="location.href='/users.html'">
 👥 Friends
@@ -59,19 +60,20 @@ class="friends-status">
 </button>
 
 <button onclick="logout()">
-🚪
+🚪 Logout
 </button>
 
 </div>
 
+<!-- Create Post -->
+
 <textarea
 id="postText"
-placeholder="What's happening?">
-</textarea>
+placeholder="What's happening?"></textarea>
 
 <br><br>
 
-  <input
+<input
 type="file"
 id="postImage"
 accept="image/*"
@@ -80,16 +82,16 @@ style="display:none;">
 <label
 for="postImage"
 class="image-btn">
+
 📷 Add Photo
+
 </label>
 
 <div
 id="postPreview"
-style="
-display:none;
-margin-top:10px;
-text-align:center;
-"><img
+style="display:none;margin-top:10px;text-align:center;">
+
+<img
 id="postPreviewImage"
 style="
 max-width:220px;
@@ -99,9 +101,10 @@ border-radius:12px;
 
 <br><br>
 
-<button
-onclick="removePostImage()">
+<button onclick="removePostImage()">
+
 ❌ Remove
+
 </button>
 
 </div>
@@ -109,14 +112,45 @@ onclick="removePostImage()">
 <button
 id="postBtn"
 onclick="createPost()">
+
 🚀 Post
+
 </button>
-  
+
 <hr>
 
+<!-- Feed -->
+
 <div id="feed"></div>
+
+<!-- Bottom Navigation -->
+
+<div class="bottom-nav">
+
+<a href="/home.html" class="active">
+🏠<br>Home
+</a>
+
+<a href="/messenger.html">
+💬<br>Chats
+</a>
+
+<a href="/status.html">
+🟢<br>Status
+</a>
+
+<a href="/notification.html">
+🔔<br>Alerts
+</a>
+
+<a href="/profile.html">
+👤<br>Profile
+</a>
+
+</div>
 
 <script src="/js/home.js"></script>
 
 </body>
+
 </html>
