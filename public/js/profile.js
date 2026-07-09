@@ -68,6 +68,10 @@ profile.followers.length;
 document.getElementById("following").innerText =
 profile.following.length; 
 
+document
+.getElementById("coverFile")
+.addEventListener("change", uploadCover);   
+
 }
 
 async function saveProfile(){
@@ -260,6 +264,51 @@ if(data.success){
 alert("✅ Follow Updated");
 
 loadProfile();
+
+}else{
+
+alert(data.message);
+
+}
+
+}
+
+async function uploadCover(){
+
+const file =
+document.getElementById("coverFile").files[0];
+
+if(!file){
+return;
+}
+
+const formData = new FormData();
+
+formData.append("cover",file);
+formData.append("email",user.email);
+
+const res = await fetch(
+"/api/auth/cover",
+{
+method:"POST",
+body:formData
+}
+);
+
+const data = await res.json();
+
+if(data.success){
+
+user.cover = data.cover;
+
+localStorage.setItem(
+"user",
+JSON.stringify(user)
+);
+
+alert("✅ Cover Updated");
+
+location.reload();
 
 }else{
 
