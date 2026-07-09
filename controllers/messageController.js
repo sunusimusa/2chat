@@ -27,6 +27,46 @@ image = result.secure_url;
 
 }
 
+const message = await Message.create({
+
+sender,
+receiver,
+text,
+image,
+delivered:true,
+deliveredAt:new Date()
+
+});
+
+await Notification.create({
+
+receiver,
+sender,
+type:"message",
+text:`${sender} sent you a message 📨`
+
+});
+
+res.json({
+success:true,
+message
+});
+
+}catch(err){
+
+console.error(err);
+
+res.status(500).json({
+success:false,
+message:err.message
+});
+
+}
+
+};
+
+// ================= SEND VOICE =================
+
 exports.sendVoice = async (req, res) => {
 
 try{
@@ -72,10 +112,8 @@ text:`${sender} sent you a voice message 🎤`
 });
 
 res.json({
-
 success:true,
 message
-
 });
 
 }catch(err){
@@ -83,53 +121,8 @@ message
 console.error(err);
 
 res.status(500).json({
-
 success:false,
 message:err.message
-
-});
-
-}
-
-};
-
-const message = await Message.create({
-
-sender,
-receiver,
-text,
-image,
-delivered:true,
-deliveredAt:new Date()
-
-});
-
-
-await Notification.create({
-
-receiver,
-sender,
-type:"message",
-text:`${sender} sent you a message 📨`
-
-});
-
-res.json({
-
-success:true,
-message
-
-});
-
-}catch(err){
-
-console.error(err);
-
-res.status(500).json({
-
-success:false,
-message:err.message
-
 });
 
 }
