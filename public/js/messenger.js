@@ -1,17 +1,10 @@
-const me =
-JSON.parse(
-localStorage.getItem("user")
-);
+const me = JSON.parse(localStorage.getItem("user"));
 
 async function loadUsers(){
 
-const res =
-await fetch(
-"/api/messages/list/" + me.username
-);
+const res = await fetch("/api/messages/list/" + me.username);
 
-const data =
-await res.json();
+const data = await res.json();
 
 let html = "";
 
@@ -19,54 +12,36 @@ data.chats.forEach(chat=>{
 
 html += `
 
-<div
-class="user"
-onclick="openChat('${chat.username}')"
->
+<div class="user" onclick="openChat('${chat.username}')">
 
-<img
-src="${chat.avatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}">
+<img src="${chat.avatar || '/images/default.png'}">
 
+<div class="user-info">
 
-<div style="flex:1;">
+<h3>${chat.username}</h3>
 
-<b>${chat.username}</b>
-
-<br>
-
-<small>
-
-${chat.online ? "🟢 Online" : "Last seen"}
-
-</small>
-
-<small style="color:gray;">
-${chat.lastMessage}
-</small>
+<p>${chat.lastMessage}</p>
 
 </div>
 
-<div style="position:relative;">
+<div style="text-align:right;">
 
-<img
-src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-style="
-width:50px;
-height:50px;
-border-radius:50%;
-">
+<div class="chat-time">
 
-<div style="
-position:absolute;
-bottom:2px;
-right:2px;
-width:12px;
-height:12px;
-background:
-${chat.online ? "#00c853" : "#9e9e9e"};
-border-radius:50%;
-border:2px solid white;
-"></div>
+${chat.time
+? new Date(chat.time).toLocaleTimeString([],{
+hour:"2-digit",
+minute:"2-digit"
+})
+: ""}
+
+</div>
+
+${chat.online
+? '<div class="online-dot"></div>'
+: ''}
+
+</div>
 
 </div>
 
@@ -74,20 +49,35 @@ border:2px solid white;
 
 });
 
-document.getElementById("users").innerHTML =
-"<h2 align='center'>💬 Chats</h2>" + html;
+document.getElementById("users").innerHTML = html;
 
 }
 
 function openChat(username){
 
-location.href=
-"/chat.html?user="+username;
+location.href="/chat.html?user="+username;
 
 }
+
+const search = document.getElementById("searchUser");
+
+search.addEventListener("input",()=>{
+
+const value = search.value.toLowerCase();
+
+document.querySelectorAll(".user").forEach(user=>{
+
+const name = user.innerText.toLowerCase();
+
+user.style.display =
+name.includes(value)
+? "flex"
+: "none";
+
+});
+
+});
 
 loadUsers();
 
 setInterval(loadUsers,5000);
-
-
