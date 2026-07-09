@@ -3,11 +3,14 @@ const router = require("express").Router();
 const upload =
 require("../middleware/upload");
 
+const upload = require("../config/upload");
+
 const {
 register,
 login,
 updateProfile,
 uploadAvatar,
+uploadCover,
 getUsers,
 getStatus
 } = require("../controllers/authController");
@@ -31,6 +34,12 @@ router.post(
   "/avatar",
   upload.single("avatar"),
   uploadAvatar
+);
+
+router.post(
+"/cover",
+upload.single("cover"),
+uploadCover
 );
 
 router.get(
