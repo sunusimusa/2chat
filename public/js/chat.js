@@ -131,23 +131,6 @@ cursor:pointer;
 ""
 }
 
-${msg.voice
-?
-`
-<audio
-controls
-preload="metadata"
-src="${msg.voice}"
-style="
-width:220px;
-margin:8px 0;
-">
-</audio>
-`
-:
-""
-}
-
 ${msg.text || ""}
 
 ${
