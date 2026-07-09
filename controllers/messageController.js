@@ -223,11 +223,14 @@ username:user?user.username:otherUser,
 avatar:user?user.avatar:"",
 online:user?user.online:false,
 lastSeen:user?user.lastSeen:null,
-lastMessage: msg.text
-  ? msg.text
-  : msg.image
-  ? "📷 Image"
-  : "Message",
+lastMessage:
+msg.text
+? msg.text
+: msg.image
+? "📷 Image"
+: msg.voice
+? "🎤 Voice Message"
+: "Message",
 };
 
 }
