@@ -179,7 +179,7 @@ document.getElementById("message").value.trim();
 const image =
 document.getElementById("image").files[0];
     
-if(text==="" && !image && !voice){
+if(text === "" && !image){
     return;
 }
 
@@ -193,10 +193,7 @@ if(image){
 
 formData.append("file",image);
 
-}
-    
-
-}
+}  
 
 for (const pair of formData.entries()) {
     console.log(pair[0], pair[1]);
