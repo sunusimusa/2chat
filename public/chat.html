@@ -96,9 +96,7 @@ style="display:none;">
 <label
 for="image"
 class="image-btn">
-
 📷
-
 </label>
 
 <textarea
@@ -106,11 +104,42 @@ id="message"
 placeholder="Type message..."></textarea>
 
 <button
+id="voiceBtn"
+class="voice-btn">
+🎤
+</button>
+
+<button
 id="sendBtn"
 onclick="sendMessage()">
-
 📤
+</button>
 
+</div>
+
+<div
+id="voiceRecorder"
+class="voice-recorder"
+style="display:none;">
+
+<div class="record-dot"></div>
+
+<span id="recordTime">
+00:00
+</span>
+
+<div id="voiceWave">
+▁▂▃▄▅▆▇█
+</div>
+
+<button
+id="cancelVoice">
+❌
+</button>
+
+<button
+id="sendVoice">
+📤
 </button>
 
 </div>
