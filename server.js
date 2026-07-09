@@ -13,6 +13,9 @@ const notificationRoutes =
 require("./routes/notificationRoutes");
 const friendRoutes =
 require("./routes/friendRoutes");
+const statusRoutes =
+require("./routes/statusRoutes");
+
 
 const app = express();
 const server = http.createServer(app);
@@ -37,7 +40,7 @@ app.use("/api/notifications",
 notificationRoutes
 );
 app.use("/api/friends", friendRoutes);
-
+app.use("/api/status", statusRoutes);
 
 app.get("/",(req,res)=>{
   res.send("🚀 2Chat Server Running Successfully");
