@@ -12,7 +12,6 @@ try{
 const { sender, receiver, text } = req.body;
 
 let image = "";
-let voice = "";
 
 if(req.file){
 
@@ -31,22 +30,6 @@ folder:"2chat-images"
 
 image = result.secure_url;
 
-}else{
-
-const result = await cloudinary.uploader.upload(
-req.file.path,
-{
-resource_type:"auto",
-folder:"2chat-voice"
-}
-);
-
-voice = result.secure_url;
-
-console.log("VOICE URL:", voice);
-
-}
-
 }
 
 const message = await Message.create({
@@ -55,7 +38,6 @@ sender,
 receiver,
 text,
 image,
-voice,
 delivered:true,
 deliveredAt:new Date()
 
