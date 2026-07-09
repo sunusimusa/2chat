@@ -22,6 +22,11 @@ type:String,
 default:""
 },
 
+  voice:{
+type:String,
+default:""
+},
+
   reactions:{
 type:[
 {
