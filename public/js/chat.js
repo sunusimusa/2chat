@@ -491,3 +491,70 @@ recordTime.innerText = `${m}:${s}`;
 },1000);
 
 }
+
+const sendVoiceBtn = document.getElementById("sendVoice");
+const cancelVoiceBtn = document.getElementById("cancelVoice");
+
+sendVoiceBtn.addEventListener("click", stopRecordingAndSend);
+cancelVoiceBtn.addEventListener("click", cancelRecording);
+
+async function stopRecordingAndSend(){
+
+if(!recording) return;
+
+clearInterval(recordTimer);
+
+mediaRecorder.stop();
+
+recording = false;
+
+voiceRecorder.style.display = "none";
+
+setTimeout(async ()=>{
+
+const formData = new FormData();
+
+formData.append("sender",user.username);
+formData.append("receiver",receiver);
+formData.append("voice",audioBlob,"voice.webm");
+
+const res = await fetch("/api/messages/voice",{
+method:"POST",
+body:formData
+});
+
+const data = await res.json();
+
+if(data.success){
+
+socket.emit("newMessage",data.message);
+
+loadMessages();
+
+}else{
+
+alert(data.message);
+
+}
+
+},500);
+
+}
+
+function cancelRecording(){
+
+if(!recording) return;
+
+clearInterval(recordTimer);
+
+mediaRecorder.stop();
+
+recording = false;
+
+audioBlob = null;
+
+voiceRecorder.style.display = "none";
+
+recordTime.innerText = "00:00";
+
+}
