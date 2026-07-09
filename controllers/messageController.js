@@ -226,11 +226,13 @@ lastSeen:user?user.lastSeen:null,
 lastMessage:
 msg.text
 ? msg.text
-: msg.image
-? "📷 Image"
 : msg.voice
-? "🎤 Voice Message"
+? "🎤 Voice message"
+: msg.image
+? "📷 Photo"
 : "Message",
+
+time: msg.createdAt,
 };
 
 }
