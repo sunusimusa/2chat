@@ -428,3 +428,66 @@ function cancelPress(){
 clearTimeout(pressTimer);
 
 }
+
+let mediaRecorder;
+let audioChunks = [];
+let audioBlob = null;
+let recording = false;
+let recordTimer;
+let seconds = 0;
+
+const voiceBtn = document.getElementById("voiceBtn");
+const voiceRecorder = document.getElementById("voiceRecorder");
+const recordTime = document.getElementById("recordTime");
+
+voiceBtn.addEventListener("click", startRecording);
+
+async function startRecording(){
+
+if(recording) return;
+
+const stream = await navigator.mediaDevices.getUserMedia({
+audio:true
+});
+
+mediaRecorder = new MediaRecorder(stream);
+
+audioChunks = [];
+
+mediaRecorder.ondataavailable = (e)=>{
+audioChunks.push(e.data);
+};
+
+mediaRecorder.onstop = ()=>{
+
+audioBlob = new Blob(audioChunks,{
+type:"audio/webm"
+});
+
+};
+
+mediaRecorder.start();
+
+recording = true;
+
+voiceRecorder.style.display = "flex";
+
+seconds = 0;
+
+recordTime.innerText = "00:00";
+
+recordTimer = setInterval(()=>{
+
+seconds++;
+
+const m =
+String(Math.floor(seconds/60)).padStart(2,"0");
+
+const s =
+String(seconds%60).padStart(2,"0");
+
+recordTime.innerText = `${m}:${s}`;
+
+},1000);
+
+}
