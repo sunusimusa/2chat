@@ -29,6 +29,11 @@ default:[]
       default: ""
     },
 
+    cover: {
+  type: String,
+  default: "/images/default-cover.jpg"
+},
+
     online:{
 type:Boolean,
 default:false
