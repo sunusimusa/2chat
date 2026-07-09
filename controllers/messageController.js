@@ -27,6 +27,72 @@ image = result.secure_url;
 
 }
 
+exports.sendVoice = async (req, res) => {
+
+try{
+
+const { sender, receiver } = req.body;
+
+if(!req.file){
+
+return res.json({
+success:false,
+message:"No voice file uploaded."
+});
+
+}
+
+const result = await cloudinary.uploader.upload(
+req.file.path,
+{
+resource_type:"video",
+folder:"2chat-voice"
+}
+);
+
+const message = await Message.create({
+
+sender,
+receiver,
+text:"",
+image:"",
+voice:result.secure_url,
+delivered:true,
+deliveredAt:new Date()
+
+});
+
+await Notification.create({
+
+receiver,
+sender,
+type:"message",
+text:`${sender} sent you a voice message 🎤`
+
+});
+
+res.json({
+
+success:true,
+message
+
+});
+
+}catch(err){
+
+console.error(err);
+
+res.status(500).json({
+
+success:false,
+message:err.message
+
+});
+
+}
+
+};
+
 const message = await Message.create({
 
 sender,
