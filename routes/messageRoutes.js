@@ -6,6 +6,7 @@ require("../middleware/upload");
 
 const {
 sendMessage,
+sendVoice,
 getMessages,
 getChats,
 reactMessage
@@ -16,6 +17,12 @@ router.post(
 "/send",
 upload.single("file"),
 sendMessage
+);
+
+router.post(
+"/voice",
+upload.single("voice"),
+sendVoice
 );
 
 // Get Chat
