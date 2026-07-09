@@ -3,8 +3,6 @@ const router = require("express").Router();
 const upload =
 require("../middleware/upload");
 
-const upload = require("../config/upload");
-
 const {
 register,
 login,
