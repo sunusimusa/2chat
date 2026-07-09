@@ -68,10 +68,6 @@ profile.followers.length;
 document.getElementById("following").innerText =
 profile.following.length; 
 
-document
-.getElementById("coverFile")
-.addEventListener("change", uploadCover);   
-
 }
 
 async function saveProfile(){
@@ -317,3 +313,11 @@ alert(data.message);
 }
 
 }
+
+loadProfile();
+
+loadMyPosts();
+
+document
+.getElementById("coverFile")
+.addEventListener("change", uploadCover);
