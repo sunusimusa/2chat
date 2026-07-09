@@ -196,8 +196,6 @@ document.getElementById("message").value.trim();
 const image =
 document.getElementById("image").files[0];
     
-const voice = audioBlob;
-
 if(text==="" && !image && !voice){
     return;
 }
@@ -213,19 +211,9 @@ if(image){
 formData.append("file",image);
 
 }
-
-else if(voice){
-
-formData.append(
-"file",
-voice,
-"voice.webm"
-);
+    
 
 }
-
-console.log("Voice Blob:", voice);
-console.log("Voice Size:", voice ? voice.size : 0);
 
 for (const pair of formData.entries()) {
     console.log(pair[0], pair[1]);
@@ -249,12 +237,6 @@ document.getElementById("message").value="";
 document.getElementById("image").value="";
 document.getElementById("previewBox").style.display =
 "none";
-
-audioBlob = null;
-
-document.getElementById("voicePreview").style.display="none";
-
-document.getElementById("voicePreview").src=""; 
 
 loadMessages();
     
@@ -345,10 +327,6 @@ imageInput.value = "";
 
 document.getElementById("previewBox").style.display =
 "none";
-
-audioBlob = null;
-
-document.getElementById("voicePreview").src = "";    
 
 }
 
@@ -468,59 +446,5 @@ showReaction(e,id);
 function cancelPress(){
 
 clearTimeout(pressTimer);
-
-}
-
-async function toggleRecording(){
-
-if(!recording){
-
-const stream = await navigator.mediaDevices.getUserMedia({
-audio:true
-});
-
-mediaRecorder = new MediaRecorder(stream);
-
-audioChunks = [];
-
-mediaRecorder.start();
-
-recording = true;
-
-document.getElementById("recordBtn").innerText = "⏹";
-
-mediaRecorder.ondataavailable = (e)=>{
-
-audioChunks.push(e.data);
-
-};
-
-mediaRecorder.onstop = () => {
-
-    audioBlob = new Blob(audioChunks, {
-        type: "audio/webm"
-    });
-
-    const url = URL.createObjectURL(audioBlob);
-
-    const player = document.getElementById("voicePreview");
-
-    player.src = url;
-
-    player.load(); // Muhimmi
-
-    player.style.display = "block";
-
-};
-
-}else{
-
-mediaRecorder.stop();
-
-recording = false;
-
-document.getElementById("recordBtn").innerText = "🎤";
-
-}
 
 }
