@@ -131,6 +131,23 @@ cursor:pointer;
 ""
 }
 
+${
+msg.voice
+?
+`
+<audio
+controls
+src="${msg.voice}"
+style="
+width:230px;
+margin-bottom:8px;
+">
+</audio>
+`
+:
+""
+}
+
 ${msg.text || ""}
 
 ${
