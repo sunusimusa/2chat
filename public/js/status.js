@@ -1,132 +1,122 @@
-const user =
-JSON.parse(localStorage.getItem("user"));
+const user = JSON.parse(localStorage.getItem("user"));
 
-const fileInput =
-document.getElementById("statusFile");
+const fileInput = document.getElementById("statusFile");
 
 fileInput.addEventListener("change", uploadStatus);
 
-function pickStatus(){
+function pickStatus() {
+    fileInput.click();
+}
 
-fileInput.click();
+async function uploadStatus() {
+
+    const file = fileInput.files[0];
+
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = async function (e) {
+
+        try {
+
+            const media = e.target.result;
+
+            const type = file.type.startsWith("video")
+                ? "video"
+                : "image";
+
+            const res = await fetch("/api/status/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: user.username,
+                    type,
+                    media,
+                    text: ""
+                })
+            });
+
+            const data = await res.json();
+
+            console.log(data);
+
+            if (data.success) {
+
+                alert("✅ Status uploaded successfully.");
+
+                fileInput.value = "";
+
+                loadStatuses();
+
+            } else {
+
+                alert(data.message);
+
+            }
+
+        } catch (err) {
+
+            console.error(err);
+
+            alert("Upload failed.");
+
+        }
+
+    };
+
+    reader.readAsDataURL(file);
 
 }
 
-async function uploadStatus(){
+async function loadStatuses() {
 
-const file = fileInput.files[0];
+    try {
 
-if(!file) return;
+        const res = await fetch("/api/status/all");
 
-const reader = new FileReader();
+        const data = await res.json();
 
-reader.onload = async function(e){
+        const list = document.getElementById("statusList");
 
-const media = e.target.result;
+        list.innerHTML = "";
 
-const type =
-file.type.startsWith("video")
-? "video"
-: "image";
+        data.statuses.forEach(status => {
 
-const res = await fetch("/api/status/create",{
+            if (status.username === user.username) return;
 
-method:"POST",
+            list.innerHTML += `
+            <div class="status-card" onclick="openStatus('${status._id}')">
 
-headers:{
-"Content-Type":"application/json"
-},
+                <img src="${status.avatar || '/images/default.png'}">
 
-body:JSON.stringify({
+                <div>
 
-username:user.username,
+                    <h4>${status.username}</h4>
 
-type,
+                    <small>${new Date(status.createdAt).toLocaleString()}</small>
 
-media,
+                </div>
 
-text:""
+            </div>
+            `;
 
-})
+        });
 
-});
+    } catch (err) {
 
-const data = await res.json();
+        console.error(err);
 
-console.log(data);
+    }
 
-if(data.success){
+}
 
-alert("✅ Status uploaded successfully.");
+function openStatus(id) {
 
-try{
+    location.href = "/status-view.html?id=" + id;
+
+}
+
 loadStatuses();
-}catch(err){
-console.log(err);
-}
-
-}else{
-
-alert(data.message);
-
-}
-
-reader.readAsDataURL(file);
-
-}
-
-async function loadStatuses(){
-
-const res =
-await fetch("/api/status/all");
-
-const data =
-await res.json();
-
-const list =
-document.getElementById("statusList");
-
-list.innerHTML = "";
-
-data.statuses.forEach(status=>{
-
-if(status.username===user.username) return;
-
-list.innerHTML += `
-
-<div class="status-card"
-onclick="openStatus('${status._id}')">
-
-<img src="${status.avatar || '/images/default.png'}">
-
-<div>
-
-<h4>${status.username}</h4>
-
-<small>
-
-${new Date(status.createdAt).toLocaleString()}
-
-</small>
-
-</div>
-
-</div>
-
-`;
-
-});
-
-}
-
-try{
-loadStatuses();
-}catch(err){
-console.log(err);
-}
-
-function openStatus(id){
-
-location.href="/status-view.html?id="+id;
-
-}
