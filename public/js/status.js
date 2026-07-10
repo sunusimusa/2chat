@@ -53,6 +53,8 @@ text:""
 
 const data = await res.json();
 
+console.log(data);
+
 if(data.success){
 
 alert("✅ Status uploaded successfully.");
@@ -64,8 +66,6 @@ loadStatuses();
 alert(data.message);
 
 }
-
-};
 
 reader.readAsDataURL(file);
 
