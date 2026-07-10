@@ -1,6 +1,5 @@
 const Post = require("../models/Post");
-const cloudinary =
-require("../services/cloudinary");
+const cloudinary = require("../config/cloudinary");
 
 const Notification =
 require("../models/Notification");
