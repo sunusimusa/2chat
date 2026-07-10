@@ -26,7 +26,7 @@ async function uploadStatus() {
                 ? "video"
                 : "image";
 
-            const res = await fetch("/api/status/create", {
+            const res = await fetch("/api/status/sunusi123", ...) {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
