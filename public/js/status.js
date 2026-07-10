@@ -59,7 +59,11 @@ if(data.success){
 
 alert("✅ Status uploaded successfully.");
 
+try{
 loadStatuses();
+}catch(err){
+console.log(err);
+}
 
 }else{
 
@@ -115,7 +119,11 @@ ${new Date(status.createdAt).toLocaleString()}
 
 }
 
+try{
 loadStatuses();
+}catch(err){
+console.log(err);
+}
 
 function openStatus(id){
 
