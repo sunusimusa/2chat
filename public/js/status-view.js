@@ -1,90 +1,107 @@
 const user = JSON.parse(localStorage.getItem("user"));
 
-const params = new URLSearchParams(location.search);
+const params = new URLSearchParams(window.location.search);
 
 const id = params.get("id");
 
 let progress = 0;
 
-async function loadStatus(){
+async function loadStatus() {
 
-const res = await fetch("/api/status/" + id);
+    try {
 
-const data = await res.json();
+        const res = await fetch("/api/status/view/" + id);
 
-if(!data.success){
+        const data = await res.json();
 
-alert("Status not found");
+        if (!data.success) {
 
-history.back();
+            alert("Status not found");
 
-return;
+            history.back();
 
-}
+            return;
 
-const status = data.status;
+        }
 
-document.getElementById("avatar").src =
-status.avatar || "/images/default.png";
+        const status = data.status;
 
-document.getElementById("username").innerText =
-status.username;
+        document.getElementById("avatar").src =
+            status.avatar || "/images/default.png";
 
-document.getElementById("time").innerText =
-new Date(status.createdAt).toLocaleString();
+        document.getElementById("username").innerText =
+            status.username;
 
-if(status.type==="image"){
+        document.getElementById("time").innerText =
+            new Date(status.createdAt).toLocaleString();
 
-const img = document.getElementById("statusImage");
+        if (status.mediaType === "video") {
 
-img.src = status.media;
+            document.getElementById("statusVideo").src =
+                status.media;
 
-img.style.display = "block";
+            document.getElementById("statusVideo").style.display =
+                "block";
 
-}else{
+        } else {
 
-const video = document.getElementById("statusVideo");
+            document.getElementById("statusImage").src =
+                status.media;
 
-video.src = status.media;
+            document.getElementById("statusImage").style.display =
+                "block";
 
-video.style.display = "block";
+        }
 
-}
+        await fetch("/api/status/view/" + id, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username: user.username
+            })
+        });
 
-startProgress();
+        startProgress();
 
-}
+    } catch (err) {
 
-function startProgress(){
+        console.error(err);
 
-const bar = document.getElementById("progressBar");
-
-const timer = setInterval(()=>{
-
-progress += 2;
-
-bar.style.width = progress + "%";
-
-if(progress >= 100){
-
-clearInterval(timer);
-
-history.back();
-
-}
-
-},100);
+    }
 
 }
 
-function replyStatus(){
+function startProgress() {
 
-const text =
-document.getElementById("reply").value.trim();
+    const bar = document.getElementById("progressBar");
 
-if(text==="") return;
+    const timer = setInterval(() => {
 
-alert("Reply feature will be connected next.");
+        progress += 2;
+
+        bar.style.width = progress + "%";
+
+        if (progress >= 100) {
+
+            clearInterval(timer);
+
+            history.back();
+
+        }
+
+    }, 100);
+
+}
+
+function replyStatus() {
+
+    const text = document.getElementById("reply").value.trim();
+
+    if (text === "") return;
+
+    alert("Reply feature will be added next.");
 
 }
 
