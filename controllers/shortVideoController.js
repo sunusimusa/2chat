@@ -1,32 +1,41 @@
 const ShortVideo = require("../models/ShortVideo");
+const cloudinary = require("../config/cloudinary");
+const fs = require("fs");
 
-// ================= UPLOAD VIDEO =================
-
+// Upload Short Video
 exports.uploadVideo = async (req, res) => {
 
     try {
 
-        const {
-            username,
-            avatar,
-            caption,
-            video
-        } = req.body;
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: "Please select a video."
+            });
+        }
 
-        const newVideo = await ShortVideo.create({
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            resource_type: "video",
+            folder: "2chat/shorts"
+        });
 
-            username,
-            avatar,
-            caption,
-            video
+        fs.unlinkSync(req.file.path);
+
+        const short = await ShortVideo.create({
+
+            username: req.body.username,
+
+            avatar: req.body.avatar || "",
+
+            caption: req.body.caption || "",
+
+            video: result.secure_url
 
         });
 
         res.json({
-
             success: true,
-            video: newVideo
-
+            video: short
         });
 
     } catch (err) {
@@ -34,19 +43,15 @@ exports.uploadVideo = async (req, res) => {
         console.error(err);
 
         res.status(500).json({
-
             success: false,
             message: err.message
-
         });
 
     }
 
 };
 
-
-// ================= GET ALL VIDEOS =================
-
+// Get Videos
 exports.getVideos = async (req, res) => {
 
     try {
@@ -55,28 +60,22 @@ exports.getVideos = async (req, res) => {
             .sort({ createdAt: -1 });
 
         res.json({
-
             success: true,
             videos
-
         });
 
     } catch (err) {
 
         res.status(500).json({
-
             success: false,
             message: err.message
-
         });
 
     }
 
 };
 
-
-// ================= LIKE VIDEO =================
-
+// Like Video
 exports.likeVideo = async (req, res) => {
 
     try {
@@ -86,14 +85,10 @@ exports.likeVideo = async (req, res) => {
         const video = await ShortVideo.findById(videoId);
 
         if (!video) {
-
             return res.json({
-
                 success: false,
                 message: "Video not found"
-
             });
-
         }
 
         if (video.likes.includes(username)) {
@@ -111,83 +106,63 @@ exports.likeVideo = async (req, res) => {
         await video.save();
 
         res.json({
-
             success: true,
             likes: video.likes.length
-
         });
 
     } catch (err) {
 
         res.status(500).json({
-
             success: false,
             message: err.message
-
         });
 
     }
 
 };
 
-
-// ================= COMMENT =================
-
+// Comment
 exports.commentVideo = async (req, res) => {
 
     try {
 
-        const {
-            videoId,
-            username,
-            text
-        } = req.body;
+        const { videoId, username, text } = req.body;
 
         const video = await ShortVideo.findById(videoId);
 
         if (!video) {
 
             return res.json({
-
                 success: false,
                 message: "Video not found"
-
             });
 
         }
 
         video.comments.push({
-
             username,
             text
-
         });
 
         await video.save();
 
         res.json({
-
             success: true,
             comments: video.comments
-
         });
 
     } catch (err) {
 
         res.status(500).json({
-
             success: false,
             message: err.message
-
         });
 
     }
 
 };
 
-
-// ================= VIEW =================
-
+// Add View
 exports.addView = async (req, res) => {
 
     try {
@@ -197,10 +172,8 @@ exports.addView = async (req, res) => {
         if (!video) {
 
             return res.json({
-
                 success: false,
                 message: "Video not found"
-
             });
 
         }
@@ -210,19 +183,15 @@ exports.addView = async (req, res) => {
         await video.save();
 
         res.json({
-
             success: true,
             views: video.views
-
         });
 
     } catch (err) {
 
         res.status(500).json({
-
             success: false,
             message: err.message
-
         });
 
     }
