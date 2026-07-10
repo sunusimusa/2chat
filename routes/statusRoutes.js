@@ -1,17 +1,22 @@
 const router = require("express").Router();
 
 const {
-  createStatus,
-  getStatuses,
-  getStatusById
+    createStatus,
+    getStatuses,
+    getStatusById,
+    viewStatus
 } = require("../controllers/statusController");
 
-// CREATE
-router.post("/sunusi123", createStatus);
-// ALL STATUS
+// Upload Status
+router.post("/create", createStatus);
+
+// Get all Status
 router.get("/all", getStatuses);
 
-// SINGLE STATUS
-router.get("/:id", getStatusById);
+// Get one Status
+router.get("/view/:id", getStatusById);
+
+// Mark Status as viewed
+router.put("/view/:id", viewStatus);
 
 module.exports = router;
