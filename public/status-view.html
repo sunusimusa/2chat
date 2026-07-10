@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Status Viewer</title>
+
+<link rel="stylesheet" href="/css/status-view.css">
+
+</head>
+
+<body>
+
+<div class="progress">
+
+<div id="progressBar"></div>
+
+</div>
+
+<div class="top">
+
+<img id="avatar" src="/images/default.png">
+
+<div>
+
+<h3 id="username"></h3>
+
+<small id="time"></small>
+
+</div>
+
+</div>
+
+<div id="viewer">
+
+<img
+id="statusImage"
+style="display:none;">
+
+<video
+id="statusVideo"
+controls
+autoplay
+style="display:none;">
+</video>
+
+</div>
+
+<div class="bottom">
+
+<input
+type="text"
+id="reply"
+placeholder="Reply to status...">
+
+<button onclick="replyStatus()">
+📤
+</button>
+
+</div>
+
+<script src="/js/status-view.js"></script>
+
+</body>
+
+</html>
