@@ -8,6 +8,7 @@ font-family:Arial,sans-serif;
 body{
 background:#000;
 overflow:hidden;
+color:#fff;
 }
 
 #shortsContainer{
@@ -15,6 +16,7 @@ height:100vh;
 width:100%;
 overflow-y:scroll;
 scroll-snap-type:y mandatory;
+scroll-behavior:smooth;
 }
 
 .short{
@@ -91,3 +93,21 @@ font-size:15px;
 cursor:pointer;
 box-shadow:0 4px 10px rgba(0,0,0,.3);
 }
+
+#shortsContainer::-webkit-scrollbar{
+display:none;
+}
+
+.short video{
+background:#000;
+}
+
+.actions button:hover{
+transform:scale(1.1);
+transition:.2s;
+}
+
+.actions button:active{
+transform:scale(.9);
+}
+
