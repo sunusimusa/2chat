@@ -5,9 +5,9 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>Status Viewer</title>
+<title>Status</title>
 
 <link rel="stylesheet" href="/css/status-view.css">
 
@@ -35,17 +35,17 @@
 
 </div>
 
-<div id="viewer">
+<div class="viewer">
 
 <img
 id="statusImage"
-style="display:none;">
+style="display:none;max-width:100%;max-height:80vh;border-radius:12px;">
 
 <video
 id="statusVideo"
 controls
 autoplay
-style="display:none;">
+style="display:none;max-width:100%;max-height:80vh;border-radius:12px;">
 </video>
 
 </div>
@@ -55,10 +55,12 @@ style="display:none;">
 <input
 type="text"
 id="reply"
-placeholder="Reply to status...">
+placeholder="Reply...">
 
 <button onclick="replyStatus()">
-📤
+
+📩
+
 </button>
 
 </div>
