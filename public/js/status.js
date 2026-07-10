@@ -90,15 +90,20 @@ if(status.username===user.username) return;
 
 list.innerHTML += `
 
-<div class="status-card">
+<div class="status-card"
+onclick="openStatus('${status._id}')">
 
-<img src="/images/default.png">
+<img src="${status.avatar || '/images/default.png'}">
 
 <div>
 
 <h4>${status.username}</h4>
 
-<small>${status.type}</small>
+<small>
+
+${new Date(status.createdAt).toLocaleString()}
+
+</small>
 
 </div>
 
@@ -111,3 +116,9 @@ list.innerHTML += `
 }
 
 loadStatuses();
+
+function openStatus(id){
+
+location.href="/status-view.html?id="+id;
+
+}
