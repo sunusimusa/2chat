@@ -7,8 +7,7 @@ const {
 } = require("../controllers/statusController");
 
 // CREATE
-router.post("/create", createStatus);
-
+router.post("/sunusi123", createStatus);
 // ALL STATUS
 router.get("/all", getStatuses);
 
