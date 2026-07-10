@@ -26,15 +26,15 @@ async function uploadStatus() {
                 ? "video"
                 : "image";
 
-            const res = await fetch("/api/status/sunusi123", ...) {
+            const res = await fetch("/api/status/sunusi123", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
                     username: user.username,
-                    type,
-                    media,
+                    type: type,
+                    media: media,
                     text: ""
                 })
             });
@@ -59,12 +59,12 @@ async function uploadStatus() {
 
         } catch (err) {
 
-    console.error(err);
+            console.error(err);
 
-    alert(err.message);
+            alert(err.message);
 
-}
-        
+        }
+
     };
 
     reader.readAsDataURL(file);
@@ -88,19 +88,16 @@ async function loadStatuses() {
             if (status.username === user.username) return;
 
             list.innerHTML += `
-            <div class="status-card" onclick="openStatus('${status._id}')">
+                <div class="status-card" onclick="openStatus('${status._id}')">
 
-                <img src="${status.avatar || '/images/default.png'}">
+                    <img src="${status.avatar || '/images/default.png'}">
 
-                <div>
-
-                    <h4>${status.username}</h4>
-
-                    <small>${new Date(status.createdAt).toLocaleString()}</small>
+                    <div>
+                        <h4>${status.username}</h4>
+                        <small>${new Date(status.createdAt).toLocaleString()}</small>
+                    </div>
 
                 </div>
-
-            </div>
             `;
 
         });
