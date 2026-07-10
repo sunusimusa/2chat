@@ -1,8 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const generateToken = require("../utils/generateToken");
-const cloudinary =
-require("../services/cloudinary");
+const cloudinary = require("../config/cloudinary");
 
 // REGISTER
 exports.register = async (req, res) => {
