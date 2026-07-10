@@ -1,5 +1,7 @@
 const router = require("express").Router();
 
+const upload = require("../middleware/upload");
+
 const {
 
     uploadVideo,
@@ -10,20 +12,23 @@ const {
 
 } = require("../controllers/shortVideoController");
 
-
-// Upload Video
-router.post("/upload", uploadVideo);
+// Upload Short Video
+router.post(
+    "/upload",
+    upload.single("video"),
+    uploadVideo
+);
 
 // Get All Videos
 router.get("/all", getVideos);
 
-// Like Video
+// Like
 router.put("/like", likeVideo);
 
 // Comment
 router.put("/comment", commentVideo);
 
-// Add View
+// View
 router.put("/view/:id", addView);
 
 module.exports = router;
