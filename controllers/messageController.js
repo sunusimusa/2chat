@@ -1,5 +1,5 @@
 const Message = require("../models/Message");
-const cloudinary = require("../services/cloudinary");
+const cloudinary = require("../config/cloudinary");
 const Notification = require("../models/Notification");
 const User = require("../models/User");
 
