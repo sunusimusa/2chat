@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -20,30 +21,8 @@
 <b id="userName"></b>
 </p>
 
-<!-- Status -->
-<div class="status-bar">
-
-<div class="my-status" onclick="location.href='/status.html'">
-
-<img
-id="statusAvatar"
-src="/images/default.png">
-
-<p>My Status</p>
-
-</div>
-
-<div
-id="friendsStatus"
-class="friends-status">
-
-</div>
-
-</div>
-
-<hr>
-
 <!-- Top Menu -->
+
 <div class="top-menu">
 
 <button onclick="location.href='/users.html'">
@@ -65,11 +44,14 @@ class="friends-status">
 
 </div>
 
+<hr>
+
 <!-- Create Post -->
 
 <textarea
 id="postText"
-placeholder="What's happening?"></textarea>
+placeholder="What's happening?">
+</textarea>
 
 <br><br>
 
@@ -89,7 +71,11 @@ class="image-btn">
 
 <div
 id="postPreview"
-style="display:none;margin-top:10px;text-align:center;">
+style="
+display:none;
+margin-top:10px;
+text-align:center;
+">
 
 <img
 id="postPreviewImage"
