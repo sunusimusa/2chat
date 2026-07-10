@@ -59,12 +59,12 @@ async function uploadStatus() {
 
         } catch (err) {
 
-            console.error(err);
+    console.error(err);
 
-            alert("Upload failed.");
+    alert(err.message);
 
-        }
-
+}
+        
     };
 
     reader.readAsDataURL(file);
