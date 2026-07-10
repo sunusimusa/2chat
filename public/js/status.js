@@ -18,34 +18,33 @@ async function uploadStatus() {
 
     reader.onload = async function (e) {
 
+        const media = e.target.result;
+
+        const mediaType = file.type.startsWith("video")
+            ? "video"
+            : "image";
+
         try {
 
-            const media = e.target.result;
-
-            const type = file.type.startsWith("video")
-                ? "video"
-                : "image";
-
-            const res = await fetch("/api/status/sunusi123", {
+            const res = await fetch("/api/status/create", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
                     username: user.username,
-                    type: type,
-                    media: media,
+                    avatar: user.avatar || "",
+                    media,
+                    mediaType,
                     text: ""
                 })
             });
 
             const data = await res.json();
 
-            console.log(data);
-
             if (data.success) {
 
-                alert("✅ Status uploaded successfully.");
+                alert("✅ Status Uploaded");
 
                 fileInput.value = "";
 
@@ -61,7 +60,7 @@ async function uploadStatus() {
 
             console.error(err);
 
-            alert(err.message);
+            alert("Upload Failed");
 
         }
 
@@ -88,13 +87,19 @@ async function loadStatuses() {
             if (status.username === user.username) return;
 
             list.innerHTML += `
-                <div class="status-card" onclick="openStatus('${status._id}')">
+                <div class="status-card"
+                     onclick="openStatus('${status._id}')">
 
                     <img src="${status.avatar || '/images/default.png'}">
 
                     <div>
+
                         <h4>${status.username}</h4>
-                        <small>${new Date(status.createdAt).toLocaleString()}</small>
+
+                        <small>
+                        ${new Date(status.createdAt).toLocaleString()}
+                        </small>
+
                     </div>
 
                 </div>
@@ -104,7 +109,7 @@ async function loadStatuses() {
 
     } catch (err) {
 
-        console.error(err);
+        console.log(err);
 
     }
 
