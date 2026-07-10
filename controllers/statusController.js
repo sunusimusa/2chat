@@ -1,86 +1,100 @@
 const Status = require("../models/Status");
+const cloudinary = require("../config/cloudinary");
 
-// Upload Status
+// ================= CREATE STATUS =================
 exports.createStatus = async (req, res) => {
-try{
+  try {
 
-const { username, type, media, text } = req.body;
+    const { username, type, media, text } = req.body;
 
-const status = await Status.create({
-username,
-type,
-media,
-text
-});
+    let mediaUrl = "";
 
-res.json({
-success:true,
-status
-});
+    if (media) {
 
-}catch(err){
+      const result = await cloudinary.uploader.upload(media, {
+        folder: "2chat-status",
+        resource_type: type === "video" ? "video" : "image"
+      });
 
-res.status(500).json({
-success:false,
-message:err.message
-});
+      mediaUrl = result.secure_url;
+    }
 
-}
+    const status = await Status.create({
+      username,
+      type,
+      media: mediaUrl,
+      text
+    });
+
+    res.json({
+      success: true,
+      status
+    });
+
+  } catch (err) {
+
+    console.log(err);
+
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
+
+  }
 };
 
-// Get All Active Status
+// ================= GET ALL STATUS =================
 exports.getStatuses = async (req, res) => {
 
-try{
+  try {
 
-const statuses = await Status.find()
-.sort({createdAt:-1});
+    const statuses = await Status.find()
+      .sort({ createdAt: -1 });
 
-res.json({
-success:true,
-statuses
-});
+    res.json({
+      success: true,
+      statuses
+    });
 
-}catch(err){
+  } catch (err) {
 
-res.status(500).json({
-success:false,
-message:err.message
-});
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
 
-}
+  }
 
 };
 
-
-// Get One Status
+// ================= GET ONE STATUS =================
 exports.getStatusById = async (req, res) => {
 
-try{
+  try {
 
-const status = await Status.findById(req.params.id);
+    const status = await Status.findById(req.params.id);
 
-if(!status){
+    if (!status) {
 
-return res.json({
-success:false,
-message:"Status not found"
-});
+      return res.json({
+        success: false,
+        message: "Status not found"
+      });
 
-}
+    }
 
-res.json({
-success:true,
-status
-});
+    res.json({
+      success: true,
+      status
+    });
 
-}catch(err){
+  } catch (err) {
 
-res.status(500).json({
-success:false,
-message:err.message
-});
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
 
-}
+  }
 
 };
