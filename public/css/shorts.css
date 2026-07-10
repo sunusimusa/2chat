@@ -1,1 +1,93 @@
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
 
+body{
+background:#000;
+overflow:hidden;
+}
+
+#shortsContainer{
+height:100vh;
+width:100%;
+overflow-y:scroll;
+scroll-snap-type:y mandatory;
+}
+
+.short{
+position:relative;
+height:100vh;
+width:100%;
+scroll-snap-align:start;
+background:#000;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.short video{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+.overlay{
+position:absolute;
+bottom:20px;
+left:15px;
+color:#fff;
+z-index:10;
+max-width:70%;
+}
+
+.overlay h3{
+font-size:18px;
+margin-bottom:8px;
+}
+
+.overlay p{
+font-size:14px;
+opacity:.9;
+}
+
+.actions{
+position:absolute;
+right:12px;
+bottom:90px;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:18px;
+z-index:10;
+color:#fff;
+}
+
+.actions button{
+background:none;
+border:none;
+color:white;
+font-size:28px;
+cursor:pointer;
+}
+
+.actions span{
+font-size:12px;
+}
+
+.uploadBtn{
+position:fixed;
+top:15px;
+right:15px;
+z-index:100;
+background:#1877f2;
+color:white;
+border:none;
+padding:12px 18px;
+border-radius:25px;
+font-size:15px;
+cursor:pointer;
+box-shadow:0 4px 10px rgba(0,0,0,.3);
+}
