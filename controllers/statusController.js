@@ -51,3 +51,36 @@ message:err.message
 }
 
 };
+
+
+// Get One Status
+exports.getStatusById = async (req, res) => {
+
+try{
+
+const status = await Status.findById(req.params.id);
+
+if(!status){
+
+return res.json({
+success:false,
+message:"Status not found"
+});
+
+}
+
+res.json({
+success:true,
+status
+});
+
+}catch(err){
+
+res.status(500).json({
+success:false,
+message:err.message
+});
+
+}
+
+};
