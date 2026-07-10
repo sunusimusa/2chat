@@ -1,1 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,initial-scale=1.0">
+
+<title>Upload Short</title>
+
+<link rel="stylesheet"
+href="/css/upload-short.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>🎥 Upload Short Video</h2>
+
+<input
+type="file"
+id="video"
+accept="video/*">
+
+<textarea
+id="caption"
+placeholder="Write caption...">
+</textarea>
+
+<video
+id="preview"
+controls
+style="display:none;">
+</video>
+
+<button onclick="uploadShort()">
+🚀 Upload
+</button>
+
+<button onclick="history.back()">
+⬅ Back
+</button>
+
+</div>
+
+<script src="/js/upload-short.js"></script>
+
+</body>
+
+</html>
