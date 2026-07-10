@@ -29,60 +29,46 @@ async function uploadShort() {
 
     }
 
-    const reader = new FileReader();
+    try {
 
-    reader.onload = async function (e) {
+        const formData = new FormData();
 
-        try {
+        formData.append("video", file);
 
-            const res = await fetch("/api/shorts/upload", {
+        formData.append("username", user.username);
 
-                method: "POST",
+        formData.append("avatar", user.avatar || "");
 
-                headers: {
+        formData.append("caption", caption);
 
-                    "Content-Type": "application/json"
+        const res = await fetch("/api/shorts/upload", {
 
-                },
+            method: "POST",
 
-                body: JSON.stringify({
+            body: formData
 
-                    username: user.username,
+        });
 
-                    avatar: user.avatar || "",
+        const data = await res.json();
 
-                    caption: caption,
+        if (data.success) {
 
-                    video: e.target.result
+            alert("🎉 Short uploaded successfully.");
 
-                })
+            location.href = "/shorts.html";
 
-            });
+        } else {
 
-            const data = await res.json();
-
-            if (data.success) {
-
-                alert("🎉 Short uploaded successfully.");
-
-                location.href = "/shorts.html";
-
-            } else {
-
-                alert(data.message);
-
-            }
-
-        } catch (err) {
-
-            console.error(err);
-
-            alert("Upload failed.");
+            alert(data.message);
 
         }
 
-    };
+    } catch (err) {
 
-    reader.readAsDataURL(file);
+        console.error(err);
+
+        alert(err.message);
+
+    }
 
 }
