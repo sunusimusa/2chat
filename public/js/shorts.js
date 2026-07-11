@@ -46,7 +46,11 @@ onclick="togglePlay('${video._id}')">
 
 <div class="actions">
 
-<button onclick="likeVideo('${video._id}')">❤️</button>
+<button
+id="likeBtn-${video._id}"
+onclick="likeVideo('${video._id}')">
+❤️
+</button>
 <span id="likes-${video._id}">${video.likes.length}</span>
 
 <button onclick="commentVideo('${video._id}')">💬</button>
@@ -134,14 +138,14 @@ async function likeVideo(id) {
 
     try {
 
-        await fetch("/api/shorts/like", {
+        const btn = document.getElementById("likeBtn-" + id);
+
+        const res = await fetch("/api/shorts/like", {
 
             method: "PUT",
 
             headers: {
-
                 "Content-Type": "application/json"
-
             },
 
             body: JSON.stringify({
@@ -154,7 +158,16 @@ async function likeVideo(id) {
 
         });
 
-        loadVideos();
+        const data = await res.json();
+
+        if (data.success) {
+
+            btn.classList.toggle("liked");
+
+            document.getElementById("likes-" + id).innerText =
+                data.likes;
+
+        }
 
     } catch (err) {
 
