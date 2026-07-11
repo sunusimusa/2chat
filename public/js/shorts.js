@@ -94,13 +94,17 @@ function autoPlayVideos() {
 
             if (entry.isIntersecting) {
 
-                entry.target.play();
+    entry.target.play();
 
-            } else {
+    const id = entry.target.id.replace("video-", "");
 
-                entry.target.pause();
+    addView(id);
 
-            }
+} else {
+
+    entry.target.pause();
+
+}
 
         });
 
@@ -197,6 +201,35 @@ function shareVideo(id) {
 
 }
 
+async function addView(id) {
+
+    try {
+
+        const res = await fetch("/api/shorts/view/" + id, {
+
+            method: "PUT"
+
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+
+            document.getElementById("views-" + id).innerText =
+                data.views;
+
+        }
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+
+}
+
 // ================= LOAD =================
 
 loadVideos();
+
+
