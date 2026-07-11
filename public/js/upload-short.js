@@ -49,8 +49,14 @@ async function uploadShort() {
 
         });
 
-        const data = await res.json();
+        const text = await res.text();
 
+console.log(text);
+
+alert(text);
+
+return;
+        
         if (data.success) {
 
             alert("🎉 Short uploaded successfully.");
