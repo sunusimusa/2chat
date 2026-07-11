@@ -37,8 +37,13 @@ id="video-${video._id}"
 src="${video.video}"
 playsinline
 loop
+ondblclick="doubleLike('${video._id}')"
 onclick="togglePlay('${video._id}')">
 </video>
+
+<div id="heart-${video._id}" class="heart-animation">
+❤️
+</div>
 
 <div class="overlay">
 
