@@ -40,7 +40,7 @@ onclick="togglePlay('${video._id}')">
 
 <h3>@${video.username}</h3>
 
-<p>${video.caption || ""}</p>
+<p>${video.caption ? video.caption : "No description."}</p>
 
 </div>
 
