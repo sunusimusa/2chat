@@ -370,6 +370,23 @@ async function sendComment() {
 
 }
 
+async function doubleLike(id){
+
+    const heart =
+        document.getElementById("heart-" + id);
+
+    heart.classList.add("show");
+
+    setTimeout(()=>{
+
+        heart.classList.remove("show");
+
+    },500);
+
+    await likeVideo(id);
+
+}
+
 // ================= LOAD =================
 
 loadVideos();
