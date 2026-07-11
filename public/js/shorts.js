@@ -46,33 +46,17 @@ onclick="togglePlay('${video._id}')">
 
 <div class="actions">
 
-<button onclick="likeVideo('${video._id}')">
-❤️
-</button>
+<button onclick="likeVideo('${video._id}')">❤️</button>
+<span id="likes-${video._id}">${video.likes.length}</span>
 
-<span id="likes-${video._id}">
-${video.likes.length}
-</span>
+<button onclick="commentVideo('${video._id}')">💬</button>
+<span>${video.comments.length}</span>
 
-<button onclick="commentVideo('${video._id}')">
-💬
-</button>
+<button onclick="shareVideo('${video._id}')">📤</button>
+<span>Share</span>
 
-<span>
-${video.comments.length}
-</span>
-
-<button onclick="shareVideo('${video._id}')">
-📤
-</button>
-
-<button>
-👁️
-</button>
-
-<span id="views-${video._id}">
-${video.views}
-</span>
+<button disabled>👁️</button>
+<span id="views-${video._id}">${video.views}</span>
 
 </div>
 
