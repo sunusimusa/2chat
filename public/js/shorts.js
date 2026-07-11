@@ -24,6 +24,8 @@ async function loadVideos() {
 
         container.innerHTML = "";
 
+        window.videos = data.videos;
+
         data.videos.forEach(video => {
 
             container.innerHTML += `
@@ -187,7 +189,14 @@ async function likeVideo(id) {
 
 function commentVideo(id) {
 
-    alert("💬 Comment System Coming Next");
+    currentVideoId = id;
+
+    document
+        .getElementById("commentModal")
+        .classList
+        .add("show");
+
+    loadComments(id);
 
 }
 
@@ -227,6 +236,51 @@ async function addView(id) {
         console.log(err);
 
     }
+
+}
+
+function closeComments() {
+
+    document
+        .getElementById("commentModal")
+        .classList
+        .remove("show");
+
+}              
+
+function loadComments(id) {
+
+    const video = window.videos.find(v => v._id === id);
+
+    const list =
+        document.getElementById("commentList");
+
+    list.innerHTML = "";
+
+    if (!video.comments.length) {
+
+        list.innerHTML =
+            "<p style='text-align:center;'>No comments yet.</p>";
+
+        return;
+
+    }
+
+    video.comments.forEach(comment => {
+
+        list.innerHTML += `
+
+<div class="comment-item">
+
+<b>@${comment.username}</b>
+
+<p>${comment.text}</p>
+
+</div>
+
+`;
+
+    });
 
 }
 
