@@ -1,6 +1,6 @@
 const ShortVideo = require("../models/ShortVideo");
 const cloudinary = require("../config/cloudinary");
-const fs = require("fs");
+const streamifier = require("streamifier");
 
 // Upload Short Video
 exports.uploadVideo = async (req, res) => {
@@ -14,12 +14,22 @@ exports.uploadVideo = async (req, res) => {
             });
         }
 
-        const result = await cloudinary.uploader.upload(req.file.path, {
-            resource_type: "video",
-            folder: "2chat/shorts"
-        });
+        const uploadResult = await new Promise((resolve, reject) => {
 
-        fs.unlinkSync(req.file.path);
+            const stream = cloudinary.uploader.upload_stream(
+                {
+                    resource_type: "video",
+                    folder: "2chat/shorts"
+                },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            );
+
+            streamifier.createReadStream(req.file.buffer).pipe(stream);
+
+        });
 
         const short = await ShortVideo.create({
 
@@ -29,7 +39,7 @@ exports.uploadVideo = async (req, res) => {
 
             caption: req.body.caption || "",
 
-            video: result.secure_url
+            video: uploadResult.secure_url
 
         });
 
