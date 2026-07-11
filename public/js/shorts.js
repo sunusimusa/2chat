@@ -2,6 +2,8 @@ const user = JSON.parse(localStorage.getItem("user"));
 
 const container = document.getElementById("shortsContainer");
 
+let currentVideoId = null;
+
 // ================= LOAD VIDEOS =================
 
 async function loadVideos() {
