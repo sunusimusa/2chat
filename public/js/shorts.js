@@ -284,8 +284,87 @@ function loadComments(id) {
 
 }
 
+async function sendComment() {
+
+    const input = document.getElementById("commentText");
+
+    const text = input.value.trim();
+
+    if (text === "") return;
+
+    try {
+
+        const res = await fetch("/api/shorts/comment", {
+
+            method: "PUT",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                videoId: currentVideoId,
+
+                username: user.username,
+
+                text
+
+            })
+
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+
+            input.value = "";
+
+            const list = document.getElementById("commentList");
+
+            list.innerHTML = "";
+
+            data.comments.forEach(comment => {
+
+                list.innerHTML += `
+
+<div class="comment-item">
+
+<b>@${comment.username}</b>
+
+<p>${comment.text}</p>
+
+</div>
+
+`;
+
+            });
+
+            // Sabunta yawan comments a memory
+            const video = window.videos.find(v => v._id === currentVideoId);
+
+            if (video) {
+
+                video.comments = data.comments;
+
+            }
+
+        } else {
+
+            alert(data.message);
+
+        }
+
+    } catch (err) {
+
+        console.log(err);
+
+        alert("Failed to send comment.");
+
+    }
+
+}
+
 // ================= LOAD =================
 
 loadVideos();
-
-
