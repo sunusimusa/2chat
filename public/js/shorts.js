@@ -59,10 +59,18 @@ onclick="togglePlay('${video._id}')">
 
 <button
 id="followBtn-${video.username}"
-class="follow-btn"
+class="follow-btn ${
+following.includes(video.username)
+? "following"
+: ""
+}"
 onclick="followUser('${video.username}')">
 
-+ Follow
+${
+following.includes(video.username)
+? "✓ Following"
+: "+ Follow"
+}
 
 </button>
 
