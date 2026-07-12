@@ -79,6 +79,27 @@ onclick="likeVideo('${video._id}')">
 
         });
 
+        const params = new URLSearchParams(window.location.search);
+
+const videoId = params.get("video");
+
+if(videoId){
+
+    const target =
+    document.getElementById("video-" + videoId);
+
+    if(target){
+
+        target.parentElement.scrollIntoView({
+
+            behavior:"smooth"
+
+        });
+
+    }
+
+}
+
         autoPlayVideos();
 
     } catch (err) {
