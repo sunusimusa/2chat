@@ -208,7 +208,10 @@ function commentVideo(id) {
 // ================= SHARE =================
 async function shareVideo(id) {
 
-    const url = window.location.origin + "/shorts.html?id=" + id;
+    const url =
+window.location.origin +
+"/shorts.html?video=" +
+id;
 
     try {
 
