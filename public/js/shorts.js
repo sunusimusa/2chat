@@ -500,19 +500,29 @@ async function followUser(targetUsername){
 
             if(btn.innerText === "+ Follow"){
 
-                btn.innerText = "✓ Following";
+    btn.innerText = "✓ Following";
 
-                btn.classList.add("following");
+    btn.classList.add("following");
 
-            }else{
+    user.following.push(targetUsername);
 
-                btn.innerText = "+ Follow";
+}else{
 
-                btn.classList.remove("following");
+    btn.innerText = "+ Follow";
 
-            }
+    btn.classList.remove("following");
 
-        }
+    user.following =
+        user.following.filter(
+            u => u !== targetUsername
+        );
+
+}
+
+localStorage.setItem(
+    "user",
+    JSON.stringify(user)
+);
 
     }catch(err){
 
