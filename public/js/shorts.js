@@ -451,6 +451,67 @@ async function doubleLike(id){
 
 }
 
+async function followUser(targetUsername){
+
+    if(targetUsername === user.username){
+
+        return;
+
+    }
+
+    try{
+
+        const res = await fetch("/api/users/follow",{
+
+            method:"PUT",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                myUsername:user.username,
+
+                targetUsername
+
+            })
+
+        });
+
+        const data = await res.json();
+
+        if(data.success){
+
+            const btn =
+            document.getElementById(
+                "followBtn-" + targetUsername
+            );
+
+            if(btn.innerText === "+ Follow"){
+
+                btn.innerText = "✓ Following";
+
+                btn.classList.add("following");
+
+            }else{
+
+                btn.innerText = "+ Follow";
+
+                btn.classList.remove("following");
+
+            }
+
+        }
+
+    }catch(err){
+
+        console.log(err);
+
+    }
+
+}
+
 // ================= LOAD =================
 
 loadVideos();
