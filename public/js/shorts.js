@@ -24,6 +24,8 @@ async function loadVideos() {
 
         container.innerHTML = "";
 
+        const following = user.following || [];
+
         window.videos = data.videos;
 
         data.videos.forEach(video => {
