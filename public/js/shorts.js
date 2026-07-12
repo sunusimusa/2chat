@@ -206,14 +206,37 @@ function commentVideo(id) {
 }
 
 // ================= SHARE =================
-
-function shareVideo(id) {
+async function shareVideo(id) {
 
     const url = window.location.origin + "/shorts.html?id=" + id;
 
-    navigator.clipboard.writeText(url);
+    try {
 
-    alert("📤 Link Copied");
+        if (navigator.share) {
+
+            await navigator.share({
+
+                title: "2Chat Shorts",
+
+                text: "Watch this amazing Short on 2Chat!",
+
+                url: url
+
+            });
+
+        } else {
+
+            await navigator.clipboard.writeText(url);
+
+            alert("📋 Link copied successfully.");
+
+        }
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
 
 }
 
