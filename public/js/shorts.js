@@ -464,9 +464,7 @@ async function doubleLike(id){
 async function followUser(targetUsername){
 
     if(targetUsername === user.username){
-
         return;
-
     }
 
     try{
@@ -493,36 +491,36 @@ async function followUser(targetUsername){
 
         if(data.success){
 
-            const btn =
-            document.getElementById(
+            const btn = document.getElementById(
                 "followBtn-" + targetUsername
             );
 
             if(btn.innerText === "+ Follow"){
 
-    btn.innerText = "✓ Following";
+                btn.innerText = "✓ Following";
 
-    btn.classList.add("following");
+                btn.classList.add("following");
 
-    user.following.push(targetUsername);
+                user.following.push(targetUsername);
 
-}else{
+            }else{
 
-    btn.innerText = "+ Follow";
+                btn.innerText = "+ Follow";
 
-    btn.classList.remove("following");
+                btn.classList.remove("following");
 
-    user.following =
-        user.following.filter(
-            u => u !== targetUsername
-        );
+                user.following = user.following.filter(
+                    u => u !== targetUsername
+                );
 
-}
+            }
 
-localStorage.setItem(
-    "user",
-    JSON.stringify(user)
-);
+            localStorage.setItem(
+                "user",
+                JSON.stringify(user)
+            );
+
+        }
 
     }catch(err){
 
@@ -531,6 +529,7 @@ localStorage.setItem(
     }
 
 }
+                
 
 // ================= LOAD =================
 
