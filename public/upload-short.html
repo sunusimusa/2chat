@@ -5,13 +5,11 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Upload Short</title>
 
-<link rel="stylesheet"
-href="/css/upload-short.css">
+<link rel="stylesheet" href="/css/upload-short.css">
 
 </head>
 
@@ -19,17 +17,23 @@ href="/css/upload-short.css">
 
 <div class="container">
 
-<h2>🎥 Upload Short Video</h2>
+<h2>🎬 Create a Short</h2>
+
+<label for="video" class="upload-box">
+
+<div class="upload-icon">📹</div>
+
+<p>Select a Video</p>
+
+<small>Maximum size: 20MB</small>
+
+</label>
 
 <input
 type="file"
 id="video"
-accept="video/*">
-
-<textarea
-id="caption"
-placeholder="Write caption...">
-</textarea>
+accept="video/*"
+hidden>
 
 <video
 id="preview"
@@ -37,13 +41,31 @@ controls
 style="display:none;">
 </video>
 
-<button onclick="uploadShort()">
-🚀 Upload
+<textarea
+id="caption"
+maxlength="200"
+placeholder="Write something about your video...">
+</textarea>
+
+<div class="button-group">
+
+<button
+class="upload-btn"
+onclick="uploadShort()">
+
+🚀 Upload Short
+
 </button>
 
-<button onclick="history.back()">
+<button
+class="back-btn"
+onclick="history.back()">
+
 ⬅ Back
+
 </button>
+
+</div>
 
 </div>
 
