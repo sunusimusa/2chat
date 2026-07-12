@@ -47,7 +47,24 @@ onclick="togglePlay('${video._id}')">
 
 <div class="overlay">
 
+<div class="user-info">
+
+<div>
+
 <h3>@${video.username}</h3>
+
+</div>
+
+<button
+id="followBtn-${video.username}"
+class="follow-btn"
+onclick="followUser('${video.username}')">
+
++ Follow
+
+</button>
+
+</div>
 
 <p>${video.caption ? video.caption : "No description."}</p>
 
