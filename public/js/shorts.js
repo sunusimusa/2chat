@@ -49,42 +49,39 @@ onclick="togglePlay('${video._id}')">
 
 <div class="overlay">
 
-<div class="user-info">
+    <div class="user-info">
 
-<div>
+        <div>
+            <h3>@${video.username}</h3>
+        </div>
 
-<h3>@${video.username}</h3>
+        <div class="user-buttons">
 
-</div>
+            <button class="uploadBtn"
+            onclick="location.href='/upload-short.html'">
+                ➕
+            </button>
 
-<div class="user-buttons">
+            <button
+            id="followBtn-${video.username}"
+            class="follow-btn ${
+                following.includes(video.username) ? "following" : ""
+            }"
+            onclick="followUser('${video.username}')">
 
-<button
-class="uploadBtn"
-onclick="location.href='/upload-short.html'">
-➕
-</button>
+            ${
+                following.includes(video.username)
+                ? "✓ Following"
+                : "+ Follow"
+            }
 
-<button
-id="followBtn-${video.username}"
-class="follow-btn ${
-following.includes(video.username)
-? "following"
-: ""
-}"
-onclick="followUser('${video.username}')">
+            </button>
 
-${
-following.includes(video.username)
-? "✓ Following"
-: "+ Follow"
-}
+        </div>
 
-</button>
+    </div>
 
-</div>
-
-<p>${video.caption ? video.caption : ""}</p>
+    <p>${video.caption || ""}</p>
 
 </div>
 
