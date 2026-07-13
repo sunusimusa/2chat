@@ -36,4 +36,6 @@ router.put("/view/:id", addView);
 // Save / Unsave Video
 router.put("/save", saveVideo);
 
+router.get("/saved/:username", getSavedVideos);
+
 module.exports = router;
