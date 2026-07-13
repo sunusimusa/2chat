@@ -52,10 +52,16 @@ onclick="togglePlay('${video._id}')">
 <div class="user-info">
 
 <div>
-
 <h3>@${video.username}</h3>
-
 </div>
+
+<div class="user-buttons">
+
+<button
+class="uploadBtn"
+onclick="location.href='/upload-short.html'">
+➕
+</button>
 
 <button
 id="followBtn-${video.username}"
