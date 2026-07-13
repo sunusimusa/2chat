@@ -144,17 +144,19 @@ text-shadow:0 2px 5px rgba(0,0,0,.8);
 
 .uploadBtn{
 position:fixed;
-top:15px;
-right:15px;
-z-index:100;
-background:#1877f2;
-color:white;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+width:65px;
+height:65px;
 border:none;
-padding:12px 18px;
-border-radius:25px;
-font-size:15px;
+border-radius:50%;
+background:#ff0050;
+color:#fff;
+font-size:32px;
 cursor:pointer;
-box-shadow:0 4px 10px rgba(0,0,0,.3);
+box-shadow:0 4px 12px rgba(0,0,0,.4);
+z-index:999;
 }
 
 #shortsContainer::-webkit-scrollbar{
