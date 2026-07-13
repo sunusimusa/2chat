@@ -142,23 +142,6 @@ text-shadow:0 2px 5px rgba(0,0,0,.8);
 
 }
 
-.uploadBtn{
-position:fixed;
-bottom:20px;
-left:50%;
-transform:translateX(-50%);
-width:65px;
-height:65px;
-border:none;
-border-radius:50%;
-background:#ff0050;
-color:#fff;
-font-size:32px;
-cursor:pointer;
-box-shadow:0 4px 12px rgba(0,0,0,.4);
-z-index:999;
-}
-
 #shortsContainer::-webkit-scrollbar{
 display:none;
 }
