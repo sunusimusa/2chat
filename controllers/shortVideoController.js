@@ -273,3 +273,42 @@ exports.saveVideo = async (req, res) => {
     }
 
 };
+
+exports.getSavedVideos = async (req, res) => {
+
+    try{
+
+        const user = await User.findOne({
+            username:req.params.username
+        }).populate("savedVideos");
+
+        if(!user){
+
+            return res.json({
+                success:false,
+                message:"User not found"
+            });
+
+        }
+
+        res.json({
+
+            success:true,
+
+            videos:user.savedVideos
+
+        });
+
+    }catch(err){
+
+        res.status(500).json({
+
+            success:false,
+
+            message:err.message
+
+        });
+
+    }
+
+};
