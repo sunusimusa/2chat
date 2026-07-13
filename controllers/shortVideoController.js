@@ -1,4 +1,5 @@
 const ShortVideo = require("../models/ShortVideo");
+const User = require("../models/User");
 const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
 
@@ -195,6 +196,71 @@ exports.addView = async (req, res) => {
         res.json({
             success: true,
             views: video.views
+        });
+
+    } catch (err) {
+
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+
+    }
+
+};
+
+// ================= SAVE / UNSAVE VIDEO =================
+
+exports.saveVideo = async (req, res) => {
+
+    try {
+
+        const { username, videoId } = req.body;
+
+        const user = await User.findOne({ username });
+
+        if (!user) {
+            return res.json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        const video = await ShortVideo.findById(videoId);
+
+        if (!video) {
+            return res.json({
+                success: false,
+                message: "Video not found"
+            });
+        }
+
+        const alreadySaved = user.savedVideos.some(
+            id => id.toString() === videoId
+        );
+
+        if (alreadySaved) {
+
+            user.savedVideos = user.savedVideos.filter(
+                id => id.toString() !== videoId
+            );
+
+            await user.save();
+
+            return res.json({
+                success: true,
+                saved: false
+            });
+
+        }
+
+        user.savedVideos.push(videoId);
+
+        await user.save();
+
+        res.json({
+            success: true,
+            saved: true
         });
 
     } catch (err) {
