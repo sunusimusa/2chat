@@ -100,6 +100,13 @@ onclick="likeVideo('${video._id}')">
 <button onclick="shareVideo('${video._id}')">📤</button>
 <span>Share</span>
 
+<button
+id="saveBtn-${video._id}"
+onclick="saveVideo('${video._id}')">
+🔖
+</button>
+<span>Save</span>
+
 <button disabled>👁️</button>
 <span id="views-${video._id}">${video.views}</span>
 
@@ -534,7 +541,62 @@ async function followUser(targetUsername){
     }
 
 }
-                
+
+
+// ================= SAVE VIDEO =================
+
+async function saveVideo(id){
+
+    try{
+
+        const btn =
+        document.getElementById("saveBtn-" + id);
+
+        const res = await fetch("/api/shorts/save",{
+
+            method:"PUT",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                username:user.username,
+
+                videoId:id
+
+            })
+
+        });
+
+        const data = await res.json();
+
+        if(data.success){
+
+            if(data.saved){
+
+                btn.innerText="✅";
+
+                btn.classList.add("liked");
+
+            }else{
+
+                btn.innerText="🔖";
+
+                btn.classList.remove("liked");
+
+            }
+
+        }
+
+    }catch(err){
+
+        console.log(err);
+
+    }
+
+}                
 
 // ================= LOAD =================
 
