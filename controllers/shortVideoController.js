@@ -213,6 +213,8 @@ exports.addView = async (req, res) => {
 
 exports.saveVideo = async (req, res) => {
 
+    console.log(req.body);
+
     try {
 
         const { username, videoId } = req.body;
