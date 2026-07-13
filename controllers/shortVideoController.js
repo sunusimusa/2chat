@@ -210,66 +210,72 @@ exports.addView = async (req, res) => {
 };
 
 // ================= SAVE / UNSAVE VIDEO =================
-
 exports.saveVideo = async (req, res) => {
 
-    console.log(req.body);
-
     try {
+
+        console.log("BODY:", req.body);
 
         const { username, videoId } = req.body;
 
         const user = await User.findOne({ username });
 
+        console.log("USER:", user);
+
         if (!user) {
             return res.json({
-                success: false,
-                message: "User not found"
+                success:false,
+                message:"User not found"
             });
         }
 
         const video = await ShortVideo.findById(videoId);
 
-        if (!video) {
+        console.log("VIDEO:", video);
+
+        if(!video){
             return res.json({
-                success: false,
-                message: "Video not found"
+                success:false,
+                message:"Video not found"
             });
         }
 
-        const alreadySaved = user.savedVideos.some(
-            id => id.toString() === videoId
-        );
+        console.log("Before Save:", user.savedVideos);
 
-        if (alreadySaved) {
-
-            user.savedVideos = user.savedVideos.filter(
-                id => id.toString() !== videoId
+        const alreadySaved =
+            user.savedVideos.some(
+                id => id.toString() === videoId
             );
 
-            await user.save();
+        if(alreadySaved){
 
-            return res.json({
-                success: true,
-                saved: false
-            });
+            user.savedVideos =
+                user.savedVideos.filter(
+                    id => id.toString() !== videoId
+                );
+
+        }else{
+
+            user.savedVideos.push(video._id);
 
         }
-
-        user.savedVideos.push(videoId);
 
         await user.save();
 
+        console.log("After Save:", user.savedVideos);
+
         res.json({
-            success: true,
-            saved: true
+            success:true,
+            saved:!alreadySaved
         });
 
-    } catch (err) {
+    } catch(err){
+
+        console.log(err);
 
         res.status(500).json({
-            success: false,
-            message: err.message
+            success:false,
+            message:err.message
         });
 
     }
