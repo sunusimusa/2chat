@@ -1,71 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+content="width=device-width,initial-scale=1.0">
 
 <title>2Chat Shorts</title>
 
-<link rel="stylesheet" href="/css/shorts.css">
+<link rel="stylesheet"
+href="/css/shorts.css">
 
 </head>
 
 <body>
 
-<!-- Shorts Container -->
+<div id="shortsContainer">
 
-<div id="shortsContainer"></div>
+<!-- Shorts will load here -->
 
-  <button
+</div>
+
+<!-- Upload Button -->
+
+<button
 class="uploadBtn"
 onclick="location.href='/upload-short.html'">
 
 ➕
 
-</button>  
+</button>
 
-<!-- Comment Modal -->
+<!-- Comment Popup -->
 
-<div id="commentModal" class="comment-modal">
+<div
+id="commentModal"
+class="comment-modal">
 
-    <div class="comment-box">
+<div class="comment-box">
 
-        <div class="comment-header">
+<div class="comment-header">
 
-            <h3>💬 Comments</h3>
+<h3>💬 Comments</h3>
 
-            <button onclick="closeComments()">✖</button>
+<button
+onclick="closeComments()">
 
-        </div>
+✖
 
-        <div id="commentList" class="comment-list">
+</button>
 
-            <!-- Comments will appear here -->
+</div>
 
-        </div>
+<div
+id="commentList"
+class="comment-list">
 
-        <div class="comment-input">
+</div>
 
-            <input
-                type="text"
-                id="commentText"
-                placeholder="Write a comment...">
+<div class="comment-input">
 
-            <button onclick="sendComment()">
-                Send
-            </button>
+<input
+type="text"
+id="commentText"
+placeholder="Write a comment...">
 
-        </div>
+<button
+onclick="sendComment()">
 
-    </div>
+Send
+
+</button>
+
+</div>
+
+</div>
 
 </div>
 
 <script src="/js/shorts.js"></script>
 
 </body>
-
 </html>
