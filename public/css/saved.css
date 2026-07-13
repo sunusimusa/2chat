@@ -1,1 +1,35 @@
+body{
 
+background:#111;
+
+color:#fff;
+
+font-family:Arial;
+
+padding:15px;
+
+}
+
+h2{
+
+margin-bottom:20px;
+
+}
+
+#savedContainer{
+
+display:grid;
+
+grid-template-columns:repeat(2,1fr);
+
+gap:12px;
+
+}
+
+.video-card video{
+
+width:100%;
+
+border-radius:12px;
+
+}
