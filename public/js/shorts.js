@@ -84,7 +84,7 @@ following.includes(video.username)
 
 </div>
 
-<p>${video.caption ? video.caption : "No description."}</p>
+<p>${video.caption ? video.caption : ""}</p>
 
 </div>
 
