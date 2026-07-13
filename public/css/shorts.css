@@ -85,23 +85,14 @@ padding-right:5px;
 }
 
 .actions{
-
 position:absolute;
-
-right:12px;
-
-bottom:110px;
-
+right:15px;
+bottom:120px;
 display:flex;
-
 flex-direction:column;
-
 align-items:center;
-
 gap:18px;
-
 z-index:30;
-
 }
 
 .actions button{
