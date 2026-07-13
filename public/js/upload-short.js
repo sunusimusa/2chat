@@ -15,7 +15,7 @@ videoInput.addEventListener("change", () => {
 
 });
 
-async function uploadShort() {
+function uploadShort() {
 
     const file = videoInput.files[0];
 
@@ -29,52 +29,64 @@ async function uploadShort() {
 
     }
 
-    try {
+    const formData = new FormData();
 
-        const formData = new FormData();
+    formData.append("video", file);
 
-        formData.append("video", file);
+    formData.append("username", user.username);
 
-        formData.append("username", user.username);
+    formData.append("avatar", user.avatar || "");
 
-        formData.append("avatar", user.avatar || "");
+    formData.append("caption", caption);
 
-        formData.append("caption", caption);
+    const xhr = new XMLHttpRequest();
 
-        const res = await fetch("/api/shorts/upload", {
+    xhr.open("POST", "/api/shorts/upload", true);
 
-            method: "POST",
+    document.getElementById("progressContainer").style.display = "block";
 
-            body: formData
+    xhr.upload.onprogress = function(e){
 
-        });
+        if(e.lengthComputable){
 
-        const text = await res.text();
+            const percent = Math.round((e.loaded / e.total) * 100);
 
-console.log(text);
+            document.getElementById("progressFill").style.width = percent + "%";
 
-alert(text);
+            document.getElementById("progressText").innerText = percent + "%";
 
-return;
-        
-        if (data.success) {
+        }
 
-            alert("🎉 Short uploaded successfully.");
+    };
 
-            location.href = "/shorts.html";
+    xhr.onload = function(){
 
-        } else {
+        const data = JSON.parse(xhr.responseText);
+
+        if(data.success){
+
+            document.getElementById("progressText").innerText = "✅ Upload Complete";
+
+            setTimeout(()=>{
+
+                location.href="/shorts.html";
+
+            },1000);
+
+        }else{
 
             alert(data.message);
 
         }
 
-    } catch (err) {
+    };
 
-        console.error(err);
+    xhr.onerror = function(){
 
-        alert(err.message);
+        alert("Upload failed.");
 
-    }
+    };
+
+    xhr.send(formData);
 
 }
