@@ -52,7 +52,14 @@ default:Date.now
 following:{
   type:[String],
   default:[]
-}, 
+},
+
+    savedVideos: [
+    {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Short"
+    }
+],
 
     bio: {
       type: String,
