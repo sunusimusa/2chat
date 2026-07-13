@@ -3,16 +3,14 @@ const router = require("express").Router();
 const upload = require("../middleware/upload");
 
 const {
-
     uploadVideo,
     getVideos,
     likeVideo,
     commentVideo,
     addView,
-    saveVideo
-
+    saveVideo,
+    getSavedVideos
 } = require("../controllers/shortVideoController");
-
 
 // Upload Short Video
 router.post(
