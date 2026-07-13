@@ -52,7 +52,9 @@ onclick="togglePlay('${video._id}')">
 <div class="user-info">
 
 <div>
+
 <h3>@${video.username}</h3>
+
 </div>
 
 <div class="user-buttons">
