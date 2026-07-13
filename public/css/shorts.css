@@ -37,21 +37,12 @@ object-fit:cover;
 }
 
 .overlay{
-
 position:absolute;
-
 left:15px;
-
+right:90px;   /* Ka bar sarari ga buttons */
 bottom:25px;
-
-width:70%;
-
 color:#fff;
-
 z-index:20;
-
-text-shadow:0 2px 8px rgba(0,0,0,.8);
-
 }
 
 .overlay h3{
@@ -87,7 +78,8 @@ padding-right:5px;
 .actions{
 position:absolute;
 right:15px;
-bottom:120px;
+top:50%;
+transform:translateY(-50%);
 display:flex;
 flex-direction:column;
 align-items:center;
