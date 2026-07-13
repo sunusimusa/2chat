@@ -8,9 +8,11 @@ const {
     getVideos,
     likeVideo,
     commentVideo,
-    addView
+    addView,
+    saveVideo
 
 } = require("../controllers/shortVideoController");
+
 
 // Upload Short Video
 router.post(
@@ -30,5 +32,8 @@ router.put("/comment", commentVideo);
 
 // View
 router.put("/view/:id", addView);
+
+// Save / Unsave Video
+router.put("/save", saveVideo);
 
 module.exports = router;
