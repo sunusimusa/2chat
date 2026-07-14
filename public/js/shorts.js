@@ -34,8 +34,8 @@ async function loadVideos() {
 
 const savedData = await savedRes.json();
 
-const savedVideos = savedData.success
-    ? savedData.videos.map(v => v._id)
+const savedVideos = savedData.success && Array.isArray(savedData.videos)
+    ? savedData.videos.map(v => String(v._id))
     : [];
 
         data.videos.forEach(video => {
@@ -115,7 +115,7 @@ id="saveBtn-${video._id}"
 class="${savedVideos.includes(video._id) ? "liked" : ""}"
 onclick="saveVideo('${video._id}')">
 
-${savedVideos.includes(video._id) ? "✅" : "🔖"}
+${savedVideos.includes(String(video._id)) ? "✅" : "🔖"}
 
 </button>
 <span>Save</span>
