@@ -40,13 +40,29 @@ const savedVideos = savedData.success && Array.isArray(savedData.videos)
     ? savedData.videos.map(v => String(v._id))
     : [];
 
-        let videos = data.videos;
+        let videos = [...data.videos];
 
 if(currentTab === "following"){
 
     videos = videos.filter(video =>
         user.following.includes(video.username)
     );
+
+}else{
+
+    // For You: sabbin videos da masu likes da views su fara fitowa
+
+    videos.sort((a,b)=>{
+
+        const scoreA =
+            a.likes.length * 5 + a.views;
+
+        const scoreB =
+            b.likes.length * 5 + b.views;
+
+        return scoreB - scoreA;
+
+    });
 
 }
 
@@ -622,7 +638,6 @@ async function saveVideo(id){
     }
 
 }
-
 
 function showForYou(){
 
