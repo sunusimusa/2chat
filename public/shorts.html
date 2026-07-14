@@ -16,6 +16,27 @@ href="/css/shorts.css">
 
 <body>
 
+  <div class="shorts-tabs">
+
+    <button id="forYouTab"
+    class="active"
+    onclick="loadVideos('foryou')">
+
+        For You
+
+    </button>
+
+    <button id="followingTab"
+    onclick="loadVideos('following')">
+
+        Following
+
+    </button>
+
+</div>
+
+<div id="shortsContainer"></div>
+
 <div id="shortsContainer">
 
 <!-- Shorts will load here -->
