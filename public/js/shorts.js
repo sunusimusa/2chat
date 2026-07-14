@@ -28,6 +28,16 @@ async function loadVideos() {
 
         window.videos = data.videos;
 
+        const savedRes = await fetch(
+    "/api/shorts/saved/" + user.username
+);
+
+const savedData = await savedRes.json();
+
+const savedVideos = savedData.success
+    ? savedData.videos.map(v => v._id)
+    : [];
+
         data.videos.forEach(video => {
 
             container.innerHTML += `
