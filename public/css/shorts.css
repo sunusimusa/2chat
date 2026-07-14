@@ -317,3 +317,28 @@ body{
 .uploadBtn:active{
     transform:scale(.95);
 }
+
+.shorts-tabs{
+position:fixed;
+top:10px;
+left:50%;
+transform:translateX(-50%);
+display:flex;
+gap:25px;
+z-index:1000;
+}
+
+.shorts-tabs button{
+background:none;
+border:none;
+color:#bbb;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+padding:8px 5px;
+}
+
+.shorts-tabs button.active{
+color:#fff;
+border-bottom:3px solid #ff0050;
+}
