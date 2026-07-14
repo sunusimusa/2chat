@@ -102,8 +102,11 @@ onclick="likeVideo('${video._id}')">
 
 <button
 id="saveBtn-${video._id}"
+class="${savedVideos.includes(video._id) ? "liked" : ""}"
 onclick="saveVideo('${video._id}')">
-🔖
+
+${savedVideos.includes(video._id) ? "✅" : "🔖"}
+
 </button>
 <span>Save</span>
 
