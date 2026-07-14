@@ -342,3 +342,26 @@ padding:8px 5px;
 color:#fff;
 border-bottom:3px solid #ff0050;
 }
+
+.short-tabs{
+    position:fixed;
+    top:15px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:40px;
+    z-index:9999;
+}
+
+.short-tabs span{
+    color:#bbb;
+    font-size:24px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.short-tabs span.active{
+    color:#fff;
+    border-bottom:3px solid #ff0050;
+    padding-bottom:5px;
+}
