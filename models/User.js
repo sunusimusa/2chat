@@ -55,10 +55,10 @@ following:{
 },
 
     savedVideos: [
-    {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Short"
-    }
+{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "ShortVideo"
+}
 ],
 
     bio: {
