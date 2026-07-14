@@ -3,6 +3,8 @@ const user = JSON.parse(localStorage.getItem("user"));
 const container = document.getElementById("shortsContainer");
 
 let currentVideoId = null;
+let currentTab = "foryou";
+
 
 // ================= LOAD VIDEOS =================
 
@@ -38,8 +40,18 @@ const savedVideos = savedData.success && Array.isArray(savedData.videos)
     ? savedData.videos.map(v => String(v._id))
     : [];
 
-        data.videos.forEach(video => {
+        let videos = data.videos;
 
+if(currentTab === "following"){
+
+    videos = videos.filter(video =>
+        user.following.includes(video.username)
+    );
+
+}
+
+videos.forEach(video => {
+    
             container.innerHTML += `
 
 <div class="short">
@@ -609,7 +621,36 @@ async function saveVideo(id){
 
     }
 
-}                
+}
+
+
+function showForYou(){
+
+    currentTab = "foryou";
+
+    document.getElementById("forYouTab")
+        .classList.add("active");
+
+    document.getElementById("followingTab")
+        .classList.remove("active");
+
+    loadVideos();
+
+}
+
+function showFollowing(){
+
+    currentTab = "following";
+
+    document.getElementById("followingTab")
+        .classList.add("active");
+
+    document.getElementById("forYouTab")
+        .classList.remove("active");
+
+    loadVideos();
+
+}
 
 // ================= LOAD =================
 
