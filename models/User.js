@@ -24,6 +24,11 @@ default:[]
       required: true
     },
 
+    creatorBadge: {
+    type: String,
+    default: "🥉 Bronze Creator"
+},
+
     avatar: {
       type: String,
       default: ""
