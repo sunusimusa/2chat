@@ -264,4 +264,75 @@ body{
 }
 
 
+.top-shorts{
+
+margin:15px;
+
+background:#1c1c1c;
+
+padding:20px;
+
+border-radius:18px;
+
 }
+
+
+.top-item{
+
+display:flex;
+
+gap:15px;
+
+padding:15px 0;
+
+border-bottom:1px solid #333;
+
+}
+
+
+.rank{
+
+font-size:25px;
+
+width:40px;
+
+display:flex;
+
+align-items:center;
+
+}
+
+
+.top-item video{
+
+width:90px;
+
+height:120px;
+
+object-fit:cover;
+
+border-radius:12px;
+
+}
+
+
+.details span{
+
+margin-right:10px;
+
+color:#bbb;
+
+font-size:13px;
+
+}
+
+
+.details h4{
+
+color:#ff0050;
+
+margin-top:8px;
+
+}
+
+
