@@ -335,4 +335,124 @@ margin-top:8px;
 
 }
 
+.creator-badge{
 
+display:inline-block;
+
+padding:8px 18px;
+
+border-radius:30px;
+
+font-size:18px;
+
+font-weight:bold;
+
+background:#444;
+
+color:white;
+
+margin-top:10px;
+
+}
+
+
+
+.badge-bronze{
+
+background:linear-gradient(
+45deg,
+#cd7f32,
+#8b4513
+);
+
+}
+
+
+
+.badge-silver{
+
+background:linear-gradient(
+45deg,
+#eee,
+#777
+);
+
+color:#222;
+
+}
+
+
+
+.badge-gold{
+
+background:linear-gradient(
+45deg,
+#ffd700,
+#ff9800
+);
+
+color:#fff;
+
+animation:goldGlow 2s infinite;
+
+}
+
+
+
+.badge-diamond{
+
+background:linear-gradient(
+45deg,
+#00e5ff,
+#2979ff
+);
+
+animation:diamondGlow 2s infinite;
+
+}
+
+
+
+@keyframes goldGlow{
+
+0%{
+box-shadow:0 0 5px gold;
+}
+
+50%{
+box-shadow:0 0 25px gold;
+}
+
+100%{
+box-shadow:0 0 5px gold;
+}
+
+}
+
+
+
+@keyframes diamondGlow{
+
+0%{
+box-shadow:0 0 5px cyan;
+}
+
+50%{
+box-shadow:0 0 30px cyan;
+}
+
+100%{
+box-shadow:0 0 5px cyan;
+}
+
+}
+
+
+
+.mini-badge{
+
+font-size:14px;
+
+margin-left:5px;
+
+}
