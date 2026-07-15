@@ -330,32 +330,37 @@ function commentVideo(id) {
 }
 
 // ================= SHARE =================
-async function shareVideo(id) {
+async function shareVideo(id){
 
-    await fetch("/api/shorts/share/" + id, {
-    method: "PUT"
-});
+    try{
 
-    const url =
-window.location.origin +
-"/shorts.html?video=" +
-id;
+        const res = await fetch("/api/shorts/share/" + id,{
+            method:"PUT"
+        });
 
-    try {
+        const data = await res.json();
 
-        if (navigator.share) {
+        if(data.success){
+
+            document.getElementById(
+                "shares-" + id
+            ).innerText = data.shares;
+
+        }
+
+        const url =
+            window.location.origin +
+            "/shorts.html?video=" + id;
+
+        if(navigator.share){
 
             await navigator.share({
-
-                title: "2Chat Shorts",
-
-                text: "Watch this amazing Short on 2Chat!",
-
-                url: url
-
+                title:"2Chat Shorts",
+                text:"Watch this Short on 2Chat!",
+                url
             });
 
-        } else {
+        }else{
 
             await navigator.clipboard.writeText(url);
 
@@ -363,7 +368,7 @@ id;
 
         }
 
-    } catch (err) {
+    }catch(err){
 
         console.log(err);
 
@@ -371,30 +376,31 @@ id;
 
 }
 
-async function addView(id) {
+async function addView(id){
 
-    try {
-const res = await fetch("/api/shorts/share/" + id,{
-    method:"PUT"
-});
+    try{
 
-const data = await res.json();
+        const res = await fetch("/api/shorts/view/" + id,{
+            method:"PUT"
+        });
 
-if(data.success){
+        const data = await res.json();
 
-    document.getElementById(
-        "shares-" + id
-    ).innerText = data.shares;
+        if(data.success){
 
-}
-        
-    } catch (err) {
+            document.getElementById(
+                "views-" + id
+            ).innerText = data.views;
+
+        }
+
+    }catch(err){
 
         console.log(err);
 
     }
 
-}
+}   
 
 function closeComments() {
 
