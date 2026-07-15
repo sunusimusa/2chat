@@ -116,7 +116,6 @@ ${a.topVideo.caption || "No caption"}
 
 }
 
-loadAnalytics();
 
 async function loadViewsChart(){
 
@@ -194,8 +193,6 @@ async function loadViewsChart(){
 
 }
 
-
-loadViewsChart();
 
 async function loadTopVideos(){
 
@@ -309,4 +306,113 @@ console.log(err);
 }
 
 
+// ================= FOLLOWERS GROWTH =================
+
+async function loadFollowersGrowth(){
+
+    try{
+
+        const res = await fetch(
+            "/api/shorts/analytics/followers/" + user.username
+        );
+
+        const data = await res.json();
+
+
+        if(!data.success){
+
+            console.log(data.message);
+            return;
+
+        }
+
+
+        // Total Followers
+
+        document.getElementById(
+            "totalFollowers"
+        ).innerText = data.totalFollowers;
+
+
+
+        const labels = data.growth.map(item => item.day);
+
+
+        const followersData = data.growth.map(
+            item => item.followers
+        );
+
+
+
+        const ctx = document
+        .getElementById("followersChart")
+        .getContext("2d");
+
+
+
+        new Chart(ctx, {
+
+            type:"line",
+
+            data:{
+
+                labels:labels,
+
+                datasets:[{
+
+                    label:"Followers",
+
+                    data:followersData,
+
+                    tension:0.4,
+
+                    fill:true
+
+                }]
+
+            },
+
+
+            options:{
+
+                responsive:true,
+
+                plugins:{
+
+                    legend:{
+
+                        display:true
+
+                    }
+
+                },
+
+
+                scales:{
+
+                    y:{
+
+                        beginAtZero:true
+
+                    }
+
+                }
+
+            }
+
+        });
+
+
+
+    }catch(err){
+
+        console.log(err);
+
+    }
+
+}
+
+loadAnalytics();
+loadChart();
 loadTopVideos();
+loadFollowersGrowth();
