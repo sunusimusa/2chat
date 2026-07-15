@@ -1,1 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,initial-scale=1.0">
+
+<title>Creator Analytics</title>
+
+<link rel="stylesheet" href="/css/analytics.css">
+
+</head>
+
+<body>
+
+<header class="topbar">
+
+<button onclick="history.back()">
+⬅
+</button>
+
+<h2>📊 Creator Dashboard</h2>
+
+</header>
+
+<div class="dashboard">
+
+<div class="card">
+
+<h3>🎥 Videos</h3>
+
+<h1 id="totalVideos">0</h1>
+
+</div>
+
+<div class="card">
+
+<h3>👁 Views</h3>
+
+<h1 id="totalViews">0</h1>
+
+</div>
+
+<div class="card">
+
+<h3>❤️ Likes</h3>
+
+<h1 id="totalLikes">0</h1>
+
+</div>
+
+<div class="card">
+
+<h3>💬 Comments</h3>
+
+<h1 id="totalComments">0</h1>
+
+</div>
+
+<div class="card">
+
+<h3>📤 Shares</h3>
+
+<h1 id="totalShares">0</h1>
+
+</div>
+
+<div class="card">
+
+<h3>🔖 Saves</h3>
+
+<h1 id="totalSaves">0</h1>
+
+</div>
+
+<div class="card">
+
+<h3>⏱ Watch Time</h3>
+
+<h1 id="watchTime">0 sec</h1>
+
+</div>
+
+<div class="card">
+
+<h3>📈 Engagement</h3>
+
+<h1 id="engagement">0%</h1>
+
+</div>
+
+</div>
+
+<div class="top-video">
+
+<h2>
+🏆 Best Performing Video
+</h2>
+
+<video
+id="bestVideo"
+controls
+playsinline>
+</video>
+
+<p id="bestCaption"></p>
+
+</div>
+
+<div class="bottom-nav">
+
+<a href="/home.html">
+🏠<br>Home
+</a>
+
+<a href="/shorts.html">
+🎬<br>Shorts
+</a>
+
+<a href="/trending.html">
+🔥<br>Trending
+</a>
+
+<a href="/saved.html">
+🔖<br>Saved
+</a>
+
+<a href="/analytics.html" class="active">
+📊<br>Analytics
+</a>
+
+</div>
+
+<script src="/js/analytics.js"></script>
+
+</body>
+
+</html>
