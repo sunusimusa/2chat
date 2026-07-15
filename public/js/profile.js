@@ -202,6 +202,38 @@ await res.json();
 document.getElementById("postsCount").innerText =
 data.count;
 
+  const badge =
+document.getElementById("creatorBadge");
+
+
+if(data.badge.includes("Gold")){
+
+badge.className =
+"creator-badge badge-gold";
+
+}
+
+else if(data.badge.includes("Diamond")){
+
+badge.className =
+"creator-badge badge-diamond";
+
+}
+
+else if(data.badge.includes("Silver")){
+
+badge.className =
+"creator-badge badge-silver";
+
+}
+
+else{
+
+badge.className =
+"creator-badge badge-bronze";
+
+}  
+
 let html = "";
 
 data.posts.forEach(post=>{
