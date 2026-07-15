@@ -726,3 +726,59 @@ exports.getAnalyticsChart = async (req, res) => {
     }
 
 };
+
+exports.getTopVideos = async (req,res)=>{
+
+    try{
+
+        const username = req.params.username;
+
+
+        let videos = await ShortVideo.find({
+            username
+        });
+
+
+        videos.sort((a,b)=>{
+
+
+            const scoreA =
+                (a.views || 0) +
+                (a.likes.length * 5) +
+                (a.watchTime || 0);
+
+
+            const scoreB =
+                (b.views || 0) +
+                (b.likes.length * 5) +
+                (b.watchTime || 0);
+
+
+            return scoreB - scoreA;
+
+
+        });
+
+
+        res.json({
+
+            success:true,
+
+            videos: videos.slice(0,5)
+
+        });
+
+
+    }catch(err){
+
+        res.status(500).json({
+
+            success:false,
+
+            message:err.message
+
+        });
+
+    }
+
+};
