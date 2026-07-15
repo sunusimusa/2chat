@@ -26,7 +26,9 @@ content="width=device-width,initial-scale=1.0">
 
 </header>
 
+
 <div class="dashboard">
+
 
 <div class="card">
 
@@ -36,6 +38,7 @@ content="width=device-width,initial-scale=1.0">
 
 </div>
 
+
 <div class="card">
 
 <h3>👁 Views</h3>
@@ -43,6 +46,7 @@ content="width=device-width,initial-scale=1.0">
 <h1 id="totalViews">0</h1>
 
 </div>
+
 
 <div class="card">
 
@@ -52,6 +56,7 @@ content="width=device-width,initial-scale=1.0">
 
 </div>
 
+
 <div class="card">
 
 <h3>💬 Comments</h3>
@@ -59,6 +64,7 @@ content="width=device-width,initial-scale=1.0">
 <h1 id="totalComments">0</h1>
 
 </div>
+
 
 <div class="card">
 
@@ -68,6 +74,7 @@ content="width=device-width,initial-scale=1.0">
 
 </div>
 
+
 <div class="card">
 
 <h3>🔖 Saves</h3>
@@ -75,6 +82,7 @@ content="width=device-width,initial-scale=1.0">
 <h1 id="totalSaves">0</h1>
 
 </div>
+
 
 <div class="card">
 
@@ -84,6 +92,7 @@ content="width=device-width,initial-scale=1.0">
 
 </div>
 
+
 <div class="card">
 
 <h3>📈 Engagement</h3>
@@ -92,47 +101,14 @@ content="width=device-width,initial-scale=1.0">
 
 </div>
 
-</div>
-
-<div class="top-video">
-
-<h2>
-🏆 Best Performing Video
-</h2>
-
-<video
-id="bestVideo"
-controls
-playsinline>
-</video>
-
-<p id="bestCaption"></p>
 
 </div>
 
-<div class="bottom-nav">
 
-<a href="/home.html">
-🏠<br>Home
-</a>
 
-<a href="/shorts.html">
-🎬<br>Shorts
-</a>
+<!-- Views Chart -->
 
-<a href="/trending.html">
-🔥<br>Trending
-</a>
-
-<a href="/saved.html">
-🔖<br>Saved
-</a>
-
-<a href="/analytics.html" class="active">
-📊<br>Analytics
-</a>
-
-  <div class="chart-box">
+<div class="chart-box">
 
 <h2>📈 Views Last 7 Days</h2>
 
@@ -140,11 +116,75 @@ playsinline>
 
 </div>
 
+
+
+<!-- Best Video -->
+
+<div class="top-video">
+
+<h2>
+🏆 Best Performing Video
+</h2>
+
+
+<video
+id="bestVideo"
+controls
+playsinline>
+</video>
+
+
+<p id="bestCaption"></p>
+
+
 </div>
+
+
+
+
+<!-- Bottom Navigation -->
+
+<div class="bottom-nav">
+
+
+<a href="/home.html">
+🏠<br>
+Home
+</a>
+
+
+<a href="/shorts.html">
+🎬<br>
+Shorts
+</a>
+
+
+<a href="/trending.html">
+🔥<br>
+Trending
+</a>
+
+
+<a href="/saved.html">
+🔖<br>
+Saved
+</a>
+
+
+<a href="/analytics.html" class="active">
+📊<br>
+Analytics
+</a>
+
+
+</div>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script src="/js/analytics.js"></script>
+
 
 </body>
 
