@@ -361,6 +361,18 @@ const savedVideos = await ShortVideo.find({
     _id: { $in: user.savedVideos }
 });
 
+        // Ƙara maki daga videos da user ya yi Like
+videos.forEach(video => {
+
+    if(video.likes.includes(user.username)){
+
+        favoriteCategories[video.category] =
+            (favoriteCategories[video.category] || 0) + 2;
+
+    }
+
+});
+
 savedVideos.forEach(video => {
 
     favoriteCategories[video.category] =
