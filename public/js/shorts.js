@@ -97,7 +97,15 @@ onclick="togglePlay('${video._id}')">
     <div class="user-info">
 
         <div>
-            <h3>@${video.username}</h3>
+
+            <h3>
+@${video.username}
+
+<span class="mini-badge">
+${video.badge || ""}
+</span>
+
+</h3>
         </div>
 
         <div class="user-buttons">
