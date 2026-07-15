@@ -72,3 +72,43 @@ font-size:14px;
 color:#bbb;
 line-height:24px;
 }
+
+.bottom-nav{
+position:fixed;
+left:0;
+bottom:0;
+width:100%;
+height:65px;
+background:#111;
+display:flex;
+justify-content:space-around;
+align-items:center;
+border-top:1px solid #333;
+z-index:1000;
+}
+
+.bottom-nav a{
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+color:#bbb;
+text-decoration:none;
+font-size:12px;
+flex:1;
+}
+
+.bottom-nav a.active{
+color:#ff0050;
+font-weight:bold;
+}
+
+.bottom-nav a i,
+.bottom-nav a{
+font-size:22px;
+}
+
+#trendingContainer{
+padding:15px;
+padding-bottom:90px;
+}
