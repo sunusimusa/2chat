@@ -18,9 +18,9 @@ const shortVideoSchema = new mongoose.Schema({
     },
 
     category: {
-    type: String,
-    default: "general"
-},
+        type: String,
+        default: "general"
+    },
 
     video: {
         type: String,
@@ -47,9 +47,19 @@ const shortVideoSchema = new mongoose.Schema({
     },
 
     watchTime: {
-    type: Number,
-    default: 0
-}
+        type: Number,
+        default: 0
+    },
+
+    shares: {
+        type: Number,
+        default: 0
+    },
+
+    saves: {
+        type: Number,
+        default: 0
+    }
 
 }, {
     timestamps: true
