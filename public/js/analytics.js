@@ -194,7 +194,7 @@ async function loadViewsChart(){
 
 }
 
-loadChart();
+loadViewsChart();
 
 async function loadTopVideos(){
 
