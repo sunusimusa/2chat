@@ -653,3 +653,76 @@ exports.getAnalytics = async (req, res) => {
     }
 
 };
+
+exports.getAnalyticsChart = async (req, res) => {
+
+    try{
+
+        const username = req.params.username;
+
+        const videos = await ShortVideo.find({
+            username
+        });
+
+        const chart = [];
+
+        for(let i = 6; i >= 0; i--){
+
+            const day = new Date();
+
+            day.setHours(0,0,0,0);
+
+            day.setDate(day.getDate() - i);
+
+            const nextDay = new Date(day);
+
+            nextDay.setDate(nextDay.getDate() + 1);
+
+            let views = 0;
+
+            videos.forEach(video=>{
+
+                if(
+                    video.createdAt >= day &&
+                    video.createdAt < nextDay
+                ){
+
+                    views += video.views;
+
+                }
+
+            });
+
+            chart.push({
+
+                day: day.toLocaleDateString("en-US",{
+                    weekday:"short"
+                }),
+
+                views
+
+            });
+
+        }
+
+        res.json({
+
+            success:true,
+
+            chart
+
+        });
+
+    }catch(err){
+
+        res.status(500).json({
+
+            success:false,
+
+            message:err.message
+
+        });
+
+    }
+
+};
