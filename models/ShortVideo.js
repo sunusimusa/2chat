@@ -17,6 +17,11 @@ const shortVideoSchema = new mongoose.Schema({
         default: ""
     },
 
+    category: {
+    type: String,
+    default: "general"
+},
+
     video: {
         type: String,
         required: true
