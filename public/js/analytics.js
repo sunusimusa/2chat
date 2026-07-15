@@ -417,3 +417,40 @@ async function loadFollowersGrowth(){
 
 
 loadFollowersGrowth();
+
+async function loadCreatorLevel(){
+
+    try{
+
+        const res = await fetch(
+        "/api/shorts/analytics/level/" 
+        + user.username
+        );
+
+
+        const data = await res.json();
+
+
+        if(data.success){
+
+            document.getElementById(
+            "creatorLevel"
+            ).innerText = data.level;
+
+
+            document.getElementById(
+            "nextLevel"
+            ).innerText = data.next;
+
+        }
+
+
+    }catch(err){
+
+        console.log(err);
+
+    }
+
+}
+
+loadCreatorLevel();
