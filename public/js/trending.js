@@ -26,6 +26,8 @@ async function loadTrending(){
 <div class="trending-card"
 onclick="location.href='/shorts.html?video=${video._id}'">
 
+${index==0 ? '<div class="crown">👑</div>' : ''}
+
 <video
 src="${video.video}"
 muted
@@ -95,3 +97,5 @@ video.views
 }
 
 loadTrending();
+
+window.addEventListener("focus", loadTrending);
