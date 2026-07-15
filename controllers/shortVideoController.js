@@ -226,8 +226,8 @@ exports.saveVideo = async (req, res) => {
 
         if (!user) {
             return res.json({
-                success:false,
-                message:"User not found"
+                success: false,
+                message: "User not found"
             });
         }
 
@@ -235,49 +235,68 @@ exports.saveVideo = async (req, res) => {
 
         console.log("VIDEO:", video);
 
-        if(!video){
+        if (!video) {
             return res.json({
-                success:false,
-                message:"Video not found"
+                success: false,
+                message: "Video not found"
             });
         }
 
         console.log("Before Save:", user.savedVideos);
 
-        const alreadySaved =
-            user.savedVideos.some(
-                id => id.toString() === videoId
+        const alreadySaved = user.savedVideos.some(
+            id => id.toString() === videoId
+        );
+
+        if (alreadySaved) {
+
+            // UNSAVE
+            user.savedVideos = user.savedVideos.filter(
+                id => id.toString() !== videoId
             );
 
-        if(alreadySaved){
+            if (video.saves > 0) {
+                video.saves--;
+            }
 
-            user.savedVideos =
-                user.savedVideos.filter(
-                    id => id.toString() !== videoId
-                );
+            await user.save();
+            await video.save();
 
-        }else{
+            console.log("After Unsave:", user.savedVideos);
 
+            return res.json({
+                success: true,
+                saved: false,
+                saves: video.saves
+            });
+
+        } else {
+
+            // SAVE
             user.savedVideos.push(video._id);
+
+            video.saves++;
+
+            await user.save();
+            await video.save();
+
+            console.log("After Save:", user.savedVideos);
+
+            return res.json({
+                success: true,
+                saved: true,
+                saves: video.saves
+            });
 
         }
 
-        await user.save();
-
-        console.log("After Save:", user.savedVideos);
-
-        res.json({
-            success:true,
-            saved:!alreadySaved
-        });
-
-    } catch(err){
+    } catch (err) {
 
         console.log(err);
 
         res.status(500).json({
-            success:false,
-            message:err.message
+            success: false,
+            message: err.message
         });
 
     }
@@ -518,6 +537,41 @@ exports.getTrendingVideos = async (req, res) => {
 
             message: err.message
 
+        });
+
+    }
+
+};
+
+// ================= SHARE VIDEO =================
+
+exports.addShare = async (req, res) => {
+
+    try {
+
+        const video = await ShortVideo.findById(req.params.id);
+
+        if (!video) {
+            return res.json({
+                success: false,
+                message: "Video not found"
+            });
+        }
+
+        video.shares += 1;
+
+        await video.save();
+
+        res.json({
+            success: true,
+            shares: video.shares
+        });
+
+    } catch (err) {
+
+        res.status(500).json({
+            success: false,
+            message: err.message
         });
 
     }
