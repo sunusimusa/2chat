@@ -28,20 +28,34 @@ onclick="location.href='/shorts.html?video=${video._id}'">
 
 <video
 src="${video.video}"
-muted>
+muted
+loop
+autoplay
+playsinline>
 </video>
 
 <div class="info">
 
 <div class="rank">
 
-#${index+1}
+${
+index==0 ? "🥇 #1" :
+index==1 ? "🥈 #2" :
+index==2 ? "🥉 #3" :
+"#"+(index+1)
+}
 
 </div>
 
 <div class="username">
 
 @${video.username}
+
+<div class="category">
+
+🏷 ${video.category}
+
+</div>
 
 </div>
 
@@ -60,6 +74,13 @@ ${video.caption || ""}
 👁 ${video.views}<br>
 
 🔥 ${Math.floor(video.watchTime||0)} sec
+
+⭐ Trending Score:
+${
+video.likes.length*5+
+video.comments.length*8+
+video.views
+}
 
 </div>
 
