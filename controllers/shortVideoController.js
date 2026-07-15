@@ -867,3 +867,129 @@ exports.getFollowersGrowth = async (req,res)=>{
     }
 
 };
+
+exports.getCreatorLevel = async (req,res)=>{
+
+    try{
+
+        const username = req.params.username;
+
+
+        const user = await User.findOne({
+            username
+        });
+
+
+        if(!user){
+
+            return res.json({
+                success:false,
+                message:"User not found"
+            });
+
+        }
+
+
+        const videos = await ShortVideo.find({
+            username
+        });
+
+
+
+        let views = 0;
+        let likes = 0;
+        let watchTime = 0;
+
+
+
+        videos.forEach(video=>{
+
+            views += video.views;
+
+            likes += video.likes.length;
+
+            watchTime += video.watchTime || 0;
+
+        });
+
+
+
+        const followers =
+        user.followers.length;
+
+
+
+        let level = "🥉 Bronze Creator";
+
+
+        let next = "🥈 Silver Creator";
+
+
+        if(
+            followers >= 1000 &&
+            views >= 100000 &&
+            watchTime >= 36000
+        ){
+
+            level = "🥇 Gold Creator";
+            next = "💎 Diamond Creator";
+
+        }
+
+
+        if(
+            followers >= 10000 &&
+            views >= 1000000 &&
+            watchTime >= 360000
+        ){
+
+            level = "💎 Diamond Creator";
+            next = "MAX";
+
+        }
+
+
+        else if(
+            followers >= 100 &&
+            views >= 10000 &&
+            watchTime >= 3600
+        ){
+
+            level = "🥈 Silver Creator";
+            next = "🥇 Gold Creator";
+
+        }
+
+
+
+        res.json({
+
+            success:true,
+
+            level,
+
+            next,
+
+            stats:{
+                followers,
+                views,
+                likes,
+                watchTime
+            }
+
+        });
+
+
+
+    }catch(err){
+
+        res.status(500).json({
+
+            success:false,
+            message:err.message
+
+        });
+
+    }
+
+};
