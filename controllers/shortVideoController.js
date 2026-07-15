@@ -426,3 +426,38 @@ const feed = [
     }
 
 };
+
+exports.addWatchTime = async (req, res) => {
+
+    try {
+
+        const { seconds } = req.body;
+
+        const video = await ShortVideo.findById(req.params.id);
+
+        if (!video) {
+            return res.json({
+                success: false,
+                message: "Video not found"
+            });
+        }
+
+        video.watchTime += Number(seconds);
+
+        await video.save();
+
+        res.json({
+            success: true,
+            watchTime: video.watchTime
+        });
+
+    } catch (err) {
+
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+
+    }
+
+};
