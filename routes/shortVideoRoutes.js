@@ -56,8 +56,9 @@ router.get("/analytics/:username", getAnalytics);
 router.get("/analytics-chart/:username", getAnalyticsChart);
 
 router.get(
-"/analytics/top/:username",
-shortVideoController.getTopVideos
+    "/analytics/top/:username",
+    getTopVideos
 );
+
 
 module.exports = router;
