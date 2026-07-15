@@ -11,7 +11,8 @@ const {
     saveVideo,
     getSavedVideos,
     getForYouVideos,
-    addWatchTime
+    addWatchTime,
+    getTrendingVideos
 } = require("../controllers/shortVideoController");
 
 // Upload Short Video
@@ -41,5 +42,7 @@ router.get("/saved/:username", getSavedVideos);
 router.get("/foryou/:username", getForYouVideos);
 
 router.put("/watch/:id", addWatchTime);
+
+router.get("/trending", getTrendingVideos);
 
 module.exports = router;
