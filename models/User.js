@@ -54,6 +54,11 @@ following:{
   default:[]
 },
 
+    favoriteCategories: {
+    type: [String],
+    default: []
+},
+
     savedVideos: [
 {
     type: mongoose.Schema.Types.ObjectId,
