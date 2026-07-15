@@ -143,7 +143,9 @@ onclick="likeVideo('${video._id}')">
 <span>${video.comments.length}</span>
 
 <button onclick="shareVideo('${video._id}')">📤</button>
-<span>Share</span>
+<span id="shares-${video._id}">
+${video.shares || 0}
+</span>
 
 <button
 id="saveBtn-${video._id}"
@@ -330,6 +332,10 @@ function commentVideo(id) {
 // ================= SHARE =================
 async function shareVideo(id) {
 
+    await fetch("/api/shorts/share/" + id, {
+    method: "PUT"
+});
+
     const url =
 window.location.origin +
 "/shorts.html?video=" +
@@ -368,22 +374,20 @@ id;
 async function addView(id) {
 
     try {
+const res = await fetch("/api/shorts/share/" + id,{
+    method:"PUT"
+});
 
-        const res = await fetch("/api/shorts/view/" + id, {
+const data = await res.json();
 
-            method: "PUT"
+if(data.success){
 
-        });
+    document.getElementById(
+        "shares-" + id
+    ).innerText = data.shares;
 
-        const data = await res.json();
-
-        if (data.success) {
-
-            document.getElementById("views-" + id).innerText =
-                data.views;
-
-        }
-
+}
+        
     } catch (err) {
 
         console.log(err);
