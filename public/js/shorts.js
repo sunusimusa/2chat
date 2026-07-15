@@ -58,11 +58,15 @@ if(currentTab === "following"){
     videos.sort((a,b)=>{
 
         const scoreA =
-            a.likes.length * 5 + a.views;
+    a.likes.length * 5 +
+    a.views +
+    (a.watchTime || 0);
 
-        const scoreB =
-            b.likes.length * 5 + b.views;
-
+const scoreB =
+    b.likes.length * 5 +
+    b.views +
+    (b.watchTime || 0);
+        
         return scoreB - scoreA;
 
     });
