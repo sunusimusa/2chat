@@ -202,38 +202,6 @@ await res.json();
 document.getElementById("postsCount").innerText =
 data.count;
 
-  const badge =
-document.getElementById("creatorBadge");
-
-
-if(data.badge.includes("Gold")){
-
-badge.className =
-"creator-badge badge-gold";
-
-}
-
-else if(data.badge.includes("Diamond")){
-
-badge.className =
-"creator-badge badge-diamond";
-
-}
-
-else if(data.badge.includes("Silver")){
-
-badge.className =
-"creator-badge badge-silver";
-
-}
-
-else{
-
-badge.className =
-"creator-badge badge-bronze";
-
-}  
-
 let html = "";
 
 data.posts.forEach(post=>{
@@ -262,8 +230,6 @@ document.getElementById("myPosts").innerHTML =
 html;
 
 }
-
-loadProfile();
 
 loadMyPosts();
 
@@ -346,9 +312,6 @@ alert(data.message);
 
 }
 
-loadProfile();
-
-loadMyPosts();
 
 document
 .getElementById("coverFile")
@@ -357,17 +320,48 @@ document
 async function loadCreatorBadge(){
 
 const res = await fetch(
-"/api/shorts/creator-badge/" + user.username
+"/api/shorts/creator-badge/" + profileUsername
 );
 
 const data = await res.json();
 
 
-if(data.success){
+const badge =
+document.getElementById("creatorBadge");
 
-document.getElementById(
-"creatorBadge"
-).innerText = data.badge;
+
+if(data.success && badge){
+
+    badge.innerText = data.badge;
+
+
+    if(data.badge.includes("Diamond")){
+
+        badge.className =
+        "creator-badge badge-diamond";
+
+    }
+
+    else if(data.badge.includes("Gold")){
+
+        badge.className =
+        "creator-badge badge-gold";
+
+    }
+
+    else if(data.badge.includes("Silver")){
+
+        badge.className =
+        "creator-badge badge-silver";
+
+    }
+
+    else{
+
+        badge.className =
+        "creator-badge badge-bronze";
+
+    }
 
 }
 
