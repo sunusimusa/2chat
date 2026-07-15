@@ -399,8 +399,24 @@ savedVideos.forEach(video => {
 // Shirya sauran videos bisa category
 otherVideos.sort((a, b) => {
 
-    const scoreA = favoriteCategories[a.category] || 0;
-    const scoreB = favoriteCategories[b.category] || 0;
+    let scoreA = favoriteCategories[a.category] || 0;
+    let scoreB = favoriteCategories[b.category] || 0;
+
+    // Ƙara maki daga Watch Time
+    scoreA += (a.watchTime || 0) / 100;
+    scoreB += (b.watchTime || 0) / 100;
+
+    // Ƙara maki daga Likes
+    scoreA += a.likes.length;
+    scoreB += b.likes.length;
+
+    // Ƙara maki daga Comments
+    scoreA += a.comments.length * 2;
+    scoreB += b.comments.length * 2;
+
+    // Ƙara maki daga Views
+    scoreA += a.views / 10;
+    scoreB += b.views / 10;
 
     return scoreB - scoreA;
 
