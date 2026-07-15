@@ -128,3 +128,21 @@ font-size:12px;
 margin:6px 0;
 
 }
+
+.crown{
+
+position:absolute;
+
+top:8px;
+
+right:8px;
+
+font-size:28px;
+
+}
+
+.trending-card{
+
+position:relative;
+
+}
