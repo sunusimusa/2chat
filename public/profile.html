@@ -4,177 +4,155 @@
   <title>2Chat Profile</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link rel="stylesheet" href="/css/profile.css">
-  
+  <link rel="stylesheet" href="/css/profile.css">
+
 </head>
 <body>
 
+<!-- Cover -->
 <div class="cover">
-  
-<img id="coverImage"
-src="/images/default-cover.jpg"
-class="cover-image">
 
-  <div class="cover-box">
+  <img
+    id="coverImage"
+    src="/images/default-cover.jpg"
+    class="cover-image">
 
-<img id="coverImage"
-src="/images/default-cover.jpg"
-class="cover-image">
+  <input
+    type="file"
+    id="coverFile"
+    accept="image/*"
+    hidden>
 
-<input
-type="file"
-id="coverFile"
-accept="image/*"
-style="display:none;">
-
-<button
-class="cover-btn"
-onclick="document.getElementById('coverFile').click()">
-
-📷 Change Cover
-
-</button>
+  <button
+    class="cover-btn"
+    onclick="document.getElementById('coverFile').click()">
+    📷 Change Cover
+  </button>
 
 </div>
 
-<input
-type="file"
-id="coverFile"
-hidden>
-
-<button
-class="cover-btn"
-onclick="document.getElementById('coverFile').click()">
-📷 Change Cover
-</button>
-
-</div>
-
+<!-- Profile -->
 <div class="profile-box">
 
-<img
-id="avatar"
-class="avatar">
+  <img
+    id="avatar"
+    class="avatar">
 
-<input
-type="file"
-id="avatarFile"
-hidden>
+  <input
+    type="file"
+    id="avatarFile"
+    hidden>
 
-<button
-class="avatar-btn"
-onclick="document.getElementById('avatarFile').click()">
-📷 Change Photo
-</button>
+  <button
+    class="avatar-btn"
+    onclick="document.getElementById('avatarFile').click()">
+    📷 Change Photo
+  </button>
 
-<h2 id="username"></h2>
+  <h2 id="username"></h2>
 
-<p id="email"></p>
+  <p id="email"></p>
 
-<p id="bio"></p>
+  <p id="bio"></p>
 
-<div class="stats">
+  <div class="stats">
 
-<div class="stat">
-  <h2 id="postsCount">0</h2>
-  <p>Posts</p>
-</div>
+    <div class="stat">
+      <h2 id="postsCount">0</h2>
+      <p>Posts</p>
+    </div>
 
-<div>
-<b id="followers">0</b>
-<br>
-Followers
-</div>
+    <div class="stat">
+      <b id="followers">0</b><br>
+      Followers
+    </div>
 
-<div>
-<b id="following">0</b>
-<br>
-Following
-</div>
+    <div class="stat">
+      <b id="following">0</b><br>
+      Following
+    </div>
 
-</div>
+  </div>
 
-<hr>
+  <hr>
 
-<input
-id="newUsername"
-placeholder="New Username">
+  <input
+    id="newUsername"
+    placeholder="New Username">
 
-<br><br>
+  <br><br>
 
-<textarea
-id="newBio"
-placeholder="Write your bio">
-</textarea>
+  <textarea
+    id="newBio"
+    placeholder="Write your bio"></textarea>
 
-<br><br>
+  <br><br>
 
-<button
-id="followBtn"
-style="display:none;"
-onclick="followUser(profileUsername)">
-➕ Follow
-</button>
+  <button
+    id="followBtn"
+    style="display:none;"
+    onclick="followUser(profileUsername)">
+    ➕ Follow
+  </button>
 
-<button onclick="location.href='/saved.html'">
-🔖 Saved Videos
-</button>
+  <button onclick="location.href='/saved.html'">
+    🔖 Saved Videos
+  </button>
 
+  <button onclick="saveProfile()">
+    💾 Save Profile
+  </button>
 
-<button onclick="saveProfile()">
-💾 Save Profile
-</button>
+  <button onclick="uploadAvatar()">
+    📷 Upload Avatar
+  </button>
 
-<button onclick="uploadAvatar()">
-📷 Upload Avatar
-</button>
+  <button onclick="goHome()">
+    🏠 Home
+  </button>
 
-<button onclick="goHome()">
-🏠 Home
-</button>
-
-<button onclick="logout()">
-🚪 Logout
-</button>
+  <button onclick="logout()">
+    🚪 Logout
+  </button>
 
 </div>
 
+<!-- My Posts -->
 <div class="my-posts">
 
-<h2>
-🖼 My Posts
-</h2>
+  <h2>🖼 My Posts</h2>
 
-<div id="myPosts">
+  <div id="myPosts"></div>
 
 </div>
 
-  <div class="bottom-nav">
+<!-- Bottom Navigation -->
 
-<a href="/home.html">
-🏠<br>Home
-</a>
+<div class="bottom-nav">
 
-<a href="/shorts.html">
-🎬<br>Shorts
-</a>
+  <a href="/home.html">
+    🏠<br>Home
+  </a>
 
-<a href="/trending.html">
-🔥<br>Trending
-</a>
+  <a href="/shorts.html">
+    🎬<br>Shorts
+  </a>
 
-<a href="/saved.html">
-🔖<br>Saved
-</a>
+  <a href="/trending.html">
+    🔥<br>Trending
+  </a>
 
-<a href="/profile.html" class="active">
-👤<br>Profile
-</a>
+  <a href="/saved.html">
+    🔖<br>Saved
+  </a>
+
+  <a href="/profile.html" class="active">
+    👤<br>Profile
+  </a>
 
 </div>
 
 <script src="/js/profile.js"></script>
 
 </body>
-
 </html>
