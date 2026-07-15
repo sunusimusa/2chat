@@ -17,7 +17,8 @@ const {
     getAnalytics,
     getAnalyticsChart,
     getTopVideos,
-    getFollowersGrowth
+    getFollowersGrowth,
+    getCreatorLevel
 } = require("../controllers/shortVideoController");
 
 // Upload Short Video
@@ -64,6 +65,11 @@ router.get(
 router.get(
 "/analytics/followers/:username",
 getFollowersGrowth
+);
+
+router.get(
+"/analytics/level/:username",
+getCreatorLevel
 );
 
 module.exports = router;
