@@ -322,3 +322,55 @@ exports.getSavedVideos = async (req, res) => {
     }
 
 };
+
+exports.getForYouVideos = async (req, res) => {
+
+    try{
+
+        const user = await User.findOne({
+            username: req.params.username
+        });
+
+        if(!user){
+
+            return res.json({
+                success:false,
+                message:"User not found"
+            });
+
+        }
+
+        let videos = await ShortVideo.find()
+            .sort({ createdAt:-1 });
+
+        // Videos daga mutanen da yake following su
+        const followingVideos = videos.filter(v =>
+            user.following.includes(v.username)
+        );
+
+        // Sauran videos
+        const otherVideos = videos.filter(v =>
+            !user.following.includes(v.username)
+        );
+
+        // For You Feed
+        const feed = [
+            ...followingVideos,
+            ...otherVideos
+        ];
+
+        res.json({
+            success:true,
+            videos:feed
+        });
+
+    }catch(err){
+
+        res.status(500).json({
+            success:false,
+            message:err.message
+        });
+
+    }
+
+};
