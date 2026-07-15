@@ -117,3 +117,82 @@ ${a.topVideo.caption || "No caption"}
 }
 
 loadAnalytics();
+
+async function loadViewsChart(){
+
+    try{
+
+        const res = await fetch(
+            "/api/shorts/analytics-chart/" + user.username
+        );
+
+        const data = await res.json();
+
+        if(!data.success){
+
+            return;
+
+        }
+
+
+        const labels = data.chart.map(
+            item => item.day
+        );
+
+
+        const views = data.chart.map(
+            item => item.views
+        );
+
+
+        const ctx =
+        document.getElementById("viewsChart");
+
+
+        new Chart(ctx,{
+
+            type:"line",
+
+            data:{
+
+                labels:labels,
+
+                datasets:[{
+
+                    label:"Views",
+
+                    data:views,
+
+                    tension:0.4
+
+                }]
+
+            },
+
+            options:{
+
+                responsive:true,
+
+                plugins:{
+
+                    legend:{
+                        display:true
+                    }
+
+                }
+
+            }
+
+        });
+
+
+    }catch(err){
+
+        console.log(err);
+
+    }
+
+}
+
+
+loadViewsChart();
