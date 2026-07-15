@@ -4,6 +4,7 @@ const container = document.getElementById("shortsContainer");
 
 let currentVideoId = null;
 let currentTab = "foryou";
+let watchStart = 0;
 
 
 // ================= LOAD VIDEOS =================
@@ -210,11 +211,25 @@ function autoPlayVideos() {
 
     const id = entry.target.id.replace("video-", "");
 
+    watchStart = Date.now();
+
     addView(id);
 
 } else {
 
     entry.target.pause();
+
+    const id = entry.target.id.replace("video-", "");
+
+    const seconds = Math.floor(
+        (Date.now() - watchStart) / 1000
+    );
+
+    if(seconds > 0){
+
+        addWatchTime(id, seconds);
+
+    }
 
 }
 
@@ -666,6 +681,32 @@ function showFollowing(){
         .classList.remove("active");
 
     loadVideos();
+
+}
+
+async function addWatchTime(id, seconds){
+
+    try{
+
+        await fetch("/api/shorts/watch/" + id,{
+
+            method:"PUT",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+                seconds
+            })
+
+        });
+
+    }catch(err){
+
+        console.log(err);
+
+    }
 
 }
 
