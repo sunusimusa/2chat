@@ -16,7 +16,8 @@ const {
     addShare,
     getAnalytics,
     getAnalyticsChart,
-    getTopVideos
+    getTopVideos,
+    getFollowersGrowth
 } = require("../controllers/shortVideoController");
 
 // Upload Short Video
@@ -60,5 +61,9 @@ router.get(
     getTopVideos
 );
 
+router.get(
+"/analytics/followers/:username",
+getFollowersGrowth
+);
 
 module.exports = router;
