@@ -196,3 +196,117 @@ async function loadViewsChart(){
 
 
 loadViewsChart();
+
+async function loadTopVideos(){
+
+
+try{
+
+
+const res = await fetch(
+"/api/shorts/analytics/top/" + user.username
+);
+
+
+const data = await res.json();
+
+
+if(!data.success) return;
+
+
+const box =
+document.getElementById("topVideos");
+
+
+box.innerHTML="";
+
+
+data.videos.forEach((video,index)=>{
+
+
+const score =
+(video.views || 0) +
+(video.likes.length * 5) +
+(video.watchTime || 0);
+
+
+
+box.innerHTML += `
+
+
+<div class="top-item">
+
+
+<div class="rank">
+
+${index==0?"🥇":
+ index==1?"🥈":
+ index==2?"🥉":
+ "#"+(index+1)}
+
+</div>
+
+
+<video
+src="${video.video}"
+muted
+playsinline>
+</video>
+
+
+<div class="details">
+
+
+<h3>
+@${video.username}
+</h3>
+
+
+<p>
+${video.caption || "No caption"}
+</p>
+
+
+<span>
+👁 ${video.views}
+</span>
+
+
+<span>
+❤️ ${video.likes.length}
+</span>
+
+
+<span>
+⏱ ${video.watchTime || 0}s
+</span>
+
+
+<h4>
+🔥 Score: ${score}
+</h4>
+
+
+</div>
+
+
+</div>
+
+
+`;
+
+
+});
+
+
+}catch(err){
+
+console.log(err);
+
+}
+
+
+}
+
+
+loadTopVideos();
