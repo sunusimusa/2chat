@@ -782,3 +782,88 @@ exports.getTopVideos = async (req,res)=>{
     }
 
 };
+
+exports.getFollowersGrowth = async (req,res)=>{
+
+    try{
+
+        const username = req.params.username;
+
+
+        const user = await User.findOne({
+            username
+        });
+
+
+        if(!user){
+
+            return res.json({
+
+                success:false,
+
+                message:"User not found"
+
+            });
+
+        }
+
+
+        const growth = [];
+
+
+        for(let i = 6; i >= 0; i--){
+
+            const date = new Date();
+
+            date.setHours(0,0,0,0);
+
+            date.setDate(
+                date.getDate() - i
+            );
+
+
+            // A yanzu muna amfani da followers count
+            // daga User document
+
+            growth.push({
+
+                day: date.toLocaleDateString(
+                    "en-US",
+                    {
+                        weekday:"short"
+                    }
+                ),
+
+                followers:user.followers.length
+
+            });
+
+        }
+
+
+        res.json({
+
+            success:true,
+
+            totalFollowers:user.followers.length,
+
+            growth
+
+        });
+
+
+    }catch(err){
+
+
+        res.status(500).json({
+
+            success:false,
+
+            message:err.message
+
+        });
+
+
+    }
+
+};
