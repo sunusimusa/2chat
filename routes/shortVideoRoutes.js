@@ -12,7 +12,8 @@ const {
     getSavedVideos,
     getForYouVideos,
     addWatchTime,
-    getTrendingVideos
+    getTrendingVideos,
+    addShare
 } = require("../controllers/shortVideoController");
 
 // Upload Short Video
@@ -33,6 +34,8 @@ router.put("/comment", commentVideo);
 
 // View
 router.put("/view/:id", addView);
+
+router.put("/share/:id", addShare);
 
 // Save / Unsave Video
 router.put("/save", saveVideo);
