@@ -53,11 +53,11 @@ index==2 ? "🥉 #3" :
 
 @${video.username}
 
+</div>
+
 <div class="category">
 
-🏷 ${video.category}
-
-</div>
+🏷 ${video.category || "General"}
 
 </div>
 
