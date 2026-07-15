@@ -577,3 +577,79 @@ exports.addShare = async (req, res) => {
     }
 
 };
+
+exports.getAnalytics = async (req, res) => {
+
+    try{
+
+        const username = req.params.username;
+
+        const videos = await ShortVideo.find({ username });
+
+        let totalViews = 0;
+        let totalLikes = 0;
+        let totalComments = 0;
+        let totalShares = 0;
+        let totalSaves = 0;
+        let totalWatchTime = 0;
+
+        let topVideo = null;
+        let topViews = 0;
+
+        videos.forEach(video => {
+
+            totalViews += video.views || 0;
+            totalLikes += video.likes.length;
+            totalComments += video.comments.length;
+            totalShares += video.shares || 0;
+            totalSaves += video.saves || 0;
+            totalWatchTime += video.watchTime || 0;
+
+            if(video.views > topViews){
+
+                topViews = video.views;
+                topVideo = video;
+
+            }
+
+        });
+
+        res.json({
+
+            success:true,
+
+            analytics:{
+
+                totalVideos:videos.length,
+
+                totalViews,
+
+                totalLikes,
+
+                totalComments,
+
+                totalShares,
+
+                totalSaves,
+
+                totalWatchTime,
+
+                topVideo
+
+            }
+
+        });
+
+    }catch(err){
+
+        res.status(500).json({
+
+            success:false,
+
+            message:err.message
+
+        });
+
+    }
+
+};
