@@ -116,6 +116,7 @@ ${a.topVideo.caption || "No caption"}
 
 }
 
+loadAnalytics();
 
 async function loadViewsChart(){
 
@@ -193,6 +194,7 @@ async function loadViewsChart(){
 
 }
 
+loadChart();
 
 async function loadTopVideos(){
 
@@ -305,6 +307,7 @@ console.log(err);
 
 }
 
+loadTopVideos();
 
 // ================= FOLLOWERS GROWTH =================
 
@@ -412,7 +415,5 @@ async function loadFollowersGrowth(){
 
 }
 
-loadAnalytics();
-loadChart();
-loadTopVideos();
+
 loadFollowersGrowth();
