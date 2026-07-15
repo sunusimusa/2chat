@@ -354,10 +354,34 @@ exports.getForYouVideos = async (req, res) => {
         );
 
         // For You Feed
-        const feed = [
-            ...followingVideos,
-            ...otherVideos
-        ];
+        const favoriteCategories = {};
+
+// Ƙididdige categories daga Saved Videos
+const savedVideos = await ShortVideo.find({
+    _id: { $in: user.savedVideos }
+});
+
+savedVideos.forEach(video => {
+
+    favoriteCategories[video.category] =
+        (favoriteCategories[video.category] || 0) + 1;
+
+});
+
+// Shirya sauran videos bisa category
+otherVideos.sort((a, b) => {
+
+    const scoreA = favoriteCategories[a.category] || 0;
+    const scoreB = favoriteCategories[b.category] || 0;
+
+    return scoreB - scoreA;
+
+});
+
+const feed = [
+    ...followingVideos,
+    ...otherVideos
+];
 
         res.json({
             success:true,
