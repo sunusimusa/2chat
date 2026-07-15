@@ -12,8 +12,10 @@ async function loadVideos() {
 
     try {
 
-        const res = await fetch("/api/shorts/all");
-
+        const res = await fetch(
+    "/api/shorts/foryou/" + user.username
+);
+        
         const data = await res.json();
 
         if (!data.success) {
