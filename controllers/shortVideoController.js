@@ -993,3 +993,113 @@ exports.getCreatorLevel = async (req,res)=>{
     }
 
 };
+
+exports.getCreatorBadge = async(req,res)=>{
+
+try{
+
+const username = req.params.username;
+
+
+const user = await User.findOne({
+    username
+});
+
+
+if(!user){
+
+return res.json({
+success:false,
+message:"User not found"
+});
+
+}
+
+
+
+const videos = await ShortVideo.find({
+username
+});
+
+
+let views = 0;
+let watchTime = 0;
+
+
+videos.forEach(video=>{
+
+views += video.views;
+
+watchTime += video.watchTime || 0;
+
+});
+
+
+const followers = user.followers.length;
+
+
+
+let badge = "🥉 Bronze Creator";
+
+
+
+if(
+followers >= 10000 &&
+views >= 1000000 &&
+watchTime >= 360000
+){
+
+badge = "💎 Diamond Creator";
+
+}
+
+else if(
+followers >= 1000 &&
+views >= 100000 &&
+watchTime >= 36000
+){
+
+badge = "🥇 Gold Creator";
+
+}
+
+else if(
+followers >= 100 &&
+views >= 10000 &&
+watchTime >= 3600
+){
+
+badge = "🥈 Silver Creator";
+
+}
+
+
+
+user.creatorBadge = badge;
+
+await user.save();
+
+
+
+res.json({
+
+success:true,
+
+badge
+
+});
+
+
+}catch(err){
+
+res.status(500).json({
+
+success:false,
+
+message:err.message
+
+});
+
+}
+
+};
