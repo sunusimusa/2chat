@@ -8,13 +8,15 @@
 <meta name="viewport"
 content="width=device-width,initial-scale=1.0">
 
-<title>Creator Analytics</title>
+<title>2Chat Creator Studio</title>
 
 <link rel="stylesheet" href="/css/analytics.css">
 
 </head>
 
+
 <body>
+
 
 <header class="topbar">
 
@@ -22,99 +24,164 @@ content="width=device-width,initial-scale=1.0">
 ⬅
 </button>
 
-<h2>📊 Creator Dashboard</h2>
+<h2>
+📊 Creator Studio
+</h2>
 
 </header>
+
+
+
+<!-- Creator Level Banner -->
+
+<div class="creator-banner">
+
+
+<h2>
+🏆 <span id="creatorLevel">
+🥉 Bronze Creator
+</span>
+</h2>
+
+
+<p>
+Next Level:
+<b id="nextLevel">
+🥈 Silver Creator
+</b>
+</p>
+
+
+<div class="progress">
+
+<div id="levelProgress"></div>
+
+</div>
+
+
+<p>
+🔥 Keep creating to unlock more rewards
+</p>
+
+
+</div>
+
+
+
+
+<!-- Main Stats -->
 
 
 <div class="dashboard">
 
 
 <div class="card">
+<h3>
+🎥 Shorts
+</h3>
 
-<h3>🎥 Videos</h3>
-
-<h1 id="totalVideos">0</h1>
-
-</div>
-
-
-<div class="card">
-
-<h3>👁 Views</h3>
-
-<h1 id="totalViews">0</h1>
-
-</div>
-
-
-<div class="card">
-
-<h3>❤️ Likes</h3>
-
-<h1 id="totalLikes">0</h1>
-
-</div>
-
-
-<div class="card">
-
-<h3>💬 Comments</h3>
-
-<h1 id="totalComments">0</h1>
-
-</div>
-
-
-<div class="card">
-
-<h3>📤 Shares</h3>
-
-<h1 id="totalShares">0</h1>
-
-</div>
-
-
-<div class="card">
-
-<h3>🔖 Saves</h3>
-
-<h1 id="totalSaves">0</h1>
-
-</div>
-
-
-<div class="card">
-
-<h3>⏱ Watch Time</h3>
-
-<h1 id="watchTime">0 sec</h1>
-
-</div>
-
-  <div class="card creator-level">
-
-<h3>🏆 Creator Level</h3>
-
-<h1 id="creatorLevel">
-🥉 Bronze Creator
+<h1 id="totalVideos">
+0
 </h1>
 
-<p>
-Next:
-<span id="nextLevel">
-🥈 Silver Creator
-</span>
-</p>
+</div>
+
+
+
+<div class="card">
+<h3>
+👥 Followers
+</h3>
+
+<h1 id="totalFollowers">
+0
+</h1>
 
 </div>
+
+
 
 
 <div class="card">
 
-<h3>📈 Engagement</h3>
+<h3>
+👁 Views
+</h3>
 
-<h1 id="engagement">0%</h1>
+<h1 id="totalViews">
+0
+</h1>
+
+</div>
+
+
+
+<div class="card">
+
+<h3>
+❤️ Likes
+</h3>
+
+<h1 id="totalLikes">
+0
+</h1>
+
+</div>
+
+
+
+<div class="card">
+
+<h3>
+💬 Comments
+</h3>
+
+<h1 id="totalComments">
+0
+</h1>
+
+</div>
+
+
+
+
+<div class="card">
+
+<h3>
+📤 Shares
+</h3>
+
+<h1 id="totalShares">
+0
+</h1>
+
+</div>
+
+
+
+<div class="card">
+
+<h3>
+⏱ Watch Time
+</h3>
+
+<h1 id="watchTime">
+0 sec
+</h1>
+
+</div>
+
+
+
+<div class="card">
+
+<h3>
+📈 Engagement
+</h3>
+
+<h1 id="engagement">
+0%
+</h1>
 
 </div>
 
@@ -123,20 +190,43 @@ Next:
 
 
 
-<!-- Views Chart -->
 
-<div class="chart-box">
 
-<h2>📈 Views Last 7 Days</h2>
+<!-- Creator Score -->
 
-<canvas id="viewsChart"></canvas>
 
-</div>
-
-<div class="top-shorts">
+<div class="score-box">
 
 <h2>
-🏆 Top Performing Shorts
+⭐ Creator Score
+</h2>
+
+
+<h1 id="creatorScore">
+0
+</h1>
+
+
+<p>
+Based on views, likes, watch time and shares
+</p>
+
+
+</div>
+
+
+
+
+
+
+<!-- Top Videos -->
+
+
+<div class="section">
+
+
+<h2>
+🔥 Top Performing Shorts
 </h2>
 
 
@@ -147,9 +237,50 @@ Next:
 
 </div>
 
+
+
+
+
+<!-- Charts -->
+
+
+<div class="chart-box">
+
+<h2>
+📈 Views Last 7 Days
+</h2>
+
+
+<canvas id="viewsChart"></canvas>
+
+
+</div>
+
+
+
+
+<div class="chart-box">
+
+<h2>
+👥 Followers Growth
+</h2>
+
+
+<canvas id="followersChart"></canvas>
+
+
+</div>
+
+
+
+
+
+
 <!-- Best Video -->
 
-<div class="top-video">
+
+<div class="section">
+
 
 <h2>
 🏆 Best Performing Video
@@ -168,22 +299,9 @@ playsinline>
 
 </div>
 
-<div class="chart-box">
-
-<h2>
-👥 Followers Growth
-</h2>
-
-<h1 id="totalFollowers">
-0
-</h1>
-
-<canvas id="followersChart"></canvas>
-
-</div>
 
 
-<!-- Bottom Navigation -->
+
 
 <div class="bottom-nav">
 
@@ -214,11 +332,12 @@ Saved
 
 <a href="/analytics.html" class="active">
 📊<br>
-Analytics
+Studio
 </a>
 
 
 </div>
+
 
 
 
