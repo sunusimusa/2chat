@@ -40,6 +40,8 @@ exports.uploadVideo = async (req, res) => {
 
             caption: req.body.caption || "",
 
+            category: req.body.category || "general",
+
             video: uploadResult.secure_url
 
         });
