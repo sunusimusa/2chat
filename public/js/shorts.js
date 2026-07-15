@@ -4,7 +4,7 @@ const container = document.getElementById("shortsContainer");
 
 let currentVideoId = null;
 let currentTab = "foryou";
-let watchStart = 0;
+let watchStart = {};
 
 
 // ================= LOAD VIDEOS =================
@@ -211,8 +211,8 @@ function autoPlayVideos() {
 
     const id = entry.target.id.replace("video-", "");
 
-    watchStart = Date.now();
-
+   watchStart[id] = Date.now();
+                
     addView(id);
 
 } else {
@@ -222,8 +222,8 @@ function autoPlayVideos() {
     const id = entry.target.id.replace("video-", "");
 
     const seconds = Math.floor(
-        (Date.now() - watchStart) / 1000
-    );
+    (Date.now() - (watchStart[id] || Date.now())) / 1000
+);
 
     if(seconds > 0){
 
