@@ -361,6 +361,22 @@ const savedVideos = await ShortVideo.find({
     _id: { $in: user.savedVideos }
 });
 
+        // Ƙara maki daga videos da user ya yi Comment
+videos.forEach(video => {
+
+    const commented = video.comments.some(
+        comment => comment.username === user.username
+    );
+
+    if(commented){
+
+        favoriteCategories[video.category] =
+            (favoriteCategories[video.category] || 0) + 2;
+
+    }
+
+});
+
         // Ƙara maki daga videos da user ya yi Like
 videos.forEach(video => {
 
