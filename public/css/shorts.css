@@ -318,50 +318,67 @@ body{
     transform:scale(.95);
 }
 
+/* TABS BUTTONS */
+
 .shorts-tabs{
-position:fixed;
-top:10px;
-left:50%;
-transform:translateX(-50%);
-display:flex;
-gap:25px;
-z-index:1000;
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    z-index: 1000;
 }
 
 .shorts-tabs button{
-background:none;
-border:none;
-color:#bbb;
-font-size:18px;
-font-weight:bold;
-cursor:pointer;
-padding:8px 5px;
+    background: none;
+    border: none;
+    color: #bbb;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 5px 8px;
 }
 
 .shorts-tabs button.active{
-color:#fff;
-border-bottom:3px solid #ff0050;
+    color: #fff;
+    border-bottom: 3px solid #ff0050;
 }
+
+
+/* FOR YOU / FOLLOWING / TRENDING */
 
 .short-tabs{
-    position:fixed;
-    top:15px;
-    left:50%;
-    transform:translateX(-50%);
-    display:flex;
-    gap:40px;
-    z-index:9999;
+    position: fixed;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    z-index: 9999;
 }
 
-.short-tabs span{
-    color:#bbb;
-    font-size:24px;
-    font-weight:bold;
-    cursor:pointer;
+.short-tabs span,
+.short-tabs button{
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.7);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 6px;
+    transition: .2s;
 }
 
-.short-tabs span.active{
-    color:#fff;
-    border-bottom:3px solid #ff0050;
-    padding-bottom:5px;
+.short-tabs span:hover,
+.short-tabs button:hover{
+    color: #fff;
+}
+
+.short-tabs span.active,
+.short-tabs button.active{
+    color: #fff;
+    border-bottom: 3px solid #ff0050;
+    padding-bottom: 4px;
 }
