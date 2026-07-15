@@ -477,3 +477,49 @@ exports.addWatchTime = async (req, res) => {
     }
 
 };
+
+exports.getTrendingVideos = async (req, res) => {
+
+    try {
+
+        const videos = await ShortVideo.find();
+
+        videos.sort((a, b) => {
+
+            const scoreA =
+                (a.views * 1) +
+                (a.likes.length * 5) +
+                (a.comments.length * 8) +
+                ((a.watchTime || 0) / 60);
+
+            const scoreB =
+                (b.views * 1) +
+                (b.likes.length * 5) +
+                (b.comments.length * 8) +
+                ((b.watchTime || 0) / 60);
+
+            return scoreB - scoreA;
+
+        });
+
+        res.json({
+
+            success: true,
+
+            videos: videos.slice(0, 20)
+
+        });
+
+    } catch (err) {
+
+        res.status(500).json({
+
+            success: false,
+
+            message: err.message
+
+        });
+
+    }
+
+};
