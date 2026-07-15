@@ -39,6 +39,11 @@ function uploadShort() {
 
     formData.append("caption", caption);
 
+    formData.append(
+    "category",
+    document.getElementById("category").value
+);
+
     const xhr = new XMLHttpRequest();
 
     xhr.open("POST", "/api/shorts/upload", true);
