@@ -321,3 +321,24 @@ loadMyPosts();
 document
 .getElementById("coverFile")
 .addEventListener("change", uploadCover);
+
+async function loadCreatorBadge(){
+
+const res = await fetch(
+"/api/shorts/creator-badge/" + user.username
+);
+
+const data = await res.json();
+
+
+if(data.success){
+
+document.getElementById(
+"creatorBadge"
+).innerText = data.badge;
+
+}
+
+}
+
+loadCreatorBadge();
