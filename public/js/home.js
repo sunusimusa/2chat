@@ -392,13 +392,30 @@ word-wrap:break-word;
 ${post.text}
 </p>
 
-<button
-onclick="viewPost('${post._id}')">
-💬 View all comments
-</button>
+<div class="post-actions">
 
 <button onclick="likePost('${post._id}')">
-❤️ Like (${post.likes ? post.likes.length : 0})
+
+<i class="fa-regular fa-heart"></i>
+
+<span>${post.likes ? post.likes.length : 0}</span>
+
+</button>
+
+<button onclick="viewPost('${post._id}')">
+
+<i class="fa-regular fa-comment"></i>
+
+<span>${post.comments.length}</span>
+
+</button>
+
+<button onclick="sharePost('${post._id}')">
+
+<i class="fa-solid fa-share"></i>
+
+<span>Share</span>
+
 </button>
 
 ${
@@ -406,15 +423,19 @@ post.username===user.username
 ?
 
 `
-<button
-onclick="editPost('${post._id}',\`${post.text}\`)">
-✏️ Edit
+
+<button onclick="editPost('${post._id}',\`${post.text}\`)">
+
+<i class="fa-solid fa-pen"></i>
+
 </button>
 
-<button
-onclick="deletePost('${post._id}')">
-🗑️ Delete
+<button onclick="deletePost('${post._id}')">
+
+<i class="fa-solid fa-trash"></i>
+
 </button>
+
 `
 
 :
@@ -422,6 +443,8 @@ onclick="deletePost('${post._id}')">
 ""
 
 }
+
+</div>
 
 <hr>
 
@@ -435,16 +458,14 @@ padding:8px;
 
 <br><br>
 
-<button
+<button class="comment-btn"
 onclick="commentPost('${post._id}')">
-💬 Comment
-</button>
 
-<p>
-<b>
-💬 ${post.comments.length}
-</b>
-</p>
+<i class="fa-regular fa-paper-plane"></i>
+
+Comment
+
+</button>
 
 <div>
 
@@ -615,3 +636,30 @@ onclick="location.href='/status.html?user=${status.username}'">
 }
 
 loadStatusBar();
+
+async function sharePost(postId){
+
+const url =
+window.location.origin +
+"/post.html?id=" +
+postId;
+
+if(navigator.share){
+
+navigator.share({
+
+title:"2Chat Post",
+
+url
+
+});
+
+}else{
+
+navigator.clipboard.writeText(url);
+
+alert("✅ Link copied");
+
+}
+
+}
