@@ -545,3 +545,72 @@ opacity:1;
 }
 
 }
+
+/* ===========================
+   PREMIUM MESSAGE
+=========================== */
+
+/* Bubble Tail */
+
+.bubble-me::after{
+content:"";
+position:absolute;
+right:-7px;
+bottom:0;
+width:18px;
+height:18px;
+background:#1877f2;
+clip-path:polygon(0 0,100% 100%,0 100%);
+}
+
+.bubble-other::after{
+content:"";
+position:absolute;
+left:-7px;
+bottom:0;
+width:18px;
+height:18px;
+background:#fff;
+clip-path:polygon(100% 0,100% 100%,0 100%);
+}
+
+/* Time */
+
+.message-time{
+display:block;
+font-size:11px;
+margin-top:8px;
+opacity:.75;
+text-align:right;
+}
+
+/* Reaction */
+
+.message-reactions{
+display:flex;
+gap:5px;
+margin-top:8px;
+flex-wrap:wrap;
+}
+
+.message-reactions span{
+background:#fff;
+padding:4px 8px;
+border-radius:20px;
+font-size:13px;
+box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+.bubble-me .message-reactions span{
+background:rgba(255,255,255,.18);
+color:#fff;
+}
+
+/* Hover */
+
+.bubble-me:hover,
+.bubble-other:hover{
+transform:translateY(-2px);
+transition:.2s;
+}
+
