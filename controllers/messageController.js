@@ -67,11 +67,12 @@ message:err.message
 
 // ================= SEND VOICE =================
 
-exports.sendVoice = async (req, res) => {
+exports.sendVoice = async (req,res)=>{
 
 try{
 
 const { sender, receiver } = req.body;
+
 
 if(!req.file){
 
@@ -82,25 +83,44 @@ message:"No voice file uploaded."
 
 }
 
-const result = await cloudinary.uploader.upload(
-req.file.path,
+
+const streamifier = require("streamifier");
+
+
+let voiceUrl = "";
+
+
+const uploadStream =
+cloudinary.uploader.upload_stream(
+
 {
 resource_type:"video",
 folder:"2chat-voice"
-}
-);
+},
 
-const message = await Message.create({
+(error,result)=>{
+
+if(error){
+
+throw error;
+
+}
+
+voiceUrl = result.secure_url;
+
+
+Message.create({
 
 sender,
 receiver,
 text:"",
 image:"",
-voice:result.secure_url,
+voice:voiceUrl,
 delivered:true,
 deliveredAt:new Date()
 
-});
+}).then(async(message)=>{
+
 
 await Notification.create({
 
@@ -111,18 +131,37 @@ text:`${sender} sent you a voice message 🎤`
 
 });
 
+
 res.json({
+
 success:true,
 message
+
 });
+
+
+});
+
+
+}
+
+);
+
+
+streamifier
+.createReadStream(req.file.buffer)
+.pipe(uploadStream);
+
 
 }catch(err){
 
-console.error(err);
+console.log(err);
 
 res.status(500).json({
+
 success:false,
 message:err.message
+
 });
 
 }
