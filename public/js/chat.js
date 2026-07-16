@@ -68,8 +68,8 @@ document.getElementById("status").innerHTML =
 
 });
 
-async function loadMessages(){
-
+async function loadMessages(autoScroll=true){
+    
 if(!receiver) return;
 
 const res =
@@ -179,11 +179,11 @@ document.getElementById("chat");
 
 chat.innerHTML = html;
 
-const nearBottom =
-chat.scrollHeight - chat.scrollTop - chat.clientHeight < 100;
+if(autoScroll){
 
-if (nearBottom) {
-    chat.scrollTop = chat.scrollHeight;
+chat.scrollTop =
+chat.scrollHeight;
+
 }
     
 }
@@ -259,7 +259,19 @@ loadMessages();
 
 loadMessages();
 
-// setInterval(loadMessages,2000);
+// Auto refresh every 5 seconds
+setInterval(()=>{
+
+const chat=document.getElementById("chat");
+
+const nearBottom =
+chat.scrollHeight -
+chat.scrollTop -
+chat.clientHeight < 100;
+
+loadMessages(nearBottom);
+
+},5000);
 
 socket.on("receiveMessage",(msg)=>{
 
