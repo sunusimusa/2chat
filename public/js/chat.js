@@ -236,7 +236,10 @@ document.getElementById("previewBox").style.display =
 "none";
 
 loadMessages();
-    
+
+const chat = document.getElementById("chat");
+chat.scrollTop = chat.scrollHeight;
+
 }else{
 
 alert(data.message);
