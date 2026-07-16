@@ -43,10 +43,20 @@ followBtn.style.display = "none";
 
 }
 
-document.getElementById("avatar").src =
-profile.avatar ||
-"https://cdn-icons-png.flaticon.com/512/149/149071.png";
+const avatar =
+document.getElementById("avatar");
 
+if(profile.avatar && profile.avatar !== ""){
+
+    avatar.src = profile.avatar;
+
+}else{
+
+    avatar.src =
+    "/images/default-avatar.png";
+
+}
+ 
 const coverImage = document.getElementById("coverImage");
 
 if (coverImage) {
@@ -54,20 +64,23 @@ if (coverImage) {
 }
     
 document.getElementById("username").innerText =
-profile.username;
+"@" + (profile.username || "User");
+
 
 document.getElementById("email").innerText =
-profile.email;
+profile.email || "No email";
 
 document.getElementById("bio").innerText =
 profile.bio || "No bio yet";
 
+
 document.getElementById("followers").innerText =
-profile.followers.length;
+profile.followers ? profile.followers.length : 0;
+
 
 document.getElementById("following").innerText =
-profile.following.length; 
-
+profile.following ? profile.following.length : 0;    
+    
 }
 
 async function saveProfile(){
