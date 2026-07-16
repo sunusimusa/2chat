@@ -51,11 +51,6 @@ deliveredAt:{
 type:Date
 },
 
- voice: {
-  type: String,
-  default: ""
-}, 
-
   seenAt:{
     type:Date
   }
