@@ -348,37 +348,54 @@ body{
 
 /* FOR YOU / FOLLOWING / TRENDING */
 
-.short-tabs{
-    position: fixed;
-    top: 15px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    z-index: 9999;
+.top-tabs{
+
+position:absolute;
+top:15px;
+left:0;
+width:100%;
+
+display:flex;
+justify-content:center;
+align-items:center;
+gap:18px;
+
+z-index:100;
+
 }
 
-.short-tabs span,
-.short-tabs button{
-    background: none;
-    border: none;
-    color: rgba(255,255,255,0.7);
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    padding: 4px 6px;
-    transition: .2s;
+.top-tabs a{
+
+color:rgba(255,255,255,.75);
+
+text-decoration:none;
+
+font-size:17px;
+
+font-weight:600;
+
+padding:6px 10px;
+
+border-radius:20px;
+
+transition:.3s;
+
 }
 
-.short-tabs span:hover,
-.short-tabs button:hover{
-    color: #fff;
+.top-tabs a:hover{
+
+background:rgba(255,255,255,.15);
+
 }
 
-.short-tabs span.active,
-.short-tabs button.active{
-    color: #fff;
-    border-bottom: 3px solid #ff0050;
-    padding-bottom: 4px;
+.top-tabs a.active{
+
+color:#fff;
+
+background:rgba(0,0,0,.35);
+
+border-bottom:3px solid #ff0050;
+
 }
+
+
