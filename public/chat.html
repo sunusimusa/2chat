@@ -5,17 +5,20 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
 <title>2Chat Chat</title>
 
-<link rel="stylesheet" href="/css/chat.css">
+<link rel="stylesheet"
+href="/css/chat.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
 </head>
 
-
 <body>
-
 
 <!-- Reaction Popup -->
 
@@ -30,95 +33,104 @@
 
 </div>
 
-
-
 <!-- Header -->
 
 <div class="header">
 
-<button onclick="history.back()">
-⬅
+<button class="back-btn"
+onclick="history.back()">
+
+<i class="fa-solid fa-arrow-left"></i>
+
 </button>
 
+<div class="chat-profile">
+
+<img
+id="chatAvatar"
+src="/images/default.png"
+class="chat-avatar">
 
 <div>
 
-<span id="chatUser"></span>
-
-<br>
+<h3 id="chatUser"></h3>
 
 <small id="status">
-⚫ Offline
+
+<i class="fa-solid fa-circle"></i>
+
+Offline
+
 </small>
 
-
 <br>
-
 
 <small
 id="typing"
-style="display:none;color:white;">
+style="display:none;">
 
-✍️ Typing...
+<i class="fa-solid fa-pen"></i>
+
+Typing...
 
 </small>
 
-
 </div>
 
 </div>
 
+<div class="header-icons">
 
+<button>
+
+<i class="fa-solid fa-phone"></i>
+
+</button>
+
+<button>
+
+<i class="fa-solid fa-video"></i>
+
+</button>
+
+<button>
+
+<i class="fa-solid fa-circle-info"></i>
+
+</button>
+
+</div>
+
+</div>
 
 <!-- Messages -->
 
 <div id="chat"></div>
 
-
-
-
 <!-- Image Preview -->
 
-<div
-id="previewBox"
-style="
-display:none;
-padding:10px;
-background:#fff;
-border-top:1px solid #ddd;
-text-align:center;
-">
-
+<div id="previewBox"
+class="preview-box"
+style="display:none;">
 
 <img
-id="previewImage"
-style="
-max-width:220px;
-max-height:220px;
-border-radius:12px;
-">
-
+id="previewImage">
 
 <br><br>
 
-
 <button onclick="removeImage()">
 
-❌ Remove
+<i class="fa-solid fa-trash"></i>
+
+Remove
 
 </button>
 
-
 </div>
-
-
-
-
 
 <!-- Bottom -->
 
 <div class="bottom">
-
 
 <input
 type="file"
@@ -126,40 +138,27 @@ id="image"
 accept="image/*"
 style="display:none;">
 
-
-
 <label
 for="image"
 class="image-btn">
 
-📷
+<i class="fa-solid fa-image"></i>
 
 </label>
 
-
-
 <textarea
 id="message"
-placeholder="Type message..."></textarea>
-
-
+placeholder="Type a message..."></textarea>
 
 <button
 id="sendBtn"
 onclick="sendMessage()">
 
-📤
+<i class="fa-solid fa-paper-plane"></i>
 
 </button>
 
-
-
 </div>
-
-
-
-
-
 
 <!-- Full Image Viewer -->
 
@@ -168,31 +167,21 @@ id="imageViewer"
 class="image-viewer"
 style="display:none;">
 
-
-
 <span
 class="close-image"
 onclick="closeImage()">
 
-✖
+<i class="fa-solid fa-xmark"></i>
 
 </span>
 
-
-
 <img id="fullImage">
 
-
-
 </div>
-
-
-
 
 <script src="/socket.io/socket.io.js"></script>
 
 <script src="/js/chat.js"></script>
-
 
 </body>
 
