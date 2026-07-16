@@ -179,8 +179,13 @@ document.getElementById("chat");
 
 chat.innerHTML = html;
 
-chat.scrollTop = chat.scrollHeight;
+const nearBottom =
+chat.scrollHeight - chat.scrollTop - chat.clientHeight < 100;
 
+if (nearBottom) {
+    chat.scrollTop = chat.scrollHeight;
+}
+    
 }
 
 async function sendMessage(){
@@ -254,7 +259,7 @@ loadMessages();
 
 loadMessages();
 
-setInterval(loadMessages,2000);
+// setInterval(loadMessages,2000);
 
 socket.on("receiveMessage",(msg)=>{
 
