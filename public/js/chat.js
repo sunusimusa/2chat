@@ -50,8 +50,8 @@ socket.on("userOnline",(username)=>{
 
 if(username===receiver){
 
-document.getElementById("status").innerText =
-"🟢 Online";
+document.getElementById("status").innerHTML =
+'<i class="fa-solid fa-circle" style="color:#00ff66;font-size:10px"></i> Online';
 
 }
 
@@ -61,9 +61,9 @@ socket.on("userOffline",(username)=>{
 
 if(username===receiver){
 
-document.getElementById("status").innerText =
-"Last seen recently";
-
+document.getElementById("status").innerHTML =
+'<i class="fa-regular fa-clock"></i> Last seen recently';
+    
 }
 
 });
@@ -137,7 +137,29 @@ ${
 mine
 ?
 `<br>
-<small style="font-size:11px;opacity:.8;">
+
+<small class="message-status">
+${
+msg.seen
+?
+
+'<i class="fa-solid fa-check-double" style="color:#00b7ff"></i> Seen'
+
+:
+
+msg.delivered
+
+?
+
+'<i class="fa-solid fa-check-double"></i> Delivered'
+
+:
+
+'<i class="fa-solid fa-check"></i> Sent'
+
+}
+</small>
+
 ${
 msg.seen
 ?
@@ -263,8 +285,7 @@ document.getElementById("typing").style.display =
 "block";
 
 document.getElementById("typing").innerText =
-"✍️ " + data.sender + " is typing...";
-
+`<i class="fa-solid fa-pen"></i> ${data.sender} is typing...`
 });
 
 socket.on("stopTyping",()=>{
