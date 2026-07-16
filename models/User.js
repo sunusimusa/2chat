@@ -24,11 +24,6 @@ default:[]
       required: true
     },
 
-    creatorBadge: {
-    type: String,
-    default: "🥉 Bronze Creator"
-},
-
     avatar: {
       type: String,
       default: ""
@@ -62,6 +57,11 @@ following:{
     favoriteCategories: {
     type: [String],
     default: []
+},
+
+    creatorBadge: {
+    type: String,
+    default: "🥉 Bronze Creator"
 },
 
     savedVideos: [
