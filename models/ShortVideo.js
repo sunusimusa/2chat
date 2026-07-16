@@ -22,6 +22,11 @@ const shortVideoSchema = new mongoose.Schema({
         default: "general"
     },
 
+    hashtags:{
+    type:[String],
+    default:[]
+},
+
     video: {
         type: String,
         required: true
