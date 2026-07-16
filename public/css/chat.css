@@ -373,3 +373,175 @@ background:#1667d9;
 #sendBtn:active{
 transform:scale(.95);
 }
+
+/* ===========================
+   IMAGE VIEWER
+=========================== */
+
+.image-viewer{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+display:none;
+justify-content:center;
+align-items:center;
+background:rgba(0,0,0,.95);
+backdrop-filter:blur(5px);
+z-index:9999;
+animation:fadeViewer .25s ease;
+}
+
+.image-viewer img{
+max-width:95%;
+max-height:90%;
+border-radius:15px;
+box-shadow:0 5px 30px rgba(0,0,0,.5);
+}
+
+.close-image{
+position:absolute;
+top:20px;
+right:25px;
+width:45px;
+height:45px;
+border-radius:50%;
+background:rgba(255,255,255,.15);
+display:flex;
+align-items:center;
+justify-content:center;
+color:#fff;
+font-size:22px;
+cursor:pointer;
+transition:.25s;
+}
+
+.close-image:hover{
+background:rgba(255,255,255,.3);
+transform:rotate(90deg);
+}
+
+/* ===========================
+   REACTION POPUP
+=========================== */
+
+.reaction-popup{
+position:fixed;
+display:none;
+background:#fff;
+padding:10px 14px;
+border-radius:40px;
+box-shadow:0 8px 25px rgba(0,0,0,.25);
+z-index:9999;
+animation:popReaction .2s ease;
+}
+
+.reaction-popup span{
+font-size:28px;
+margin:0 6px;
+cursor:pointer;
+transition:.2s;
+display:inline-block;
+}
+
+.reaction-popup span:hover{
+transform:scale(1.35);
+}
+
+/* ===========================
+   STATUS COLORS
+=========================== */
+
+#status{
+color:#d8ffe1;
+}
+
+#status i{
+margin-right:5px;
+}
+
+#typing{
+color:#fff;
+font-style:italic;
+}
+
+/* ===========================
+   MOBILE RESPONSIVE
+=========================== */
+
+@media(max-width:768px){
+
+.header{
+height:65px;
+padding:0 10px;
+}
+
+.chat-avatar{
+width:42px;
+height:42px;
+}
+
+.chat-profile h3{
+font-size:16px;
+}
+
+#chat{
+padding:12px;
+}
+
+.bubble-me,
+.bubble-other{
+max-width:86%;
+font-size:14px;
+}
+
+.bottom{
+height:75px;
+padding:10px;
+gap:8px;
+}
+
+.bottom textarea{
+font-size:14px;
+height:45px;
+}
+
+.image-btn,
+#sendBtn{
+width:45px;
+height:45px;
+font-size:18px;
+}
+
+}
+
+/* ===========================
+   ANIMATIONS
+=========================== */
+
+@keyframes popReaction{
+
+from{
+transform:scale(.5);
+opacity:0;
+}
+
+to{
+transform:scale(1);
+opacity:1;
+}
+
+}
+
+@keyframes fadeViewer{
+
+from{
+opacity:0;
+}
+
+to{
+opacity:1;
+}
+
+}
