@@ -136,11 +136,6 @@ ${msg.text || ""}
 ${
 mine
 ?
-`<br>
-
-${
-mine
-?
 `
 <br>
 
