@@ -5,13 +5,11 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>2Chat Chat</title>
 
-<link rel="stylesheet"
-href="/css/chat.css">
+<link rel="stylesheet" href="/css/chat.css">
 
 <link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
@@ -20,22 +18,9 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 
 <body>
 
-<!-- Reaction Popup -->
+<!-- HEADER -->
 
-<div id="reactionPopup" class="reaction-popup">
-
-<span onclick="selectReaction('❤️')">❤️</span>
-<span onclick="selectReaction('👍')">👍</span>
-<span onclick="selectReaction('😂')">😂</span>
-<span onclick="selectReaction('😮')">😮</span>
-<span onclick="selectReaction('😢')">😢</span>
-<span onclick="selectReaction('😡')">😡</span>
-
-</div>
-
-<!-- Header -->
-
-<div class="header">
+<header class="chat-header">
 
 <button class="back-btn"
 onclick="history.back()">
@@ -44,42 +29,36 @@ onclick="history.back()">
 
 </button>
 
-<div class="chat-profile">
+<div class="chat-user">
 
 <img
 id="chatAvatar"
 src="/images/default.png"
 class="chat-avatar">
 
-<div>
+<div class="chat-info">
 
 <h3 id="chatUser"></h3>
 
-<small id="status">
+<p id="status">
 
 <i class="fa-solid fa-circle"></i>
 
 Offline
 
-</small>
+</p>
 
-<br>
-
-<small
-id="typing"
-style="display:none;">
-
-<i class="fa-solid fa-pen"></i>
+<p id="typing" style="display:none">
 
 Typing...
 
-</small>
+</p>
 
 </div>
 
 </div>
 
-<div class="header-icons">
+<div class="header-actions">
 
 <button>
 
@@ -95,28 +74,25 @@ Typing...
 
 <button>
 
-<i class="fa-solid fa-circle-info"></i>
+<i class="fa-solid fa-ellipsis-vertical"></i>
 
 </button>
 
 </div>
 
+</header>
+
+<!-- CHAT -->
+
+<div id="chat" class="chat-container">
+
 </div>
 
-<!-- Messages -->
+<!-- IMAGE PREVIEW -->
 
-<div id="chat"></div>
+<div id="previewBox" class="preview-box" style="display:none;">
 
-<!-- Image Preview -->
-
-<div id="previewBox"
-class="preview-box"
-style="display:none;">
-
-<img
-id="previewImage">
-
-<br><br>
+<img id="previewImage">
 
 <button onclick="removeImage()">
 
@@ -128,23 +104,21 @@ Remove
 
 </div>
 
-<!-- Bottom -->
+<!-- MESSAGE BAR -->
 
-<div class="bottom">
+<div class="message-bar">
+
+<label for="image" class="icon-btn">
+
+<i class="fa-solid fa-image"></i>
+
+</label>
 
 <input
 type="file"
 id="image"
 accept="image/*"
-style="display:none;">
-
-<label
-for="image"
-class="image-btn">
-
-<i class="fa-solid fa-image"></i>
-
-</label>
+hidden>
 
 <textarea
 id="message"
@@ -160,12 +134,31 @@ onclick="sendMessage()">
 
 </div>
 
-<!-- Full Image Viewer -->
+<!-- REACTION POPUP -->
+
+<div
+id="reactionPopup"
+class="reaction-popup">
+
+<span onclick="selectReaction('❤️')">❤️</span>
+
+<span onclick="selectReaction('👍')">👍</span>
+
+<span onclick="selectReaction('😂')">😂</span>
+
+<span onclick="selectReaction('😮')">😮</span>
+
+<span onclick="selectReaction('😢')">😢</span>
+
+<span onclick="selectReaction('😡')">😡</span>
+
+</div>
+
+<!-- IMAGE VIEWER -->
 
 <div
 id="imageViewer"
-class="image-viewer"
-style="display:none;">
+class="image-viewer">
 
 <span
 class="close-image"
