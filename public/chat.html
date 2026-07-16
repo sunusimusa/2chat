@@ -1,17 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>2Chat Chat</title>
 
 <link rel="stylesheet" href="/css/chat.css">
 
 </head>
 
+
 <body>
 
+
 <!-- Reaction Popup -->
+
 <div id="reactionPopup" class="reaction-popup">
 
 <span onclick="selectReaction('❤️')">❤️</span>
@@ -23,10 +30,16 @@
 
 </div>
 
+
+
 <!-- Header -->
+
 <div class="header">
 
-<button onclick="history.back()">⬅</button>
+<button onclick="history.back()">
+⬅
+</button>
+
 
 <div>
 
@@ -38,7 +51,9 @@
 ⚫ Offline
 </small>
 
+
 <br>
+
 
 <small
 id="typing"
@@ -48,14 +63,22 @@ style="display:none;color:white;">
 
 </small>
 
+
 </div>
 
 </div>
+
+
 
 <!-- Messages -->
+
 <div id="chat"></div>
 
+
+
+
 <!-- Image Preview -->
+
 <div
 id="previewBox"
 style="
@@ -66,6 +89,7 @@ border-top:1px solid #ddd;
 text-align:center;
 ">
 
+
 <img
 id="previewImage"
 style="
@@ -74,7 +98,9 @@ max-height:220px;
 border-radius:12px;
 ">
 
+
 <br><br>
+
 
 <button onclick="removeImage()">
 
@@ -82,10 +108,17 @@ border-radius:12px;
 
 </button>
 
+
 </div>
 
+
+
+
+
 <!-- Bottom -->
+
 <div class="bottom">
+
 
 <input
 type="file"
@@ -93,56 +126,49 @@ id="image"
 accept="image/*"
 style="display:none;">
 
+
+
 <label
 for="image"
 class="image-btn">
+
 📷
+
 </label>
+
+
 
 <textarea
 id="message"
 placeholder="Type message..."></textarea>
 
+
+
 <button
 id="sendBtn"
 onclick="sendMessage()">
+
 📤
+
 </button>
+
+
 
 </div>
 
-<div
-id="voiceRecorder"
-class="voice-recorder"
-style="display:none;">
 
-<div class="record-dot"></div>
 
-<span id="recordTime">
-00:00
-</span>
 
-<div id="voiceWave">
-▁▂▃▄▅▆▇█
-</div>
 
-<button
-id="cancelVoice">
-❌
-</button>
-
-<button
-id="sendVoice">
-📤
-</button>
-
-</div>
 
 <!-- Full Image Viewer -->
+
 <div
 id="imageViewer"
 class="image-viewer"
 style="display:none;">
+
+
 
 <span
 class="close-image"
@@ -152,12 +178,22 @@ onclick="closeImage()">
 
 </span>
 
+
+
 <img id="fullImage">
+
+
 
 </div>
 
+
+
+
 <script src="/socket.io/socket.io.js"></script>
+
 <script src="/js/chat.js"></script>
 
+
 </body>
+
 </html>
