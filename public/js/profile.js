@@ -244,8 +244,6 @@ html;
 
 }
 
-loadMyPosts();
-
 async function followUser(targetUsername){
 
 const res =
@@ -380,4 +378,7 @@ if(data.success && badge){
 
 }
 
+loadProfile();
+loadMyPosts();
 loadCreatorBadge();
+
