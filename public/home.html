@@ -10,6 +10,9 @@
 
 <link rel="stylesheet" href="/css/home.css">
 
+  <link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+  
 </head>
   
 <body>
@@ -17,7 +20,8 @@
 <h1>2Chat</h1>
 
 <p>
-👤 Logged in as:
+<i class="fa-solid fa-user"></i>
+Logged in as:
 <b id="userName"></b>
 </p>
 
@@ -25,24 +29,31 @@
 <div class="top-menu">
 
 <button onclick="location.href='/users.html'">
-👥 Friends
+<i class="fa-solid fa-user-group"></i>
+Friends
 </button>
 
 <button onclick="location.href='/shorts.html'">
-🎬 Shorts
+<i class="fa-solid fa-clapperboard"></i>
+Shorts
 </button>
 
 <button onclick="location.href='/notification.html'">
-🔔
+
+<i class="fa-solid fa-bell"></i>
+
 <span id="notificationCount"></span>
+
 </button>
 
 <button onclick="goProfile()">
-👤 Profile
+<i class="fa-solid fa-user"></i>
+Profile
 </button>
 
 <button onclick="logout()">
-🚪 Logout
+<i class="fa-solid fa-right-from-bracket"></i>
+Logout
 </button>
 
 </div>
@@ -68,7 +79,8 @@ style="display:none;">
 for="postImage"
 class="image-btn">
 
-📷 Add Photo
+<i class="fa-solid fa-image"></i>
+Add Photo
 
 </label>
 
@@ -92,7 +104,8 @@ border-radius:12px;
 
 <button onclick="removePostImage()">
 
-❌ Remove
+<i class="fa-solid fa-trash"></i>
+Remove
 
 </button>
 
@@ -102,7 +115,8 @@ border-radius:12px;
 id="postBtn"
 onclick="createPost()">
 
-🚀 Post
+<i class="fa-solid fa-paper-plane"></i>
+Post
 
 </button>
 
@@ -113,27 +127,31 @@ onclick="createPost()">
 <div id="feed"></div>
 
 <!-- Bottom Navigation -->
-  
-<div class="bottom-nav">
+  <div class="bottom-nav">
 
 <a href="/home.html" class="active">
-🏠<br>Home
+<i class="fa-solid fa-house"></i>
+<span>Home</span>
 </a>
 
 <a href="/shorts.html">
-🎬<br>Shorts
+<i class="fa-solid fa-clapperboard"></i>
+<span>Shorts</span>
 </a>
 
 <a href="/trending.html">
-🔥<br>Trending
+<i class="fa-solid fa-fire"></i>
+<span>Trending</span>
 </a>
 
 <a href="/messenger.html">
-💬<br>Chats
+<i class="fa-solid fa-comments"></i>
+<span>Chats</span>
 </a>
 
 <a href="/profile.html">
-👤<br>Profile
+<i class="fa-solid fa-user"></i>
+<span>Profile</span>
 </a>
 
 </div>
