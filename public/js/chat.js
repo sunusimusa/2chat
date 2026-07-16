@@ -177,15 +177,16 @@ msg.delivered
 const chat =
 document.getElementById("chat");
 
+if(chat.innerHTML !== html){
+
 chat.innerHTML = html;
 
 if(autoScroll){
 
-chat.scrollTop =
-chat.scrollHeight;
+chat.scrollTop = chat.scrollHeight;
 
 }
-    
+
 }
 
 async function sendMessage(){
