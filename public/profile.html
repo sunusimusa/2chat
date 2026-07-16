@@ -1,137 +1,186 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>2Chat Profile</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2Chat Profile</title>
 
-  <link rel="stylesheet" href="/css/profile.css">
+<meta name="viewport"
+content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="/css/profile.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
 </head>
+
 <body>
 
 <!-- Cover -->
 <div class="cover">
 
-  <img
-    id="coverImage"
-    src="/images/default-cover.jpg"
-    class="cover-image">
+<img
+id="coverImage"
+src="/images/default-cover.jpg"
+class="cover-image">
 
-  <input
-    type="file"
-    id="coverFile"
-    accept="image/*"
-    hidden>
+<input
+type="file"
+id="coverFile"
+accept="image/*"
+hidden>
 
-  <button
-    class="cover-btn"
-    onclick="document.getElementById('coverFile').click()">
-    📷 Change Cover
-  </button>
+<button
+class="cover-btn"
+onclick="document.getElementById('coverFile').click()">
+
+<i class="fa-solid fa-camera"></i>
+Change Cover
+
+</button>
 
 </div>
 
 <!-- Profile -->
 <div class="profile-box">
 
-  <img
-    id="avatar"
-    class="avatar">
+<img
+id="avatar"
+class="avatar">
 
-  <input
-    type="file"
-    id="avatarFile"
-    hidden>
+<input
+type="file"
+id="avatarFile"
+hidden>
 
-  <button
-    class="avatar-btn"
-    onclick="document.getElementById('avatarFile').click()">
-    📷 Change Photo
-  </button>
+<button
+class="avatar-btn"
+onclick="document.getElementById('avatarFile').click()">
 
-  <h2 id="username"></h2>
+<i class="fa-solid fa-camera"></i>
+Change Photo
 
- <div id="creatorBadge" 
-  class="creator-badge">
+</button>
+
+<h2 id="username"></h2>
+
+<div
+id="creatorBadge"
+class="creator-badge">
+
 🥉 Bronze Creator
+
 </div>
 
-  <p id="email"></p>
+<p id="email"></p>
 
-  <p id="bio"></p>
+<p id="bio"></p>
 
-  <div class="stats">
+<div class="stats">
 
-    <div class="stat">
-      <h2 id="postsCount">0</h2>
-      <p>Posts</p>
-    </div>
+<div class="stat">
+<h2 id="postsCount">0</h2>
+<p>Posts</p>
+</div>
 
-    <div class="stat">
-      <b id="followers">0</b><br>
-      Followers
-    </div>
+<div class="stat">
+<b id="followers">0</b><br>
+Followers
+</div>
 
-    <div class="stat">
-      <b id="following">0</b><br>
-      Following
-    </div>
+<div class="stat">
+<b id="following">0</b><br>
+Following
+</div>
 
-  </div>
+</div>
 
-  <hr>
+<hr>
 
-  <input
-    id="newUsername"
-    placeholder="New Username">
+<input
+id="newUsername"
+placeholder="New Username">
 
-  <br><br>
+<br><br>
 
-  <textarea
-    id="newBio"
-    placeholder="Write your bio"></textarea>
+<textarea
+id="newBio"
+placeholder="Write your bio"></textarea>
 
-  <br><br>
+<br><br>
 
-  <button
-    id="followBtn"
-    style="display:none;"
-    onclick="followUser(profileUsername)">
-    ➕ Follow
-  </button>
+<button
+id="followBtn"
+style="display:none;"
+onclick="followUser(profileUsername)">
 
-  <button onclick="location.href='/saved.html'">
-    🔖 Saved Videos
-  </button>
+<i class="fa-solid fa-user-plus"></i>
+Follow
 
-  <button onclick="location.href='/analytics.html'">
-    📊 Creator Studio
-  </button>
+</button>
 
-  <button onclick="saveProfile()">
-    💾 Save Profile
-  </button>
+<button
+onclick="location.href='/saved.html'">
 
-  <button onclick="uploadAvatar()">
-    📷 Upload Avatar
-  </button>
+<i class="fa-solid fa-bookmark"></i>
+Saved Videos
 
-  <button onclick="goHome()">
-    🏠 Home
-  </button>
+</button>
 
-  <button onclick="logout()">
-    🚪 Logout
-  </button>
+<button
+onclick="location.href='/analytics.html'">
+
+<i class="fa-solid fa-chart-line"></i>
+Creator Studio
+
+</button>
+
+<button
+onclick="saveProfile()">
+
+<i class="fa-solid fa-floppy-disk"></i>
+Save Profile
+
+</button>
+
+<button
+onclick="uploadAvatar()">
+
+<i class="fa-solid fa-camera"></i>
+Upload Avatar
+
+</button>
+
+<button
+onclick="goHome()">
+
+<i class="fa-solid fa-house"></i>
+Home
+
+</button>
+
+<button
+onclick="logout()">
+
+<i class="fa-solid fa-right-from-bracket"></i>
+Logout
+
+</button>
 
 </div>
 
 <!-- My Posts -->
+
 <div class="my-posts">
 
-  <h2>🖼 My Posts</h2>
+<h2>
 
-  <div id="myPosts"></div>
+<i class="fa-solid fa-images"></i>
+
+My Posts
+
+</h2>
+
+<div id="myPosts"></div>
 
 </div>
 
@@ -139,25 +188,47 @@
 
 <div class="bottom-nav">
 
-  <a href="/home.html">
-    🏠<br>Home
-  </a>
+<a href="/home.html">
 
-  <a href="/shorts.html">
-    🎬<br>Shorts
-  </a>
+<i class="fa-solid fa-house"></i>
 
-  <a href="/trending.html">
-    🔥<br>Trending
-  </a>
+<span>Home</span>
 
-  <a href="/saved.html">
-    🔖<br>Saved
-  </a>
+</a>
 
-  <a href="/profile.html" class="active">
-    👤<br>Profile
-  </a>
+<a href="/shorts.html">
+
+<i class="fa-solid fa-clapperboard"></i>
+
+<span>Shorts</span>
+
+</a>
+
+<a href="/trending.html">
+
+<i class="fa-solid fa-fire"></i>
+
+<span>Trending</span>
+
+</a>
+
+<a href="/saved.html">
+
+<i class="fa-solid fa-bookmark"></i>
+
+<span>Saved</span>
+
+</a>
+
+<a
+href="/profile.html"
+class="active">
+
+<i class="fa-solid fa-user"></i>
+
+<span>Profile</span>
+
+</a>
 
 </div>
 
