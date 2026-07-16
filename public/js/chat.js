@@ -315,10 +315,7 @@ msg.sender===receiver ||
 msg.receiver===receiver
 ){
 
-loadMessages();
-
-const chat = document.getElementById("chat");
-chat.scrollTop = chat.scrollHeight;
+appendMessage(msg);
 
 }
 
