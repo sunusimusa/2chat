@@ -133,6 +133,13 @@ cursor:pointer;
 
 ${msg.text || ""}
 
+<div class="message-time">
+${new Date(msg.createdAt).toLocaleTimeString([],{
+hour:"2-digit",
+minute:"2-digit"
+})}
+</div>
+
 ${
 mine
 ?
