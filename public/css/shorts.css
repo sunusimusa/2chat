@@ -349,53 +349,34 @@ body{
 /* FOR YOU / FOLLOWING / TRENDING */
 
 .top-tabs{
-
 position:absolute;
 top:15px;
-left:0;
-width:100%;
-
+left:50%;
+transform:translateX(-50%);
 display:flex;
-justify-content:center;
-align-items:center;
 gap:18px;
-
 z-index:100;
-
 }
 
 .top-tabs a{
-
-color:rgba(255,255,255,.75);
-
+width:45px;
+height:45px;
+border-radius:50%;
+background:rgba(0,0,0,.35);
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:24px;
 text-decoration:none;
-
-font-size:17px;
-
-font-weight:600;
-
-padding:6px 10px;
-
-border-radius:20px;
-
+color:#fff;
 transition:.3s;
-
-}
-
-.top-tabs a:hover{
-
-background:rgba(255,255,255,.15);
-
 }
 
 .top-tabs a.active{
-
-color:#fff;
-
-background:rgba(0,0,0,.35);
-
-border-bottom:3px solid #ff0050;
-
+background:#ff0050;
+transform:scale(1.08);
 }
 
-
+.top-tabs a:hover{
+transform:scale(1.1);
+}
