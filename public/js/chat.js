@@ -68,6 +68,37 @@ document.getElementById("status").innerHTML =
 
 });
 
+function appendMessage(msg){
+
+const chat = document.getElementById("chat");
+
+const mine = msg.sender === user.username;
+
+const div = document.createElement("div");
+
+div.className = mine ? "me" : "other";
+
+div.innerHTML = `
+
+<div class="${mine ? "bubble-me" : "bubble-other"}">
+
+${msg.image ? `
+<img src="${msg.image}"
+onclick="openImage('${msg.image}')">
+` : ""}
+
+${msg.text || ""}
+
+</div>
+
+`;
+
+chat.appendChild(div);
+
+chat.scrollTop = chat.scrollHeight;
+
+}
+
 async function loadMessages(autoScroll=true){
     
 if(!receiver) return;
