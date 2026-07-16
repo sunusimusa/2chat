@@ -138,40 +138,28 @@ mine
 ?
 `<br>
 
+${
+mine
+?
+`
+<br>
+
 <small class="message-status">
+
 ${
 msg.seen
 ?
-
 '<i class="fa-solid fa-check-double" style="color:#00b7ff"></i> Seen'
-
 :
-
 msg.delivered
-
 ?
-
 '<i class="fa-solid fa-check-double"></i> Delivered'
-
 :
-
 '<i class="fa-solid fa-check"></i> Sent'
-
 }
+
 </small>
-
-${
-msg.seen
-?
-"✓✓ Seen"
-:
-msg.delivered
-?
-"✓✓ Delivered"
-:
-"✓ Sent"
-}
-</small>`
+`
 :
 ""
 }
@@ -281,11 +269,13 @@ loadMessages();
 
 socket.on("typing",(data)=>{
 
-document.getElementById("typing").style.display =
-"block";
+const typing = document.getElementById("typing");
 
-document.getElementById("typing").innerText =
-`<i class="fa-solid fa-pen"></i> ${data.sender} is typing...`
+typing.style.display = "block";
+
+typing.innerHTML =
+`<i class="fa-solid fa-pen"></i> ${data.sender} is typing...`;
+
 });
 
 socket.on("stopTyping",()=>{
