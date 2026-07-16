@@ -19,7 +19,8 @@ const {
     getTopVideos,
     getFollowersGrowth,
     getCreatorLevel,
-    getCreatorBadge
+    getCreatorBadge,
+    searchShorts
 } = require("../controllers/shortVideoController");
 
 // Upload Short Video
@@ -76,6 +77,11 @@ getCreatorLevel
 router.get(
 "/creator-badge/:username",
 getCreatorBadge
+);
+
+router.get(
+"/search/:keyword",
+searchShorts
 );
 
 module.exports = router;
