@@ -1,10 +1,18 @@
 const me = JSON.parse(localStorage.getItem("user"));
 
-async function loadUsers(){
+if (!me) {
+location.href = "/login.html";
+}
+
+async function loadUsers() {
+
+try{
 
 const res = await fetch("/api/messages/list/" + me.username);
 
 const data = await res.json();
+
+if(!data.success) return;
 
 let html = "";
 
@@ -12,9 +20,15 @@ data.chats.forEach(chat=>{
 
 html += `
 
-<div class="user" onclick="openChat('${chat.username}')">
+<div class="user"
+onclick="openChat('${chat.username}')">
 
-<img src="${chat.avatar || '/images/default.png'}">
+<img
+src="${chat.avatar || '/images/default.png'}">
+
+${chat.online
+? '<div class="online-dot"></div>'
+: ''}
 
 <div class="user-info">
 
@@ -24,7 +38,12 @@ html += `
 
 </div>
 
-<div style="text-align:right;">
+<div style="
+display:flex;
+flex-direction:column;
+align-items:end;
+gap:6px;
+">
 
 <div class="chat-time">
 
@@ -37,9 +56,20 @@ minute:"2-digit"
 
 </div>
 
-${chat.online
-? '<div class="online-dot"></div>'
-: ''}
+${
+chat.unread && chat.unread > 0
+
+?
+
+`<div class="unread">
+${chat.unread}
+</div>`
+
+:
+
+""
+
+}
 
 </div>
 
@@ -51,32 +81,53 @@ ${chat.online
 
 document.getElementById("users").innerHTML = html;
 
-}
+}catch(err){
 
-function openChat(username){
-
-location.href="/chat.html?user="+username;
+console.log(err);
 
 }
 
-const search = document.getElementById("searchUser");
+}
+
+// SEARCH
+
+const search =
+document.getElementById("searchUser");
 
 search.addEventListener("input",()=>{
 
-const value = search.value.toLowerCase();
+const value =
+search.value.toLowerCase();
 
-document.querySelectorAll(".user").forEach(user=>{
-
-const name = user.innerText.toLowerCase();
+document.querySelectorAll(".user")
+.forEach(user=>{
 
 user.style.display =
-name.includes(value)
-? "flex"
-: "none";
+user.innerText.toLowerCase()
+.includes(value)
+
+?
+
+"flex"
+
+:
+
+"none";
 
 });
 
 });
+
+// OPEN CHAT
+
+function openChat(username){
+
+location.href =
+"/chat.html?user=" + username;
+
+}
+
+// AUTO REFRESH
 
 loadUsers();
 
