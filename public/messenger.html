@@ -5,11 +5,16 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport"
+content="width=device-width,initial-scale=1.0">
 
 <title>2Chat Messenger</title>
 
-<link rel="stylesheet" href="/css/messenger.css">
+<link rel="stylesheet"
+href="/css/messenger.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
 </head>
 
@@ -17,28 +22,66 @@
 
 <div class="sidebar">
 
+<!-- Header -->
+
 <div class="topbar">
 
-<h2>💬 Chats</h2>
+<div class="logo">
+
+<h2>
+
+<i class="fa-solid fa-comments"></i>
+
+2Chat
+
+</h2>
+
+</div>
+
+<button
+class="new-chat">
+
+<i class="fa-solid fa-pen-to-square"></i>
+
+</button>
+
+</div>
+
+<!-- Search -->
+
+<div class="search-box">
+
+<i class="fa-solid fa-magnifying-glass"></i>
 
 <input
 type="text"
 id="searchUser"
-placeholder="Search chat...">
+placeholder="Search chats...">
 
 </div>
+
+<!-- Chat List -->
 
 <div id="users"></div>
 
 </div>
 
+<!-- Welcome -->
+
 <div class="welcome">
 
 <div>
 
-<h1>💙 2Chat Messenger</h1>
+<i class="fa-solid fa-comments"
+style="font-size:80px;color:#1877f2;"></i>
 
-<p>Select a conversation to start chatting.</p>
+<h1>2Chat Messenger</h1>
+
+<p>
+
+Choose a conversation and start chatting.
+
+</p>
 
 </div>
 
