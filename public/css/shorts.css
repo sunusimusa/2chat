@@ -380,3 +380,8 @@ transform:scale(1.08);
 .top-tabs a:hover{
 transform:scale(1.1);
 }
+
+.material-symbols-rounded{
+font-size:28px;
+line-height:1;
+}
