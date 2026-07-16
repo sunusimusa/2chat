@@ -32,19 +32,36 @@ exports.uploadVideo = async (req, res) => {
 
         });
 
-        const short = await ShortVideo.create({
+        
+            let tags = [];
 
-            username: req.body.username,
+if(req.body.hashtags){
 
-            avatar: req.body.avatar || "",
+    tags = req.body.hashtags
+    .split(" ")
+    .map(tag =>
+        tag.replace("#","").toLowerCase()
+    )
+    .filter(tag=>tag);
 
-            caption: req.body.caption || "",
+}
 
-            category: req.body.category || "general",
 
-            video: uploadResult.secure_url
+const short = await ShortVideo.create({
 
-        });
+    username: req.body.username,
+
+    avatar: req.body.avatar || "",
+
+    caption: req.body.caption || "",
+
+    category: req.body.category || "general",
+
+    hashtags: tags,
+
+    video: uploadResult.secure_url
+
+});
 
         res.json({
             success: true,
@@ -1086,6 +1103,71 @@ res.json({
 success:true,
 
 badge
+
+});
+
+
+}catch(err){
+
+res.status(500).json({
+
+success:false,
+
+message:err.message
+
+});
+
+}
+
+};
+
+// ================= SEARCH SHORTS =================
+
+exports.searchShorts = async(req,res)=>{
+
+try{
+
+const keyword =
+req.params.keyword.toLowerCase();
+
+
+const videos = await ShortVideo.find({
+
+$or:[
+
+{
+caption:{
+$regex:keyword,
+$options:"i"
+}
+},
+
+{
+hashtags:{
+$in:[keyword]
+}
+},
+
+{
+username:{
+$regex:keyword,
+$options:"i"
+}
+}
+
+]
+
+})
+.sort({
+createdAt:-1
+});
+
+
+res.json({
+
+success:true,
+
+videos
 
 });
 
