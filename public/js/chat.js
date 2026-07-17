@@ -1,6 +1,7 @@
 const user = JSON.parse(localStorage.getItem("user"));
 
 let selectedMessage = null;
+let replyMessage = null;
 
 if (!user) {
     location.href = "/login.html";
@@ -82,7 +83,7 @@ div.innerHTML = `
 
 <div
 class="${mine ? "bubble-me" : "bubble-other"}"
-oncontextmenu="showReaction(event,'${msg._id}')"
+oncontextmenu="showMessageMenu(event,${JSON.stringify(msg).replace(/"/g,"&quot;")})"
 ontouchstart="startPress(event,'${msg._id}')"
 ontouchend="cancelPress()"
 >
@@ -190,7 +191,7 @@ html += `
 
 <div
 class="${mine ? "bubble-me" : "bubble-other"}"
-oncontextmenu="showReaction(event,'${msg._id}')"
+oncontextmenu="showMessageMenu(event,${JSON.stringify(msg).replace(/"/g,"&quot;")})"
 ontouchstart="startPress(event,'${msg._id}')"
 ontouchend="cancelPress()"
 >
@@ -554,4 +555,47 @@ function cancelPress(){
 clearTimeout(pressTimer);
 
 }
+
+function startReply(msg){
+
+replyMessage = msg;
+
+document.getElementById("replyText").innerText =
+msg.text || "📷 Photo";
+
+document.getElementById("replyPreview").style.display =
+"flex";
+
+}
+
+function cancelReply(){
+
+replyMessage = null;
+
+document.getElementById("replyPreview").style.display =
+"none";
+
+}
+
+function showMessageMenu(e,msg){
+
+e.preventDefault();
+
+const action =
+prompt(
+"1 = Reply\n2 = React"
+);
+
+if(action==="1"){
+
+startReply(msg);
+
+}else if(action==="2"){
+
+showReaction(e,msg._id);
+
+}
+
+}
+
 
