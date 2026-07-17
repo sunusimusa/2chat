@@ -650,11 +650,25 @@ function startReply(msg){
 
 replyMessage = msg;
 
-document.getElementById("replyText").innerText =
-msg.text || "📷 Photo";
+let preview = "Message";
 
-document.getElementById("replyPreview").style.display =
-"flex";
+if(msg.text){
+
+preview = msg.text;
+
+}else if(msg.image){
+
+preview = "📷 Photo";
+
+}else if(msg.voice){
+
+preview = "🎤 Voice message";
+
+}
+
+document.getElementById("replyText").innerText = preview;
+
+document.getElementById("replyPreview").style.display = "flex";
 
 }
 
