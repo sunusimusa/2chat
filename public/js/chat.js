@@ -296,20 +296,6 @@ loadMessages();
 
 loadMessages();
 
-// Auto refresh every 5 seconds
-setInterval(()=>{
-
-const chat=document.getElementById("chat");
-
-const nearBottom =
-chat.scrollHeight -
-chat.scrollTop -
-chat.clientHeight < 100;
-
-loadMessages(nearBottom);
-
-},5000);
-
 socket.on("receiveMessage",(msg)=>{
 
 if(
