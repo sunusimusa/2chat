@@ -989,3 +989,38 @@ transition:transform .15s ease;
 touch-action:pan-y;
 }
 
+/* SWIPE REPLY ICON */
+
+.swipe-reply-icon{
+
+position:fixed;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+width:42px;
+height:42px;
+
+border-radius:50%;
+
+background:#25D366;
+color:#fff;
+
+font-size:18px;
+
+left:15px;
+
+opacity:0;
+
+transform:scale(.5);
+
+transition:.18s;
+
+pointer-events:none;
+
+z-index:9999;
+
+box-shadow:0 3px 10px rgba(0,0,0,.25);
+
+}
