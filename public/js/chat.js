@@ -104,6 +104,37 @@ cursor:pointer;
 
 ` : ""}
 
+${
+
+msg.replyTo
+?
+
+`
+
+<div class="reply-bubble">
+
+<div class="reply-user">
+
+↩ ${msg.replyUser}
+
+</div>
+
+<div class="reply-message">
+
+${msg.replyText}
+
+</div>
+
+</div>
+
+`
+
+:
+
+""
+
+}
+
 ${msg.text || ""}
 
 <div class="message-time">
@@ -212,6 +243,37 @@ cursor:pointer;
 ">`
 :
 ""
+}
+
+${
+
+msg.replyTo
+?
+
+`
+
+<div class="reply-bubble">
+
+<div class="reply-user">
+
+↩ ${msg.replyUser}
+
+</div>
+
+<div class="reply-message">
+
+${msg.replyText}
+
+</div>
+
+</div>
+
+`
+
+:
+
+""
+
 }
 
 ${msg.text || ""}
