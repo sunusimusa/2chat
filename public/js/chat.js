@@ -80,14 +80,65 @@ div.className = mine ? "me" : "other";
 
 div.innerHTML = `
 
-<div class="${mine ? "bubble-me" : "bubble-other"}">
+<div
+class="${mine ? "bubble-me" : "bubble-other"}"
+oncontextmenu="showReaction(event,'${msg._id}')"
+ontouchstart="startPress(event,'${msg._id}')"
+ontouchend="cancelPress()"
+>
 
 ${msg.image ? `
-<img src="${msg.image}"
-onclick="openImage('${msg.image}')">
+
+<img
+src="${msg.image}"
+onclick="openImage('${msg.image}')"
+style="
+width:100%;
+max-width:220px;
+border-radius:12px;
+display:block;
+margin-bottom:8px;
+cursor:pointer;
+">
+
 ` : ""}
 
 ${msg.text || ""}
+
+<div class="message-time">
+
+${msg.createdAt
+? new Date(msg.createdAt).toLocaleTimeString([],{
+hour:"2-digit",
+minute:"2-digit"
+})
+: ""}
+
+</div>
+
+${
+mine
+?
+`
+<small class="message-status">
+
+${
+msg.seen
+?
+'<i class="fa-solid fa-check-double" style="color:#00b7ff"></i> Seen'
+:
+msg.delivered
+?
+'<i class="fa-solid fa-check-double"></i> Delivered'
+:
+'<i class="fa-solid fa-check"></i> Sent'
+}
+
+</small>
+`
+:
+""
+}
 
 </div>
 
