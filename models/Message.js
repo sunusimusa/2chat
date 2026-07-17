@@ -27,6 +27,22 @@ type:String,
 default:""
 },
 
+  replyTo:{
+type:mongoose.Schema.Types.ObjectId,
+ref:"Message",
+default:null
+},
+
+replyText:{
+type:String,
+default:""
+},
+
+replyUser:{
+type:String,
+default:""
+},
+
   reactions:{
 type:[
 {
