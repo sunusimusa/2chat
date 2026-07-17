@@ -777,10 +777,25 @@ const moveX = e.touches[0].clientX;
 
 const diff = moveX - startX;
 
+const icon =
+document.getElementById("swipeReplyIcon");
+
 if(diff > 0 && diff < 120){
 
 currentBubble.style.transform =
 `translateX(${diff}px)`;
+
+const rect =
+currentBubble.getBoundingClientRect();
+
+icon.style.top =
+(rect.top + rect.height/2 - 21) + "px";
+
+icon.style.opacity =
+Math.min(diff/70,1);
+
+icon.style.transform =
+`scale(${0.5 + diff/140})`;
 
 }
 
@@ -794,6 +809,13 @@ const moved =
 parseInt(
 currentBubble.style.transform.replace(/[^\d]/g,"")
 ) || 0;
+
+const icon =
+document.getElementById("swipeReplyIcon");
+
+icon.style.opacity = "0";
+
+icon.style.transform = "scale(.5)";   
 
 currentBubble.style.transition =
 ".2s";
