@@ -384,10 +384,14 @@ formData.append("replyTo", replyMessage._id);
 
 formData.append("replyText", replyMessage.text || "");
 
+formData.append("replyImage", replyMessage.image || "");
+
+formData.append("replyVoice", replyMessage.voice || "");
+
 formData.append("replyUser", replyMessage.sender);
 
-}    
-
+}
+    
 for (const pair of formData.entries()) {
     console.log(pair[0], pair[1]);
 }
