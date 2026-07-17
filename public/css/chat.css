@@ -788,3 +788,73 @@ transition:.25s;
 transform:scale(1.08);
 }
 
+.reply-preview{
+
+position:fixed;
+
+left:0;
+right:0;
+
+bottom:72px;
+
+background:#fff;
+
+border-top:1px solid #ddd;
+
+padding:10px 15px;
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+z-index:999;
+
+box-shadow:0 -2px 8px rgba(0,0,0,.08);
+
+}
+
+.reply-info{
+
+flex:1;
+
+overflow:hidden;
+
+}
+
+.reply-info small{
+
+color:#1877f2;
+
+font-weight:bold;
+
+}
+
+.reply-info p{
+
+margin-top:4px;
+
+white-space:nowrap;
+
+overflow:hidden;
+
+text-overflow:ellipsis;
+
+color:#444;
+
+}
+
+.reply-preview button{
+
+border:none;
+
+background:none;
+
+font-size:22px;
+
+cursor:pointer;
+
+color:#666;
+
+}
