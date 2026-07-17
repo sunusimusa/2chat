@@ -10,8 +10,15 @@ exports.sendMessage = async (req, res) => {
 
 try{
 
-const { sender, receiver, text } = req.body;
-
+const {
+sender,
+receiver,
+text,
+replyTo,
+replyText,
+replyUser
+} = req.body;
+  
 let image = "";
 
 if(req.file){
@@ -34,6 +41,11 @@ sender,
 receiver,
 text,
 image,
+
+replyTo: replyTo || null,
+replyText: replyText || "",
+replyUser: replyUser || "",
+
 delivered:true,
 deliveredAt:new Date()
 
