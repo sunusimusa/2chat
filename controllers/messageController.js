@@ -16,6 +16,8 @@ receiver,
 text,
 replyTo,
 replyText,
+replyImage,
+replyVoice,
 replyUser
 } = req.body;
   
@@ -36,7 +38,6 @@ image = result.secure_url;
 }
 
 const message = await Message.create({
-
 sender,
 receiver,
 text,
@@ -44,13 +45,14 @@ image,
 
 replyTo: replyTo || null,
 replyText: replyText || "",
+replyImage: replyImage || "",
+replyVoice: replyVoice || "",
 replyUser: replyUser || "",
 
 delivered:true,
 deliveredAt:new Date()
-
 });
-
+  
 await Notification.create({
 
 receiver,
