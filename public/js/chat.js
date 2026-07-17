@@ -825,9 +825,17 @@ currentBubble.style.transform =
 
 if(moved > 70){
 
-startReply(swipeMessage);
+icon.classList.add("reply-bounce");
 
 navigator.vibrate?.(30);
+
+setTimeout(()=>{
+
+icon.classList.remove("reply-bounce");
+
+startReply(swipeMessage);
+
+},180);
 
 }
 
