@@ -858,3 +858,57 @@ cursor:pointer;
 color:#666;
 
 }
+
+.reply-bubble{
+
+border-left:4px solid #1877f2;
+
+background:rgba(24,119,242,.08);
+
+padding:8px 10px;
+
+border-radius:10px;
+
+margin-bottom:8px;
+
+}
+
+.bubble-me .reply-bubble{
+
+background:rgba(255,255,255,.15);
+
+border-left-color:#fff;
+
+}
+
+.reply-user{
+
+font-size:13px;
+
+font-weight:bold;
+
+color:#1877f2;
+
+margin-bottom:3px;
+
+}
+
+.bubble-me .reply-user{
+
+color:#fff;
+
+}
+
+.reply-message{
+
+font-size:13px;
+
+opacity:.85;
+
+white-space:nowrap;
+
+overflow:hidden;
+
+text-overflow:ellipsis;
+
+}
