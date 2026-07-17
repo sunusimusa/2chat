@@ -122,13 +122,32 @@ msg.replyTo
 <div class="reply-message">
 
 ${
-msg.replyText
-? msg.replyText
-: msg.replyImage
-? "📷 Photo"
-: msg.replyVoice
-? "🎤 Voice message"
-: "Message"
+msg.replyImage
+?
+
+`
+<img
+src="${msg.replyImage}"
+class="reply-thumb">
+`
+
+:
+
+msg.replyVoice
+?
+
+`
+<div class="reply-voice">
+
+🎤 Voice message
+
+</div>
+`
+
+:
+
+msg.replyText || "Message"
+
 }
 
 </div>
@@ -271,13 +290,32 @@ msg.replyTo
 <div class="reply-message">
 
 ${
-msg.replyText
-? msg.replyText
-: msg.replyImage
-? "📷 Photo"
-: msg.replyVoice
-? "🎤 Voice message"
-: "Message"
+msg.replyImage
+?
+
+`
+<img
+src="${msg.replyImage}"
+class="reply-thumb">
+`
+
+:
+
+msg.replyVoice
+?
+
+`
+<div class="reply-voice">
+
+🎤 Voice message
+
+</div>
+`
+
+:
+
+msg.replyText || "Message"
+
 }
 
 </div>
