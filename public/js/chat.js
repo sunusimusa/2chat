@@ -298,7 +298,17 @@ if(image){
 
 formData.append("file",image);
 
-}  
+} 
+
+if(replyMessage){
+
+formData.append("replyTo", replyMessage._id);
+
+formData.append("replyText", replyMessage.text || "");
+
+formData.append("replyUser", replyMessage.sender);
+
+}    
 
 for (const pair of formData.entries()) {
     console.log(pair[0], pair[1]);
@@ -322,6 +332,8 @@ document.getElementById("message").value="";
 document.getElementById("image").value="";
 document.getElementById("previewBox").style.display =
 "none";
+
+cancelReply(); 
 
 loadMessages();
 
