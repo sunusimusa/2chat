@@ -2,6 +2,9 @@ const user = JSON.parse(localStorage.getItem("user"));
 
 let selectedMessage = null;
 let replyMessage = null;
+let startX = 0;
+let currentBubble = null;
+let swipeMessage = null;
 
 if (!user) {
     location.href = "/login.html";
@@ -83,9 +86,15 @@ div.innerHTML = `
 
 <div
 class="${mine ? "bubble-me" : "bubble-other"}"
+
 oncontextmenu="showMessageMenu(event,${JSON.stringify(msg).replace(/"/g,"&quot;")})"
-ontouchstart="startPress(event,'${msg._id}')"
-ontouchend="cancelPress()"
+
+ontouchstart="touchStart(event, ${JSON.stringify(msg).replace(/"/g,"&quot;")})"
+
+ontouchmove="touchMove(event)"
+
+ontouchend="touchEnd(event)"
+
 >
 
 ${msg.image ? `
@@ -249,9 +258,15 @@ html += `
 
 <div
 class="${mine ? "bubble-me" : "bubble-other"}"
+
 oncontextmenu="showMessageMenu(event,${JSON.stringify(msg).replace(/"/g,"&quot;")})"
-ontouchstart="startPress(event,'${msg._id}')"
-ontouchend="cancelPress()"
+
+ontouchstart="touchStart(event, ${JSON.stringify(msg).replace(/"/g,"&quot;")})"
+
+ontouchmove="touchMove(event)"
+
+ontouchend="touchEnd(event)"
+
 >
 
 ${
@@ -744,4 +759,69 @@ showReaction(e,msg._id);
 
 }
 
+function touchStart(e,msg){
+
+startX = e.touches[0].clientX;
+
+currentBubble = e.currentTarget;
+
+swipeMessage = msg;
+
+}
+
+function touchMove(e){
+
+if(!currentBubble) return;
+
+const moveX = e.touches[0].clientX;
+
+const diff = moveX - startX;
+
+if(diff > 0 && diff < 120){
+
+currentBubble.style.transform =
+`translateX(${diff}px)`;
+
+}
+
+}
+
+function touchEnd(){
+
+if(!currentBubble) return;
+
+const moved =
+parseInt(
+currentBubble.style.transform.replace(/[^\d]/g,"")
+) || 0;
+
+currentBubble.style.transition =
+".2s";
+
+currentBubble.style.transform =
+"translateX(0px)";
+
+if(moved > 70){
+
+startReply(swipeMessage);
+
+navigator.vibrate?.(30);
+
+}
+
+setTimeout(()=>{
+
+if(currentBubble){
+
+currentBubble.style.transition="";
+
+}
+
+},200);
+
+currentBubble = null;
+
+swipeMessage = null;
+
+}
 
