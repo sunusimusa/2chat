@@ -982,3 +982,10 @@ gap:6px;
 font-size:13px;
 color:#666;
 }
+
+.bubble-me,
+.bubble-other{
+transition:transform .15s ease;
+touch-action:pan-y;
+}
+
