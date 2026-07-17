@@ -228,7 +228,9 @@ mine
 `
 <br>
 
-<small class="message-status">
+<small
+class="message-status"
+data-status="${msg._id}">
 
 ${
 msg.seen
@@ -333,15 +335,35 @@ alert(data.message);
 
 }
 
-socket.on("messageDelivered",()=>{
+socket.on("messageDelivered",(data)=>{
 
-loadMessages();
+const status =
+document.querySelector(
+`[data-status="${data.messageId}"]`
+);
+
+if(status){
+
+status.innerHTML =
+'<i class="fa-solid fa-check-double"></i> Delivered';
+
+}
 
 });
 
-socket.on("messageSeen",()=>{
+socket.on("messageSeen",(data)=>{
 
-loadMessages();
+const status =
+document.querySelector(
+`[data-status="${data.messageId}"]`
+);
+
+if(status){
+
+status.innerHTML =
+'<i class="fa-solid fa-check-double" style="color:#00b7ff"></i> Seen';
+
+}
 
 });
 
