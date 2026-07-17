@@ -121,7 +121,15 @@ msg.replyTo
 
 <div class="reply-message">
 
-${msg.replyText}
+${
+msg.replyText
+? msg.replyText
+: msg.replyImage
+? "📷 Photo"
+: msg.replyVoice
+? "🎤 Voice message"
+: "Message"
+}
 
 </div>
 
@@ -262,7 +270,15 @@ msg.replyTo
 
 <div class="reply-message">
 
-${msg.replyText}
+${
+msg.replyText
+? msg.replyText
+: msg.replyImage
+? "📷 Photo"
+: msg.replyVoice
+? "🎤 Voice message"
+: "Message"
+}
 
 </div>
 
