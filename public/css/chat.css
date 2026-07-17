@@ -912,3 +912,36 @@ overflow:hidden;
 text-overflow:ellipsis;
 
 }
+
+.reply-bubble{
+background:rgba(0,0,0,.08);
+border-left:4px solid #25D366;
+padding:8px 10px;
+margin-bottom:8px;
+border-radius:10px;
+overflow:hidden;
+}
+
+.bubble-me .reply-bubble{
+background:rgba(255,255,255,.15);
+border-left:4px solid #fff;
+}
+
+.reply-user{
+font-size:13px;
+font-weight:bold;
+margin-bottom:4px;
+color:#25D366;
+}
+
+.bubble-me .reply-user{
+color:#fff;
+}
+
+.reply-message{
+font-size:13px;
+opacity:.85;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
