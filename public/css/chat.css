@@ -17,24 +17,6 @@ overflow:hidden;
 background:#eef2f7;
 }
 
-/* HEADER */
-
-.header{
-position:fixed;
-top:0;
-left:0;
-right:0;
-height:70px;
-background:#1877f2;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 15px;
-color:#fff;
-z-index:1000;
-box-shadow:0 4px 15px rgba(0,0,0,.18);
-}
-
 /* Back Button */
 
 .back-btn{
@@ -57,58 +39,12 @@ background:rgba(255,255,255,.25);
 transform:scale(1.05);
 }
 
-/* Profile */
-
-.chat-profile{
-display:flex;
-align-items:center;
-gap:12px;
-flex:1;
-margin-left:12px;
-}
-
 .chat-avatar{
 width:48px;
 height:48px;
 border-radius:50%;
 object-fit:cover;
 border:2px solid #fff;
-}
-
-.chat-profile h3{
-font-size:18px;
-font-weight:700;
-margin:0;
-}
-
-.chat-profile small{
-font-size:12px;
-opacity:.95;
-}
-
-/* Header Icons */
-
-.header-icons{
-display:flex;
-align-items:center;
-gap:10px;
-}
-
-.header-icons button{
-width:40px;
-height:40px;
-border:none;
-border-radius:50%;
-background:rgba(255,255,255,.15);
-color:#fff;
-font-size:17px;
-cursor:pointer;
-transition:.25s;
-}
-
-.header-icons button:hover{
-background:rgba(255,255,255,.25);
-transform:scale(1.08);
 }
 
 /* ===========================
