@@ -5,9 +5,14 @@ let replyMessage = null;
 let startX = 0;
 let currentBubble = null;
 let swipeMessage = null;
+
 let recording = false;
 let recordSeconds = 0;
 let recordTimer = null;
+
+let mediaRecorder;
+let audioChunks = [];
+let audioBlob = null;
 
 
 if (!user) {
@@ -912,14 +917,33 @@ recordBtn.addEventListener("touchstart",startRecording);
 recordBtn.addEventListener("mouseup",stopRecording);
 recordBtn.addEventListener("touchend",stopRecording);
 
-function startRecording(){
+async function startRecording(){
 
 if(recording) return;
+
+try{
+
+const stream =
+await navigator.mediaDevices.getUserMedia({
+audio:true
+});
+
+audioChunks = [];
+
+mediaRecorder =
+new MediaRecorder(stream);
+
+mediaRecorder.ondataavailable = e=>{
+
+audioChunks.push(e.data);
+
+};
+
+mediaRecorder.start();
 
 recording = true;
 
 document.getElementById("message").style.display="none";
-
 document.getElementById("recordingBox").style.display="flex";
 
 recordSeconds = 0;
@@ -938,6 +962,14 @@ document.getElementById("recordTime").innerText =
 `${min}:${sec}`;
 
 },1000);
+
+}catch(err){
+
+alert("Microphone permission denied.");
+
+console.log(err);
+
+}
 
 }
 
