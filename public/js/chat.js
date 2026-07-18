@@ -925,25 +925,48 @@ startRecording();
 
 });
 
+let mediaRecorder;
+let audioChunks = [];
+let recording = false;
+let recordTimer = null;
+let recordSeconds = 0;
+
 async function startRecording(){
 
 if(recording) return;
 
 try{
 
-const stream =
-await navigator.mediaDevices.getUserMedia({
+const stream = await navigator.mediaDevices.getUserMedia({
 audio:true
 });
 
 audioChunks = [];
 
-mediaRecorder =
-new MediaRecorder(stream);
+mediaRecorder = new MediaRecorder(stream);
 
-mediaRecorder.ondataavailable = e=>{
+mediaRecorder.ondataavailable = (e)=>{
+
+if(e.data.size > 0){
 
 audioChunks.push(e.data);
+
+}
+
+};
+
+mediaRecorder.onstop = ()=>{
+
+const audioBlob = new Blob(audioChunks,{
+type:"audio/webm"
+});
+
+console.log(audioBlob);
+
+// Wannan na gwaji ne
+alert("Voice recorded successfully!");
+
+stream.getTracks().forEach(track=>track.stop());
 
 };
 
@@ -951,10 +974,16 @@ mediaRecorder.start();
 
 recording = true;
 
+document.getElementById("recordIcon").className =
+"fa-solid fa-stop";
+
 document.getElementById("message").style.display="none";
+
 document.getElementById("recordingBox").style.display="flex";
 
 recordSeconds = 0;
+
+document.getElementById("recordTime").innerText = "00:00";
 
 recordTimer = setInterval(()=>{
 
@@ -973,9 +1002,9 @@ document.getElementById("recordTime").innerText =
 
 }catch(err){
 
-alert("Microphone permission denied.");
-
 console.log(err);
+
+alert("Microphone permission denied.");
 
 }
 
@@ -993,6 +1022,28 @@ document.getElementById("message").style.display="block";
 
 document.getElementById("recordingBox").style.display="none";
 
-alert("Voice recorded successfully (UI Test)");
+document.getElementById("recordIcon").className =
+"fa-solid fa-microphone";
+
+if(mediaRecorder &&
+mediaRecorder.state !== "inactive"){
+
+mediaRecorder.stop();
+
+}
+
+}
+
+function toggleRecording(){
+
+if(recording){
+
+stopRecording();
+
+}else{
+
+startRecording();
+
+}
 
 }
