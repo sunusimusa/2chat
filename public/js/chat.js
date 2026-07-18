@@ -960,8 +960,10 @@ document.getElementById("message").style.display="none";
 
 document.getElementById("recordingBox").style.display="flex";
 
-document.getElementById("stopRecordBtn").style.display = "flex";
+document.getElementById("stopRecordBtn").style.display="block";
 
+document.getElementById("sendVoiceBtn").style.display="none";
+    
 recordSeconds = 0;
 
 document.getElementById("recordTime").innerText = "00:00";
@@ -1003,8 +1005,10 @@ document.getElementById("message").style.display="block";
 
 document.getElementById("recordingBox").style.display="none";
 
-document.getElementById("stopRecordBtn").style.display = "none";
+document.getElementById("stopRecordBtn").style.display="none";
 
+document.getElementById("sendVoiceBtn").style.display="block";
+    
 document.getElementById("recordIcon").className =
 "fa-solid fa-microphone";
 
@@ -1081,3 +1085,16 @@ document.getElementById("recordTime").innerText =
 },1000);
 
 }
+
+function sendVoice(){
+
+alert("Voice will be sent in the next phase.");
+
+document.getElementById("sendVoiceBtn").style.display="none";
+
+document.getElementById("recordIcon").className =
+"fa-solid fa-microphone";
+
+}
+
+
