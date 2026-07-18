@@ -349,22 +349,6 @@ background:#fff;
 
 /* Send Button */
 
-#sendBtn{
-width:48px;
-height:48px;
-border:none;
-border-radius:50%;
-background:#1877f2;
-color:#fff;
-font-size:20px;
-cursor:pointer;
-display:flex;
-justify-content:center;
-align-items:center;
-flex-shrink:0;
-transition:.25s;
-}
-
 #sendBtn:hover{
 transform:scale(1.08);
 background:#1667d9;
@@ -475,11 +459,6 @@ font-style:italic;
 .header{
 height:65px;
 padding:0 10px;
-}
-
-.chat-avatar{
-width:42px;
-height:42px;
 }
 
 .chat-profile h3{
@@ -881,45 +860,10 @@ border-left-color:#fff;
 
 }
 
-.reply-user{
-
-font-size:13px;
-
-font-weight:bold;
-
-color:#1877f2;
-
-margin-bottom:3px;
-
-}
-
 .bubble-me .reply-user{
 
 color:#fff;
 
-}
-
-.reply-message{
-
-font-size:13px;
-
-opacity:.85;
-
-white-space:nowrap;
-
-overflow:hidden;
-
-text-overflow:ellipsis;
-
-}
-
-.reply-bubble{
-background:rgba(0,0,0,.08);
-border-left:4px solid #25D366;
-padding:8px 10px;
-margin-bottom:8px;
-border-radius:10px;
-overflow:hidden;
 }
 
 .bubble-me .reply-bubble{
@@ -927,32 +871,8 @@ background:rgba(255,255,255,.15);
 border-left:4px solid #fff;
 }
 
-.reply-user{
-font-size:13px;
-font-weight:bold;
-margin-bottom:4px;
-color:#25D366;
-}
-
 .bubble-me .reply-user{
 color:#fff;
-}
-
-.reply-message{
-font-size:13px;
-opacity:.85;
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
-}
-
-
-.reply-bubble{
-background:rgba(0,0,0,.08);
-border-left:4px solid #25D366;
-padding:8px;
-margin-bottom:8px;
-border-radius:8px;
 }
 
 .reply-user{
@@ -990,40 +910,6 @@ touch-action:pan-y;
 }
 
 /* SWIPE REPLY ICON */
-
-.swipe-reply-icon{
-
-position:fixed;
-
-display:flex;
-justify-content:center;
-align-items:center;
-
-width:42px;
-height:42px;
-
-border-radius:50%;
-
-background:#25D366;
-color:#fff;
-
-font-size:18px;
-
-left:15px;
-
-opacity:0;
-
-transform:scale(.5);
-
-transition:.18s;
-
-pointer-events:none;
-
-z-index:9999;
-
-box-shadow:0 3px 10px rgba(0,0,0,.25);
-
-}
 
 @keyframes replyBounce{
 
