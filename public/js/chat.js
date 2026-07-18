@@ -1065,3 +1065,31 @@ document.getElementById("recordIcon").className =
 "fa-solid fa-play";
 
 }
+
+function resumeRecording(){
+
+if(!mediaRecorder) return;
+
+mediaRecorder.resume();
+
+paused = false;
+
+document.getElementById("recordIcon").className =
+"fa-solid fa-pause";
+
+recordTimer = setInterval(()=>{
+
+recordSeconds++;
+
+const min =
+String(Math.floor(recordSeconds/60)).padStart(2,"0");
+
+const sec =
+String(recordSeconds%60).padStart(2,"0");
+
+document.getElementById("recordTime").innerText =
+`${min}:${sec}`;
+
+},1000);
+
+}
