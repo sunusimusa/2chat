@@ -13,6 +13,7 @@ let recordTimer = null;
 let mediaRecorder;
 let audioChunks = [];
 let audioBlob = null;
+let paused = false;
 
 
 if (!user) {
@@ -1030,14 +1031,37 @@ mediaRecorder.stop();
 
 function toggleRecording(){
 
-if(recording){
-
-stopRecording();
-
-}else{
+if(!recording){
 
 startRecording();
 
+return;
+
 }
+
+if(!paused){
+
+pauseRecording();
+
+}else{
+
+resumeRecording();
+
+}
+
+}
+
+function pauseRecording(){
+
+if(!mediaRecorder) return;
+
+mediaRecorder.pause();
+
+paused = true;
+
+clearInterval(recordTimer);
+
+document.getElementById("recordIcon").className =
+"fa-solid fa-play";
 
 }
