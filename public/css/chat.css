@@ -1048,3 +1048,44 @@ transform:scale(1);
 .reply-bounce{
 animation:replyBounce .28s;
 }
+
+.reply-icon-inside{
+
+position:absolute;
+
+left:-18px;
+
+top:50%;
+
+transform:translateY(-50%) scale(.4);
+
+width:34px;
+height:34px;
+
+border-radius:50%;
+
+background:#25D366;
+color:#fff;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+opacity:0;
+
+transition:.18s ease;
+
+pointer-events:none;
+
+box-shadow:0 2px 8px rgba(0,0,0,.2);
+
+}
+
+.bubble-me,
+.bubble-other{
+
+position:relative;
+
+overflow:visible;
+
+}
