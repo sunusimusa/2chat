@@ -5,6 +5,10 @@ let replyMessage = null;
 let startX = 0;
 let currentBubble = null;
 let swipeMessage = null;
+let recording = false;
+let recordSeconds = 0;
+let recordTimer = null;
+
 
 if (!user) {
     location.href = "/login.html";
@@ -896,5 +900,59 @@ currentBubble.style.transition="";
 
 currentBubble = null;
 swipeMessage = null;
+
+}
+
+const recordBtn =
+document.getElementById("recordBtn");
+
+recordBtn.addEventListener("mousedown",startRecording);
+recordBtn.addEventListener("touchstart",startRecording);
+
+recordBtn.addEventListener("mouseup",stopRecording);
+recordBtn.addEventListener("touchend",stopRecording);
+
+function startRecording(){
+
+if(recording) return;
+
+recording = true;
+
+document.getElementById("message").style.display="none";
+
+document.getElementById("recordingBox").style.display="flex";
+
+recordSeconds = 0;
+
+recordTimer = setInterval(()=>{
+
+recordSeconds++;
+
+const min =
+String(Math.floor(recordSeconds/60)).padStart(2,"0");
+
+const sec =
+String(recordSeconds%60).padStart(2,"0");
+
+document.getElementById("recordTime").innerText =
+`${min}:${sec}`;
+
+},1000);
+
+}
+
+function stopRecording(){
+
+if(!recording) return;
+
+recording = false;
+
+clearInterval(recordTimer);
+
+document.getElementById("message").style.display="block";
+
+document.getElementById("recordingBox").style.display="none";
+
+alert("Voice recorded successfully (UI Test)");
 
 }
