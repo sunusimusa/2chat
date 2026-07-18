@@ -911,11 +911,19 @@ swipeMessage = null;
 const recordBtn =
 document.getElementById("recordBtn");
 
-recordBtn.addEventListener("mousedown",startRecording);
-recordBtn.addEventListener("touchstart",startRecording);
+recordBtn.addEventListener("click", () => {
 
-recordBtn.addEventListener("mouseup",stopRecording);
-recordBtn.addEventListener("touchend",stopRecording);
+if(recording){
+
+stopRecording();
+
+}else{
+
+startRecording();
+
+}
+
+});
 
 async function startRecording(){
 
