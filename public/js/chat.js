@@ -909,23 +909,6 @@ swipeMessage = null;
 
 }
 
-const recordBtn =
-document.getElementById("recordBtn");
-
-recordBtn.addEventListener("click", () => {
-
-if(recording){
-
-stopRecording();
-
-}else{
-
-startRecording();
-
-}
-
-});
-
 async function startRecording(){
 
 if(recording) return;
@@ -972,9 +955,6 @@ paused = false;
 
 document.getElementById("recordIcon").className =
 "fa-solid fa-pause";
-
-document.getElementById("recordIcon").className =
-"fa-solid fa-stop";
 
 document.getElementById("message").style.display="none";
 
