@@ -787,13 +787,15 @@ if(!currentBubble) return;
 
 const moveX = e.touches[0].clientX;
 
-const diff = moveX - startX;
+let diff = moveX - startX;
 
-    diff = Math.max(0, Math.min(diff, 80));
+// Hana swipe zuwa hagu kuma iyakance zuwa 80px
+diff = Math.max(0, Math.min(diff, 80));
 
 currentBubble.style.transform =
 `translateX(${diff}px)`;
 
+// Reply icon animation
 const icon =
 currentBubble.querySelector(".reply-icon-inside");
 
@@ -803,27 +805,6 @@ icon.style.opacity = diff / 80;
 
 icon.style.transform =
 `translateY(-50%) scale(${0.5 + diff / 160})`;
-
-}
-
-    const icon =
-currentBubble.querySelector(".reply-icon-inside");
-
-if(icon){
-
-icon.style.opacity =
-Math.min(diff/70,1);
-
-icon.style.transform =
-`translateY(-50%) scale(${0.4 + diff/140})`;
-
-}
-
-icon.style.opacity =
-Math.min(diff/70,1);
-
-icon.style.transform =
-`scale(${0.5 + diff/140})`;
 
 }
 
