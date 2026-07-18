@@ -87,12 +87,6 @@ div.innerHTML = `
 <div
 class="${mine ? "bubble-me" : "bubble-other"}"
 
-<span class="reply-icon-inside">
-
-<i class="fa-solid fa-reply"></i>
-
-</span>
-
 oncontextmenu="showMessageMenu(event,${JSON.stringify(msg).replace(/"/g,"&quot;")})"
 
 ontouchstart="touchStart(event, ${JSON.stringify(msg).replace(/"/g,"&quot;")})"
@@ -102,6 +96,12 @@ ontouchmove="touchMove(event)"
 ontouchend="touchEnd(event)"
 
 >
+
+<span class="reply-icon-inside">
+
+<i class="fa-solid fa-reply"></i>
+
+</span>
 
 ${msg.image ? `
 
@@ -265,12 +265,6 @@ html += `
 <div
 class="${mine ? "bubble-me" : "bubble-other"}"
 
-<span class="reply-icon-inside">
-
-<i class="fa-solid fa-reply"></i>
-
-</span>
-
 oncontextmenu="showMessageMenu(event,${JSON.stringify(msg).replace(/"/g,"&quot;")})"
 
 ontouchstart="touchStart(event, ${JSON.stringify(msg).replace(/"/g,"&quot;")})"
@@ -280,6 +274,12 @@ ontouchmove="touchMove(event)"
 ontouchend="touchEnd(event)"
 
 >
+
+<span class="reply-icon-inside">
+
+<i class="fa-solid fa-reply"></i>
+
+</span>
 
 ${
 msg.image
@@ -789,9 +789,6 @@ const moveX = e.touches[0].clientX;
 
 const diff = moveX - startX;
 
-const icon =
-document.getElementById("swipeReplyIcon");
-
 if(diff > 0 && diff < 120){
 
 currentBubble.style.transform =
@@ -809,12 +806,6 @@ icon.style.transform =
 `translateY(-50%) scale(${0.4 + diff/140})`;
 
 }
-
-const rect =
-currentBubble.getBoundingClientRect();
-
-icon.style.top =
-(rect.top + rect.height/2 - 21) + "px";
 
 icon.style.opacity =
 Math.min(diff/70,1);
@@ -836,8 +827,16 @@ currentBubble.style.transform.replace(/[^\d]/g,"")
 ) || 0;
 
 const icon =
-document.getElementById("swipeReplyIcon");
+currentBubble.querySelector(".reply-icon-inside");
 
+if(icon){
+
+icon.style.opacity="0";
+
+icon.style.transform=
+"translateY(-50%) scale(.4)";
+
+}
 icon.style.opacity = "0";
 
 icon.style.transform = "scale(.5)";   
