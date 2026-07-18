@@ -87,6 +87,12 @@ div.innerHTML = `
 <div
 class="${mine ? "bubble-me" : "bubble-other"}"
 
+<span class="reply-icon-inside">
+
+<i class="fa-solid fa-reply"></i>
+
+</span>
+
 oncontextmenu="showMessageMenu(event,${JSON.stringify(msg).replace(/"/g,"&quot;")})"
 
 ontouchstart="touchStart(event, ${JSON.stringify(msg).replace(/"/g,"&quot;")})"
@@ -258,6 +264,12 @@ html += `
 
 <div
 class="${mine ? "bubble-me" : "bubble-other"}"
+
+<span class="reply-icon-inside">
+
+<i class="fa-solid fa-reply"></i>
+
+</span>
 
 oncontextmenu="showMessageMenu(event,${JSON.stringify(msg).replace(/"/g,"&quot;")})"
 
@@ -785,6 +797,19 @@ if(diff > 0 && diff < 120){
 currentBubble.style.transform =
 `translateX(${diff}px)`;
 
+    const icon =
+currentBubble.querySelector(".reply-icon-inside");
+
+if(icon){
+
+icon.style.opacity =
+Math.min(diff/70,1);
+
+icon.style.transform =
+`translateY(-50%) scale(${0.4 + diff/140})`;
+
+}
+
 const rect =
 currentBubble.getBoundingClientRect();
 
@@ -848,6 +873,18 @@ currentBubble.style.transition="";
 }
 
 },200);
+
+const icon =
+currentBubble.querySelector(".reply-icon-inside");
+
+if(icon){
+
+icon.style.opacity = "0";
+
+icon.style.transform =
+"translateY(-50%) scale(.4)";
+
+}
 
 currentBubble = null;
 
