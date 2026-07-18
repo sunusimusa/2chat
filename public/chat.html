@@ -93,7 +93,7 @@ Remove
 
 <!-- MESSAGE BAR -->
 
-  <div id="replyPreview" class="reply-preview" style="display:none;">
+<div id="replyPreview" class="reply-preview" style="display:none;">
 
 <div class="reply-info">
 
@@ -111,10 +111,10 @@ Remove
 
 </div>
 
-<div class="message-bar">
+  <div class="message-bar">
 
 <label for="image" class="icon-btn">
-<i class="fa-solid fa-image"></i>
+    <i class="fa-solid fa-image"></i>
 </label>
 
 <input
@@ -127,24 +127,19 @@ hidden>
 id="message"
 placeholder="Type a message..."></textarea>
 
-<div
-id="recordingBox"
-class="recording-box"
-style="display:none;">
+<button id="recordBtn" onclick="toggleRecording()">
+    <i id="recordIcon" class="fa-solid fa-microphone"></i>
+</button>
+
+</div>
+
+<div id="recordingBox" class="recording-box" style="display:none;">
 
 <span class="record-dot"></span>
 
 <span id="recordTime">00:00</span>
 
 <span class="record-text">Recording...</span>
-
-</div>
-
-<button id="recordBtn">
-
-<i class="fa-solid fa-microphone"></i>
-
-</button>
 
 </div>
   
