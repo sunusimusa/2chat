@@ -960,6 +960,8 @@ document.getElementById("message").style.display="none";
 
 document.getElementById("recordingBox").style.display="flex";
 
+document.getElementById("stopRecordBtn").style.display = "flex";
+
 recordSeconds = 0;
 
 document.getElementById("recordTime").innerText = "00:00";
@@ -1000,6 +1002,8 @@ clearInterval(recordTimer);
 document.getElementById("message").style.display="block";
 
 document.getElementById("recordingBox").style.display="none";
+
+document.getElementById("stopRecordBtn").style.display = "none";
 
 document.getElementById("recordIcon").className =
 "fa-solid fa-microphone";
