@@ -925,12 +925,6 @@ startRecording();
 
 });
 
-let mediaRecorder;
-let audioChunks = [];
-let recording = false;
-let recordTimer = null;
-let recordSeconds = 0;
-
 async function startRecording(){
 
 if(recording) return;
