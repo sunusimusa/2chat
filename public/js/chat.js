@@ -822,33 +822,29 @@ currentBubble.style.transform.replace(/[^\d]/g,"")
 const icon =
 currentBubble.querySelector(".reply-icon-inside");
 
+currentBubble.style.transition=".2s";
+currentBubble.style.transform="translateX(0px)";
+
 if(icon){
 
 icon.style.opacity="0";
-
-icon.style.transform=
-"translateY(-50%) scale(.4)";
+icon.style.transform="translateY(-50%) scale(.4)";
 
 }
-icon.style.opacity = "0";
-
-icon.style.transform = "scale(.5)";   
-
-currentBubble.style.transition =
-".2s";
-
-currentBubble.style.transform =
-"translateX(0px)";
 
 if(moved > 70){
 
-icon.classList.add("reply-bounce");
-
 navigator.vibrate?.(30);
+
+if(icon){
+icon.classList.add("reply-bounce");
+}
 
 setTimeout(()=>{
 
+if(icon){
 icon.classList.remove("reply-bounce");
+}
 
 startReply(swipeMessage);
 
@@ -866,21 +862,7 @@ currentBubble.style.transition="";
 
 },200);
 
-const icon =
-currentBubble.querySelector(".reply-icon-inside");
-
-if(icon){
-
-icon.style.opacity = "0";
-
-icon.style.transform =
-"translateY(-50%) scale(.4)";
-
-}
-
 currentBubble = null;
-
 swipeMessage = null;
 
 }
-
