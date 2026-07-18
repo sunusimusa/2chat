@@ -14,9 +14,41 @@ const socket = io();
 
 socket.emit("join", user.username);
 
+loadChatUser();
+
 const params = new URLSearchParams(window.location.search);
 
 const receiver = params.get("user");
+
+async function loadChatUser(){
+
+if(!receiver) return;
+
+try{
+
+const res = await fetch(`/api/users/profile/${receiver}`);
+const data = await res.json();
+
+if(data.success){
+
+document.getElementById("chatUser").innerText =
+data.user.username;
+
+document.getElementById("chatAvatar").src =
+data.user.avatar || "/images/default.png";
+
+}
+
+}catch(err){
+
+console.log(err);
+
+document.getElementById("chatUser").innerText =
+receiver;
+
+}
+
+}
 
 const messageBox =
 document.getElementById("message");
