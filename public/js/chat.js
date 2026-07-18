@@ -968,6 +968,10 @@ stream.getTracks().forEach(track=>track.stop());
 mediaRecorder.start();
 
 recording = true;
+paused = false;
+
+document.getElementById("recordIcon").className =
+"fa-solid fa-pause";
 
 document.getElementById("recordIcon").className =
 "fa-solid fa-stop";
