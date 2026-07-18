@@ -789,10 +789,22 @@ const moveX = e.touches[0].clientX;
 
 const diff = moveX - startX;
 
-if(diff > 0 && diff < 120){
+    diff = Math.max(0, Math.min(diff, 80));
 
 currentBubble.style.transform =
 `translateX(${diff}px)`;
+
+const icon =
+currentBubble.querySelector(".reply-icon-inside");
+
+if(icon){
+
+icon.style.opacity = diff / 80;
+
+icon.style.transform =
+`translateY(-50%) scale(${0.5 + diff / 160})`;
+
+}
 
     const icon =
 currentBubble.querySelector(".reply-icon-inside");
