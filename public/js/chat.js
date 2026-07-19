@@ -1220,7 +1220,7 @@ const progress = player.querySelector(".voice-progress");
 
 audio.onloadedmetadata = () => {
 
-const total = Math.floor(audio.duration);
+const total = Math.floor(audio.duration || 0);
 
 const min = Math.floor(total / 60);
 
@@ -1293,7 +1293,7 @@ icon.className = "fa-solid fa-play";
 
 progress.style.width = "0%";
 
-const total = Math.floor(audio.duration);
+const total = Math.floor(audio.duration || 0);
 
 const min = Math.floor(total / 60);
 
