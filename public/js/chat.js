@@ -1207,3 +1207,70 @@ alert(data.message);
 }
 
 }
+
+document.addEventListener("click", function(e){
+
+const playBtn = e.target.closest(".voice-play");
+
+if(!playBtn) return;
+
+const player = playBtn.closest(".voice-player");
+
+const audio = player.querySelector(".voice-audio");
+
+const icon = playBtn.querySelector("i");
+
+const progress = player.querySelector(".voice-progress");
+
+if(audio.paused){
+
+// Dakatar da sauran voice idan akwai
+document.querySelectorAll(".voice-audio").forEach(a=>{
+
+if(a!==audio){
+
+a.pause();
+
+a.currentTime = 0;
+
+const p = a.closest(".voice-player");
+
+p.querySelector(".voice-play i").className =
+"fa-solid fa-play";
+
+p.querySelector(".voice-progress").style.width="0%";
+
+}
+
+});
+
+audio.play();
+
+icon.className="fa-solid fa-pause";
+
+}else{
+
+audio.pause();
+
+icon.className="fa-solid fa-play";
+
+}
+
+audio.ontimeupdate = ()=>{
+
+const percent =
+(audio.currentTime/audio.duration)*100;
+
+progress.style.width = percent+"%";
+
+};
+
+audio.onended = ()=>{
+
+icon.className="fa-solid fa-play";
+
+progress.style.width="0%";
+
+};
+
+});
