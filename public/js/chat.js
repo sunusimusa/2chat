@@ -312,8 +312,11 @@ msg.delivered
 
 chat.appendChild(div);
 
-chat.scrollTop = chat.scrollHeight;
+// Load duration na sabon voice
+loadVoiceDurations();
 
+chat.scrollTop = chat.scrollHeight;
+    
 }
 
 async function loadMessages(autoScroll=true){
@@ -551,6 +554,9 @@ if(chat.innerHTML !== html){
 
 chat.innerHTML = html;
 
+// Load duration na duk voice messages
+loadVoiceDurations();
+
 if(autoScroll){
 
 chat.scrollTop = chat.scrollHeight;
@@ -559,7 +565,8 @@ chat.scrollTop = chat.scrollHeight;
 
 }
 
-}    
+}
+   
 
 async function sendMessage(){
 
@@ -1383,4 +1390,38 @@ player.querySelector(".voice-time").innerText =
 
 };
 
-});   
+});
+
+function loadVoiceDurations(){
+
+document.querySelectorAll(".voice-audio").forEach(audio=>{
+
+const player = audio.closest(".voice-player");
+
+const time = player.querySelector(".voice-time");
+
+const updateDuration = ()=>{
+
+const total = Math.floor(audio.duration || 0);
+
+const min = Math.floor(total / 60);
+
+const sec = String(total % 60).padStart(2,"0");
+
+time.innerText = `${min}:${sec}`;
+
+};
+
+if(audio.readyState >= 1){
+
+updateDuration();
+
+}else{
+
+audio.addEventListener("loadedmetadata", updateDuration, {once:true});
+
+}
+
+});
+
+}
