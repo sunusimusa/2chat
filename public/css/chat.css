@@ -1084,3 +1084,79 @@ text-align:right;
 display:none;
 
 }
+
+.voice-wave{
+
+position:relative;
+
+flex:1;
+
+height:32px;
+
+display:flex;
+
+align-items:center;
+
+overflow:hidden;
+
+}
+
+.voice-bars{
+
+display:flex;
+
+align-items:flex-end;
+
+gap:2px;
+
+width:100%;
+
+height:24px;
+
+}
+
+.voice-bars span{
+
+width:3px;
+
+background:#cfcfcf;
+
+border-radius:4px;
+
+}
+
+.voice-bars span:nth-child(1){height:6px;}
+.voice-bars span:nth-child(2){height:12px;}
+.voice-bars span:nth-child(3){height:18px;}
+.voice-bars span:nth-child(4){height:10px;}
+.voice-bars span:nth-child(5){height:22px;}
+.voice-bars span:nth-child(6){height:14px;}
+.voice-bars span:nth-child(7){height:8px;}
+.voice-bars span:nth-child(8){height:20px;}
+.voice-bars span:nth-child(9){height:11px;}
+.voice-bars span:nth-child(10){height:16px;}
+.voice-bars span:nth-child(11){height:24px;}
+.voice-bars span:nth-child(12){height:12px;}
+.voice-bars span:nth-child(13){height:19px;}
+.voice-bars span:nth-child(14){height:8px;}
+.voice-bars span:nth-child(15){height:15px;}
+
+.voice-progress{
+
+position:absolute;
+
+left:0;
+
+top:0;
+
+bottom:0;
+
+width:0%;
+
+background:rgba(37,211,102,.35);
+
+transition:width .1s linear;
+
+pointer-events:none;
+
+}
