@@ -1287,41 +1287,58 @@ const p = a.closest(".voice-player");
 p.querySelector(".voice-play i").className =
 "fa-solid fa-play";
 
-p.querySelector(".voice-progress").style.width="0%";
+p.querySelector(".voice-progress").style.width = "0%";
+
+const otherBars =
+p.querySelectorAll(".voice-bars span");
+
+otherBars.forEach(bar=>{
+
+bar.style.background = "#cfcfcf";
+
+});
 
 }
 
 });
+
+audio.play();
+
+icon.className = "fa-solid fa-pause";
+
+}else{
+
+audio.pause();
+
+icon.className = "fa-solid fa-play";
+
+}
 
 audio.ontimeupdate = ()=>{
 
 const percent =
 (audio.currentTime / audio.duration) * 100;
 
-// Progress bar
+// Progress
 progress.style.width = percent + "%";
 
-// Wave bars color
-const bars = player.querySelectorAll(".voice-bars span");
+// Wave bars
+const bars =
+player.querySelectorAll(".voice-bars span");
 
 bars.forEach((bar,index)=>{
 
 const barPercent =
 ((index + 1) / bars.length) * 100;
 
-if(barPercent <= percent){
-
-bar.style.background = "#25D366";
-
-}else{
-
-bar.style.background = "#cfcfcf";
-
-}
+bar.style.background =
+barPercent <= percent
+? "#25D366"
+: "#cfcfcf";
 
 });
 
-// Sabunta lokaci
+// Time
 const current =
 Math.floor(audio.currentTime);
 
@@ -1342,15 +1359,25 @@ icon.className = "fa-solid fa-play";
 
 progress.style.width = "0%";
 
-const total = Math.floor(audio.duration || 0);
+const bars =
+player.querySelectorAll(".voice-bars span");
 
-const min = Math.floor(total / 60);
+bars.forEach(bar=>{
 
-const sec = String(total % 60).padStart(2,"0");
+bar.style.background = "#cfcfcf";
+
+});
+
+const total =
+Math.floor(audio.duration || 0);
+
+const min =
+Math.floor(total / 60);
+
+const sec =
+String(total % 60).padStart(2,"0");
 
 player.querySelector(".voice-time").innerText =
 `${min}:${sec}`;
-    
-};
 
-});  
+};
