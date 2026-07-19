@@ -236,9 +236,7 @@ ${msg.voice ? `
 </div>
 
 <span class="voice-time">
-
-${msg.voiceDuration || 0}s
-
+0:00
 </span>
 
 <audio class="voice-audio">
@@ -448,9 +446,7 @@ ${msg.voice ? `
 </div>
 
 <span class="voice-time">
-
-${msg.voiceDuration || 0}s
-
+0:00
 </span>
 
 <audio class="voice-audio">
@@ -1259,18 +1255,31 @@ icon.className="fa-solid fa-play";
 audio.ontimeupdate = ()=>{
 
 const percent =
-(audio.currentTime/audio.duration)*100;
+(audio.currentTime / audio.duration) * 100;
 
-progress.style.width = percent+"%";
+progress.style.width = percent + "%";
+
+// Sabunta lokaci
+const current =
+Math.floor(audio.currentTime);
+
+const min =
+Math.floor(current / 60);
+
+const sec =
+String(current % 60).padStart(2,"0");
+
+player.querySelector(".voice-time").innerText =
+`${min}:${sec}`;
 
 };
 
 audio.onended = ()=>{
 
-icon.className="fa-solid fa-play";
+icon.className = "fa-solid fa-play";
 
-progress.style.width="0%";
+progress.style.width = "0%";
+
+player.querySelector(".voice-time").innerText = "0:00";
 
 };
-
-});
