@@ -1425,3 +1425,15 @@ audio.addEventListener("loadedmetadata", updateDuration, { once:true });
 });
 
 }
+
+function startVoiceCall(){
+
+socket.emit("voiceCall",{
+
+caller: user.username,
+
+receiver: receiver
+
+});
+
+}
