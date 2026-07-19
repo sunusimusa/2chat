@@ -1437,3 +1437,25 @@ receiver: receiver
 });
 
 }
+
+socket.on("incomingVoiceCall",(data)=>{
+
+document.getElementById("incomingCall").style.display = "flex";
+
+document.getElementById("callerName").innerText = data.caller;
+
+});
+
+function acceptCall(){
+
+document.getElementById("incomingCall").style.display = "none";
+
+alert("Voice Call Accepted");
+
+}
+
+function rejectCall(){
+
+document.getElementById("incomingCall").style.display = "none";
+
+}
