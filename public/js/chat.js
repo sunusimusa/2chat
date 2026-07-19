@@ -547,19 +547,22 @@ msg.delivered
 const chat =
 document.getElementById("chat");
 
-if(chat.innerHTML !== html){
-
 chat.innerHTML = html;
+
+loadVoiceDurations();
 
 if(autoScroll){
 
+requestAnimationFrame(()=>{
+
 chat.scrollTop = chat.scrollHeight;
 
-}
+});
 
 }
     
-} 
+}
+    
 
 async function sendMessage(){
 
