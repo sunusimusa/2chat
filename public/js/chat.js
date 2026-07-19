@@ -1283,3 +1283,5 @@ progress.style.width = "0%";
 player.querySelector(".voice-time").innerText = "0:00";
 
 };
+
+});  
