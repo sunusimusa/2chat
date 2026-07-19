@@ -221,19 +221,31 @@ msg.replyText || "Message"
 
 ${msg.voice ? `
 
-<div class="voice-message">
+<div class="voice-player">
 
-<audio controls preload="metadata">
+<button class="voice-play">
+
+<i class="fa-solid fa-play"></i>
+
+</button>
+
+<div class="voice-wave">
+
+<div class="voice-progress"></div>
+
+</div>
+
+<span class="voice-time">
+
+${msg.voiceDuration || 0}s
+
+</span>
+
+<audio class="voice-audio">
 
 <source src="${msg.voice}" type="audio/webm">
 
-Your browser does not support audio.
-
 </audio>
-
-<div class="voice-duration">
-
-🎤 ${msg.voiceDuration || 0}s
 
 </div>
 
@@ -421,17 +433,31 @@ msg.replyText || "Message"
 
 ${msg.voice ? `
 
-<div class="voice-message">
+<div class="voice-player">
 
-<audio controls preload="metadata">
+<button class="voice-play">
+
+<i class="fa-solid fa-play"></i>
+
+</button>
+
+<div class="voice-wave">
+
+<div class="voice-progress"></div>
+
+</div>
+
+<span class="voice-time">
+
+${msg.voiceDuration || 0}s
+
+</span>
+
+<audio class="voice-audio">
 
 <source src="${msg.voice}" type="audio/webm">
 
 </audio>
-
-<div class="voice-duration">
-
-🎤 ${msg.voiceDuration || 0}s
 
 </div>
 
