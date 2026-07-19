@@ -991,19 +991,24 @@ opacity:.8;
 
 }
 
+
 .voice-player{
 
 display:flex;
 align-items:center;
-gap:10px;
+gap:8px;
 
-padding:8px 10px;
+width:170px;
+height:48px;
 
-border-radius:20px;
+padding:6px 10px;
 
-background:rgba(255,255,255,.12);
+border-radius:24px;
+
+background:rgba(255,255,255,.15);
 
 }
+   
 
 .bubble-other .voice-player{
 
@@ -1013,18 +1018,16 @@ background:#f2f2f2;
 
 .voice-play{
 
-width:38px;
-height:38px;
+width:34px;
+height:34px;
 
 border:none;
-
 border-radius:50%;
 
 background:#25D366;
-
 color:#fff;
 
-font-size:16px;
+font-size:14px;
 
 display:flex;
 align-items:center;
@@ -1040,15 +1043,13 @@ flex-shrink:0;
 
 flex:1;
 
-height:6px;
+height:4px;
 
-background:#d6d6d6;
+background:rgba(255,255,255,.35);
 
-border-radius:20px;
+border-radius:10px;
 
 overflow:hidden;
-
-position:relative;
 
 }
 
@@ -1070,7 +1071,11 @@ font-size:12px;
 
 font-weight:bold;
 
-white-space:nowrap;
+color:#fff;
+
+min-width:28px;
+
+text-align:right;
 
 }
 
