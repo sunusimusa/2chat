@@ -231,6 +231,26 @@ ${msg.voice ? `
 
 <div class="voice-wave">
 
+<div class="voice-bars">
+
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+
+</div>
+
 <div class="voice-progress"></div>
 
 </div>
@@ -440,6 +460,26 @@ ${msg.voice ? `
 </button>
 
 <div class="voice-wave">
+
+<div class="voice-bars">
+
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+
+</div>
 
 <div class="voice-progress"></div>
 
