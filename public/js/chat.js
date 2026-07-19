@@ -219,7 +219,27 @@ msg.replyText || "Message"
 
 }
 
-${msg.text || ""}
+${msg.voice ? `
+
+<div class="voice-message">
+
+<audio controls preload="metadata">
+
+<source src="${msg.voice}" type="audio/webm">
+
+Your browser does not support audio.
+
+</audio>
+
+<div class="voice-duration">
+
+🎤 ${msg.voiceDuration || 0}s
+
+</div>
+
+</div>
+
+` : msg.text || ""}
 
 <div class="message-time">
 
@@ -399,7 +419,25 @@ msg.replyText || "Message"
 
 }
 
-${msg.text || ""}
+${msg.voice ? `
+
+<div class="voice-message">
+
+<audio controls preload="metadata">
+
+<source src="${msg.voice}" type="audio/webm">
+
+</audio>
+
+<div class="voice-duration">
+
+🎤 ${msg.voiceDuration || 0}s
+
+</div>
+
+</div>
+
+` : msg.text || ""}
 
 <div class="message-time">
 ${new Date(msg.createdAt).toLocaleTimeString([],{
