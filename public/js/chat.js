@@ -1398,7 +1398,11 @@ const time = player.querySelector(".voice-time");
 
 const updateDuration = ()=>{
 
-const total = Math.floor(audio.duration || 0);
+if(!isFinite(audio.duration) || isNaN(audio.duration)){
+return;
+}
+
+const total = Math.floor(audio.duration);
 
 const min = Math.floor(total / 60);
 
@@ -1414,7 +1418,7 @@ updateDuration();
 
 }else{
 
-audio.addEventListener("loadedmetadata", updateDuration, {once:true});
+audio.addEventListener("loadedmetadata", updateDuration, { once:true });
 
 }
 
