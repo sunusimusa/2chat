@@ -1273,6 +1273,18 @@ player.querySelector(".voice-time").innerText =
     
 if(audio.paused){
 
+    audio.play();
+
+icon.className = "fa-solid fa-pause";
+
+}else{
+
+audio.pause();
+
+icon.className = "fa-solid fa-play";
+
+}
+
 // Dakatar da sauran voice idan akwai
 document.querySelectorAll(".voice-audio").forEach(a=>{
 
@@ -1301,18 +1313,6 @@ bar.style.background = "#cfcfcf";
 }
 
 });
-
-audio.play();
-
-icon.className = "fa-solid fa-pause";
-
-}else{
-
-audio.pause();
-
-icon.className = "fa-solid fa-play";
-
-}
 
 audio.ontimeupdate = ()=>{
 
@@ -1381,3 +1381,5 @@ player.querySelector(".voice-time").innerText =
 `${min}:${sec}`;
 
 };
+
+});   
