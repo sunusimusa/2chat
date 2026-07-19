@@ -1218,6 +1218,19 @@ const icon = playBtn.querySelector("i");
 
 const progress = player.querySelector(".voice-progress");
 
+audio.onloadedmetadata = () => {
+
+const total = Math.floor(audio.duration);
+
+const min = Math.floor(total / 60);
+
+const sec = String(total % 60).padStart(2,"0");
+
+player.querySelector(".voice-time").innerText =
+`${min}:${sec}`;
+
+};
+    
 if(audio.paused){
 
 // Dakatar da sauran voice idan akwai
@@ -1280,8 +1293,15 @@ icon.className = "fa-solid fa-play";
 
 progress.style.width = "0%";
 
-player.querySelector(".voice-time").innerText = "0:00";
+const total = Math.floor(audio.duration);
 
+const min = Math.floor(total / 60);
+
+const sec = String(total % 60).padStart(2,"0");
+
+player.querySelector(".voice-time").innerText =
+`${min}:${sec}`;
+    
 };
 
 });  
