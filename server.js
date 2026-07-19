@@ -54,13 +54,34 @@ mongoose.connect(process.env.MONGO_URI)
 
   console.log("✅ MongoDB Connected");
 
-  io.on("connection", (socket) => {
 
-    socket.on("voiceCall",(data)=>{
+ io.on("connection",(socket)=>{
+
+socket.on("voiceCall",(data)=>{
 
 io.to(data.receiver).emit("incomingVoiceCall",{
 
-caller: data.caller
+caller:data.caller
+
+});
+
+});
+
+socket.on("acceptVoiceCall",(data)=>{
+
+io.to(data.caller).emit("voiceCallAccepted",{
+
+receiver:data.receiver
+
+});
+
+});
+
+socket.on("rejectVoiceCall",(data)=>{
+
+io.to(data.caller).emit("voiceCallRejected",{
+
+receiver:data.receiver
 
 });
 
