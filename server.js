@@ -56,6 +56,16 @@ mongoose.connect(process.env.MONGO_URI)
 
   io.on("connection", (socket) => {
 
+    socket.on("voiceCall",(data)=>{
+
+io.to(data.receiver).emit("incomingVoiceCall",{
+
+caller: data.caller
+
+});
+
+});
+
 console.log("🟢 User Connected");
 
 socket.on("join", async (username) => {
