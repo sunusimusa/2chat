@@ -935,14 +935,9 @@ audioChunks.push(e.data);
 
 mediaRecorder.onstop = ()=>{
 
-const audioBlob = new Blob(audioChunks,{
+audioBlob = new Blob(audioChunks,{
 type:"audio/webm"
 });
-
-console.log(audioBlob);
-
-// Wannan na gwaji ne
-alert("Voice recorded successfully!");
 
 stream.getTracks().forEach(track=>track.stop());
 
@@ -1086,15 +1081,65 @@ document.getElementById("recordTime").innerText =
 
 }
 
-function sendVoice(){
+async function sendVoice(){
 
-alert("Voice will be sent in the next phase.");
+if(!audioBlob) return;
+
+const formData = new FormData();
+
+formData.append(
+"voice",
+audioBlob,
+"voice.webm"
+);
+
+formData.append(
+"sender",
+user.username
+);
+
+formData.append(
+"receiver",
+receiver
+);
+
+formData.append(
+"duration",
+recordSeconds
+);
+
+const res = await fetch(
+"/api/messages/voice",
+{
+method:"POST",
+body:formData
+}
+);
+
+const data = await res.json();
+
+if(data.success){
+
+socket.emit(
+"newMessage",
+data.message
+);
+
+loadMessages();
 
 document.getElementById("sendVoiceBtn").style.display="none";
 
 document.getElementById("recordIcon").className =
 "fa-solid fa-microphone";
 
+audioBlob = null;
+
+recordSeconds = 0;
+
+}else{
+
+alert(data.message);
+
 }
 
-
+}
