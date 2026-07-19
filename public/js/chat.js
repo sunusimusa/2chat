@@ -1312,6 +1312,34 @@ const percent =
 
 progress.style.width = percent + "%";
 
+// Wave bars color
+const bars = player.querySelectorAll(".voice-bars span");
+
+bars.forEach((bar,index)=>{
+
+const barPercent =
+((index + 1) / bars.length) * 100;
+
+if(barPercent <= percent){
+
+bar.style.background = "#25D366";
+
+}else{
+
+bar.style.background = "#cfcfcf";
+
+}
+
+});
+
+const bars = player.querySelectorAll(".voice-bars span");
+
+bars.forEach(bar=>{
+
+bar.style.background = "#cfcfcf";
+
+});
+    
 // Sabunta lokaci
 const current =
 Math.floor(audio.currentTime);
