@@ -564,9 +564,7 @@ chat.scrollTop = chat.scrollHeight;
 }
 
 }
-
-}
-   
+  
 
 async function sendMessage(){
 
