@@ -27,6 +27,11 @@ type:String,
 default:""
 },
 
+  voiceDuration:{
+type:Number,
+default:0
+},
+
   replyTo:{
 type:mongoose.Schema.Types.ObjectId,
 ref:"Message",
