@@ -1450,12 +1450,26 @@ function acceptCall(){
 
 document.getElementById("incomingCall").style.display = "none";
 
-alert("Voice Call Accepted");
+socket.emit("acceptVoiceCall",{
+
+caller: receiver,
+
+receiver: user.username
+
+});
 
 }
 
 function rejectCall(){
 
 document.getElementById("incomingCall").style.display = "none";
+
+socket.emit("rejectVoiceCall",{
+
+caller: receiver,
+
+receiver: user.username
+
+});
 
 }
