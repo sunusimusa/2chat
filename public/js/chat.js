@@ -1293,23 +1293,12 @@ p.querySelector(".voice-progress").style.width="0%";
 
 });
 
-audio.play();
-
-icon.className="fa-solid fa-pause";
-
-}else{
-
-audio.pause();
-
-icon.className="fa-solid fa-play";
-
-}
-
 audio.ontimeupdate = ()=>{
 
 const percent =
 (audio.currentTime / audio.duration) * 100;
 
+// Progress bar
 progress.style.width = percent + "%";
 
 // Wave bars color
@@ -1332,14 +1321,6 @@ bar.style.background = "#cfcfcf";
 
 });
 
-const bars = player.querySelectorAll(".voice-bars span");
-
-bars.forEach(bar=>{
-
-bar.style.background = "#cfcfcf";
-
-});
-    
 // Sabunta lokaci
 const current =
 Math.floor(audio.currentTime);
