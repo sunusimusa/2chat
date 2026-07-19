@@ -256,7 +256,7 @@ ${msg.voice ? `
 </div>
 
 <span class="voice-time">
-0:00
+${Math.floor((msg.voiceDuration || 0)/60)}:${String((msg.voiceDuration || 0)%60).padStart(2,"0")}
 </span>
 
 <audio class="voice-audio">
@@ -311,9 +311,6 @@ msg.delivered
 `;
 
 chat.appendChild(div);
-
-// Load duration na sabon voice
-loadVoiceDurations();
 
 chat.scrollTop = chat.scrollHeight;
     
@@ -489,7 +486,7 @@ ${msg.voice ? `
 </div>
 
 <span class="voice-time">
-0:00
+${Math.floor((msg.voiceDuration || 0)/60)}:${String((msg.voiceDuration || 0)%60).padStart(2,"0")}
 </span>
 
 <audio class="voice-audio">
@@ -553,9 +550,6 @@ document.getElementById("chat");
 if(chat.innerHTML !== html){
 
 chat.innerHTML = html;
-
-// Load duration na duk voice messages
-loadVoiceDurations();
 
 if(autoScroll){
 
