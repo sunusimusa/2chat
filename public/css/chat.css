@@ -967,3 +967,26 @@ transition:.25s;
 transform:scale(1.05);
 
 }
+
+.voice-message{
+
+display:flex;
+flex-direction:column;
+gap:6px;
+margin-top:5px;
+
+}
+
+.voice-message audio{
+
+width:230px;
+max-width:100%;
+
+}
+
+.voice-duration{
+
+font-size:12px;
+opacity:.8;
+
+}
