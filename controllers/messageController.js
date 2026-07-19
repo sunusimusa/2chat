@@ -98,10 +98,6 @@ message:"No voice file uploaded."
 
 }
 
-
-const streamifier = require("streamifier");
-
-
 let voiceUrl = "";
 
 
@@ -128,10 +124,17 @@ Message.create({
 
 sender,
 receiver,
+
 text:"",
 image:"",
+
 voice:voiceUrl,
+
+voiceDuration:
+Number(req.body.duration)||0,
+
 delivered:true,
+
 deliveredAt:new Date()
 
 }).then(async(message)=>{
