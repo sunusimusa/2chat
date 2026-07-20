@@ -196,6 +196,79 @@ document.getElementById("callTimer").innerText = "00:00";
 
 }
 
+let callSeconds = 0;
+let callInterval = null;
+
+function startCallTimer(){
+
+    callSeconds = 0;
+
+    callInterval = setInterval(()=>{
+
+        callSeconds++;
+
+        const min = String(Math.floor(callSeconds / 60)).padStart(2,"0");
+        const sec = String(callSeconds % 60).padStart(2,"0");
+
+        document.getElementById("callTimer").innerText =
+        `${min}:${sec}`;
+
+    },1000);
+
+}
+
+function stopCallTimer(){
+
+    clearInterval(callInterval);
+
+    callInterval = null;
+
+    callSeconds = 0;
+
+    document.getElementById("callTimer").innerText = "00:00";
+
+}
+
+function endCall(){
+
+    stopCallTimer();
+
+    document.getElementById("callScreen").style.display = "none";
+
+    if(localStream){
+
+        localStream.getTracks().forEach(track=>track.stop());
+
+        localStream = null;
+
+    }
+
+    if(remoteStream){
+
+        remoteStream.getTracks().forEach(track=>track.stop());
+
+        remoteStream = null;
+
+    }
+
+    if(peerConnection){
+
+        peerConnection.close();
+
+        peerConnection = null;
+
+    }
+
+    document.getElementById("remoteAudio").srcObject = null;
+
+    socket.emit("endVoiceCall",{
+        receiver
+    });
+
+    console.log("📴 Call Ended");
+
+}
+
 socket.on("voiceCallEnded",()=>{
 
 endCall();
