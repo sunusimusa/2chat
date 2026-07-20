@@ -1568,6 +1568,22 @@ candidate: event.candidate
 
 }
 
+peerConnection.onicecandidate = (event)=>{
+
+if(event.candidate){
+
+socket.emit("iceCandidate",{
+
+receiver: receiver,
+
+candidate: event.candidate
+
+});
+
+}
+
+};
+
 async function makeOffer(){
 
 await createPeerConnection();
@@ -1634,5 +1650,17 @@ socket.on("webrtcAnswer", async(data)=>{
 await peerConnection.setRemoteDescription(
 new RTCSessionDescription(data.answer)
 );
+
+});
+
+socket.on("iceCandidate", async(data)=>{
+
+if(peerConnection){
+
+await peerConnection.addIceCandidate(
+new RTCIceCandidate(data.candidate)
+);
+
+}
 
 });
