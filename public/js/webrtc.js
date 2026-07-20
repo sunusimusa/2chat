@@ -38,6 +38,22 @@ remoteStream.addTrack(track);
 
 };
 
+peerConnection.onicecandidate = (event)=>{
+
+if(event.candidate){
+
+socket.emit("iceCandidate",{
+
+receiver: receiver,
+
+candidate: event.candidate
+
+});
+
+}
+
+};
+
 console.log("✅ PeerConnection Ready");
 
 }
