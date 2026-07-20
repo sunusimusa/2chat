@@ -17,15 +17,26 @@ let paused = false;
 
 let callerName = "";
 
-let localStream;
-let peerConnection;
+// ======================
+// WebRTC
+// ======================
 
-const servers = {
-  iceServers: [
-    {
-      urls: "stun:stun.l.google.com:19302"
-    }
-  ]
+let localStream = null;
+let remoteStream = null;
+let peerConnection = null;
+
+const rtcConfig = {
+
+iceServers: [
+
+{
+
+urls: "stun:stun.l.google.com:19302"
+
+}
+
+]
+
 };
 
 
@@ -1466,14 +1477,26 @@ async function acceptCall(){
 document.getElementById("incomingCall").style.display = "none";
 
 localStream = await navigator.mediaDevices.getUserMedia({
+
 audio:true
+
 });
 
-alert("Call accepted");
+await createPeerConnection();
 
-socket.emit("callAccepted",{
-caller: receiver,
+// Sanya microphone
+localStream.getTracks().forEach(track=>{
+
+peerConnection.addTrack(track,localStream);
+
+});
+
+socket.emit("acceptVoiceCall",{
+
+caller: callerName,
+
 receiver: user.username
+
 });
 
 }
@@ -1504,3 +1527,41 @@ alert(data.receiver + " rejected your call.");
 
 });
 
+
+async function createPeerConnection(){
+
+peerConnection = new RTCPeerConnection(rtcConfig);
+
+remoteStream = new MediaStream();
+
+document.getElementById("remoteAudio").srcObject = remoteStream;
+
+// Idan an karɓi audio daga ɗayan mutum
+peerConnection.ontrack = (event)=>{
+
+event.streams[0].getTracks().forEach(track=>{
+
+remoteStream.addTrack(track);
+
+});
+
+};
+
+// ICE Candidates
+peerConnection.onicecandidate = (event)=>{
+
+if(event.candidate){
+
+socket.emit("iceCandidate",{
+
+receiver: receiver,
+
+candidate: event.candidate
+
+});
+
+}
+
+};
+
+}
