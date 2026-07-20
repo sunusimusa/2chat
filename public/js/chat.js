@@ -1480,6 +1480,13 @@ receiver: user.username
 }
 
 socket.on("voiceCallAccepted",(data)=>{
+    
+document.getElementById("callScreen").style.display = "flex";
+
+document.getElementById("callStatus").innerText =
+"Connected";
+
+startCallTimer();
 
 alert(data.receiver + " accepted your call.");
 
