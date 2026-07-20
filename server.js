@@ -87,6 +87,38 @@ receiver:data.receiver
 
 });
 
+socket.on("webrtcOffer",(data)=>{
+
+io.to(data.receiver).emit("webrtcOffer",{
+
+caller: socket.username,
+
+offer: data.offer
+
+});
+
+});
+
+socket.on("webrtcAnswer",(data)=>{
+
+io.to(data.receiver).emit("webrtcAnswer",{
+
+answer: data.answer
+
+});
+
+});
+
+socket.on("iceCandidate",(data)=>{
+
+io.to(data.receiver).emit("iceCandidate",{
+
+candidate: data.candidate
+
+});
+
+});
+
 console.log("🟢 User Connected");
 
 socket.on("join", async (username) => {
