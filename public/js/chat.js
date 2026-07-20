@@ -17,29 +17,6 @@ let paused = false;
 
 let callerName = "";
 
-// ======================
-// WebRTC
-// ======================
-
-let localStream = null;
-let remoteStream = null;
-let peerConnection = null;
-
-const rtcConfig = {
-
-iceServers: [
-
-{
-
-urls: "stun:stun.l.google.com:19302"
-
-}
-
-]
-
-};
-
-
 if (!user) {
     location.href = "/login.html";
 }
@@ -1530,26 +1507,6 @@ alert(data.receiver + " rejected your call.");
 });
 
 
-async function createPeerConnection(){
-
-peerConnection = new RTCPeerConnection(rtcConfig);
-
-remoteStream = new MediaStream();
-
-document.getElementById("remoteAudio").srcObject = remoteStream;
-
-// Idan an karɓi audio daga ɗayan mutum
-peerConnection.ontrack = (event)=>{
-
-event.streams[0].getTracks().forEach(track=>{
-
-remoteStream.addTrack(track);
-
-});
-
-};
-
-// ICE Candidates
 peerConnection.onicecandidate = (event)=>{
 
 if(event.candidate){
@@ -1565,102 +1522,3 @@ candidate: event.candidate
 }
 
 };
-
-}
-
-peerConnection.onicecandidate = (event)=>{
-
-if(event.candidate){
-
-socket.emit("iceCandidate",{
-
-receiver: receiver,
-
-candidate: event.candidate
-
-});
-
-}
-
-};
-
-async function makeOffer(){
-
-await createPeerConnection();
-
-localStream = await navigator.mediaDevices.getUserMedia({
-audio:true
-});
-
-localStream.getTracks().forEach(track=>{
-
-peerConnection.addTrack(track, localStream);
-
-});
-
-const offer = await peerConnection.createOffer();
-
-await peerConnection.setLocalDescription(offer);
-
-socket.emit("webrtcOffer",{
-
-receiver: receiver,
-
-offer: offer
-
-});
-
-}
-
-
-socket.on("webrtcOffer", async(data)=>{
-
-await createPeerConnection();
-
-localStream = await navigator.mediaDevices.getUserMedia({
-audio:true
-});
-
-localStream.getTracks().forEach(track=>{
-
-peerConnection.addTrack(track, localStream);
-
-});
-
-await peerConnection.setRemoteDescription(
-new RTCSessionDescription(data.offer)
-);
-
-const answer = await peerConnection.createAnswer();
-
-await peerConnection.setLocalDescription(answer);
-
-socket.emit("webrtcAnswer",{
-
-receiver:data.caller,
-
-answer:answer
-
-});
-
-});
-
-socket.on("webrtcAnswer", async(data)=>{
-
-await peerConnection.setRemoteDescription(
-new RTCSessionDescription(data.answer)
-);
-
-});
-
-socket.on("iceCandidate", async(data)=>{
-
-if(peerConnection){
-
-await peerConnection.addIceCandidate(
-new RTCIceCandidate(data.candidate)
-);
-
-}
-
-});
