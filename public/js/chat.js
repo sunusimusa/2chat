@@ -17,6 +17,17 @@ let paused = false;
 
 let callerName = "";
 
+let localStream;
+let peerConnection;
+
+const servers = {
+  iceServers: [
+    {
+      urls: "stun:stun.l.google.com:19302"
+    }
+  ]
+};
+
 
 if (!user) {
     location.href = "/login.html";
