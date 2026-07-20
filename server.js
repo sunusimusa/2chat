@@ -109,6 +109,16 @@ answer:data.answer
 
 });
 
+socket.on("iceCandidate",(data)=>{
+
+io.to(data.receiver).emit("iceCandidate",{
+
+candidate: data.candidate
+
+});
+
+});
+
 console.log("🟢 User Connected");
 
 socket.on("join", async (username) => {
