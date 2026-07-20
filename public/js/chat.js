@@ -1450,7 +1450,9 @@ audio.addEventListener("loadedmetadata", updateDuration, { once:true });
 
 }
 
-function startVoiceCall(){
+async function startVoiceCall(){
+
+await makeOffer();
 
 socket.emit("voiceCall",{
 
@@ -1563,5 +1565,33 @@ candidate: event.candidate
 }
 
 };
+
+}
+
+async function makeOffer(){
+
+await createPeerConnection();
+
+localStream = await navigator.mediaDevices.getUserMedia({
+audio:true
+});
+
+localStream.getTracks().forEach(track=>{
+
+peerConnection.addTrack(track, localStream);
+
+});
+
+const offer = await peerConnection.createOffer();
+
+await peerConnection.setLocalDescription(offer);
+
+socket.emit("webrtcOffer",{
+
+receiver: receiver,
+
+offer: offer
+
+});
 
 }
