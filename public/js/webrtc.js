@@ -60,4 +60,53 @@ console.log("🎤 Microphone Ready");
 
 }
 
+async function createOffer(receiver){
 
+await createPeer();
+
+await startLocalAudio();
+
+const offer = await peerConnection.createOffer();
+
+await peerConnection.setLocalDescription(offer);
+
+socket.emit("webrtcOffer",{
+
+receiver,
+
+offer
+
+});
+
+console.log("📤 Offer Sent");
+
+}
+
+
+async function receiveOffer(data){
+
+await createPeer();
+
+await startLocalAudio();
+
+await peerConnection.setRemoteDescription(
+
+new RTCSessionDescription(data.offer)
+
+);
+
+const answer = await peerConnection.createAnswer();
+
+await peerConnection.setLocalDescription(answer);
+
+socket.emit("webrtcAnswer",{
+
+receiver:data.caller,
+
+answer
+
+});
+
+console.log("📤 Answer Sent");
+
+}
