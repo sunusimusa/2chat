@@ -1429,13 +1429,13 @@ audio.addEventListener("loadedmetadata", updateDuration, { once:true });
 
 async function startVoiceCall(){
 
-await makeOffer();
+await createOffer(receiver);
 
 socket.emit("voiceCall",{
 
-caller: user.username,
+caller:user.username,
 
-receiver: receiver
+receiver
 
 });
 
