@@ -8,6 +8,7 @@ let peerConnection = null;
 
 let callSeconds = 0;
 let callInterval = null;
+let remoteUser = null;
 
 const rtcConfig = {
 
@@ -47,8 +48,8 @@ if(event.candidate){
 
 socket.emit("iceCandidate",{
 
-receiver: receiver,
-
+receiver: remoteUser,
+    
 candidate: event.candidate
 
 });
@@ -163,15 +164,6 @@ new RTCIceCandidate(data.candidate)
 
 });
 
-function stopCallTimer(){
-
-clearInterval(callInterval);
-
-callSeconds = 0;
-
-document.getElementById("callTimer").innerText = "00:00";
-
-}
 
 function startCallTimer(){
 
