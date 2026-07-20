@@ -1456,15 +1456,21 @@ document.getElementById("callerName").innerText = data.caller;
 
 async function acceptCall(){
 
-document.getElementById("incomingCall").style.display = "none";
+    document.getElementById("incomingCall").style.display = "none";
 
-socket.emit("acceptVoiceCall",{
+    document.getElementById("callScreen").style.display = "flex";
 
-caller: callerName,
+    document.getElementById("callUser").innerText = callerName;
 
-receiver: user.username
+    document.getElementById("callStatus").innerText = "Connecting...";
 
-});
+    socket.emit("acceptVoiceCall",{
+
+        caller: callerName,
+
+        receiver: user.username
+
+    });
 
 }
 
