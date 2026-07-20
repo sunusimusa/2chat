@@ -87,6 +87,18 @@ receiver:data.receiver
 
 });
 
+socket.on("webrtcOffer",(data)=>{
+
+io.to(data.receiver).emit("webrtcOffer",{
+
+offer: data.offer,
+
+caller: socket.username
+
+});
+
+});
+
 console.log("🟢 User Connected");
 
 socket.on("join", async (username) => {
