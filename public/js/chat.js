@@ -1595,3 +1595,44 @@ offer: offer
 });
 
 }
+
+
+socket.on("webrtcOffer", async(data)=>{
+
+await createPeerConnection();
+
+localStream = await navigator.mediaDevices.getUserMedia({
+audio:true
+});
+
+localStream.getTracks().forEach(track=>{
+
+peerConnection.addTrack(track, localStream);
+
+});
+
+await peerConnection.setRemoteDescription(
+new RTCSessionDescription(data.offer)
+);
+
+const answer = await peerConnection.createAnswer();
+
+await peerConnection.setLocalDescription(answer);
+
+socket.emit("webrtcAnswer",{
+
+receiver:data.caller,
+
+answer:answer
+
+});
+
+});
+
+socket.on("webrtcAnswer", async(data)=>{
+
+await peerConnection.setRemoteDescription(
+new RTCSessionDescription(data.answer)
+);
+
+});
