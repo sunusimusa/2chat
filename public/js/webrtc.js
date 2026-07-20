@@ -110,3 +110,36 @@ answer
 console.log("📤 Answer Sent");
 
 }
+
+socket.on("webrtcOffer", async(data)=>{
+
+await receiveOffer(data);
+
+});
+
+
+socket.on("webrtcAnswer", async(data)=>{
+
+await peerConnection.setRemoteDescription(
+
+new RTCSessionDescription(data.answer)
+
+);
+
+console.log("✅ Connected");
+
+});
+
+socket.on("iceCandidate", async(data)=>{
+
+if(peerConnection){
+
+await peerConnection.addIceCandidate(
+
+new RTCIceCandidate(data.candidate)
+
+);
+
+}
+
+});
