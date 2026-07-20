@@ -1429,15 +1429,18 @@ audio.addEventListener("loadedmetadata", updateDuration, { once:true });
 
 async function startVoiceCall(){
 
-await createOffer(receiver);
+    document.getElementById("callScreen").style.display = "flex";
 
-socket.emit("voiceCall",{
+    document.getElementById("callUser").innerText = receiver;
 
-caller:user.username,
+    document.getElementById("callStatus").innerText = "Calling...";
 
-receiver
+    await createOffer(receiver);
 
-});
+    socket.emit("voiceCall",{
+        caller: user.username,
+        receiver
+    });
 
 }
 
@@ -1479,22 +1482,21 @@ receiver: user.username
 
 }
 
-socket.on("voiceCallAccepted",(data)=>{
-    
-document.getElementById("callScreen").style.display = "flex";
+socket.on("voiceCallAccepted",()=>{
 
 document.getElementById("callStatus").innerText =
 "Connected";
 
 startCallTimer();
 
-alert(data.receiver + " accepted your call.");
-
 });
 
-socket.on("voiceCallRejected",(data)=>{
+socket.on("voiceCallRejected",()=>{
 
-alert(data.receiver + " rejected your call.");
+stopCallTimer();
+
+document.getElementById("callScreen").style.display = "none";
+
+alert("Call rejected.");
 
 });
-
