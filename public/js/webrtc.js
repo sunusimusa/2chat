@@ -196,4 +196,8 @@ document.getElementById("callTimer").innerText = "00:00";
 
 }
 
+socket.on("voiceCallEnded",()=>{
 
+endCall();
+
+});
