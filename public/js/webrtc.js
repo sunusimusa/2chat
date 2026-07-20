@@ -163,29 +163,6 @@ new RTCIceCandidate(data.candidate)
 
 });
 
-function startCallTimer(){
-
-callSeconds = 0;
-
-clearInterval(callInterval);
-
-callInterval = setInterval(()=>{
-
-callSeconds++;
-
-const min =
-String(Math.floor(callSeconds/60)).padStart(2,"0");
-
-const sec =
-String(callSeconds%60).padStart(2,"0");
-
-document.getElementById("callTimer").innerText =
-`${min}:${sec}`;
-
-},1000);
-
-}
-
 function stopCallTimer(){
 
 clearInterval(callInterval);
@@ -195,9 +172,6 @@ callSeconds = 0;
 document.getElementById("callTimer").innerText = "00:00";
 
 }
-
-let callSeconds = 0;
-let callInterval = null;
 
 function startCallTimer(){
 
