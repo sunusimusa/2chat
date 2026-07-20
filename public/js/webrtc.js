@@ -41,3 +41,23 @@ remoteStream.addTrack(track);
 console.log("✅ PeerConnection Ready");
 
 }
+
+async function startLocalAudio(){
+
+localStream = await navigator.mediaDevices.getUserMedia({
+
+audio:true
+
+});
+
+localStream.getTracks().forEach(track=>{
+
+peerConnection.addTrack(track,localStream);
+
+});
+
+console.log("🎤 Microphone Ready");
+
+}
+
+
