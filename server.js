@@ -119,6 +119,12 @@ candidate: data.candidate
 
 });
 
+   socket.on("endVoiceCall",(data)=>{
+
+    io.to(data.receiver).emit("voiceCallEnded");
+
+});
+
 console.log("🟢 User Connected");
 
 socket.on("join", async (username) => {
