@@ -15,6 +15,8 @@ let audioChunks = [];
 let audioBlob = null;
 let paused = false;
 
+let callerName = "";
+
 
 if (!user) {
     location.href = "/login.html";
@@ -1440,6 +1442,8 @@ receiver: receiver
 
 socket.on("incomingVoiceCall",(data)=>{
 
+callerName = data.caller;
+
 document.getElementById("incomingCall").style.display = "flex";
 
 document.getElementById("callerName").innerText = data.caller;
@@ -1452,7 +1456,7 @@ document.getElementById("incomingCall").style.display = "none";
 
 socket.emit("acceptVoiceCall",{
 
-caller: receiver,
+caller: callerName,
 
 receiver: user.username
 
@@ -1466,10 +1470,23 @@ document.getElementById("incomingCall").style.display = "none";
 
 socket.emit("rejectVoiceCall",{
 
-caller: receiver,
+caller: callerName,
 
 receiver: user.username
 
 });
 
 }
+
+socket.on("voiceCallAccepted",(data)=>{
+
+alert(data.receiver + " accepted your call.");
+
+});
+
+socket.on("voiceCallRejected",(data)=>{
+
+alert(data.receiver + " rejected your call.");
+
+});
+
