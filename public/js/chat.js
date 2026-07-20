@@ -1491,19 +1491,3 @@ alert(data.receiver + " rejected your call.");
 
 });
 
-
-peerConnection.onicecandidate = (event)=>{
-
-if(event.candidate){
-
-socket.emit("iceCandidate",{
-
-receiver: receiver,
-
-candidate: event.candidate
-
-});
-
-}
-
-};
