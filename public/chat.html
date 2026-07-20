@@ -18,6 +18,34 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 
 <body>
 
+    <div id="callScreen" class="call-screen" style="display:none;">
+
+    <img id="callAvatar" src="/images/default.png" class="call-avatar">
+
+    <h2 id="callUser">Calling...</h2>
+
+    <p id="callStatus">Connecting...</p>
+
+    <h3 id="callTimer">00:00</h3>
+
+    <div class="call-actions">
+
+        <button id="muteBtn" onclick="toggleMute()">
+            <i class="fa-solid fa-microphone"></i>
+        </button>
+
+        <button id="speakerBtn" onclick="toggleSpeaker()">
+            <i class="fa-solid fa-volume-high"></i>
+        </button>
+
+        <button id="endCallBtn" onclick="endCall()">
+            <i class="fa-solid fa-phone-slash"></i>
+        </button>
+
+    </div>
+
+</div>
+
 <div id="incomingCall" class="incoming-call">
 
 <h3>📞 Incoming Voice Call</h3>
