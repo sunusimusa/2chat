@@ -1455,21 +1455,6 @@ async function acceptCall(){
 
 document.getElementById("incomingCall").style.display = "none";
 
-localStream = await navigator.mediaDevices.getUserMedia({
-
-audio:true
-
-});
-
-await createPeerConnection();
-
-// Sanya microphone
-localStream.getTracks().forEach(track=>{
-
-peerConnection.addTrack(track,localStream);
-
-});
-
 socket.emit("acceptVoiceCall",{
 
 caller: callerName,
