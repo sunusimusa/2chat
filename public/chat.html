@@ -28,6 +28,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 
     <h3 id="callTimer">00:00</h3>
 
+    <audio id="remoteAudio" autoplay></audio>
+
     <div class="call-actions">
 
         <button id="muteBtn" onclick="toggleMute()">
@@ -107,7 +109,7 @@ Typing...
     <i class="fa-solid fa-phone"></i>
 </button>
 
-<button class="header-btn" onclick="startVideoCall()">
+<button class="header-btn" disabled>
     <i class="fa-solid fa-video"></i>
 </button>
   
@@ -237,8 +239,6 @@ onclick="closeImage()">
 <img id="fullImage">
 
 </div>
-
-<audio id="remoteAudio" autoplay></audio> 
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/webrtc.js"></script>
