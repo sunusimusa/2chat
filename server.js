@@ -99,6 +99,16 @@ caller: socket.username
 
 });
 
+socket.on("webrtcAnswer",(data)=>{
+
+io.to(data.receiver).emit("webrtcAnswer",{
+
+answer:data.answer
+
+});
+
+});
+
 console.log("🟢 User Connected");
 
 socket.on("join", async (username) => {
