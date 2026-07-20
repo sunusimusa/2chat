@@ -1461,16 +1461,19 @@ document.getElementById("callerName").innerText = data.caller;
 
 });
 
-function acceptCall(){
+async function acceptCall(){
 
 document.getElementById("incomingCall").style.display = "none";
 
-socket.emit("acceptVoiceCall",{
+localStream = await navigator.mediaDevices.getUserMedia({
+audio:true
+});
 
-caller: callerName,
+alert("Call accepted");
 
+socket.emit("callAccepted",{
+caller: receiver,
 receiver: user.username
-
 });
 
 }
