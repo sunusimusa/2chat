@@ -101,21 +101,25 @@ offer: data.offer
 
 socket.on("webrtcAnswer",(data)=>{
 
-io.to(data.receiver).emit("webrtcAnswer",{
+    io.to(data.receiver).emit("webrtcAnswer",{
 
-answer: data.answer
+        answer: data.answer,
 
-});
+        sender: socket.username
 
-});
-
-socket.on("iceCandidate",(data)=>{
-
-io.to(data.receiver).emit("iceCandidate",{
-
-candidate: data.candidate
+    });
 
 });
+   
+   socket.on("iceCandidate",(data)=>{
+
+    io.to(data.receiver).emit("iceCandidate",{
+
+        candidate: data.candidate,
+
+        sender: socket.username
+
+    });
 
 });
 
