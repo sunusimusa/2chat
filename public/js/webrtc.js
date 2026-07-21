@@ -82,6 +82,8 @@ console.log("🎤 Microphone Ready");
 
 async function createOffer(receiver){
 
+remoteUser = receiver;
+
 await createPeer();
 
 await startLocalAudio();
@@ -104,6 +106,8 @@ console.log("📤 Offer Sent");
 
 
 async function receiveOffer(data){
+    
+remoteUser = data.caller;
 
 await createPeer();
 
