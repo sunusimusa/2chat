@@ -58,6 +58,21 @@ candidate: event.candidate
 
 };
 
+    peerConnection.onconnectionstatechange = ()=>{
+
+    console.log(peerConnection.connectionState);
+
+    if(peerConnection.connectionState === "connected"){
+
+        document.getElementById("callStatus").innerText =
+        "Connected";
+
+        startCallTimer();
+
+    }
+
+};
+
 console.log("✅ PeerConnection Ready");
 
 }
