@@ -247,8 +247,8 @@ function endCall(){
     document.getElementById("remoteAudio").srcObject = null;
 
     socket.emit("endVoiceCall",{
-        receiver
-    });
+    receiver: remoteUser
+});
 
     console.log("📴 Call Ended");
 
