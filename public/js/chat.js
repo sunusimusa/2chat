@@ -1543,19 +1543,19 @@ startCallTimer();
 
 socket.on("voiceCallRejected",()=>{
 
-clearTimeout(callTimeout);
-callTimeout = null;
+    clearTimeout(callTimeout);
+    callTimeout = null;
 
-callingTone.pause();
-callingTone.currentTime = 0;
+    stopCallingAnimation();
 
-stopCallTimer();
+    callingTone.pause();
+    callingTone.currentTime = 0;
 
-document.getElementById("callScreen").style.display = "none";
+    stopCallTimer();
 
-alert("Call rejected.");
+    document.getElementById("callScreen").style.display = "none";
 
-stopCallingAnimation();
+    alert("Call rejected.");
 
 });
 
