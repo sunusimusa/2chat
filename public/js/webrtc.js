@@ -403,3 +403,47 @@ async function createVideoOffer(receiver){
     console.log("📹 Video Offer Sent");
 
 }
+
+async function switchCamera(){
+
+    if(!peerConnection) return;
+
+    usingFrontCamera = !usingFrontCamera;
+
+    // Kashe tsohuwar camera
+    if(localStream){
+        localStream.getTracks().forEach(track=>track.stop());
+    }
+
+    // Buɗe sabuwar camera
+    localStream = await navigator.mediaDevices.getUserMedia({
+
+        video:{
+            facingMode: usingFrontCamera ? "user" : "environment"
+        },
+
+        audio:true
+
+    });
+
+    // Nuna local video
+    document.getElementById("localVideo").srcObject = localStream;
+
+    // Maye gurbin video track a PeerConnection
+    const videoTrack = localStream.getVideoTracks()[0];
+
+    const sender = peerConnection.getSenders().find(sender=>{
+
+        return sender.track && sender.track.kind === "video";
+
+    });
+
+    if(sender){
+
+        await sender.replaceTrack(videoTrack);
+
+    }
+
+    console.log("📹 Camera Switched");
+
+}
