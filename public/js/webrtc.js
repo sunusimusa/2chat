@@ -152,58 +152,52 @@ async function startLocalVideo(){
 
 }
 
+
 async function createOffer(receiver){
 
-remoteUser = receiver;
+    remoteUser = receiver;
 
-await createPeer();
+    await createPeer();
 
-await startLocalAudio();
+    await startLocalAudio();
 
-const offer = await peerConnection.createOffer();
+    const offer = await peerConnection.createOffer({
+        offerToReceiveAudio: true
+    });
 
-await peerConnection.setLocalDescription(offer);
+    await peerConnection.setLocalDescription(offer);
 
-socket.emit("webrtcOffer",{
+    socket.emit("webrtcOffer",{
+        receiver: remoteUser,
+        offer: peerConnection.localDescription
+    });
 
-receiver,
-
-offer
-
-});
-
-console.log("📤 Offer Sent");
+    console.log("📤 Voice Offer Sent");
 
 }
 
-
 async function receiveOffer(data){
-    
-remoteUser = data.caller;
 
-await createPeer();
+    remoteUser = data.caller;
 
-await startLocalAudio();
+    await createPeer();
 
-await peerConnection.setRemoteDescription(
+    await startLocalAudio();
 
-new RTCSessionDescription(data.offer)
+    await peerConnection.setRemoteDescription(
+        new RTCSessionDescription(data.offer)
+    );
 
-);
+    const answer = await peerConnection.createAnswer();
 
-const answer = await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
 
-await peerConnection.setLocalDescription(answer);
+    socket.emit("webrtcAnswer",{
+        receiver: remoteUser,
+        answer: peerConnection.localDescription
+    });
 
-socket.emit("webrtcAnswer",{
-
-receiver:data.caller,
-
-answer
-
-});
-
-console.log("📤 Answer Sent");
+    console.log("📤 Voice Answer Sent");
 
 }
 
