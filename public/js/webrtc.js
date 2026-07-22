@@ -39,11 +39,21 @@ remoteStream;
 // Remote Audio
 peerConnection.ontrack = (event)=>{
 
-event.streams[0].getTracks().forEach(track=>{
+    event.streams[0].getTracks().forEach(track=>{
 
-remoteStream.addTrack(track);
+        remoteStream.addTrack(track);
 
-});
+    });
+
+    document.getElementById("remoteAudio").srcObject = remoteStream;
+
+    const remoteVideo = document.getElementById("remoteVideo");
+
+    if(remoteVideo){
+
+        remoteVideo.srcObject = remoteStream;
+
+    }
 
 };
 
