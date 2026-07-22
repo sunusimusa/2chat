@@ -11,6 +11,7 @@ let callInterval = null;
 let remoteUser = null;
 let isMuted = false;
 let speakerOn = true;
+let callTimeout = null;
 
 const rtcConfig = {
 
