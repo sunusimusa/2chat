@@ -72,16 +72,25 @@ candidate: event.candidate
 
 };
 
-    peerConnection.onconnectionstatechange = ()=>{
+    peerConnection.oniceconnectionstatechange = ()=>{
 
-    console.log(peerConnection.connectionState);
+    console.log("ICE:", peerConnection.iceConnectionState);
 
-    if(peerConnection.connectionState === "connected"){
+    if(peerConnection.iceConnectionState === "connected" ||
+       peerConnection.iceConnectionState === "completed"){
 
-        document.getElementById("callStatus").innerText =
-        "Connected";
+        clearTimeout(callTimeout);
 
-        startCallTimer();
+        callingTone.pause();
+        callingTone.currentTime = 0;
+
+        stopCallingAnimation();
+
+        document.getElementById("callStatus").innerText = "Connected";
+
+        if(!callInterval){
+            startCallTimer();
+        }
 
     }
 
