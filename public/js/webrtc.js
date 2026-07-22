@@ -373,3 +373,22 @@ function startCallingAnimation(){
     },500);
 
 }
+
+async function createVideoOffer(receiver){
+
+    await createPeer();
+
+    await startLocalVideo();
+
+    const offer = await peerConnection.createOffer();
+
+    await peerConnection.setLocalDescription(offer);
+
+    socket.emit("webrtcOffer",{
+        receiver,
+        offer
+    });
+
+    console.log("📹 Video Offer Sent");
+
+}
