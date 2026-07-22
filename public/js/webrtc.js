@@ -220,6 +220,8 @@ function stopCallTimer(){
 }
 
 function endCall(sendSignal = true){
+
+stopCallingAnimation();
     
 clearTimeout(callTimeout);
 callTimeout = null;
