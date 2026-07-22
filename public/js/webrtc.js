@@ -214,14 +214,7 @@ function stopCallTimer(){
 
 }
 
-function endCall(){
-
-ringtone.pause();
-ringtone.currentTime = 0;
-
-callingTone.pause();
-callingTone.currentTime = 0;
-
+function endCall(sendSignal = true){
     stopCallTimer();
 
     document.getElementById("callScreen").style.display = "none";
@@ -256,12 +249,22 @@ callingTone.currentTime = 0;
     receiver: remoteUser
 });
 
+    ringtone.pause();
+ringtone.currentTime = 0;
+
+callingTone.pause();
+callingTone.currentTime = 0;
+
+
     console.log("📴 Call Ended");
 
 }
 
-socket.on("voiceCallEnded",()=>{
+if(sendSignal){
 
-endCall();
+    socket.emit("endVoiceCall",{
+        receiver: remoteUser
+    });
 
-});
+}
+
