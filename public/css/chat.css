@@ -1258,6 +1258,7 @@ justify-content:center;
 align-items:center;
 
 z-index:99999;
+overflow:hidden; 
 
 }
 
@@ -1403,3 +1404,61 @@ background:#444;
 display:none;
 
 }
+
+/* ===========================
+   Video Call Screen
+=========================== */
+
+.video-container{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#000;
+    z-index:1;
+}
+
+/* Video na wanda kake kira */
+#remoteVideo{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    background:#000;
+}
+
+/* Video naka */
+#localVideo{
+    position:absolute;
+    top:20px;
+    right:20px;
+    width:120px;
+    height:180px;
+    object-fit:cover;
+    border-radius:16px;
+    border:2px solid #fff;
+    background:#222;
+    box-shadow:0 0 15px rgba(0,0,0,.5);
+    z-index:10;
+}
+
+.call-avatar,
+#callUser,
+#callStatus,
+#callTimer{
+    position:relative;
+    z-index:20;
+    color:#fff;
+}
+
+.call-actions{
+    position:absolute;
+    bottom:40px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:25px;
+    z-index:30;
+}
+
