@@ -9,6 +9,7 @@ let peerConnection = null;
 let callSeconds = 0;
 let callInterval = null;
 let remoteUser = null;
+let isMuted = false;
 
 const rtcConfig = {
 
@@ -268,3 +269,31 @@ if(sendSignal){
 
 }
 
+function toggleMute(){
+
+    if(!localStream) return;
+
+    isMuted = !isMuted;
+
+    localStream.getAudioTracks().forEach(track=>{
+
+        track.enabled = !isMuted;
+
+    });
+
+    const icon =
+    document.querySelector("#muteBtn i");
+
+    if(isMuted){
+
+        icon.className =
+        "fa-solid fa-microphone-slash";
+
+    }else{
+
+        icon.className =
+        "fa-solid fa-microphone";
+
+    }
+
+}
