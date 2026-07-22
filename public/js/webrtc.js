@@ -216,6 +216,12 @@ function stopCallTimer(){
 
 function endCall(){
 
+ringtone.pause();
+ringtone.currentTime = 0;
+
+callingTone.pause();
+callingTone.currentTime = 0;
+
     stopCallTimer();
 
     document.getElementById("callScreen").style.display = "none";
