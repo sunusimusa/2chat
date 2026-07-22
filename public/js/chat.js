@@ -1552,3 +1552,14 @@ document.getElementById("callScreen").style.display = "none";
 alert("Call rejected.");
 
 });
+
+socket.on("voiceCallBusy",()=>{
+
+    callingTone.pause();
+    callingTone.currentTime = 0;
+
+    endCall(false);
+
+    alert("User is busy.");
+
+});
