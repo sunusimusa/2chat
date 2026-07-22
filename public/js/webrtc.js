@@ -102,36 +102,53 @@ console.log("✅ PeerConnection Ready");
 
 async function startLocalAudio(){
 
-localStream = await navigator.mediaDevices.getUserMedia({
+    localStream = await navigator.mediaDevices.getUserMedia({
 
-audio:true
+        audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+        },
 
-});
+        video: false
 
-localStream.getTracks().forEach(track=>{
+    });
 
-peerConnection.addTrack(track,localStream);
+    localStream.getAudioTracks().forEach(track=>{
 
-});
+        peerConnection.addTrack(track, localStream);
 
-console.log("🎤 Microphone Ready");
+    });
+
+    console.log("🎤 Local Audio Ready");
 
 }
 
 async function startLocalVideo(){
 
     localStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true
+
+        video:{
+            facingMode:"user"
+        },
+
+        audio:{
+            echoCancellation:true,
+            noiseSuppression:true,
+            autoGainControl:true
+        }
+
     });
 
     document.getElementById("localVideo").srcObject = localStream;
 
     localStream.getTracks().forEach(track=>{
+
         peerConnection.addTrack(track, localStream);
+
     });
 
-    console.log("📹 Camera Ready");
+    console.log("📹 Local Video Ready");
 
 }
 
