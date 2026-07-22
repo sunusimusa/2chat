@@ -23,6 +23,9 @@ if (!user) {
 
 const socket = io();
 
+const ringtone = document.getElementById("ringtone");
+const callingTone = document.getElementById("callingTone");   
+
 socket.emit("join", user.username);
 
 loadChatUser();
@@ -38,11 +41,7 @@ if(!receiver) return;
 try{
 
 const res = await fetch(`/api/users/profile/${receiver}`);
-const data = await res.json();
-
-const ringtone = document.getElementById("ringtone");
-const callingTone = document.getElementById("callingTone");   
-
+const data = await res.json()
 if(data.success){
 
 document.getElementById("chatUser").innerText =
@@ -1434,8 +1433,9 @@ async function startVoiceCall(){
 
     document.getElementById("callScreen").style.display = "flex";
 
-    document.getElementById("callUser").innerText = receiver;
-
+    document.getElementById("callUser").innerText =
+    document.getElementById("chatUser").innerText;
+    
     document.getElementById("callStatus").innerText = "Calling...";
 
     await createOffer(receiver);
