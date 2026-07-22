@@ -12,6 +12,7 @@ let remoteUser = null;
 let isMuted = false;
 let speakerOn = true;
 let callTimeout = null;
+let callingAnimation = null;
 let inCall = false;
 
 const rtcConfig = {
@@ -330,3 +331,26 @@ function toggleSpeaker(){
 
 }
 
+function startCallingAnimation(){
+
+    const status =
+    document.getElementById("callStatus");
+
+    let dots = 0;
+
+    clearInterval(callingAnimation);
+
+    callingAnimation = setInterval(()=>{
+
+        dots++;
+
+        if(dots > 3){
+            dots = 1;
+        }
+
+        status.innerText =
+        "Calling" + ".".repeat(dots);
+
+    },500);
+
+}
