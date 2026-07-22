@@ -1606,3 +1606,22 @@ async function startVideoCall(){
     });
 
 }
+
+async function acceptVideoCall(){
+
+    ringtone.pause();
+    ringtone.currentTime = 0;
+
+    document.getElementById("incomingCall").style.display = "none";
+
+    document.getElementById("callScreen").style.display = "flex";
+
+    document.getElementById("callUser").innerText = callerName;
+
+    document.getElementById("callStatus").innerText = "Connecting...";
+
+    await startLocalVideo();
+
+}
+
+
