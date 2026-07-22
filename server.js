@@ -148,13 +148,13 @@ receiver:data.receiver
 
 socket.on("webrtcOffer",(data)=>{
 
-io.to(data.receiver).emit("webrtcOffer",{
+    io.to(data.receiver).emit("webrtcOffer",{
 
-caller: socket.username,
+        caller: socket.username,
+        receiver: data.receiver,
+        offer: data.offer
 
-offer: data.offer
-
-});
+    });
 
 });
 
@@ -162,21 +162,21 @@ socket.on("webrtcAnswer",(data)=>{
 
     io.to(data.receiver).emit("webrtcAnswer",{
 
-        answer: data.answer,
-
-        sender: socket.username
+        sender: socket.username,
+        receiver: data.receiver,
+        answer: data.answer
 
     });
 
 });
-   
-   socket.on("iceCandidate",(data)=>{
+
+socket.on("iceCandidate",(data)=>{
 
     io.to(data.receiver).emit("iceCandidate",{
 
-        candidate: data.candidate,
-
-        sender: socket.username
+        sender: socket.username,
+        receiver: data.receiver,
+        candidate: data.candidate
 
     });
 
