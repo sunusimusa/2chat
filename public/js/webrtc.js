@@ -218,6 +218,10 @@ function stopCallTimer(){
 }
 
 function endCall(sendSignal = true){
+    
+clearTimeout(callTimeout);
+callTimeout = null;
+    
     stopCallTimer();
 
     document.getElementById("callScreen").style.display = "none";
