@@ -59,14 +59,6 @@ mongoose.connect(process.env.MONGO_URI)
 
 socket.on("voiceCall",(data)=>{
 
-const room = io.sockets.adapter.rooms.get(data.receiver);
-
-if(!room){
-
-return;
-
-}
-
 io.to(data.receiver).emit("incomingVoiceCall",{
 caller:data.caller
 });
