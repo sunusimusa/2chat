@@ -59,11 +59,41 @@ mongoose.connect(process.env.MONGO_URI)
    
    socket.inCall = false;
 
+   function getSocketByUsername(username){
+
+    for(const [,s] of io.of("/").sockets){
+
+        if(s.username === username){
+
+            return s;
+
+        }
+
+    }
+
+    return null;
+
+}
+
 socket.on("voiceCall",(data)=>{
 
-io.to(data.receiver).emit("incomingVoiceCall",{
-caller:data.caller
-});
+    const targetSocket = getSocketByUsername(data.receiver);
+
+    if(!targetSocket){
+        return;
+    }
+
+    if(targetSocket.inCall){
+
+        io.to(data.caller).emit("voiceCallBusy");
+
+        return;
+
+    }
+
+    io.to(data.receiver).emit("incomingVoiceCall",{
+        caller:data.caller
+    });
 
 });
 
