@@ -204,7 +204,16 @@ placeholder="Type a message..."></textarea>
 
 <span class="record-text">Recording...</span>
 
+
 </div>
+
+<audio id="ringtone" loop>
+    <source src="/sounds/ringtone.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="callingTone" loop>
+    <source src="/sounds/calling.mp3" type="audio/mpeg">
+</audio>
   
 <!-- REACTION POPUP -->
 
@@ -239,6 +248,8 @@ onclick="closeImage()">
 <img id="fullImage">
 
 </div>
+
+<audio id="remoteAudio" autoplay></audio>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/webrtc.js"></script>
