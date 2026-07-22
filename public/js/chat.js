@@ -1476,6 +1476,22 @@ document.getElementById("callerName").innerText = data.caller;
 
 });
 
+socket.on("incomingVideoCall",(data)=>{
+
+    callerName = data.caller;
+
+    ringtone.currentTime = 0;
+    ringtone.play().catch(()=>{});
+
+    document.getElementById("incomingCall").style.display = "flex";
+
+    document.querySelector("#incomingCall h3").innerText =
+    "📹 Incoming Video Call";
+
+    document.getElementById("callerName").innerText = data.caller;
+
+});
+
 async function acceptCall(){
 
 ringtone.pause();
