@@ -1569,3 +1569,24 @@ socket.on("voiceCallBusy",()=>{
     alert("User is busy.");
 
 });
+
+async function startVideoCall(){
+
+    document.getElementById("callScreen").style.display = "flex";
+
+    document.getElementById("callUser").innerText =
+    document.getElementById("chatUser").innerText;
+
+    document.getElementById("callStatus").innerText = "Calling...";
+
+    await createVideoOffer(receiver);
+
+    callingTone.currentTime = 0;
+    callingTone.play().catch(()=>{});
+
+    socket.emit("videoCall",{
+        caller: user.username,
+        receiver
+    });
+
+}
