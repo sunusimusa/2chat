@@ -249,62 +249,54 @@ function stopCallTimer(){
 
 function endCall(sendSignal = true){
 
-stopCallingAnimation();
-    
-clearTimeout(callTimeout);
-callTimeout = null;
+    stopCallingAnimation();
+
+    clearTimeout(callTimeout);
+    callTimeout = null;
+
     inCall = false;
-    
+
     stopCallTimer();
 
     document.getElementById("callScreen").style.display = "none";
 
     if(localStream){
-
         localStream.getTracks().forEach(track=>track.stop());
-
         localStream = null;
-
     }
 
     if(remoteStream){
-
         remoteStream.getTracks().forEach(track=>track.stop());
-
         remoteStream = null;
-
     }
 
     if(peerConnection){
-
         peerConnection.close();
-
         peerConnection = null;
-
     }
 
     document.getElementById("remoteAudio").srcObject = null;
 
-    socket.emit("endVoiceCall",{
-    receiver: remoteUser
-});
+    const remoteVideo = document.getElementById("remoteVideo");
+    if(remoteVideo){
+        remoteVideo.srcObject = null;
+    }
 
     ringtone.pause();
-ringtone.currentTime = 0;
+    ringtone.currentTime = 0;
 
-callingTone.pause();
-callingTone.currentTime = 0;
+    callingTone.pause();
+    callingTone.currentTime = 0;
 
+    if(sendSignal && remoteUser){
+
+        socket.emit("endVoiceCall",{
+            receiver: remoteUser
+        });
+
+    }
 
     console.log("📴 Call Ended");
-
-}
-
-if(sendSignal){
-
-    socket.emit("endVoiceCall",{
-        receiver: remoteUser
-    });
 
 }
 
@@ -386,6 +378,8 @@ function startCallingAnimation(){
 }
 
 async function createVideoOffer(receiver){
+
+    remoteUser = receiver;
 
     await createPeer();
 
