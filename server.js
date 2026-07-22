@@ -94,6 +94,9 @@ socket.on("voiceCall",(data)=>{
     // Kira ya shigo, ka sanya shi Busy nan take
     targetSocket.inCall = true;
 
+  activeCalls[data.caller] = data.receiver;
+activeCalls[data.receiver] = data.caller;
+
     io.to(data.receiver).emit("incomingVoiceCall",{
         caller:data.caller
     });
@@ -114,7 +117,16 @@ receiver:data.receiver
 
 socket.on("rejectVoiceCall",(data)=>{
 
-  socket.inCall = false;
+const callerSocket = getSocketByUsername(data.caller);
+
+if(callerSocket){
+    callerSocket.inCall = false;
+}
+
+delete activeCalls[data.caller];
+delete activeCalls[data.receiver];
+
+socket.inCall = false;
 
 io.to(data.caller).emit("voiceCallRejected",{
 
@@ -162,7 +174,19 @@ socket.on("webrtcAnswer",(data)=>{
 
    socket.on("endVoiceCall",(data)=>{
 
-     socket.inCall = false;
+    socket.inCall = false;
+
+    const otherSocket =
+    getSocketByUsername(data.receiver);
+
+    if(otherSocket){
+
+        otherSocket.inCall = false;
+
+    }
+
+    delete activeCalls[socket.username];
+    delete activeCalls[data.receiver];
 
     io.to(data.receiver).emit("voiceCallEnded");
 
@@ -221,12 +245,34 @@ io.to(data.sender).emit("messageSeen",{
 messageId:data.messageId
 });
 
-});    
+});
+
+const activeCalls = {};
 
 socket.on("disconnect", async () => {
 
-  socket.inCall = false;
-  
+  const partner = activeCalls[socket.username];
+
+if(partner){
+
+    const partnerSocket =
+    getSocketByUsername(partner);
+
+    if(partnerSocket){
+
+        partnerSocket.inCall = false;
+
+        io.to(partner).emit("voiceCallEnded");
+
+    }
+
+    delete activeCalls[socket.username];
+    delete activeCalls[partner];
+
+}
+
+socket.inCall = false;
+
 if(socket.username){
 
 await mongoose.model("User").updateOne(
