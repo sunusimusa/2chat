@@ -222,6 +222,7 @@ function endCall(sendSignal = true){
     
 clearTimeout(callTimeout);
 callTimeout = null;
+    inCall = false;
     
     stopCallTimer();
 
