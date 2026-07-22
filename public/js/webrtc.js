@@ -100,6 +100,23 @@ console.log("🎤 Microphone Ready");
 
 }
 
+async function startLocalVideo(){
+
+    localStream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+    });
+
+    document.getElementById("localVideo").srcObject = localStream;
+
+    localStream.getTracks().forEach(track=>{
+        peerConnection.addTrack(track, localStream);
+    });
+
+    console.log("📹 Camera Ready");
+
+}
+
 async function createOffer(receiver){
 
 remoteUser = receiver;
