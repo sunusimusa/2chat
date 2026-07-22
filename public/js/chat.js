@@ -40,6 +40,9 @@ try{
 const res = await fetch(`/api/users/profile/${receiver}`);
 const data = await res.json();
 
+const ringtone = document.getElementById("ringtone");
+const callingTone = document.getElementById("callingTone");   
+
 if(data.success){
 
 document.getElementById("chatUser").innerText =
@@ -1437,6 +1440,9 @@ async function startVoiceCall(){
 
     await createOffer(receiver);
 
+    callingTone.currentTime = 0;
+    callingTone.play().catch(()=>{});
+
     socket.emit("voiceCall",{
         caller: user.username,
         receiver
@@ -1448,6 +1454,9 @@ socket.on("incomingVoiceCall",(data)=>{
 
 callerName = data.caller;
 
+ringtone.currentTime = 0;
+ringtone.play().catch(()=>{});
+
 document.getElementById("incomingCall").style.display = "flex";
 
 document.getElementById("callerName").innerText = data.caller;
@@ -1455,6 +1464,12 @@ document.getElementById("callerName").innerText = data.caller;
 });
 
 async function acceptCall(){
+
+ringtone.pause();
+ringtone.currentTime = 0;
+
+callingTone.pause();
+callingTone.currentTime = 0;
 
     document.getElementById("incomingCall").style.display = "none";
 
@@ -1476,6 +1491,9 @@ async function acceptCall(){
 
 function rejectCall(){
 
+ringtone.pause();
+ringtone.currentTime = 0;
+
 document.getElementById("incomingCall").style.display = "none";
 
 socket.emit("rejectVoiceCall",{
@@ -1490,6 +1508,9 @@ receiver: user.username
 
 socket.on("voiceCallAccepted",()=>{
 
+callingTone.pause();
+callingTone.currentTime = 0;
+
 document.getElementById("callStatus").innerText =
 "Connected";
 
@@ -1498,6 +1519,9 @@ startCallTimer();
 });
 
 socket.on("voiceCallRejected",()=>{
+
+callingTone.pause();
+callingTone.currentTime = 0;
 
 stopCallTimer();
 
