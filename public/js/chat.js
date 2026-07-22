@@ -1432,7 +1432,8 @@ audio.addEventListener("loadedmetadata", updateDuration, { once:true });
 async function startVoiceCall(){
 
     document.getElementById("callScreen").style.display = "flex";
-
+    inCall = true;
+    
     document.getElementById("callUser").innerText =
     document.getElementById("chatUser").innerText;
     
@@ -1484,6 +1485,7 @@ callingTone.currentTime = 0;
     document.getElementById("incomingCall").style.display = "none";
 
     document.getElementById("callScreen").style.display = "flex";
+    inCall = true;
 
     document.getElementById("callUser").innerText = callerName;
 
