@@ -1434,6 +1434,8 @@ async function startVoiceCall(){
     document.getElementById("callScreen").style.display = "flex";
     inCall = true;
     
+    startCallingAnimation();
+    
     document.getElementById("callUser").innerText =
     document.getElementById("chatUser").innerText;
     
@@ -1524,6 +1526,8 @@ receiver: user.username
 
 socket.on("voiceCallAccepted",()=>{
 
+stopCallingAnimation();
+
 clearTimeout(callTimeout);
 callTimeout = null;
 
@@ -1550,6 +1554,8 @@ stopCallTimer();
 document.getElementById("callScreen").style.display = "none";
 
 alert("Call rejected.");
+
+stopCallingAnimation();
 
 });
 
