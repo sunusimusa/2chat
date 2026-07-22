@@ -56,6 +56,8 @@ mongoose.connect(process.env.MONGO_URI)
 
 
  io.on("connection",(socket)=>{
+   
+   socket.inCall = false;
 
 socket.on("voiceCall",(data)=>{
 
@@ -66,6 +68,8 @@ caller:data.caller
 });
 
 socket.on("acceptVoiceCall",(data)=>{
+  
+  socket.inCall = true;
 
 io.to(data.caller).emit("voiceCallAccepted",{
 
@@ -122,6 +126,8 @@ socket.on("webrtcAnswer",(data)=>{
 });
 
    socket.on("endVoiceCall",(data)=>{
+
+     socket.inCall = false;
 
     io.to(data.receiver).emit("voiceCallEnded");
 
