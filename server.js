@@ -91,6 +91,9 @@ socket.on("voiceCall",(data)=>{
 
     }
 
+    // Kira ya shigo, ka sanya shi Busy nan take
+    targetSocket.inCall = true;
+
     io.to(data.receiver).emit("incomingVoiceCall",{
         caller:data.caller
     });
@@ -110,6 +113,8 @@ receiver:data.receiver
 });
 
 socket.on("rejectVoiceCall",(data)=>{
+
+  socket.inCall = false;
 
 io.to(data.caller).emit("voiceCallRejected",{
 
