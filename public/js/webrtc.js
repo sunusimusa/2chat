@@ -10,6 +10,7 @@ let callSeconds = 0;
 let callInterval = null;
 let remoteUser = null;
 let isMuted = false;
+let speakerOn = true;
 
 const rtcConfig = {
 
@@ -297,3 +298,28 @@ function toggleMute(){
     }
 
 }
+
+function toggleSpeaker(){
+
+    const audio = document.getElementById("remoteAudio");
+
+    speakerOn = !speakerOn;
+
+    const icon = document.querySelector("#speakerBtn i");
+
+    if(speakerOn){
+
+        audio.volume = 1;
+
+        icon.className = "fa-solid fa-volume-high";
+
+    }else{
+
+        audio.volume = 0.3;
+
+        icon.className = "fa-solid fa-volume-low";
+
+    }
+
+}
+
