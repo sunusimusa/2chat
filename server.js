@@ -225,6 +225,8 @@ messageId:data.messageId
 
 socket.on("disconnect", async () => {
 
+  socket.inCall = false;
+  
 if(socket.username){
 
 await mongoose.model("User").updateOne(
