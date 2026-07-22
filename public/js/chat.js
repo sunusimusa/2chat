@@ -1442,6 +1442,16 @@ async function startVoiceCall(){
 
     callingTone.currentTime = 0;
     callingTone.play().catch(()=>{});
+    callTimeout = setTimeout(()=>{
+
+    callingTone.pause();
+    callingTone.currentTime = 0;
+
+    endCall();
+
+    alert("No answer");
+
+},30000);
 
     socket.emit("voiceCall",{
         caller: user.username,
@@ -1512,6 +1522,9 @@ receiver: user.username
 
 socket.on("voiceCallAccepted",()=>{
 
+clearTimeout(callTimeout);
+callTimeout = null;
+
 callingTone.pause();
 callingTone.currentTime = 0;
 
@@ -1523,6 +1536,9 @@ startCallTimer();
 });
 
 socket.on("voiceCallRejected",()=>{
+
+clearTimeout(callTimeout);
+callTimeout = null;
 
 callingTone.pause();
 callingTone.currentTime = 0;
