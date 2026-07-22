@@ -103,6 +103,16 @@ activeCalls[data.receiver] = data.caller;
 
 });
 
+   socket.on("videoCall",(data)=>{
+
+    io.to(data.receiver).emit("incomingVideoCall",{
+
+        caller: data.caller
+
+    });
+
+});
+
 socket.on("acceptVoiceCall",(data)=>{
   
   socket.inCall = true;
