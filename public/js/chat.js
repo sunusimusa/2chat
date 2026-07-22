@@ -1477,8 +1477,9 @@ callingTone.currentTime = 0;
 
     document.getElementById("callUser").innerText = callerName;
 
-    document.getElementById("callStatus").innerText = "Connecting...";
-
+    document.getElementById("callStatus").innerText = "Connected";
+    startCallTimer();
+    
     socket.emit("acceptVoiceCall",{
 
         caller: callerName,
@@ -1494,6 +1495,9 @@ function rejectCall(){
 ringtone.pause();
 ringtone.currentTime = 0;
 
+callingTone.pause();
+callingTone.currentTime = 0;
+    
 document.getElementById("incomingCall").style.display = "none";
 
 socket.emit("rejectVoiceCall",{
