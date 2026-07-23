@@ -13,7 +13,6 @@ let isMuted = false;
 let speakerOn = true;
 let callTimeout = null;
 let callingAnimation = null;
-let usingFrontCamera = true;
 let inCall = false;
 
 const rtcConfig = {
@@ -100,9 +99,7 @@ async function startLocalAudio(){
             echoCancellation: true,
             noiseSuppression: true,
             autoGainControl: true
-        },
-
-        video: false
+        }
 
     });
 
