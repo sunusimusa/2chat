@@ -174,4 +174,187 @@ onclick="startVoiceCall()">
 
 </div>
 
+    <!-- CHAT AREA -->
+
+<div id="chat" class="chat-container"></div>
+
+<!-- IMAGE PREVIEW -->
+
+<div
+id="previewBox"
+class="preview-box"
+style="display:none;">
+
+    <img id="previewImage">
+
+    <br><br>
+
+    <button onclick="removeImage()">
+        <i class="fa-solid fa-trash"></i>
+        Remove
+    </button>
+
+</div>
+
+<!-- REPLY PREVIEW -->
+
+<div
+id="replyPreview"
+class="reply-preview"
+style="display:none;">
+
+    <div class="reply-info">
+
+        <small>Replying to</small>
+
+        <p id="replyText"></p>
+
+    </div>
+
+    <button onclick="cancelReply()">
+
+        <i class="fa-solid fa-xmark"></i>
+
+    </button>
+
+</div>
+
+<!-- MESSAGE BAR -->
+
+<div class="message-bar">
+
+    <label for="image" class="icon-btn">
+
+        <i class="fa-solid fa-image"></i>
+
+    </label>
+
+    <input
+        type="file"
+        id="image"
+        accept="image/*"
+        hidden>
+
+    <textarea
+        id="message"
+        placeholder="Type a message..."></textarea>
+
+    <button
+        id="recordBtn"
+        onclick="toggleRecording()">
+
+        <i
+            id="recordIcon"
+            class="fa-solid fa-microphone"></i>
+
+    </button>
+
+    <button
+        id="stopRecordBtn"
+        onclick="stopRecording()"
+        style="display:none;">
+
+        <i class="fa-solid fa-stop"></i>
+
+    </button>
+
+    <button
+        id="sendVoiceBtn"
+        onclick="sendVoice()"
+        style="display:none;">
+
+        <i class="fa-solid fa-paper-plane"></i>
+
+    </button>
+
+</div>
+
+<!-- RECORDING BOX -->
+
+<div
+id="recordingBox"
+class="recording-box"
+style="display:none;">
+
+    <span class="record-dot"></span>
+
+    <span id="recordTime">00:00</span>
+
+    <span class="record-text">
+
+        Recording...
+
+    </span>
+
+</div>
+
+<!-- SOUNDS -->
+
+<audio id="ringtone" loop>
+
+    <source
+        src="/sounds/ringtone.mp3"
+        type="audio/mpeg">
+
+</audio>
+
+<audio id="callingTone" loop>
+
+    <source
+        src="/sounds/calling.mp3"
+        type="audio/mpeg">
+
+</audio>
+
+<!-- REACTION POPUP -->
+
+<div
+id="reactionPopup"
+class="reaction-popup">
+
+    <span onclick="selectReaction('❤️')">❤️</span>
+
+    <span onclick="selectReaction('👍')">👍</span>
+
+    <span onclick="selectReaction('😂')">😂</span>
+
+    <span onclick="selectReaction('😮')">😮</span>
+
+    <span onclick="selectReaction('😢')">😢</span>
+
+    <span onclick="selectReaction('😡')">😡</span>
+
+</div>
+
+<!-- IMAGE VIEWER -->
+
+<div
+id="imageViewer"
+class="image-viewer"
+style="display:none;">
+
+    <span
+        class="close-image"
+        onclick="closeImage()">
+
+        <i class="fa-solid fa-xmark"></i>
+
+    </span>
+
+    <img id="fullImage">
+
+</div>
+
+<!-- JAVASCRIPT -->
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script src="/js/webrtc.js"></script>
+
+<script src="/js/chat.js"></script>
+
+</body>
+
+</html>
+
 </header>
