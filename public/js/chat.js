@@ -1484,22 +1484,20 @@ async function acceptCall(){
     callingTone.pause();
     callingTone.currentTime = 0;
 
-    document.getElementById("incomingCall").style.display = "none";
+    clearTimeout(callTimeout);
 
+    document.getElementById("incomingCall").style.display = "none";
     document.getElementById("callScreen").style.display = "flex";
 
     document.getElementById("callUser").innerText = callerName;
-
     document.getElementById("callStatus").innerText = "Connecting...";
 
-    // Muhimmi sosai
-    
+    remoteUser = callerName;
+    inCall = true;
+
     socket.emit("acceptVoiceCall",{
-
         caller: callerName,
-
         receiver: user.username
-
     });
 
 }
@@ -1527,6 +1525,7 @@ receiver: user.username
 socket.on("voiceCallAccepted",()=>{
 
     clearTimeout(callTimeout);
+    callTimeout = null;
 
     callingTone.pause();
     callingTone.currentTime = 0;
@@ -1534,6 +1533,12 @@ socket.on("voiceCallAccepted",()=>{
     stopCallingAnimation();
 
     document.getElementById("callStatus").innerText = "Connected";
+
+    if(!callInterval){
+        startCallTimer();
+    }
+
+    inCall = true;
 
 });
 
