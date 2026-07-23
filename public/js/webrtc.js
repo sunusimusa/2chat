@@ -44,14 +44,6 @@ peerConnection.ontrack = (event)=>{
 
     document.getElementById("remoteAudio").srcObject = remoteStream;
 
-    const remoteVideo = document.getElementById("remoteVideo");
-
-    if(remoteVideo){
-
-        remoteVideo.srcObject = remoteStream;
-
-    }
-
     document.getElementById("remoteAudio").play().catch(()=>{});
 
 };
@@ -121,34 +113,6 @@ async function startLocalAudio(){
     });
 
     console.log("🎤 Local Audio Ready");
-
-}
-
-async function startLocalVideo(){
-
-    localStream = await navigator.mediaDevices.getUserMedia({
-
-        video:{
-            facingMode:"user"
-        },
-
-        audio:{
-            echoCancellation:true,
-            noiseSuppression:true,
-            autoGainControl:true
-        }
-
-    });
-
-    document.getElementById("localVideo").srcObject = localStream;
-
-    localStream.getTracks().forEach(track=>{
-
-        peerConnection.addTrack(track, localStream);
-
-    });
-
-    console.log("📹 Local Video Ready");
 
 }
 
@@ -295,11 +259,6 @@ function endCall(sendSignal = true){
 
     document.getElementById("remoteAudio").srcObject = null;
 
-    const remoteVideo = document.getElementById("remoteVideo");
-    if(remoteVideo){
-        remoteVideo.srcObject = null;
-    }
-
     ringtone.pause();
     ringtone.currentTime = 0;
 
@@ -395,67 +354,3 @@ function startCallingAnimation(){
 
 }
 
-async function createVideoOffer(receiver){
-
-    remoteUser = receiver;
-
-    await createPeer();
-
-    await startLocalVideo();
-
-    const offer = await peerConnection.createOffer();
-
-    await peerConnection.setLocalDescription(offer);
-
-    socket.emit("webrtcOffer",{
-        receiver,
-        offer
-    });
-
-    console.log("📹 Video Offer Sent");
-
-}
-
-async function switchCamera(){
-
-    if(!peerConnection) return;
-
-    usingFrontCamera = !usingFrontCamera;
-
-    // Kashe tsohuwar camera
-    if(localStream){
-        localStream.getTracks().forEach(track=>track.stop());
-    }
-
-    // Buɗe sabuwar camera
-    localStream = await navigator.mediaDevices.getUserMedia({
-
-        video:{
-            facingMode: usingFrontCamera ? "user" : "environment"
-        },
-
-        audio:true
-
-    });
-
-    // Nuna local video
-    document.getElementById("localVideo").srcObject = localStream;
-
-    // Maye gurbin video track a PeerConnection
-    const videoTrack = localStream.getVideoTracks()[0];
-
-    const sender = peerConnection.getSenders().find(sender=>{
-
-        return sender.track && sender.track.kind === "video";
-
-    });
-
-    if(sender){
-
-        await sender.replaceTrack(videoTrack);
-
-    }
-
-    console.log("📹 Camera Switched");
-
-}
