@@ -158,27 +158,43 @@ socket.on("webrtcOffer",(data)=>{
 
 });
 
-socket.on("webrtcAnswer",(data)=>{
+socket.on("webrtcAnswer", async(data)=>{
 
-    io.to(data.receiver).emit("webrtcAnswer",{
+    try{
 
-        sender: socket.username,
-        receiver: data.receiver,
-        answer: data.answer
+        await peerConnection.setRemoteDescription(
+            new RTCSessionDescription(data.answer)
+        );
 
-    });
+        console.log("✅ Remote Answer Set");
+
+    }catch(err){
+
+        console.error("Answer Error:", err);
+
+    }
 
 });
 
-socket.on("iceCandidate",(data)=>{
+socket.on("iceCandidate", async(data)=>{
 
-    io.to(data.receiver).emit("iceCandidate",{
+    try{
 
-        sender: socket.username,
-        receiver: data.receiver,
-        candidate: data.candidate
+        if(peerConnection && data.candidate){
 
-    });
+            await peerConnection.addIceCandidate(
+                new RTCIceCandidate(data.candidate)
+            );
+
+            console.log("🧊 ICE Added");
+
+        }
+
+    }catch(err){
+
+        console.error("ICE Error:", err);
+
+    }
 
 });
 
