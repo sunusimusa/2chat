@@ -1571,3 +1571,14 @@ socket.on("voiceCallBusy",()=>{
 
 });
 
+socket.on("voiceCallEnded",()=>{
+
+    ringtone.pause();
+    ringtone.currentTime = 0;
+
+    callingTone.pause();
+    callingTone.currentTime = 0;
+
+    endCall(false);
+
+});
