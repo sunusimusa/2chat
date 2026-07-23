@@ -1476,22 +1476,6 @@ document.getElementById("callerName").innerText = data.caller;
 
 });
 
-socket.on("incomingVideoCall",(data)=>{
-
-    callerName = data.caller;
-
-    ringtone.currentTime = 0;
-    ringtone.play().catch(()=>{});
-
-    document.getElementById("incomingCall").style.display = "flex";
-
-    document.querySelector("#incomingCall h3").innerText =
-    "📹 Incoming Video Call";
-
-    document.getElementById("callerName").innerText = data.caller;
-
-});
-
 async function acceptCall(){
 
     ringtone.pause();
@@ -1581,43 +1565,4 @@ socket.on("voiceCallBusy",()=>{
     alert("User is busy.");
 
 });
-
-async function startVideoCall(){
-
-    document.getElementById("callScreen").style.display = "flex";
-
-    document.getElementById("callUser").innerText =
-    document.getElementById("chatUser").innerText;
-
-    document.getElementById("callStatus").innerText = "Calling...";
-
-    await createVideoOffer(receiver);
-
-    callingTone.currentTime = 0;
-    callingTone.play().catch(()=>{});
-
-    socket.emit("videoCall",{
-        caller: user.username,
-        receiver
-    });
-
-}
-
-async function acceptVideoCall(){
-
-    ringtone.pause();
-    ringtone.currentTime = 0;
-
-    document.getElementById("incomingCall").style.display = "none";
-
-    document.getElementById("callScreen").style.display = "flex";
-
-    document.getElementById("callUser").innerText = callerName;
-
-    document.getElementById("callStatus").innerText = "Connecting...";
-
-    await startLocalVideo();
-
-}
-
 
