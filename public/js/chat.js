@@ -1494,22 +1494,25 @@ socket.on("incomingVideoCall",(data)=>{
 
 async function acceptCall(){
 
-ringtone.pause();
-ringtone.currentTime = 0;
+    ringtone.pause();
+    ringtone.currentTime = 0;
 
-callingTone.pause();
-callingTone.currentTime = 0;
+    callingTone.pause();
+    callingTone.currentTime = 0;
 
     document.getElementById("incomingCall").style.display = "none";
 
     document.getElementById("callScreen").style.display = "flex";
-    inCall = true;
 
     document.getElementById("callUser").innerText = callerName;
 
-    document.getElementById("callStatus").innerText = "Connected";
-    startCallTimer();
-    
+    document.getElementById("callStatus").innerText = "Connecting...";
+
+    // Muhimmi sosai
+    await createPeer();
+
+    await startLocalAudio();
+
     socket.emit("acceptVoiceCall",{
 
         caller: callerName,
@@ -1542,18 +1545,14 @@ receiver: user.username
 
 socket.on("voiceCallAccepted",()=>{
 
-stopCallingAnimation();
+    clearTimeout(callTimeout);
 
-clearTimeout(callTimeout);
-callTimeout = null;
+    callingTone.pause();
+    callingTone.currentTime = 0;
 
-callingTone.pause();
-callingTone.currentTime = 0;
+    stopCallingAnimation();
 
-document.getElementById("callStatus").innerText =
-"Connected";
-
-startCallTimer();
+    document.getElementById("callStatus").innerText = "Connected";
 
 });
 
