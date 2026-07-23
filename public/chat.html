@@ -18,9 +18,16 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 
 <body>
 
-    <div id="callScreen" class="call-screen" style="display:none;">
+<!-- ===================== -->
+<!-- Voice Call Screen -->
+<!-- ===================== -->
 
-    <img id="callAvatar" src="/images/default.png" class="call-avatar">
+<div id="callScreen" class="call-screen" style="display:none;">
+
+    <img
+        id="callAvatar"
+        src="/images/default.png"
+        class="call-avatar">
 
     <h2 id="callUser">Calling...</h2>
 
@@ -28,75 +35,88 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 
     <h3 id="callTimer">00:00</h3>
 
-    <audio id="remoteAudio" autoplay></audio>
-
-        <div class="video-container">
-
-    <video
-        id="remoteVideo"
-        autoplay
-        playsinline
-    ></video>
-
-    <video
-        id="localVideo"
-        autoplay
-        muted
-        playsinline
-    ></video>
-
-</div>
+    <audio
+        id="remoteAudio"
+        autoplay>
+    </audio>
 
     <div class="call-actions">
 
-        <button id="muteBtn" onclick="toggleMute()">
+        <button
+            id="muteBtn"
+            onclick="toggleMute()">
+
             <i class="fa-solid fa-microphone"></i>
+
         </button>
 
-        <button id="speakerBtn" onclick="toggleSpeaker()">
+        <button
+            id="speakerBtn"
+            onclick="toggleSpeaker()">
+
             <i class="fa-solid fa-volume-high"></i>
+
         </button>
 
-        <button id="switchCameraBtn" onclick="switchCamera()">
-            <i class="fa-solid fa-rotate"></i>
-        </button>
+        <button
+            id="endCallBtn"
+            onclick="endCall()">
 
-        <button id="endCallBtn" onclick="endCall()">
             <i class="fa-solid fa-phone-slash"></i>
+
         </button>
 
     </div>
 
 </div>
 
-<div id="incomingCall" class="incoming-call">
+<!-- ===================== -->
+<!-- Incoming Call -->
+<!-- ===================== -->
+
+<div
+id="incomingCall"
+class="incoming-call"
+style="display:none;">
 
 <h3>📞 Incoming Voice Call</h3>
 
-<img id="callerAvatar" src="/images/default.png">
+<img
+id="callerAvatar"
+src="/images/default.png">
 
 <h2 id="callerName"></h2>
 
 <div class="call-buttons">
 
 <button onclick="acceptCall()">
+
 ✅ Accept
+
 </button>
 
 <button onclick="rejectCall()">
+
 ❌ Reject
+
 </button>
 
 </div>
 
 </div>
 
+<!-- ===================== -->
 <!-- HEADER -->
+<!-- ===================== -->
 
 <header class="chat-header">
 
-<button class="back-btn" onclick="history.back()">
+<button
+class="back-btn"
+onclick="history.back()">
+
 <i class="fa-solid fa-arrow-left"></i>
+
 </button>
 
 <div class="chat-user">
@@ -108,16 +128,28 @@ class="chat-avatar">
 
 <div class="chat-info">
 
-<h3 id="chatUser">Loading...</h3>
+<h3 id="chatUser">
+
+Loading...
+
+</h3>
 
 <p id="status">
+
 <i class="fa-solid fa-circle online-dot"></i>
+
 Offline
+
 </p>
 
-<p id="typing" style="display:none;">
+<p
+id="typing"
+style="display:none;">
+
 <i class="fa-solid fa-pen"></i>
+
 Typing...
+
 </p>
 
 </div>
@@ -126,154 +158,20 @@ Typing...
 
 <div class="header-actions">
 
-<button class="header-btn" onclick="startVoiceCall()">
-    <i class="fa-solid fa-phone"></i>
+<button
+class="header-btn"
+onclick="startVoiceCall()">
+
+<i class="fa-solid fa-phone"></i>
+
 </button>
 
-<button class="header-btn" onclick="startVideoCall()">
-    <i class="fa-solid fa-video"></i>
-</button>
-  
 <button class="header-btn">
+
 <i class="fa-solid fa-ellipsis-vertical"></i>
+
 </button>
 
 </div>
 
 </header>
-
-<!-- CHAT AREA -->
-
-<div id="chat" class="chat-container"></div>
-
-<!-- IMAGE PREVIEW -->
-
-<div
-id="previewBox"
-class="preview-box"
-style="display:none;">
-
-<img id="previewImage">
-
-<br><br>
-
-<button onclick="removeImage()">
-<i class="fa-solid fa-trash"></i>
-Remove
-</button>
-
-</div>
-
-<!-- MESSAGE BAR -->
-
-<div id="replyPreview" class="reply-preview" style="display:none;">
-
-<div class="reply-info">
-
-<small>Replying to</small>
-
-<p id="replyText"></p>
-
-</div>
-
-<button onclick="cancelReply()">
-
-<i class="fa-solid fa-xmark"></i>
-
-</button>
-
-</div>
-
-  <div class="message-bar">
-
-<label for="image" class="icon-btn">
-    <i class="fa-solid fa-image"></i>
-</label>
-
-<input
-type="file"
-id="image"
-accept="image/*"
-hidden>
-
-<textarea
-id="message"
-placeholder="Type a message..."></textarea>
-
-<button id="recordBtn" onclick="toggleRecording()">
-    <i id="recordIcon" class="fa-solid fa-microphone"></i>
-</button>
-
-<button id="stopRecordBtn"
-        onclick="stopRecording()">
-    <i class="fa-solid fa-stop"></i>
-</button>
-
-<button id="sendVoiceBtn"
-        onclick="sendVoice()"
-        style="display:none;">
-    <i class="fa-solid fa-paper-plane"></i>
-</button>
-
-</div>
-
-<div id="recordingBox" class="recording-box" style="display:none;">
-
-<span class="record-dot"></span>
-
-<span id="recordTime">00:00</span>
-
-<span class="record-text">Recording...</span>
-
-
-</div>
-
-<audio id="ringtone" loop>
-    <source src="/sounds/ringtone.mp3" type="audio/mpeg">
-</audio>
-
-<audio id="callingTone" loop>
-    <source src="/sounds/calling.mp3" type="audio/mpeg">
-</audio>
-  
-<!-- REACTION POPUP -->
-
-<div
-id="reactionPopup"
-class="reaction-popup">
-
-<span onclick="selectReaction('❤️')">❤️</span>
-<span onclick="selectReaction('👍')">👍</span>
-<span onclick="selectReaction('😂')">😂</span>
-<span onclick="selectReaction('😮')">😮</span>
-<span onclick="selectReaction('😢')">😢</span>
-<span onclick="selectReaction('😡')">😡</span>
-
-</div>
-
-<!-- IMAGE VIEWER -->
-
-<div
-id="imageViewer"
-class="image-viewer"
-style="display:none;">
-
-<span
-class="close-image"
-onclick="closeImage()">
-
-<i class="fa-solid fa-xmark"></i>
-
-</span>
-
-<img id="fullImage">
-
-</div>
-
-<script src="/socket.io/socket.io.js"></script>
-<script src="/js/webrtc.js"></script>
-<script src="/js/chat.js"></script>
-
-</body>
-
-</html>
