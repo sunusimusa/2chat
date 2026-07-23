@@ -79,12 +79,12 @@ candidate: event.candidate
     if(peerConnection.iceConnectionState === "connected" ||
        peerConnection.iceConnectionState === "completed"){
 
+        stopCallingAnimation();
+
         clearTimeout(callTimeout);
 
         callingTone.pause();
         callingTone.currentTime = 0;
-
-        stopCallingAnimation();
 
         document.getElementById("callStatus").innerText = "Connected";
 
