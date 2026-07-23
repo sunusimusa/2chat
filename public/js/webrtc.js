@@ -67,8 +67,10 @@ candidate: event.candidate
 
     console.log("ICE:", peerConnection.iceConnectionState);
 
-    if(peerConnection.iceConnectionState === "connected" ||
-       peerConnection.iceConnectionState === "completed"){
+    if(
+        peerConnection.iceConnectionState === "connected" ||
+        peerConnection.iceConnectionState === "completed"
+    ){
 
         stopCallingAnimation();
 
@@ -82,6 +84,15 @@ candidate: event.candidate
         if(!callInterval){
             startCallTimer();
         }
+
+    }
+    else if(
+        peerConnection.iceConnectionState === "disconnected" ||
+        peerConnection.iceConnectionState === "failed" ||
+        peerConnection.iceConnectionState === "closed"
+    ){
+
+        endCall(false);
 
     }
 
