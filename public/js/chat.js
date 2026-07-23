@@ -1509,10 +1509,7 @@ async function acceptCall(){
     document.getElementById("callStatus").innerText = "Connecting...";
 
     // Muhimmi sosai
-    await createPeer();
-
-    await startLocalAudio();
-
+    
     socket.emit("acceptVoiceCall",{
 
         caller: callerName,
