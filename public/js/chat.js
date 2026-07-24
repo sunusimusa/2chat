@@ -15,16 +15,11 @@ let audioChunks = [];
 let audioBlob = null;
 let paused = false;
 
-let callerName = "";
-
 if (!user) {
     location.href = "/login.html";
 }
 
 const socket = io();
-
-const ringtone = document.getElementById("ringtone");
-const callingTone = document.getElementById("callingTone");   
 
 socket.emit("join", user.username);
 
