@@ -1512,6 +1512,8 @@ callingTone.currentTime = 0;
     
 document.getElementById("incomingCall").style.display = "none";
 
+inCall = false;
+    
 socket.emit("rejectVoiceCall",{
 
 caller: callerName,
@@ -1556,6 +1558,8 @@ socket.on("voiceCallRejected",()=>{
 
     document.getElementById("callScreen").style.display = "none";
 
+    inCall = false;
+    
     alert("Call rejected.");
 
 });
