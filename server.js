@@ -112,49 +112,22 @@ messageId:data.messageId
 
 });
 
-const activeCalls = {};
-
 socket.on("disconnect", async () => {
 
-  const partner = activeCalls[socket.username];
+    if(socket.username){
 
-if(partner){
+        await mongoose.model("User").updateOne(
+        { username: socket.username },
+        {
+            online: false,
+            lastSeen: new Date()
+        });
 
-    const partnerSocket =
-    getSocketByUsername(partner);
-
-    if(partnerSocket){
-
-        partnerSocket.inCall = false;
-
-        io.to(partner).emit("voiceCallEnded");
+        io.emit("userOffline", socket.username);
 
     }
 
-    delete activeCalls[socket.username];
-    delete activeCalls[partner];
-
-}
-
-socket.inCall = false;
-
-if(socket.username){
-
-await mongoose.model("User").updateOne(
-{ username: socket.username },
-{
-online: false,
-lastSeen: new Date()
-}
-);
-
-io.emit("userOffline", socket.username);
-
-}
-
-console.log("🔴 User Disconnected");
-
-});
+    console.log("🔴 User Disconnected");
 
 });
 
