@@ -117,11 +117,12 @@ socket.on("disconnect", async () => {
     if(socket.username){
 
         await mongoose.model("User").updateOne(
-        { username: socket.username },
-        {
-            online: false,
-            lastSeen: new Date()
-        });
+            { username: socket.username },
+            {
+                online: false,
+                lastSeen: new Date()
+            }
+        );
 
         io.emit("userOffline", socket.username);
 
@@ -131,17 +132,20 @@ socket.on("disconnect", async () => {
 
 });
 
+}); // <-- Wannan yana rufe io.on("connection")
+
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
 
-console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
 
 });
 
-})
+}) // <-- Wannan yana rufe .then()
+
 .catch((err)=>{
 
-console.error("❌ MongoDB Error:", err.message);
+    console.error("❌ MongoDB Error:", err.message);
 
-});  
+});
