@@ -239,6 +239,8 @@ function stopCallTimer(){
 
 function endCall(sendSignal = true){
 
+    console.log("END CALL CLICKED");
+
     stopCallingAnimation();
 
     clearTimeout(callTimeout);
