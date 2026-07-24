@@ -4,7 +4,6 @@
 <head>
 
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>2Chat Chat</title>
@@ -17,91 +16,6 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 </head>
 
 <body>
-
-<!-- ===================== -->
-<!-- Voice Call Screen -->
-<!-- ===================== -->
-
-<div id="callScreen" class="call-screen" style="display:none;">
-
-    <img
-        id="callAvatar"
-        src="/images/default.png"
-        class="call-avatar">
-
-    <h2 id="callUser">Calling...</h2>
-
-    <p id="callStatus">Connecting...</p>
-
-    <h3 id="callTimer">00:00</h3>
-
-    <audio
-        id="remoteAudio"
-        autoplay>
-    </audio>
-
-    <div class="call-actions">
-
-        <button
-            id="muteBtn"
-            onclick="toggleMute()">
-
-            <i class="fa-solid fa-microphone"></i>
-
-        </button>
-
-        <button
-            id="speakerBtn"
-            onclick="toggleSpeaker()">
-
-            <i class="fa-solid fa-volume-high"></i>
-
-        </button>
-
-        <button id="endCallBtn" onclick="endCall(true)">
-        
-            <i class="fa-solid fa-phone-slash"></i>
-
-        </button>
-
-    </div>
-
-</div>
-
-<!-- ===================== -->
-<!-- Incoming Call -->
-<!-- ===================== -->
-
-<div
-id="incomingCall"
-class="incoming-call"
-style="display:none;">
-
-<h3>📞 Incoming Voice Call</h3>
-
-<img
-id="callerAvatar"
-src="/images/default.png">
-
-<h2 id="callerName"></h2>
-
-<div class="call-buttons">
-
-<button onclick="acceptCall()">
-
-✅ Accept
-
-</button>
-
-<button onclick="rejectCall()">
-
-❌ Reject
-
-</button>
-
-</div>
-
-</div>
 
 <!-- ===================== -->
 <!-- HEADER -->
@@ -126,11 +40,7 @@ class="chat-avatar">
 
 <div class="chat-info">
 
-<h3 id="chatUser">
-
-Loading...
-
-</h3>
+<h3 id="chatUser">Loading...</h3>
 
 <p id="status">
 
@@ -156,14 +66,6 @@ Typing...
 
 <div class="header-actions">
 
-<button
-class="header-btn"
-onclick="startVoiceCall()">
-
-<i class="fa-solid fa-phone"></i>
-
-</button>
-
 <button class="header-btn">
 
 <i class="fa-solid fa-ellipsis-vertical"></i>
@@ -172,9 +74,9 @@ onclick="startVoiceCall()">
 
 </div>
 
- </header>
+</header>
 
-    <!-- CHAT AREA -->
+<!-- CHAT AREA -->
 
 <div id="chat" class="chat-container"></div>
 
@@ -185,14 +87,17 @@ id="previewBox"
 class="preview-box"
 style="display:none;">
 
-    <img id="previewImage">
+<img id="previewImage">
 
-    <br><br>
+<br><br>
 
-    <button onclick="removeImage()">
-        <i class="fa-solid fa-trash"></i>
-        Remove
-    </button>
+<button onclick="removeImage()">
+
+<i class="fa-solid fa-trash"></i>
+
+Remove
+
+</button>
 
 </div>
 
@@ -203,19 +108,19 @@ id="replyPreview"
 class="reply-preview"
 style="display:none;">
 
-    <div class="reply-info">
+<div class="reply-info">
 
-        <small>Replying to</small>
+<small>Replying to</small>
 
-        <p id="replyText"></p>
+<p id="replyText"></p>
 
-    </div>
+</div>
 
-    <button onclick="cancelReply()">
+<button onclick="cancelReply()">
 
-        <i class="fa-solid fa-xmark"></i>
+<i class="fa-solid fa-xmark"></i>
 
-    </button>
+</button>
 
 </div>
 
@@ -223,106 +128,88 @@ style="display:none;">
 
 <div class="message-bar">
 
-    <label for="image" class="icon-btn">
+<label for="image" class="icon-btn">
 
-        <i class="fa-solid fa-image"></i>
+<i class="fa-solid fa-image"></i>
 
-    </label>
+</label>
 
-    <input
-        type="file"
-        id="image"
-        accept="image/*"
-        hidden>
+<input
+type="file"
+id="image"
+accept="image/*"
+hidden>
 
-    <textarea
-        id="message"
-        placeholder="Type a message..."></textarea>
+<textarea
+id="message"
+placeholder="Type a message..."></textarea>
 
-    <button
-        id="recordBtn"
-        onclick="toggleRecording()">
+<button
+id="recordBtn"
+onclick="toggleRecording()">
 
-        <i
-            id="recordIcon"
-            class="fa-solid fa-microphone"></i>
+<i
+id="recordIcon"
+class="fa-solid fa-microphone"></i>
 
-    </button>
+</button>
 
-    <button
-        id="stopRecordBtn"
-        onclick="stopRecording()"
-        style="display:none;">
+<button
+id="stopRecordBtn"
+onclick="stopRecording()"
+style="display:none;">
 
-        <i class="fa-solid fa-stop"></i>
+<i class="fa-solid fa-stop"></i>
 
-    </button>
+</button>
 
-    <button
-        id="sendVoiceBtn"
-        onclick="sendVoice()"
-        style="display:none;">
+<button
+id="sendVoiceBtn"
+onclick="sendVoice()"
+style="display:none;">
 
-        <i class="fa-solid fa-paper-plane"></i>
+<i class="fa-solid fa-paper-plane"></i>
 
-    </button>
+</button>
 
 </div>
 
-<!-- RECORDING BOX -->
+<!-- RECORDING -->
 
 <div
 id="recordingBox"
 class="recording-box"
 style="display:none;">
 
-    <span class="record-dot"></span>
+<span class="record-dot"></span>
 
-    <span id="recordTime">00:00</span>
+<span id="recordTime">00:00</span>
 
-    <span class="record-text">
+<span class="record-text">
 
-        Recording...
+Recording...
 
-    </span>
+</span>
 
 </div>
 
-<!-- SOUNDS -->
-
-<audio id="ringtone" loop>
-
-    <source
-        src="/sounds/ringtone.mp3"
-        type="audio/mpeg">
-
-</audio>
-
-<audio id="callingTone" loop>
-
-    <source
-        src="/sounds/calling.mp3"
-        type="audio/mpeg">
-
-</audio>
-
-<!-- REACTION POPUP -->
+<!-- REACTION -->
 
 <div
 id="reactionPopup"
 class="reaction-popup">
 
-    <span onclick="selectReaction('❤️')">❤️</span>
+<span onclick="selectReaction('❤️')">❤️</span>
 
-    <span onclick="selectReaction('👍')">👍</span>
+<span onclick="selectReaction('👍')">👍</span>
 
-    <span onclick="selectReaction('😂')">😂</span>
+<span onclick="selectReaction('😂')">😂</span>
 
-    <span onclick="selectReaction('😮')">😮</span>
+<span onclick="selectReaction('😮')">😮</span>
 
-    <span onclick="selectReaction('😢')">😢</span>
+<span onclick="selectReaction('😢')">😢</span>
 
-    <span onclick="selectReaction('😡')">😡</span>
+<span onclick="selectReaction('😡')">😡</span>
 
 </div>
 
@@ -333,15 +220,15 @@ id="imageViewer"
 class="image-viewer"
 style="display:none;">
 
-    <span
-        class="close-image"
-        onclick="closeImage()">
+<span
+class="close-image"
+onclick="closeImage()">
 
-        <i class="fa-solid fa-xmark"></i>
+<i class="fa-solid fa-xmark"></i>
 
-    </span>
+</span>
 
-    <img id="fullImage">
+<img id="fullImage">
 
 </div>
 
@@ -349,11 +236,8 @@ style="display:none;">
 
 <script src="/socket.io/socket.io.js"></script>
 
-<script src="/js/webrtc.js"></script>
-
 <script src="/js/chat.js"></script>
 
 </body>
 
 </html>
-
