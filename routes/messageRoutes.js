@@ -1,44 +1,36 @@
-const router =
-require("express").Router();
+const router = require("express").Router();
 
-const upload =
-require("../middleware/upload");
+const upload = require("../middleware/upload");
 
 const {
-sendMessage,
-sendVoice,
-getMessages,
-getChats,
-reactMessage
+  sendMessage,
+  sendVoice,
+  getMessages,
+  getChats,
+  reactMessage
 } = require("../controllers/messageController");
 
-// Send Message
+// Send text/image
 router.post(
-"/send",
-upload.single("file"),
-sendMessage
+  "/send",
+  upload.single("file"),
+  sendMessage
 );
 
+// Send voice message
 router.post(
-"/voice",
-upload.single("voice"),
-sendVoice
+  "/voice",
+  upload.single("voice"),
+  sendVoice
 );
 
-// Get Chat
-router.get(
-"/chat",
-getMessages
-);
+// Get messages
+router.get("/chat", getMessages);
 
-router.get(
-"/list/:username",
-getChats
-);
+// Chat list
+router.get("/list/:username", getChats);
 
-router.put(
-"/react",
-reactMessage
-);
+// React
+router.put("/react", reactMessage);
 
 module.exports = router;
