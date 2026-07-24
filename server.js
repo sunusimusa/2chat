@@ -113,15 +113,21 @@ activeCalls[data.receiver] = data.caller;
 
 });
 
-socket.on("acceptVoiceCall",(data)=>{
-  
-  socket.inCall = true;
+   socket.on("acceptVoiceCall",(data)=>{
 
-io.to(data.caller).emit("voiceCallAccepted",{
+    socket.inCall = true;
 
-receiver:data.receiver
+    const callerSocket = getSocketByUsername(data.caller);
 
-});
+    if(callerSocket){
+        callerSocket.inCall = true;
+    }
+
+    io.to(data.caller).emit("voiceCallAccepted",{
+
+        receiver:data.receiver
+
+    });
 
 });
 
