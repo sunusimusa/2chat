@@ -3,15 +3,15 @@ const router = require("express").Router();
 const upload = require("../middleware/upload");
 
 const {
-    sendMessage,
-    sendVoice,
-    getMessages,
-    getChats,
-    reactMessage,
-    deleteMessage,
-    clearChat
+  sendMessage,
+  sendVoice,
+  getMessages,
+  getChats,
+  reactMessage,
+  deleteMessage,
+  clearChat,
+  deleteForEveryone
 } = require("../controllers/messageController");
-
 
 // ================= SEND =================
 
@@ -62,6 +62,11 @@ router.delete(
 router.delete(
     "/:id",
     deleteMessage
+);
+
+router.put(
+    "/delete-everyone/:id",
+    deleteForEveryone
 );
 
 
