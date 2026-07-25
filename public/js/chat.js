@@ -230,53 +230,53 @@ msg.voice ? `
 
 <div class="voice-player">
 
-<button class="voice-play">
+    <button class="voice-play">
+        <i class="fa-solid fa-play"></i>
+    </button>
 
-<i class="fa-solid fa-play"></i>
+    <div class="voice-wave">
 
-</button>
+        <div class="voice-bars">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
 
-<div class="voice-wave">
+        <div class="voice-progress"></div>
 
-<div class="voice-bars">
+    </div>
 
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
+    <span class="voice-time">
+        ${Math.floor((msg.voiceDuration || 0)/60)}:${String((msg.voiceDuration || 0)%60).padStart(2,"0")}
+    </span>
 
-</div>
-
-<div class="voice-progress"></div>
-
-</div>
-
-<span class="voice-time">
-${Math.floor((msg.voiceDuration || 0)/60)}:${String((msg.voiceDuration || 0)%60).padStart(2,"0")}
-</span>
-
-<audio class="voice-audio">
-
-<source src="${msg.voice}" type="audio/webm">
-
-</audio>
-
-</div>
+    <audio class="voice-audio">
+        <source src="${msg.voice}" type="audio/webm">
+    </audio>
 
 </div>
 
 ` : msg.text || ""}
+
+${msg.reactions && msg.reactions.length ? `
+<div class="message-reactions">
+    ${msg.reactions.map(r => `
+        <span>${r.emoji}</span>
+    `).join("")}
+</div>
+` : ""}
 
 <div class="message-time">
 
@@ -320,7 +320,7 @@ msg.delivered
 chat.appendChild(div);
 
 chat.scrollTop = chat.scrollHeight;
-    
+
 }
 
 async function loadMessages(autoScroll=true){
@@ -466,62 +466,70 @@ msg.voice ? `
 
 <div class="voice-player">
 
-<button class="voice-play">
-<i class="fa-solid fa-play"></i>
-</button>
+    <button class="voice-play">
+        <i class="fa-solid fa-play"></i>
+    </button>
 
-<div class="voice-wave">
+    <div class="voice-wave">
 
-<div class="voice-bars">
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-</div>
+        <div class="voice-bars">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
 
-<div class="voice-progress"></div>
+        <div class="voice-progress"></div>
 
-</div>
+    </div>
 
-<span class="voice-time">
-${Math.floor((msg.voiceDuration || 0)/60)}:${String((msg.voiceDuration || 0)%60).padStart(2,"0")}
-</span>
+    <span class="voice-time">
+        ${Math.floor((msg.voiceDuration || 0)/60)}:${String((msg.voiceDuration || 0)%60).padStart(2,"0")}
+    </span>
 
-<audio class="voice-audio">
-<source src="${msg.voice}" type="audio/webm">
-</audio>
+    <audio class="voice-audio">
+        <source src="${msg.voice}" type="audio/webm">
+    </audio>
 
 </div>
 
 ` : msg.text || ""}
 
+${msg.reactions && msg.reactions.length ? `
+<div class="message-reactions">
+    ${msg.reactions.map(r => `
+        <span>${r.emoji}</span>
+    `).join("")}
+</div>
+` : ""}
+
 <div class="message-time">
-${new Date(msg.createdAt).toLocaleTimeString([],{
+
+${msg.createdAt
+? new Date(msg.createdAt).toLocaleTimeString([],{
 hour:"2-digit",
 minute:"2-digit"
-})}
+})
+: ""}
+
 </div>
 
 ${
 mine
 ?
 `
-<br>
-
-<small
-class="message-status"
-data-status="${msg._id}">
+<small class="message-status">
 
 ${
 msg.seen
@@ -543,11 +551,13 @@ msg.delivered
 
 </div>
 
-</div>
-
 `;
 
-});
+chat.appendChild(div);
+
+chat.scrollTop = chat.scrollHeight;
+
+}
 
 const chat =
 document.getElementById("chat");
