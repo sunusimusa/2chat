@@ -3,38 +3,66 @@ const router = require("express").Router();
 const upload = require("../middleware/upload");
 
 const {
-  sendMessage,
-  sendVoice,
-  getMessages,
-  getChats,
-  reactMessage
+    sendMessage,
+    sendVoice,
+    getMessages,
+    getChats,
+    reactMessage,
+    deleteMessage,
+    clearChat
 } = require("../controllers/messageController");
 
-// Send text/image
+
+// ================= SEND =================
+
 router.post(
-  "/send",
-  upload.single("file"),
-  sendMessage
+    "/send",
+    upload.single("file"),
+    sendMessage
 );
 
-// Send voice message
 router.post(
-  "/voice",
-  upload.single("voice"),
-  sendVoice
+    "/voice",
+    upload.single("voice"),
+    sendVoice
 );
 
-// Get messages
-router.get("/chat", getMessages);
 
-// Chat list
-router.get("/list/:username", getChats);
+// ================= GET =================
 
-// React
-router.put("/react", reactMessage);
+router.get(
+    "/chat",
+    getMessages
+);
 
-router.delete("/:id", deleteMessage);
+router.get(
+    "/list/:username",
+    getChats
+);
 
-router.delete("/clear/:user1/:user2", clearChat);
+
+// ================= REACTION =================
+
+router.put(
+    "/react",
+    reactMessage
+);
+
+
+// ================= CLEAR CHAT =================
+
+router.delete(
+    "/clear/:user1/:user2",
+    clearChat
+);
+
+
+// ================= DELETE ONE MESSAGE =================
+
+router.delete(
+    "/:id",
+    deleteMessage
+);
+
 
 module.exports = router;
