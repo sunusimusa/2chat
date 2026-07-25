@@ -1092,38 +1092,36 @@ alert("Microphone permission denied.");
 
 function stopRecording(){
 
-if(!recording) return;
+    if(!recording) return;
 
-recording = false;
+    recording = false;
 
-clearInterval(recordTimer);
+    clearInterval(recordTimer);
 
-document.getElementById("message").style.display="block";
+    document.getElementById("message").style.display = "block";
 
-document.getElementById("recordingBox").style.display="none";
+    document.getElementById("recordingBox").style.display = "none";
 
-document.getElementById("stopRecordBtn").style.display="none";
+    document.getElementById("stopRecordBtn").style.display = "none";
 
-const sendBtn = document.getElementById("sendBtn");
+    document.getElementById("recordIcon").className =
+    "fa-solid fa-microphone";
 
-// Ka jira audioBlob ya gama ƙirƙiruwa kafin a nuna send
-if (mediaRecorder && mediaRecorder.state !== "inactive") {
-    mediaRecorder.onstop = () => {
+    if(mediaRecorder &&
+    mediaRecorder.state !== "inactive"){
 
-        audioBlob = new Blob(audioChunks, {
-            type: "audio/webm"
-        });
+        mediaRecorder.stop();
 
-        sendBtn.onclick = sendVoice;
-        sendBtn.style.display = "flex";
+    }
 
-    };
+    const sendBtn = document.getElementById("sendBtn");
 
-    mediaRecorder.stop();
-}
-    
-document.getElementById("recordIcon").className =
-"fa-solid fa-microphone";
+    sendBtn.style.display = "flex";
+
+    sendBtn.innerHTML =
+    '<i class="fa-solid fa-paper-plane"></i>';
+
+    sendBtn.onclick = sendVoice;
 
 }
 
@@ -1194,45 +1192,53 @@ document.getElementById("recordTime").innerText =
 
 async function sendVoice(){
 
-if(!audioBlob) return;
+    if(!audioBlob) return;
 
-const formData = new FormData();
+    const formData = new FormData();
 
-formData.append("voice", audioBlob, "voice.webm");
-formData.append("sender", user.username);
-formData.append("receiver", receiver);
-formData.append("duration", recordSeconds);
+    formData.append("voice", audioBlob, "voice.webm");
 
-const res = await fetch("/api/messages/voice",{
-method:"POST",
-body:formData
-});
+    formData.append("sender", user.username);
 
-const data = await res.json();
+    formData.append("receiver", receiver);
 
-if(data.success){
+    formData.append("duration", recordSeconds);
 
-socket.emit("newMessage", data.message);
+    const res = await fetch("/api/messages/voice",{
+        method:"POST",
+        body:formData
+    });
 
-loadMessages();
+    const data = await res.json();
 
-// Mayar da send button zuwa message
-const sendBtn = document.getElementById("sendBtn");
+    if(data.success){
 
-sendBtn.onclick = sendMessage;
-sendBtn.style.display = "flex";
+        socket.emit("newMessage", data.message);
 
-document.getElementById("recordIcon").className =
-"fa-solid fa-microphone";
+        loadMessages();
 
-audioBlob = null;
-recordSeconds = 0;
+        audioBlob = null;
+        recordSeconds = 0;
 
-}else{
+        document.getElementById("message").value = "";
+        document.getElementById("message").style.display = "block";
+        document.getElementById("recordingBox").style.display = "none";
 
-alert(data.message);
+        const sendBtn = document.getElementById("sendBtn");
 
-}
+        sendBtn.innerHTML =
+        '<i class="fa-solid fa-paper-plane"></i>';
+
+        sendBtn.onclick = sendMessage;
+
+        document.getElementById("recordIcon").className =
+        "fa-solid fa-microphone";
+
+    }else{
+
+        alert(data.message);
+
+    }
 
 }
 
