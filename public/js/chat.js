@@ -687,14 +687,14 @@ loadMessages();
 
 socket.on("receiveMessage",(msg)=>{
 
-if(
-msg.sender===receiver ||
-msg.receiver===receiver
-){
+    if(
+        msg.sender===receiver ||
+        msg.receiver===receiver
+    ){
 
-appendMessage(msg);
+        loadMessages();
 
-}
+    }
 
 });
 
@@ -1429,8 +1429,14 @@ async function deleteMessage(messageId){
     if(!confirm("Delete this message?")) return;
 
     const res = await fetch(`/api/messages/${messageId}`,{
-        method:"DELETE"
-    });
+    method:"DELETE",
+    headers:{
+        "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+        username:user.username
+    })
+});
 
     const data = await res.json();
 
