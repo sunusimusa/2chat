@@ -1460,3 +1460,26 @@ async function clearChat(){
 
 }
 
+function toggleChatMenu(){
+
+const menu = document.getElementById("chatMenu");
+
+menu.style.display =
+menu.style.display === "block"
+? "none"
+: "block";
+
+}
+
+document.addEventListener("click",(e)=>{
+
+if(
+!e.target.closest(".header-btn") &&
+!e.target.closest("#chatMenu")
+){
+
+document.getElementById("chatMenu").style.display = "none";
+
+}
+
+});
