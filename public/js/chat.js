@@ -746,34 +746,30 @@ document.getElementById("previewBox").style.display =
 
 }
 
-function showReaction(e,id){
+function showReaction(e, messageId){
 
-selectedMessage=id;
+    selectedMessage = messageId;
 
-const popup=
-document.getElementById("reactionPopup");
+    const popup = document.getElementById("reactionPopup");
 
-popup.style.display="block";
+    popup.style.display = "flex";
 
-const x =
-e.touches
-?
-e.touches[0].pageX
-:
-e.pageX;
+    let x, y;
 
-const y =
-e.touches
-?
-e.touches[0].pageY
-:
-e.pageY;
+    if(e.touches){
 
-popup.style.left=x+"px";
+        x = e.touches[0].pageX;
+        y = e.touches[0].pageY;
 
-popup.style.top=(y-60)+"px";
+    }else{
 
-e.preventDefault();
+        x = e.pageX;
+        y = e.pageY;
+
+    }
+
+    popup.style.left = (x - 120) + "px";
+    popup.style.top = (y - 70) + "px";
 
 }
 
@@ -801,16 +797,13 @@ document.getElementById("imageViewer").style.display = "none";
 
 async function selectReaction(emoji){
 
-document.getElementById(
-"reactionPopup"
-).style.display="none";
+    document.getElementById("reactionPopup").style.display = "none";
 
-await reactMessage(
-selectedMessage,
-emoji
-);
+    document.getElementById("reactionPopup").style.transform = "";
 
-selectedMessage=null;
+    await reactMessage(selectedMessage, emoji);
+
+    selectedMessage = null;
 
 }
 
@@ -1509,10 +1502,12 @@ function reactSelected(){
 
     const popup = document.getElementById("reactionPopup");
 
-    popup.style.display = "block";
+    popup.style.display = "flex";
 
     popup.style.left = "50%";
+
     popup.style.top = "50%";
+
     popup.style.transform = "translate(-50%,-50%)";
 
 }
@@ -1573,3 +1568,21 @@ function deleteEveryoneSelected(){
     deleteForEveryone(selectedMsg._id);
 
 }
+
+document.addEventListener("click",(e)=>{
+
+    if(
+        !e.target.closest("#reactionPopup") &&
+        !e.target.closest(".message-menu")
+    ){
+
+        const popup = document.getElementById("reactionPopup");
+
+        popup.style.display = "none";
+
+        popup.style.transform = "";
+
+    }
+
+});
+
