@@ -220,7 +220,13 @@ msg.replyText || "Message"
 
 }
 
-${msg.voice ? `
+${msg.deletedForEveryone ? `
+<div class="deleted-message">
+    <i class="fa-solid fa-ban"></i>
+    This message was deleted
+</div>
+` :
+msg.voice ? `
 
 <div class="voice-player">
 
@@ -450,8 +456,15 @@ msg.replyText || "Message"
 
 }
 
-${msg.voice ? `
+${msg.deletedForEveryone ? `
+<div class="deleted-message">
+    <i class="fa-solid fa-ban"></i>
+    This message was deleted
+</div>
+` :
 
+${msg.voice ? `
+  
 <div class="voice-player">
 
 <button class="voice-play">
