@@ -909,19 +909,55 @@ document.getElementById("replyPreview").style.display =
 
 }
 
-function showMessageMenu(e,msg){
+function showMessageMenu(e, msg){
 
     e.preventDefault();
 
     selectedMsg = msg;
 
-    const menu = document.getElementById("messageMenu");
+    let action;
 
-    menu.style.display = "block";
+    if(msg.sender === user.username){
 
-    menu.style.left = e.pageX + "px";
+        action = prompt(
+`1 = Reply
+2 = React
+3 = Delete for me
+4 = Delete for everyone`
+        );
 
-    menu.style.top = e.pageY + "px";
+    }else{
+
+        action = prompt(
+`1 = Reply
+2 = React`
+        );
+
+    }
+
+    if(action === "1"){
+
+        startReply(msg);
+
+    }
+
+    else if(action === "2"){
+
+        showReaction(e,msg._id);
+
+    }
+
+    else if(action === "3"){
+
+        deleteMessage(msg._id);
+
+    }
+
+    else if(action === "4"){
+
+        deleteForEveryone(msg._id);
+
+    }
 
 }
 
