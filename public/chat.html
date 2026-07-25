@@ -17,6 +17,31 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 
 <body>
 
+  <!-- MESSAGE MENU -->
+<div id="messageMenu" class="message-menu">
+
+    <div onclick="replySelected()">
+        <i class="fa-solid fa-reply"></i>
+        Reply
+    </div>
+
+    <div onclick="reactSelected()">
+        <i class="fa-regular fa-face-smile"></i>
+        React
+    </div>
+
+    <div id="deleteMeOption" onclick="deleteSelected()">
+        <i class="fa-solid fa-trash"></i>
+        Delete for me
+    </div>
+
+    <div id="deleteAllOption" onclick="deleteEveryoneSelected()">
+        <i class="fa-solid fa-trash-can"></i>
+        Delete for everyone
+    </div>
+
+</div>
+
   <div id="chatMenu" class="chat-menu">
 
     <div onclick="clearChat()">
