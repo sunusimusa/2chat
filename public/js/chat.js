@@ -270,9 +270,9 @@ msg.voice ? `
 
 ` : msg.text || ""}
 
-${msg.reactions && msg.reactions.length ? `
+${(msg.reactions || []).length ? `
 <div class="message-reactions">
-    ${msg.reactions.map(r => `
+    ${(msg.reactions || []).map(r=>`
         <span>${r.emoji}</span>
     `).join("")}
 </div>
@@ -506,9 +506,9 @@ msg.voice ? `
 
 ` : msg.text || ""}
 
-${msg.reactions && msg.reactions.length ? `
+${(msg.reactions || []).length ? `
 <div class="message-reactions">
-    ${msg.reactions.map(r => `
+    ${(msg.reactions || []).map(r=>`
         <span>${r.emoji}</span>
     `).join("")}
 </div>
