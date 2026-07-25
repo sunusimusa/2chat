@@ -26,11 +26,11 @@ const socket = io();
 
 socket.emit("join", user.username);
 
-loadChatUser();
-
 const params = new URLSearchParams(window.location.search);
 
 const receiver = params.get("user");
+
+loadChatUser();
 
 async function loadChatUser(){
 
@@ -462,21 +462,17 @@ ${msg.deletedForEveryone ? `
     This message was deleted
 </div>
 ` :
+msg.voice ? `
 
-${msg.voice ? `
-  
 <div class="voice-player">
 
 <button class="voice-play">
-
 <i class="fa-solid fa-play"></i>
-
 </button>
 
 <div class="voice-wave">
 
 <div class="voice-bars">
-
 <span></span>
 <span></span>
 <span></span>
@@ -492,7 +488,6 @@ ${msg.voice ? `
 <span></span>
 <span></span>
 <span></span>
-
 </div>
 
 <div class="voice-progress"></div>
@@ -504,12 +499,8 @@ ${Math.floor((msg.voiceDuration || 0)/60)}:${String((msg.voiceDuration || 0)%60)
 </span>
 
 <audio class="voice-audio">
-
 <source src="${msg.voice}" type="audio/webm">
-
 </audio>
-
-</div>
 
 </div>
 
