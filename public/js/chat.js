@@ -34,40 +34,38 @@ loadChatUser();
 
 async function loadChatUser(){
 
-console.log("Step 1");
+    console.log("Receiver:", receiver);
 
-if(!receiver) return;
+    if(!receiver){
+        console.log("Receiver is empty");
+        return;
+    }
 
-try{
+    try{
 
-console.log("Step 2");
+        const res = await fetch(`/api/users/profile/${receiver}`);
 
-const res = await fetch(`/api/users/profile/${receiver}`);
+        console.log("Status:", res.status);
 
-console.log("Step 3");
+        const data = await res.json();
 
-const data = await res.json();
+        console.log("Response:", data);
 
-console.log(data);
+        if(data.success){
 
-if(data.success){
+            document.getElementById("chatUser").innerText =
+            data.user.username;
 
-document.getElementById("chatUser").innerText =
-data.user.username;
+            document.getElementById("chatAvatar").src =
+            data.user.avatar || "/images/default.png";
 
-document.getElementById("chatAvatar").src =
-data.user.avatar || "/images/default.png";
+        }
 
-}
+    }catch(err){
 
-}catch(err){
+        console.error("Fetch Error:", err);
 
-console.log(err);
-
-document.getElementById("chatUser").innerText =
-receiver;
-
-}
+    }
 
 }
 
