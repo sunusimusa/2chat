@@ -33,4 +33,8 @@ router.get("/list/:username", getChats);
 // React
 router.put("/react", reactMessage);
 
+router.delete("/:id", deleteMessage);
+
+router.delete("/clear/:user1/:user2", clearChat);
+
 module.exports = router;
