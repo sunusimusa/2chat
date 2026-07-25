@@ -914,42 +914,43 @@ showReaction(e,msg._id);
 
 }
 
-function touchStart(e,msg){
+function touchStart(e, msg){
 
-startX = e.touches[0].clientX;
+    startX = e.touches[0].clientX;
 
-currentBubble = e.currentTarget;
+    currentBubble = e.target.closest(".bubble-me, .bubble-other");
 
-swipeMessage = msg;
+    swipeMessage = msg;
+
+    if(currentBubble){
+        currentBubble.style.transition = "";
+    }
 
 }
 
 function touchMove(e){
 
-if(!currentBubble) return;
+    if(!currentBubble) return;
 
-const moveX = e.touches[0].clientX;
+    const moveX = e.touches[0].clientX;
 
-let diff = moveX - startX;
+    let diff = moveX - startX;
 
-// Hana swipe zuwa hagu kuma iyakance zuwa 80px
-diff = Math.max(0, Math.min(diff, 80));
+    // Da zarar ya motsa kadan (5px), fara swipe
+    diff = Math.max(0, Math.min(diff, 40));
 
-currentBubble.style.transform =
-`translateX(${diff}px)`;
+    currentBubble.style.transform = `translateX(${diff}px)`;
 
-// Reply icon animation
-const icon =
-currentBubble.querySelector(".reply-icon-inside");
+    const icon = currentBubble.querySelector(".reply-icon-inside");
 
-if(icon){
+    if(icon){
 
-icon.style.opacity = diff / 80;
+        icon.style.opacity = Math.min(diff / 20, 1);
 
-icon.style.transform =
-`translateY(-50%) scale(${0.5 + diff / 160})`;
+        icon.style.transform =
+        `translateY(-50%) scale(${0.8 + diff / 80})`;
 
-}
+    }
 
 }
 
@@ -975,7 +976,7 @@ icon.style.transform="translateY(-50%) scale(.4)";
 
 }
 
-if(moved > 70){
+if(moved > 10){
 
 navigator.vibrate?.(30);
 
