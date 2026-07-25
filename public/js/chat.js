@@ -956,58 +956,48 @@ function touchMove(e){
 
 function touchEnd(){
 
-if(!currentBubble) return;
+    if(!currentBubble) return;
 
-const moved =
-parseInt(
-currentBubble.style.transform.replace(/[^\d]/g,"")
-) || 0;
+    const style = currentBubble.style.transform;
 
-const icon =
-currentBubble.querySelector(".reply-icon-inside");
+    let moved = 0;
 
-currentBubble.style.transition=".2s";
-currentBubble.style.transform="translateX(0px)";
+    const match = style.match(/translateX\(([\d.]+)px\)/);
 
-if(icon){
+    if(match){
+        moved = parseFloat(match[1]);
+    }
 
-icon.style.opacity="0";
-icon.style.transform="translateY(-50%) scale(.4)";
+    const icon =
+    currentBubble.querySelector(".reply-icon-inside");
 
-}
+    currentBubble.style.transition = ".2s";
+    currentBubble.style.transform = "translateX(0px)";
 
-if(moved > 10){
+    if(icon){
+        icon.style.opacity = "0";
+        icon.style.transform = "translateY(-50%) scale(.4)";
+    }
 
-navigator.vibrate?.(30);
+    // Da zarar an ja fiye da 5px
+    if(moved >= 5){
 
-if(icon){
-icon.classList.add("reply-bounce");
-}
+        navigator.vibrate?.(30);
 
-setTimeout(()=>{
+        startReply(swipeMessage);
 
-if(icon){
-icon.classList.remove("reply-bounce");
-}
+    }
 
-startReply(swipeMessage);
+    setTimeout(()=>{
 
-},180);
+        if(currentBubble){
+            currentBubble.style.transition = "";
+        }
 
-}
+    },200);
 
-setTimeout(()=>{
-
-if(currentBubble){
-
-currentBubble.style.transition="";
-
-}
-
-},200);
-
-currentBubble = null;
-swipeMessage = null;
+    currentBubble = null;
+    swipeMessage = null;
 
 }
 
