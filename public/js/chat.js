@@ -34,12 +34,22 @@ loadChatUser();
 
 async function loadChatUser(){
 
+console.log("Step 1");
+
 if(!receiver) return;
 
 try{
 
+console.log("Step 2");
+
 const res = await fetch(`/api/users/profile/${receiver}`);
-const data = await res.json()
+
+console.log("Step 3");
+
+const data = await res.json();
+
+console.log(data);
+
 if(data.success){
 
 document.getElementById("chatUser").innerText =
