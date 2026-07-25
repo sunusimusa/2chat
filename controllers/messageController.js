@@ -431,27 +431,3 @@ exports.clearChat = async(req,res)=>{
 
 };
 
-async function clearChat(){
-
-    if(!confirm("Delete all messages?")) return;
-
-    const res = await fetch(
-        `/api/messages/clear/${user.username}/${receiver}`,
-        {
-            method:"DELETE"
-        }
-    );
-
-    const data = await res.json();
-
-    if(data.success){
-
-        loadMessages();
-
-    }else{
-
-        alert(data.message);
-
-    }
-
-}
