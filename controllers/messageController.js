@@ -380,3 +380,78 @@ message:err.message
 }
 
 };
+
+
+exports.deleteMessage = async(req,res)=>{
+
+    try{
+
+        await Message.findByIdAndDelete(req.params.id);
+
+        res.json({
+            success:true
+        });
+
+    }catch(err){
+
+        res.status(500).json({
+            success:false,
+            message:err.message
+        });
+
+    }
+
+};
+
+exports.clearChat = async(req,res)=>{
+
+    try{
+
+        const {user1,user2}=req.params;
+
+        await Message.deleteMany({
+            $or:[
+                {sender:user1,receiver:user2},
+                {sender:user2,receiver:user1}
+            ]
+        });
+
+        res.json({
+            success:true
+        });
+
+    }catch(err){
+
+        res.status(500).json({
+            success:false,
+            message:err.message
+        });
+
+    }
+
+};
+
+async function clearChat(){
+
+    if(!confirm("Delete all messages?")) return;
+
+    const res = await fetch(
+        `/api/messages/clear/${user.username}/${receiver}`,
+        {
+            method:"DELETE"
+        }
+    );
+
+    const data = await res.json();
+
+    if(data.success){
+
+        loadMessages();
+
+    }else{
+
+        alert(data.message);
+
+    }
+
+}
