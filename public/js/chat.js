@@ -1560,3 +1560,28 @@ document.addEventListener("click",(e)=>{
     }
 
 });
+
+async function deleteForEveryone(id){
+
+    if(!confirm("Delete this message for everyone?")) return;
+
+    const res = await fetch(
+        `/api/messages/delete-everyone/${id}`,
+        {
+            method:"PUT"
+        }
+    );
+
+    const data = await res.json();
+
+    if(data.success){
+
+        loadMessages();
+
+    }else{
+
+        alert(data.message);
+
+    }
+
+}
