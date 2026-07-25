@@ -1542,7 +1542,13 @@ async function deleteForEveryone(id){
     const res = await fetch(
         `/api/messages/delete-everyone/${id}`,
         {
-            method:"PUT"
+            method:"PUT",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                username:user.username
+            })
         }
     );
 
