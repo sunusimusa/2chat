@@ -1476,3 +1476,38 @@ document.getElementById("chatMenu").style.display = "none";
 }
 
 });
+
+            
+function replySelected(){
+
+    startReply(selectedMsg);
+
+    document.getElementById("messageMenu").style.display = "none";
+
+}
+
+function reactSelected(){
+
+    document.getElementById("messageMenu").style.display = "none";
+
+    showReaction(event, selectedMsg._id);
+
+}
+
+function deleteSelected(){
+
+    document.getElementById("messageMenu").style.display = "none";
+
+    deleteMessage(selectedMsg._id);
+
+}
+
+document.addEventListener("click",(e)=>{
+
+    if(!e.target.closest("#messageMenu")){
+
+        document.getElementById("messageMenu").style.display = "none";
+
+    }
+
+});
