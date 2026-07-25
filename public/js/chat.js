@@ -14,6 +14,9 @@ let mediaRecorder;
 let audioChunks = [];
 let audioBlob = null;
 let paused = false;
+let selectedMsg = null;
+
+
 
 if (!user) {
     location.href = "/login.html";
@@ -893,29 +896,19 @@ document.getElementById("replyPreview").style.display =
 
 }
 
-function showMessageMenu(e, msg){
+function showMessageMenu(e,msg){
 
     e.preventDefault();
 
-    const action = prompt(
-`1 = Reply
-2 = React
-3 = Delete`
-    );
+    selectedMsg = msg;
 
-    if(action === "1"){
+    const menu = document.getElementById("messageMenu");
 
-        startReply(msg);
+    menu.style.display = "block";
 
-    }else if(action === "2"){
+    menu.style.left = e.pageX + "px";
 
-        showReaction(e,msg._id);
-
-    }else if(action === "3"){
-
-        deleteMessage(msg._id);
-
-    }
+    menu.style.top = e.pageY + "px";
 
 }
 
