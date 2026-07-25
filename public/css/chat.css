@@ -1498,3 +1498,22 @@ width:22px;
 color:#1877f2;
 
 }
+
+
+.deleted-message{
+
+font-style:italic;
+opacity:.7;
+color:#777;
+display:flex;
+align-items:center;
+gap:8px;
+
+}
+
+.bubble-me .deleted-message{
+
+color:#fff;
+opacity:.8;
+
+}
