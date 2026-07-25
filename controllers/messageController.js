@@ -246,70 +246,100 @@ try{
 
 const { username } = req.params;
 
-const messages = await Message.find({
+// User
+const me = await User.findOne({ username });
 
+if(!me){
+
+return res.json({
+success:false,
+message:"User not found"
+});
+
+}
+
+// Duk users da suka taɓa yin chat
+const messages = await Message.find({
 $or:[
 {sender:username},
 {receiver:username}
 ]
-
 }).sort({createdAt:-1});
 
 const chats = {};
 
-for(const msg of messages){
+// Fara da friends
+for(const friend of me.friends){
 
-const otherUser =
-msg.sender===username
-?
-msg.receiver
-:
-msg.sender;
+const user = await User.findOne({ username:friend });
 
-if(!chats[otherUser]){
+if(user){
 
-const user = await User.findOne({
-
-username:otherUser
-
-});
-
-chats[otherUser]={
-
-username:user?user.username:otherUser,
-avatar:user?user.avatar:"",
-online:user?user.online:false,
-lastSeen:user?user.lastSeen:null,
-lastMessage:
-msg.text
-? msg.text
-: msg.voice
-? "🎤 Voice message"
-: msg.image
-? "📷 Photo"
-: "Message",
-
-time: msg.createdAt,
+chats[friend]={
+username:user.username,
+avatar:user.avatar,
+online:user.online,
+lastSeen:user.lastSeen,
+lastMessage:"",
+time:null
 };
 
 }
 
 }
 
-res.json({
+// Sannan a saka latest message idan akwai
+for(const msg of messages){
 
+const otherUser =
+msg.sender===username
+? msg.receiver
+: msg.sender;
+
+if(!chats[otherUser]){
+
+const user = await User.findOne({
+username:otherUser
+});
+
+if(!user) continue;
+
+chats[otherUser]={
+username:user.username,
+avatar:user.avatar,
+online:user.online,
+lastSeen:user.lastSeen,
+lastMessage:"",
+time:null
+};
+
+}
+
+chats[otherUser].lastMessage =
+msg.deletedForEveryone
+? "🚫 Message deleted"
+: msg.text
+? msg.text
+: msg.voice
+? "🎤 Voice message"
+: msg.image
+? "📷 Photo"
+: "Message";
+
+chats[otherUser].time = msg.createdAt;
+
+}
+
+res.json({
 success:true,
 chats:Object.values(chats)
-
 });
 
 }catch(err){
 
 res.status(500).json({
-
 success:false,
 message:err.message
-
 });
 
 }
