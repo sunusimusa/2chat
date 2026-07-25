@@ -1505,7 +1505,15 @@ function reactSelected(){
 
     document.getElementById("messageMenu").style.display = "none";
 
-    showReaction(event, selectedMsg._id);
+    selectedMessage = selectedMsg._id;
+
+    const popup = document.getElementById("reactionPopup");
+
+    popup.style.display = "block";
+
+    popup.style.left = "50%";
+    popup.style.top = "50%";
+    popup.style.transform = "translate(-50%,-50%)";
 
 }
 
