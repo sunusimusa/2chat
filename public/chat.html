@@ -17,6 +17,15 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 
 <body>
 
+  <div id="chatMenu" class="chat-menu">
+
+    <div onclick="clearChat()">
+        <i class="fa-solid fa-trash"></i>
+        Clear Chat
+    </div>
+
+</div>
+
 <!-- ===================== -->
 <!-- HEADER -->
 <!-- ===================== -->
@@ -66,12 +75,10 @@ Typing...
 
 <div class="header-actions">
 
-<button class="header-btn">
-
-<i class="fa-solid fa-ellipsis-vertical"></i>
-
+<button class="header-btn" onclick="toggleChatMenu()">
+    <i class="fa-solid fa-ellipsis-vertical"></i>
 </button>
-
+  
 </div>
 
 </header>
