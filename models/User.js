@@ -71,6 +71,11 @@ following:{
 }
 ],
 
+    blockedUsers: {
+    type: [String],
+    default: []
+},
+
     bio: {
       type: String,
       default: ""
