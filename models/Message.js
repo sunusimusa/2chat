@@ -72,6 +72,16 @@ deliveredAt:{
 type:Date
 },
 
+  deletedForEveryone: {
+    type: Boolean,
+    default: false
+},
+
+  deletedBy: {
+    type: String,
+    default: ""
+},
+
   seenAt:{
     type:Date
   }
