@@ -327,7 +327,11 @@ msg.delivered
 
 chat.appendChild(div);
 
-chat.scrollTop = chat.scrollHeight;
+requestAnimationFrame(() => {
+    chat.scrollTop = chat.scrollHeight;
+});
+
+loadVoiceDurations();
 
 }
 
