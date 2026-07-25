@@ -49,6 +49,8 @@ replyImage: replyImage || "",
 replyVoice: replyVoice || "",
 replyUser: replyUser || "",
 
+reactions: [],
+  
 delivered:true,
 deliveredAt:new Date()
 });
