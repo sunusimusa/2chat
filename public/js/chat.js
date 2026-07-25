@@ -893,24 +893,29 @@ document.getElementById("replyPreview").style.display =
 
 }
 
-function showMessageMenu(e,msg){
+function showMessageMenu(e, msg){
 
-e.preventDefault();
+    e.preventDefault();
 
-const action =
-prompt(
-"1 = Reply\n2 = React"
-);
+    const action = prompt(
+`1 = Reply
+2 = React
+3 = Delete`
+    );
 
-if(action==="1"){
+    if(action === "1"){
 
-startReply(msg);
+        startReply(msg);
 
-}else if(action==="2"){
+    }else if(action === "2"){
 
-showReaction(e,msg._id);
+        showReaction(e,msg._id);
 
-}
+    }else if(action === "3"){
+
+        deleteMessage(msg._id);
+
+    }
 
 }
 
@@ -1412,3 +1417,20 @@ audio.addEventListener("loadedmetadata", updateDuration, { once:true });
 
 }
 
+async function deleteMessage(messageId){
+
+    if(!confirm("Delete this message?")) return;
+
+    const res = await fetch(`/api/messages/${messageId}`,{
+        method:"DELETE"
+    });
+
+    const data = await res.json();
+
+    if(data.success){
+        loadMessages();
+    }else{
+        alert(data.message);
+    }
+
+}
