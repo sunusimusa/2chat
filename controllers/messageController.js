@@ -431,3 +431,46 @@ exports.clearChat = async(req,res)=>{
 
 };
 
+exports.deleteForEveryone = async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+        const { username } = req.body;
+
+        const message = await Message.findById(id);
+
+        if (!message) {
+            return res.json({
+                success: false,
+                message: "Message not found"
+            });
+        }
+
+        // Sai wanda ya tura saƙon kawai zai iya gogewa
+        if (message.sender !== username) {
+            return res.json({
+                success: false,
+                message: "Permission denied"
+            });
+        }
+
+        message.deletedForEveryone = true;
+        message.deletedBy = username;
+
+        await message.save();
+
+        res.json({
+            success: true
+        });
+
+    } catch (err) {
+
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+
+    }
+
+};
