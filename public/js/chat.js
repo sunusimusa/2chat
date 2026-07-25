@@ -900,55 +900,30 @@ document.getElementById("replyPreview").style.display =
 
 }
 
-function showMessageMenu(e, msg){
+function showMessageMenu(e,msg){
 
     e.preventDefault();
 
     selectedMsg = msg;
 
-    let action;
+    const menu = document.getElementById("messageMenu");
 
-    if(msg.sender === user.username){
+    if(msg.sender===user.username){
 
-        action = prompt(
-`1 = Reply
-2 = React
-3 = Delete for me
-4 = Delete for everyone`
-        );
+        document.getElementById("deleteMeOption").style.display="flex";
+        document.getElementById("deleteAllOption").style.display="flex";
 
     }else{
 
-        action = prompt(
-`1 = Reply
-2 = React`
-        );
+        document.getElementById("deleteMeOption").style.display="none";
+        document.getElementById("deleteAllOption").style.display="none";
 
     }
 
-    if(action === "1"){
+    menu.style.display="block";
 
-        startReply(msg);
-
-    }
-
-    else if(action === "2"){
-
-        showReaction(e,msg._id);
-
-    }
-
-    else if(action === "3"){
-
-        deleteMessage(msg._id);
-
-    }
-
-    else if(action === "4"){
-
-        deleteForEveryone(msg._id);
-
-    }
+    menu.style.left=e.pageX+"px";
+    menu.style.top=e.pageY+"px";
 
 }
 
@@ -1574,5 +1549,13 @@ async function deleteForEveryone(id){
         alert(data.message);
 
     }
+
+}
+
+function deleteEveryoneSelected(){
+
+    document.getElementById("messageMenu").style.display="none";
+
+    deleteForEveryone(selectedMsg._id);
 
 }
