@@ -1056,9 +1056,10 @@ document.getElementById("message").style.display="none";
 
 document.getElementById("recordingBox").style.display="flex";
 
-document.getElementById("stopRecordBtn").style.display="block";
+document.getElementById("stopRecordBtn").style.display = "block";
 
-document.getElementById("sendVoiceBtn").style.display="none";
+// Boye send button yayin recording
+document.getElementById("sendBtn").style.display = "none";
     
 recordSeconds = 0;
 
@@ -1103,17 +1104,26 @@ document.getElementById("recordingBox").style.display="none";
 
 document.getElementById("stopRecordBtn").style.display="none";
 
-document.getElementById("sendVoiceBtn").style.display="block";
+const sendBtn = document.getElementById("sendBtn");
+
+// Ka jira audioBlob ya gama ƙirƙiruwa kafin a nuna send
+if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    mediaRecorder.onstop = () => {
+
+        audioBlob = new Blob(audioChunks, {
+            type: "audio/webm"
+        });
+
+        sendBtn.onclick = sendVoice;
+        sendBtn.style.display = "flex";
+
+    };
+
+    mediaRecorder.stop();
+}
     
 document.getElementById("recordIcon").className =
 "fa-solid fa-microphone";
-
-if(mediaRecorder &&
-mediaRecorder.state !== "inactive"){
-
-mediaRecorder.stop();
-
-}
 
 }
 
@@ -1188,53 +1198,34 @@ if(!audioBlob) return;
 
 const formData = new FormData();
 
-formData.append(
-"voice",
-audioBlob,
-"voice.webm"
-);
+formData.append("voice", audioBlob, "voice.webm");
+formData.append("sender", user.username);
+formData.append("receiver", receiver);
+formData.append("duration", recordSeconds);
 
-formData.append(
-"sender",
-user.username
-);
-
-formData.append(
-"receiver",
-receiver
-);
-
-formData.append(
-"duration",
-recordSeconds
-);
-
-const res = await fetch(
-"/api/messages/voice",
-{
+const res = await fetch("/api/messages/voice",{
 method:"POST",
 body:formData
-}
-);
+});
 
 const data = await res.json();
 
 if(data.success){
 
-socket.emit(
-"newMessage",
-data.message
-);
+socket.emit("newMessage", data.message);
 
 loadMessages();
 
-document.getElementById("sendVoiceBtn").style.display="none";
+// Mayar da send button zuwa message
+const sendBtn = document.getElementById("sendBtn");
+
+sendBtn.onclick = sendMessage;
+sendBtn.style.display = "flex";
 
 document.getElementById("recordIcon").className =
 "fa-solid fa-microphone";
 
 audioBlob = null;
-
 recordSeconds = 0;
 
 }else{
