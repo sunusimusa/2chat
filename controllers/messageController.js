@@ -299,8 +299,26 @@ msg.sender===username
 if(!chats[otherUser]){
 
 const user = await User.findOne({
-username:otherUser
+    username: otherUser
 });
+
+if (!user) continue;
+
+// Idan user ya ɓoye wannan chat,
+// amma sabon message ya shigo,
+// cire shi daga hiddenChats
+if (
+    user.hiddenChats &&
+    user.hiddenChats.includes(username)
+) {
+
+    user.hiddenChats =
+    user.hiddenChats.filter(
+        u => u !== username
+    );
+
+    await user.save();
+}
 
 if(!user) continue;
 
