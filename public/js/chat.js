@@ -553,10 +553,6 @@ msg.delivered
 
 `;
 
-chat.appendChild(div);
-
-chat.scrollTop = chat.scrollHeight;
-
 }
 
 const chat =
