@@ -1,5 +1,13 @@
 const user = JSON.parse(localStorage.getItem("user"));
 
+window.onerror = function(message, source, line, col, error){
+    alert(
+        "JS ERROR:\n" +
+        message +
+        "\nLine: " + line
+    );
+};
+
 let selectedMessage = null;
 let replyMessage = null;
 let startX = 0;
