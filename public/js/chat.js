@@ -965,30 +965,47 @@ document.getElementById("replyPreview").style.display =
 
 }
 
-function showMessageMenu(e,msg){
+function showMessageMenu(e, msg){
+
+    if(!e || !msg) return;
 
     e.preventDefault();
 
     selectedMsg = msg;
 
     const menu = document.getElementById("messageMenu");
+    const deleteMeOption = document.getElementById("deleteMeOption");
+    const deleteAllOption = document.getElementById("deleteAllOption");
 
-    if(msg.sender===user.username){
+    if(!menu) return;
 
-        document.getElementById("deleteMeOption").style.display="flex";
-        document.getElementById("deleteAllOption").style.display="flex";
+    if(
+        msg.sender === user.username
+    ){
+
+        if(deleteMeOption)
+            deleteMeOption.style.display = "flex";
+
+        if(deleteAllOption)
+            deleteAllOption.style.display = "flex";
 
     }else{
 
-        document.getElementById("deleteMeOption").style.display="none";
-        document.getElementById("deleteAllOption").style.display="none";
+        if(deleteMeOption)
+            deleteMeOption.style.display = "none";
+
+        if(deleteAllOption)
+            deleteAllOption.style.display = "none";
 
     }
 
-    menu.style.display="block";
+    menu.style.display = "block";
 
-    menu.style.left=e.pageX+"px";
-    menu.style.top=e.pageY+"px";
+    const x = e.pageX || (e.touches && e.touches[0]?.pageX) || 0;
+    const y = e.pageY || (e.touches && e.touches[0]?.pageY) || 0;
+
+    menu.style.left = x + "px";
+    menu.style.top = y + "px";
 
 }
 
@@ -1492,24 +1509,40 @@ audio.addEventListener("loadedmetadata", updateDuration, { once:true });
 
 async function deleteMessage(messageId){
 
+    if(!messageId) return;
+
     if(!confirm("Delete this message?")) return;
 
-    const res = await fetch(`/api/messages/${messageId}`,{
-    method:"DELETE",
-    headers:{
-        "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-        username:user.username
-    })
-});
+    try{
 
-    const data = await res.json();
+        const res = await fetch(`/api/messages/${messageId}`,{
+            method:"DELETE",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                username:user.username
+            })
+        });
 
-    if(data.success){
-        loadMessages();
-    }else{
-        alert(data.message);
+        const data = await res.json();
+
+        if(data.success){
+
+            loadMessages();
+
+        }else{
+
+            alert(data.message || "Failed to delete message.");
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+        alert("Network error. Please try again.");
+
     }
 
 }
@@ -1518,22 +1551,40 @@ async function clearChat(){
 
     if(!confirm("Delete all messages?")) return;
 
-    const res = await fetch(
-        `/api/messages/clear/${user.username}/${receiver}`,
-        {
-            method:"DELETE"
+    try{
+
+        const res = await fetch(
+            `/api/messages/clear/${user.username}/${receiver}`,
+            {
+                method:"DELETE"
+            }
+        );
+
+        const data = await res.json();
+
+        if(data.success){
+
+            // Goge chat nan take
+            const chat = document.getElementById("chat");
+
+            if(chat){
+                chat.innerHTML = "";
+            }
+
+            // Sake load messages
+            await loadMessages(false);
+
+        }else{
+
+            alert(data.message || "Failed to clear chat.");
+
         }
-    );
 
-    const data = await res.json();
+    }catch(err){
 
-    if(data.success){
+        console.error("Clear Chat Error:", err);
 
-        loadMessages();
-
-    }else{
-
-        alert(data.message);
+        alert("Network error. Please try again.");
 
     }
 
@@ -1541,38 +1592,54 @@ async function clearChat(){
 
 function toggleChatMenu(){
 
-const menu = document.getElementById("chatMenu");
+    const menu = document.getElementById("chatMenu");
 
-menu.style.display =
-menu.style.display === "block"
-? "none"
-: "block";
+    if(!menu) return;
+
+    menu.style.display =
+    menu.style.display === "block"
+    ? "none"
+    : "block";
 
 }
 
 document.addEventListener("click",(e)=>{
 
-if(
-!e.target.closest(".header-btn") &&
-!e.target.closest("#chatMenu")
-){
+    const menu = document.getElementById("chatMenu");
 
-document.getElementById("chatMenu").style.display = "none";
+    if(
+        menu &&
+        !e.target.closest(".header-btn") &&
+        !e.target.closest("#chatMenu")
+    ){
 
-}
+        menu.style.display = "none";
+
+    }
 
 });
 
-            
 function replySelected(){
+
+    if(!selectedMsg) return;
 
     startReply(selectedMsg);
 
-    document.getElementById("messageMenu").style.display = "none";
+    const menu = document.getElementById("messageMenu");
+
+    if(menu){
+
+        menu.style.display = "none";
+
+    }
 
 }
 
 function reactSelected(){
+
+    if(!selectedMsg){
+        return;
+    }
 
     document.getElementById("messageMenu").style.display = "none";
 
@@ -1580,17 +1647,22 @@ function reactSelected(){
 
     const popup = document.getElementById("reactionPopup");
 
+    if(!popup){
+        return;
+    }
+
     popup.style.display = "flex";
-
     popup.style.left = "50%";
-
     popup.style.top = "50%";
-
-    popup.style.transform = "translate(-50%,-50%)";
+    popup.style.transform = "translate(-50%, -50%)";
 
 }
 
 function deleteSelected(){
+
+    if(!selectedMsg){
+        return;
+    }
 
     document.getElementById("messageMenu").style.display = "none";
 
@@ -1598,67 +1670,89 @@ function deleteSelected(){
 
 }
 
-document.addEventListener("click",(e)=>{
+document.addEventListener("click", (e) => {
 
-    if(!e.target.closest("#messageMenu")){
+    if (!e.target.closest("#messageMenu")) {
 
-        document.getElementById("messageMenu").style.display = "none";
+        const menu = document.getElementById("messageMenu");
+
+        if (menu) {
+            menu.style.display = "none";
+        }
 
     }
 
 });
 
-async function deleteForEveryone(id){
+async function deleteForEveryone(id) {
 
-    if(!confirm("Delete this message for everyone?")) return;
+    if (!id) return;
 
-    const res = await fetch(
-        `/api/messages/delete-everyone/${id}`,
-        {
-            method:"PUT",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-                username:user.username
-            })
+    if (!confirm("Delete this message for everyone?")) return;
+
+    try {
+
+        const res = await fetch(
+            `/api/messages/delete-everyone/${id}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: user.username
+                })
+            }
+        );
+
+        const data = await res.json();
+
+        if (data.success) {
+
+            loadMessages();
+
+        } else {
+
+            alert(data.message || "Delete failed");
+
         }
-    );
 
-    const data = await res.json();
+    } catch (err) {
 
-    if(data.success){
-
-        loadMessages();
-
-    }else{
-
-        alert(data.message);
+        console.error(err);
+        alert("Network error.");
 
     }
 
 }
 
-function deleteEveryoneSelected(){
+function deleteEveryoneSelected() {
 
-    document.getElementById("messageMenu").style.display="none";
+    document.getElementById("messageMenu").style.display = "none";
+
+    if (!selectedMsg || !selectedMsg._id) {
+        return;
+    }
 
     deleteForEveryone(selectedMsg._id);
 
 }
 
-document.addEventListener("click",(e)=>{
+document.addEventListener("click", (e) => {
 
-    if(
+    if (
         !e.target.closest("#reactionPopup") &&
         !e.target.closest(".message-menu")
-    ){
+    ) {
 
         const popup = document.getElementById("reactionPopup");
 
-        popup.style.display = "none";
+        if (popup) {
 
-        popup.style.transform = "";
+            popup.style.display = "none";
+            popup.style.transform = "";
+
+        }
 
     }
 
