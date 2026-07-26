@@ -3,15 +3,16 @@ const router = require("express").Router();
 const upload = require("../middleware/upload");
 
 const {
-  sendMessage,
-  sendVoice,
-  getMessages,
-  getChats,
-  reactMessage,
-  deleteMessage,
-  clearChat,
-  deleteForEveryone
+    sendMessage,
+    sendVoice,
+    getMessages,
+    getChats,
+    reactMessage,
+    deleteMessage,
+    clearChat,
+    deleteForEveryone
 } = require("../controllers/messageController");
+
 
 // ================= SEND =================
 
@@ -41,7 +42,7 @@ router.get(
 );
 
 
-// ================= REACTION =================
+// ================= REACTIONS =================
 
 router.put(
     "/react",
@@ -49,25 +50,24 @@ router.put(
 );
 
 
-// ================= CLEAR CHAT =================
+// ================= DELETE =================
 
-router.delete(
-    "/clear/:user1/:user2",
-    clearChat
-);
-
-
-// ================= DELETE ONE MESSAGE =================
-
+// Delete for me
 router.delete(
     "/:id",
     deleteMessage
 );
 
+// Delete for everyone
 router.put(
     "/delete-everyone/:id",
     deleteForEveryone
 );
 
+// Clear chat
+router.delete(
+    "/clear/:user1/:user2",
+    clearChat
+);
 
 module.exports = router;
