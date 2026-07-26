@@ -83,13 +83,20 @@ message:err.message
 };
 
 // ================= SEND VOICE =================
-
-exports.sendVoice = async (req,res)=>{
+exports.sendVoice = async (req, res) => {
 
 try{
 
 const { sender, receiver } = req.body;
 
+if(!sender || !receiver){
+
+return res.json({
+success:false,
+message:"Sender or receiver missing."
+});
+
+}
 
 if(!req.file){
 
@@ -100,47 +107,43 @@ message:"No voice file uploaded."
 
 }
 
-let voiceUrl = "";
-
-
-const uploadStream =
-cloudinary.uploader.upload_stream(
+const uploadStream = cloudinary.uploader.upload_stream(
 
 {
 resource_type:"video",
 folder:"2chat-voice"
 },
 
-(error,result)=>{
+async(error, result)=>{
 
 if(error){
 
-throw error;
+console.log(error);
+
+return res.status(500).json({
+success:false,
+message:"Voice upload failed."
+});
 
 }
 
-voiceUrl = result.secure_url;
+try{
 
-
-Message.create({
+const message = await Message.create({
 
 sender,
 receiver,
 
 text:"",
 image:"",
+voice:result.secure_url,
 
-voice:voiceUrl,
-
-voiceDuration:
-Number(req.body.duration)||0,
+voiceDuration:Number(req.body.duration) || 0,
 
 delivered:true,
-
 deliveredAt:new Date()
 
-}).then(async(message)=>{
-
+});
 
 await Notification.create({
 
@@ -151,27 +154,33 @@ text:`${sender} sent you a voice message 🎤`
 
 });
 
-
-res.json({
+return res.json({
 
 success:true,
 message
 
 });
 
+}catch(err){
+
+console.log(err);
+
+return res.status(500).json({
+
+success:false,
+message:err.message
 
 });
 
+}
 
 }
 
 );
 
-
 streamifier
 .createReadStream(req.file.buffer)
 .pipe(uploadStream);
-
 
 }catch(err){
 
@@ -187,6 +196,7 @@ message:err.message
 }
 
 };
+
 
 // ================= GET CHAT =================
 
