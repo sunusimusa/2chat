@@ -60,33 +60,35 @@ async function loadChatUser(){
 
         const res = await fetch(`/api/users/profile/${receiver}`);
 
-        console.log("Status:", res.status);
-
         const data = await res.json();
-
-        console.log("Response:", data);
 
         if(data.success && data.user){
 
-    document.getElementById("chatUser").innerText =
-    data.user.username;
+            document.getElementById("chatUser").innerText =
+            data.user.username;
 
-    document.getElementById("chatAvatar").src =
-    data.user.avatar || "/images/default.png";
+            document.getElementById("chatAvatar").src =
+            data.user.avatar || "/images/default.png";
 
-}else{
+        }else{
 
-    document.getElementById("chatUser").innerText =
-    receiver || "Unknown User";
+            document.getElementById("chatUser").innerText =
+            receiver || "Unknown User";
 
-    document.getElementById("chatAvatar").src =
-    "/images/default.png";
+            document.getElementById("chatAvatar").src =
+            "/images/default.png";
 
-}
-        
+        }
+
     }catch(err){
 
-        console.error("Fetch Error:", err);
+        console.error(err);
+
+        document.getElementById("chatUser").innerText =
+        receiver || "Unknown User";
+
+        document.getElementById("chatAvatar").src =
+        "/images/default.png";
 
     }
 
