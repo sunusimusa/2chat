@@ -287,6 +287,10 @@ success:false,
 message:"Failed to load messages."
 
 });
+
+  }
+
+};
   
 // ================= CHAT LIST =================
 exports.getChats = async (req, res) => {
