@@ -464,9 +464,6 @@ msg.replyText || "Message"
 
 }
 
-
-
-
 ${msg.deletedForEveryone ? `
 <div class="deleted-message">
     <i class="fa-solid fa-ban"></i>
@@ -515,12 +512,12 @@ msg.voice ? `
 
 </div>
 
-` : msg.text || ""}
+` : (msg.text || "")}
 
-${(msg.reactions || []).length ? `
+${Array.isArray(msg.reactions) && msg.reactions.length ? `
 <div class="message-reactions">
-    ${(msg.reactions || []).map(r=>`
-        <span>${r.emoji}</span>
+    ${msg.reactions.map(r=>`
+        <span>${r?.emoji || ""}</span>
     `).join("")}
 </div>
 ` : ""}
@@ -565,26 +562,55 @@ msg.delivered
 `;
 
 }
+                         
+const chat = document.getElementById("chat");
 
-const chat =
-document.getElementById("chat");
+// Idan chat element bai samu ba
+if(!chat) return;
 
+// Saka messages
 chat.innerHTML = html;
 
-loadVoiceDurations();
+// Load voice durations idan akwai
+if(typeof loadVoiceDurations === "function"){
+    loadVoiceDurations();
+}
 
+// Auto scroll
 if(autoScroll){
 
-requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
 
-chat.scrollTop = chat.scrollHeight;
+        // Idan akwai message
+        if(chat.children.length > 0){
 
-});
+            chat.scrollTop = chat.scrollHeight;
+
+        }else{
+
+            chat.scrollTop = 0;
+
+        }
+
+    });
+
+}
+
+}catch(err){
+
+    console.error("loadMessages Error:", err);
+
+    const chat = document.getElementById("chat");
+
+    if(chat){
+
+        chat.innerHTML = "";
+
+    }
 
 }
     
 }
-    
 
 async function sendMessage(){
 
