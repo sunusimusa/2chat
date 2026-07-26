@@ -32,11 +32,18 @@ if (!user) {
 
 const socket = io();
 
-socket.emit("join", user.username);
+if(user && user.username){
+    socket.emit("join", user.username);
+}
 
 const params = new URLSearchParams(window.location.search);
 
 const receiver = params.get("user");
+
+if (!receiver) {
+    alert("User not found.");
+    location.href = "/messages.html";
+}
 
 loadChatUser();
 
@@ -59,16 +66,24 @@ async function loadChatUser(){
 
         console.log("Response:", data);
 
-        if(data.success){
+        if(data.success && data.user){
 
-            document.getElementById("chatUser").innerText =
-            data.user.username;
+    document.getElementById("chatUser").innerText =
+    data.user.username;
 
-            document.getElementById("chatAvatar").src =
-            data.user.avatar || "/images/default.png";
+    document.getElementById("chatAvatar").src =
+    data.user.avatar || "/images/default.png";
 
-        }
+}else{
 
+    document.getElementById("chatUser").innerText =
+    receiver || "Unknown User";
+
+    document.getElementById("chatAvatar").src =
+    "/images/default.png";
+
+}
+        
     }catch(err){
 
         console.error("Fetch Error:", err);
