@@ -227,20 +227,31 @@ message:err.message
 
 // ================= GET CHAT =================
 
-exports.getMessages = async (req,res)=>{
+exports.getMessages = async (req, res) => {
 
 try{
 
 const { sender, receiver } = req.query;
 
+if(!sender || !receiver){
+
+return res.status(400).json({
+success:false,
+message:"Sender and receiver are required."
+});
+
+}
+
 const messages = await Message.find({
 
 $or:[
-{sender,receiver},
-{sender:receiver,receiver:sender}
+{ sender, receiver },
+{ sender:receiver, receiver:sender }
 ]
 
-}).sort({createdAt:1});
+})
+.sort({ createdAt:1 })
+.lean();
 
 await Message.updateMany(
 
@@ -251,13 +262,15 @@ seen:false
 },
 
 {
+$set:{
 seen:true,
 seenAt:new Date()
+}
 }
 
 );
 
-res.json({
+return res.json({
 
 success:true,
 messages
@@ -266,111 +279,104 @@ messages
 
 }catch(err){
 
-res.status(500).json({
+console.error(err);
+
+return res.status(500).json({
 
 success:false,
-message:err.message
+message:"Failed to load messages."
 
 });
-
-}
-
-};
-
+  
 // ================= CHAT LIST =================
+exports.getChats = async (req, res) => {
 
-exports.getChats = async (req,res)=>{
-
-try{
+try {
 
 const { username } = req.params;
 
 // User
 const me = await User.findOne({ username });
 
-if(!me){
-
+if (!me) {
 return res.json({
-success:false,
-message:"User not found"
+success: false,
+message: "User not found"
 });
-
 }
 
-// Duk users da suka taɓa yin chat
+// Duk messages
 const messages = await Message.find({
-$or:[
-{sender:username},
-{receiver:username}
+$or: [
+{ sender: username },
+{ receiver: username }
 ]
-}).sort({createdAt:-1});
+}).sort({ createdAt: -1 });
 
 const chats = {};
 
-// Fara da friends
-for(const friend of me.friends){
+for (const friend of me.friends || []) {
 
-const user = await User.findOne({ username:friend });
+const user = await User.findOne({ username: friend });
 
-if(user){
+if (!user) continue;
 
-chats[friend]={
-username:user.username,
-avatar:user.avatar,
-online:user.online,
-lastSeen:user.lastSeen,
-lastMessage:"",
-time:null
+chats[friend] = {
+username: user.username,
+avatar: user.avatar || "/images/default.png",
+online: user.online || false,
+lastSeen: user.lastSeen || null,
+lastMessage: "",
+time: null
 };
 
 }
 
-}
-
-// Sannan a saka latest message idan akwai
-for(const msg of messages){
+// Latest messages
+for (const msg of messages) {
 
 const otherUser =
-msg.sender===username
+msg.sender === username
 ? msg.receiver
 : msg.sender;
 
-if(!chats[otherUser]){
+// Idan babu user a chats
+if (!chats[otherUser]) {
 
 const user = await User.findOne({
-    username: otherUser
+username: otherUser
 });
 
 if (!user) continue;
 
-// Idan user ya ɓoye wannan chat,
-// amma sabon message ya shigo,
-// cire shi daga hiddenChats
+// Idan hidden chat ne kuma sabon message ya shigo
 if (
-    user.hiddenChats &&
-    user.hiddenChats.includes(username)
+Array.isArray(user.hiddenChats) &&
+user.hiddenChats.includes(username)
 ) {
 
-    user.hiddenChats =
-    user.hiddenChats.filter(
-        u => u !== username
-    );
+user.hiddenChats =
+user.hiddenChats.filter(
+u => u !== username
+);
 
-    await user.save();
+await user.save();
+
 }
 
-if(!user) continue;
-
-chats[otherUser]={
-username:user.username,
-avatar:user.avatar,
-online:user.online,
-lastSeen:user.lastSeen,
-lastMessage:"",
-time:null
+chats[otherUser] = {
+username: user.username,
+avatar: user.avatar || "/images/default.png",
+online: user.online || false,
+lastSeen: user.lastSeen || null,
+lastMessage: "",
+time: null
 };
 
 }
+
+// Kada a sake overwrite idan an riga an saka latest message
+if (chats[otherUser].time) continue;
 
 chats[otherUser].lastMessage =
 msg.deletedForEveryone
@@ -388,130 +394,168 @@ chats[otherUser].time = msg.createdAt;
 }
 
 res.json({
-success:true,
-chats:Object.values(chats)
+success: true,
+chats: Object.values(chats)
 });
 
-}catch(err){
+} catch (err) {
+
+console.error(err);
 
 res.status(500).json({
-success:false,
-message:err.message
+success: false,
+message: err.message
 });
 
 }
 
 };
+
 
 // ================= REACTION =================
 
-exports.reactMessage = async (req,res)=>{
+exports.reactMessage = async (req, res) => {
 
-try{
+    try {
 
-const { messageId, username, emoji } = req.body;
+        const { messageId, username, emoji } = req.body;
 
-const message = await Message.findById(messageId);
+        if (!messageId || !username || !emoji) {
+            return res.json({
+                success: false,
+                message: "Missing required fields."
+            });
+        }
 
-if(!message){
+        const message = await Message.findById(messageId);
 
-return res.json({
+        if (!message) {
+            return res.json({
+                success: false,
+                message: "Message not found."
+            });
+        }
 
-success:false,
-message:"Message not found"
+        // Tabbatar reactions array tana nan
+        if (!Array.isArray(message.reactions)) {
+            message.reactions = [];
+        }
 
-});
+        const oldReaction = message.reactions.find(
+            r => r.username === username
+        );
 
-}
+        if (oldReaction) {
 
-const oldReaction =
-message.reactions.find(
+            // Canza emoji idan ya taba react
+            oldReaction.emoji = emoji;
 
-r=>r.username===username
+        } else {
 
-);
+            // Sabon reaction
+            message.reactions.push({
+                username,
+                emoji
+            });
 
-if(oldReaction){
+        }
 
-oldReaction.emoji = emoji;
-
-}else{
-
-message.reactions.push({
-
-username,
-emoji
-
-});
-
-}
-
-await message.save();
-
-res.json({
-
-success:true,
-message
-
-});
-
-}catch(err){
-
-res.status(500).json({
-
-success:false,
-message:err.message
-
-});
-
-}
-
-};
-
-
-exports.deleteMessage = async(req,res)=>{
-
-    try{
-
-        await Message.findByIdAndDelete(req.params.id);
+        await message.save();
 
         res.json({
-            success:true
+            success: true,
+            message
         });
 
-    }catch(err){
+    } catch (err) {
+
+        console.error(err);
 
         res.status(500).json({
-            success:false,
-            message:err.message
+            success: false,
+            message: err.message
         });
 
     }
 
 };
 
-exports.clearChat = async(req,res)=>{
+exports.deleteMessage = async (req, res) => {
 
-    try{
+    try {
 
-        const {user1,user2}=req.params;
+        const message = await Message.findById(req.params.id);
 
-        await Message.deleteMany({
-            $or:[
-                {sender:user1,receiver:user2},
-                {sender:user2,receiver:user1}
+        if (!message) {
+            return res.json({
+                success: false,
+                message: "Message not found."
+            });
+        }
+
+        // Mai message kaɗai zai iya gogewa
+        if (message.sender !== req.body.username) {
+            return res.json({
+                success: false,
+                message: "Permission denied."
+            });
+        }
+
+        await Message.findByIdAndDelete(req.params.id);
+
+        return res.json({
+            success: true,
+            message: "Message deleted successfully."
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        });
+
+    }
+
+};
+  
+exports.clearChat = async (req, res) => {
+
+    try {
+
+        const { user1, user2 } = req.params;
+
+        if (!user1 || !user2) {
+
+            return res.json({
+                success: false,
+                message: "Missing users."
+            });
+
+        }
+
+        const result = await Message.deleteMany({
+            $or: [
+                { sender: user1, receiver: user2 },
+                { sender: user2, receiver: user1 }
             ]
         });
 
-        res.json({
-            success:true
+        return res.json({
+            success: true,
+            deletedCount: result.deletedCount,
+            message: "Chat cleared successfully."
         });
 
-    }catch(err){
+    } catch (err) {
 
-        res.status(500).json({
-            success:false,
-            message:err.message
+        console.error(err);
+
+        return res.status(500).json({
+            success: false,
+            message: err.message
         });
 
     }
@@ -525,35 +569,64 @@ exports.deleteForEveryone = async (req, res) => {
         const { id } = req.params;
         const { username } = req.body;
 
+        if (!id || !username) {
+
+            return res.json({
+                success: false,
+                message: "Missing data."
+            });
+
+        }
+
         const message = await Message.findById(id);
 
         if (!message) {
+
             return res.json({
                 success: false,
-                message: "Message not found"
+                message: "Message not found."
             });
+
         }
 
-        // Sai wanda ya tura saƙon kawai zai iya gogewa
+        // Mai tura message kaɗai zai iya gogewa
         if (message.sender !== username) {
+
             return res.json({
                 success: false,
-                message: "Permission denied"
+                message: "Permission denied."
             });
+
+        }
+
+        // Idan an riga an goge shi
+        if (message.deletedForEveryone) {
+
+            return res.json({
+                success: false,
+                message: "Message already deleted."
+            });
+
         }
 
         message.deletedForEveryone = true;
         message.deletedBy = username;
+        message.text = "";
+        message.image = "";
+        message.voice = "";
 
         await message.save();
 
-        res.json({
-            success: true
+        return res.json({
+            success: true,
+            message: "Message deleted for everyone."
         });
 
     } catch (err) {
 
-        res.status(500).json({
+        console.error(err);
+
+        return res.status(500).json({
             success: false,
             message: err.message
         });
