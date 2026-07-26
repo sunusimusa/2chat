@@ -5,7 +5,6 @@ const User = require("../models/User");
 const streamifier = require("streamifier");
 
 // ================= SEND MESSAGE =================
-
 exports.sendMessage = async (req, res) => {
 
 try{
@@ -20,9 +19,20 @@ replyImage,
 replyVoice,
 replyUser
 } = req.body;
-  
+
+// Tabbatar sender da receiver suna nan
+if(!sender || !receiver){
+
+return res.json({
+success:false,
+message:"Sender or receiver missing."
+});
+
+}
+
 let image = "";
 
+// Upload image idan akwai
 if(req.file){
 
 const result = await cloudinary.uploader.upload(
@@ -37,10 +47,22 @@ image = result.secure_url;
 
 }
 
+// Kada a aika message mara text kuma babu image
+if((!text || text.trim() === "") && !image){
+
+return res.json({
+success:false,
+message:"Message cannot be empty."
+});
+
+}
+
 const message = await Message.create({
+
 sender,
 receiver,
-text,
+
+text: text || "",
 image,
 
 replyTo: replyTo || null,
@@ -50,11 +72,12 @@ replyVoice: replyVoice || "",
 replyUser: replyUser || "",
 
 reactions: [],
-  
+
 delivered:true,
 deliveredAt:new Date()
+
 });
-  
+
 await Notification.create({
 
 receiver,
@@ -64,18 +87,22 @@ text:`${sender} sent you a message 📨`
 
 });
 
-res.json({
+return res.json({
+
 success:true,
 message
+
 });
 
 }catch(err){
 
 console.error(err);
 
-res.status(500).json({
+return res.status(500).json({
+
 success:false,
 message:err.message
+
 });
 
 }
