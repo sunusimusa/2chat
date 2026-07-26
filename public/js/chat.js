@@ -826,25 +826,54 @@ document.getElementById(
 
 function openImage(image){
 
-document.getElementById("fullImage").src = image;
+    if(!image) return;
 
-document.getElementById("imageViewer").style.display = "flex";
+    const fullImage = document.getElementById("fullImage");
+    const imageViewer = document.getElementById("imageViewer");
+
+    if(!fullImage || !imageViewer) return;
+
+    fullImage.src = image;
+
+    imageViewer.style.display = "flex";
 
 }
 
 function closeImage(){
 
-document.getElementById("imageViewer").style.display = "none";
+    const imageViewer = document.getElementById("imageViewer");
+
+    if(imageViewer){
+
+        imageViewer.style.display = "none";
+
+    }
 
 }
 
 async function selectReaction(emoji){
 
-    document.getElementById("reactionPopup").style.display = "none";
+    const popup = document.getElementById("reactionPopup");
 
-    document.getElementById("reactionPopup").style.transform = "";
+    if(popup){
 
-    await reactMessage(selectedMessage, emoji);
+        popup.style.display = "none";
+
+        popup.style.transform = "";
+
+    }
+
+    if(!selectedMessage || !emoji) return;
+
+    try{
+
+        await reactMessage(selectedMessage, emoji);
+
+    }catch(err){
+
+        console.error("Reaction Error:", err);
+
+    }
 
     selectedMessage = null;
 
