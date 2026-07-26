@@ -322,41 +322,50 @@ msg.delivered ?
 
 }
 
-async function loadMessages(autoScroll=true){
-    
-if(!receiver) return;
+async function loadMessages(autoScroll = true){
 
-const res =
-await fetch(
-`/api/messages/chat?sender=${user.username}&receiver=${receiver}`
-);
+    if(!receiver) return;
 
-const data =
-await res.json();
+    try{
 
-data.messages.forEach(msg=>{
+        const res = await fetch(
+            `/api/messages/chat?sender=${user.username}&receiver=${receiver}`
+        );
 
-if(
-msg.receiver===user.username &&
-!msg.seen
-){
+        const data = await res.json();
 
-socket.emit("messageSeen",{
-sender:msg.sender,
-messageId:msg._id
-});
+        // Kariya idan API ta dawo da error
+        if(!data.success){
+            document.getElementById("chat").innerHTML = "";
+            return;
+        }
 
-}
+        // Kariya idan messages babu
+        const messages = data.messages || [];
 
-});
+        messages.forEach(msg=>{
 
-let html="";
+            if(
+                msg.receiver === user.username &&
+                !msg.seen
+            ){
 
-data.messages.forEach(msg=>{
+                socket.emit("messageSeen",{
+                    sender:msg.sender,
+                    messageId:msg._id
+                });
 
-const mine = msg.sender===user.username;
+            }
 
-html += `
+        });
+
+        let html = "";
+
+        messages.forEach(msg=>{
+
+            const mine = msg.sender === user.username;
+
+            html += `
 
 <div class="${mine ? "me" : "other"}">
 
@@ -454,6 +463,9 @@ msg.replyText || "Message"
 ""
 
 }
+
+
+
 
 ${msg.deletedForEveryone ? `
 <div class="deleted-message">
