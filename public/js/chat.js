@@ -133,37 +133,33 @@ document.getElementById("status").innerHTML =
 
 function appendMessage(msg){
 
-const chat = document.getElementById("chat");
+    if(!msg) return;
 
-const mine = msg.sender === user.username;
+    const chat = document.getElementById("chat");
+    if(!chat) return;
 
-const div = document.createElement("div");
+    const mine = msg.sender === user.username;
 
-div.className = mine ? "me" : "other";
+    const div = document.createElement("div");
+    div.className = mine ? "me" : "other";
 
-div.innerHTML = `
+    const safeMsg = JSON.stringify(msg).replace(/"/g,"&quot;");
+
+    div.innerHTML = `
 
 <div
 class="${mine ? "bubble-me" : "bubble-other"}"
-
-oncontextmenu="showMessageMenu(event,${JSON.stringify(msg).replace(/"/g,"&quot;")})"
-
-ontouchstart="touchStart(event, ${JSON.stringify(msg).replace(/"/g,"&quot;")})"
-
+oncontextmenu="showMessageMenu(event,${safeMsg})"
+ontouchstart="touchStart(event,${safeMsg})"
 ontouchmove="touchMove(event)"
-
 ontouchend="touchEnd(event)"
-
 >
 
 <span class="reply-icon-inside">
-
 <i class="fa-solid fa-reply"></i>
-
 </span>
 
 ${msg.image ? `
-
 <img
 src="${msg.image}"
 onclick="openImage('${msg.image}')"
@@ -175,52 +171,32 @@ display:block;
 margin-bottom:8px;
 cursor:pointer;
 ">
-
 ` : ""}
 
-${
-
-msg.replyTo
-?
-
-`
+${msg.replyTo ? `
 
 <div class="reply-bubble">
 
 <div class="reply-user">
-
-↩ ${msg.replyUser}
-
+↩ ${msg.replyUser || ""}
 </div>
 
 <div class="reply-message">
 
 ${
-msg.replyImage
-?
+msg.replyImage ?
 
-`
-<img
-src="${msg.replyImage}"
-class="reply-thumb">
-`
+`<img src="${msg.replyImage}" class="reply-thumb">`
 
 :
 
-msg.replyVoice
-?
+msg.replyVoice ?
 
-`
-<div class="reply-voice">
-
-🎤 Voice message
-
-</div>
-`
+`<div class="reply-voice">🎤 Voice message</div>`
 
 :
 
-msg.replyText || "Message"
+(msg.replyText || "Message")
 
 }
 
@@ -228,118 +204,121 @@ msg.replyText || "Message"
 
 </div>
 
+` : ""}
+
+${
+msg.deletedForEveryone ?
+
 `
-
-:
-
-""
-
-}
-
-${msg.deletedForEveryone ? `
 <div class="deleted-message">
-    <i class="fa-solid fa-ban"></i>
-    This message was deleted
+<i class="fa-solid fa-ban"></i>
+This message was deleted
 </div>
-` :
-msg.voice ? `
+`
 
+:
+
+msg.voice ?
+
+`
 <div class="voice-player">
 
-    <button class="voice-play">
-        <i class="fa-solid fa-play"></i>
-    </button>
+<button class="voice-play">
+<i class="fa-solid fa-play"></i>
+</button>
 
-    <div class="voice-wave">
+<div class="voice-wave">
 
-        <div class="voice-bars">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
+<div class="voice-bars">
+${"<span></span>".repeat(15)}
+</div>
 
-        <div class="voice-progress"></div>
-
-    </div>
-
-    <span class="voice-time">
-        ${Math.floor((msg.voiceDuration || 0)/60)}:${String((msg.voiceDuration || 0)%60).padStart(2,"0")}
-    </span>
-
-    <audio class="voice-audio">
-        <source src="${msg.voice}" type="audio/webm">
-    </audio>
+<div class="voice-progress"></div>
 
 </div>
 
-` : msg.text || ""}
+<span class="voice-time">
+${Math.floor((msg.voiceDuration || 0)/60)}:${String((msg.voiceDuration || 0)%60).padStart(2,"0")}
+</span>
 
-${(msg.reactions || []).length ? `
+<audio class="voice-audio">
+<source src="${msg.voice}" type="audio/webm">
+</audio>
+
+</div>
+`
+
+:
+
+(msg.text || "")
+
+}
+
+${Array.isArray(msg.reactions) && msg.reactions.length ? `
+
 <div class="message-reactions">
-    ${(msg.reactions || []).map(r=>`
-        <span>${r.emoji}</span>
-    `).join("")}
+
+${msg.reactions.map(r=>`
+<span>${r.emoji}</span>
+`).join("")}
+
 </div>
+
 ` : ""}
 
 <div class="message-time">
 
-${msg.createdAt
-? new Date(msg.createdAt).toLocaleTimeString([],{
+${msg.createdAt ?
+
+new Date(msg.createdAt).toLocaleTimeString([],{
 hour:"2-digit",
 minute:"2-digit"
 })
-: ""}
+
+:
+
+""}
 
 </div>
 
-${
-mine
-?
-`
+${mine ? `
+
 <small class="message-status">
 
 ${
-msg.seen
-?
+
+msg.seen ?
+
 '<i class="fa-solid fa-check-double" style="color:#00b7ff"></i> Seen'
+
 :
-msg.delivered
-?
+
+msg.delivered ?
+
 '<i class="fa-solid fa-check-double"></i> Delivered'
+
 :
+
 '<i class="fa-solid fa-check"></i> Sent'
+
 }
 
 </small>
-`
-:
-""
-}
+
+` : ""}
 
 </div>
-
 `;
 
-chat.appendChild(div);
+    chat.appendChild(div);
 
-requestAnimationFrame(() => {
-    chat.scrollTop = chat.scrollHeight;
-});
+    requestAnimationFrame(()=>{
+        chat.scrollTop = chat.scrollHeight;
+    });
 
-loadVoiceDurations();
+    if(typeof loadVoiceDurations === "function"){
+        loadVoiceDurations();
+    }
 
 }
 
