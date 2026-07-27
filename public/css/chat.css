@@ -584,13 +584,6 @@ display:flex;
 gap:6px;
 }
 
-
-
-
-
-
-
-
 /* ===========================
    MESSAGE BAR
 =========================== */
@@ -1155,13 +1148,6 @@ transition:width .1s linear;
 pointer-events:none;
 
 }
-
-
-
-
-
-
-
 
 .incoming-call{
 
