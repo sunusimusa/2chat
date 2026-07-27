@@ -36,6 +36,8 @@ if (!receiver) {
     document.getElementById("chatUser").innerText = "User not found";
 } else {
     loadChatUser();
+
+    loadMessages();
 }
 
 async function loadChatUser(){
@@ -113,9 +115,6 @@ receiver
 });
 
 }
-
-document.getElementById("chatUser").innerText =
-receiver;
 
 socket.on("userOnline",(username)=>{
 
@@ -569,7 +568,7 @@ msg.delivered
 
 `;
 
-}
+});
                          
 const chat = document.getElementById("chat");
 
