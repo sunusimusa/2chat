@@ -1366,6 +1366,76 @@ window.addEventListener("online",()=>{
 
 });
 
+
+async function deleteMessage(messageId){
+
+    if(!confirm("Delete this message for yourself?")) return;
+
+    try{
+
+        const res = await fetch(`/api/messages/delete/${messageId}`,{
+            method:"DELETE",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                username:user.username
+            })
+        });
+
+        const data = await res.json();
+
+        if(data.success){
+
+            loadMessages(false);
+
+        }else{
+
+            alert(data.message || "Delete failed");
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+    }
+
+}
+
+async function deleteForEveryone(messageId){
+
+    if(!confirm("Delete this message for everyone?")) return;
+
+    try{
+
+        const res = await fetch(`/api/messages/delete-everyone/${messageId}`,{
+            method:"PUT"
+        });
+
+        const data = await res.json();
+
+        if(data.success){
+
+            loadMessages(false);
+
+            socket.emit("messageDeleted",{
+                messageId
+            });
+
+        }else{
+
+            alert(data.message || "Delete failed");
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+    }
+
+}
 /* ---------- Finished ---------- */
 
 console.log("2Chat Messenger Loaded Successfully");
