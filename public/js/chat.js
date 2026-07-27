@@ -501,4 +501,229 @@ function touchEnd(){
 
 }
 
+/* ==========================
+   Voice Recording
+========================== */
+
+async function startRecording(){
+
+    if(recording) return;
+
+    try{
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio:true
+        });
+
+        mediaRecorder = new MediaRecorder(stream);
+
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = e=>{
+
+            if(e.data.size>0){
+
+                audioChunks.push(e.data);
+
+            }
+
+        };
+
+        mediaRecorder.onstop=()=>{
+
+            audioBlob=new Blob(audioChunks,{
+                type:"audio/webm"
+            });
+
+            stream.getTracks().forEach(track=>track.stop());
+
+        };
+
+        mediaRecorder.start();
+
+        recording=true;
+
+        paused=false;
+
+        recordSeconds=0;
+
+        document.getElementById("recordingBox").style.display="flex";
+
+        document.getElementById("stopRecordBtn").style.display="flex";
+
+        document.getElementById("recordBtn").innerHTML=
+        '<i class="fa-solid fa-pause"></i>';
+
+        recordTimer=setInterval(()=>{
+
+            recordSeconds++;
+
+            const m=String(Math.floor(recordSeconds/60)).padStart(2,"0");
+
+            const s=String(recordSeconds%60).padStart(2,"0");
+
+            document.getElementById("recordTime").innerText=
+            `${m}:${s}`;
+
+        },1000);
+
+    }catch(err){
+
+        console.error(err);
+
+        alert("Microphone permission denied.");
+
+    }
+
+}
+
+/* ==========================
+   Pause
+========================== */
+
+function pauseRecording(){
+
+    if(!mediaRecorder) return;
+
+    mediaRecorder.pause();
+
+    paused=true;
+
+    clearInterval(recordTimer);
+
+    document.getElementById("recordBtn").innerHTML=
+    '<i class="fa-solid fa-play"></i>';
+
+}
+
+/* ==========================
+   Resume
+========================== */
+
+function resumeRecording(){
+
+    if(!mediaRecorder) return;
+
+    mediaRecorder.resume();
+
+    paused=false;
+
+    document.getElementById("recordBtn").innerHTML=
+    '<i class="fa-solid fa-pause"></i>';
+
+    recordTimer=setInterval(()=>{
+
+        recordSeconds++;
+
+        const m=String(Math.floor(recordSeconds/60)).padStart(2,"0");
+
+        const s=String(recordSeconds%60).padStart(2,"0");
+
+        document.getElementById("recordTime").innerText=
+        `${m}:${s}`;
+
+    },1000);
+
+}
+
+/* ==========================
+   Toggle
+========================== */
+
+function toggleRecording(){
+
+    if(!recording){
+
+        startRecording();
+
+        return;
+
+    }
+
+    if(paused){
+
+        resumeRecording();
+
+    }else{
+
+        pauseRecording();
+
+    }
+
+}
+
+/* ==========================
+   Stop Recording
+========================== */
+
+function stopRecording(){
+
+    if(!recording) return;
+
+    recording=false;
+
+    clearInterval(recordTimer);
+
+    document.getElementById("recordingBox").style.display="none";
+
+    document.getElementById("stopRecordBtn").style.display="none";
+
+    document.getElementById("recordBtn").innerHTML=
+    '<i class="fa-solid fa-microphone"></i>';
+
+    if(mediaRecorder &&
+       mediaRecorder.state!=="inactive"){
+
+        mediaRecorder.stop();
+
+    }
+
+}
+
+/* ==========================
+   Send Voice
+========================== */
+
+async function sendVoice(){
+
+    if(!audioBlob) return;
+
+    const formData=new FormData();
+
+    formData.append("voice",audioBlob,"voice.webm");
+
+    formData.append("sender",user.username);
+
+    formData.append("receiver",receiver);
+
+    formData.append("duration",recordSeconds);
+
+    const res=await fetch("/api/messages/voice",{
+
+        method:"POST",
+
+        body:formData
+
+    });
+
+    const data=await res.json();
+
+    if(data.success){
+
+        appendMessage(data.message);
+
+        socket.emit("newMessage",data.message);
+
+        audioBlob=null;
+
+        recordSeconds=0;
+
+    }else{
+
+        alert(data.message);
+
+    }
+
+}
+
 
