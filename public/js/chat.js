@@ -192,6 +192,49 @@ msg.delivered ?
 }
 
 /* ==========================
+   Load Chat User
+========================== */
+
+async function loadChatUser(){
+
+    if(!receiver) return;
+
+    try{
+
+        const res = await fetch(`/api/users/${receiver}`);
+        const data = await res.json();
+
+        if(!data.success) return;
+
+        const chatUser = data.user;
+
+        const avatar = document.getElementById("chatAvatar");
+        const name = document.getElementById("chatName");
+        const status = document.getElementById("status");
+
+        if(avatar){
+            avatar.src = chatUser.avatar || "/images/default-avatar.png";
+        }
+
+        if(name){
+            name.textContent = chatUser.username;
+        }
+
+        if(status){
+            status.innerHTML = chatUser.online
+                ? '<i class="fa-solid fa-circle online-dot"></i> Online'
+                : '<i class="fa-regular fa-clock"></i> Offline';
+        }
+
+    }catch(err){
+
+        console.error("Load Chat User Error:", err);
+
+    }
+
+}
+
+/* ==========================
    Load Messages
 ========================== */
 
