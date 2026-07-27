@@ -116,11 +116,10 @@ body{
 /* ==========================
    MESSAGE ROW
 ========================== */
-
 .me,
 .other{
-    width:100%;
     display:flex;
+    width:100%;
     margin:8px 0;
 }
 
@@ -130,6 +129,37 @@ body{
 
 .other{
     justify-content:flex-start;
+}
+
+.bubble-me,
+.bubble-other{
+    display:inline-block;
+    width:auto;
+    max-width:75%;
+    min-width:70px;
+
+    padding:12px 14px;
+
+    border-radius:18px;
+
+    word-wrap:break-word;
+    overflow-wrap:break-word;
+
+    white-space:pre-wrap;
+
+    position:relative;
+}
+
+.bubble-me{
+    background:#1877f2;
+    color:#fff;
+    border-bottom-right-radius:6px;
+}
+
+.bubble-other{
+    background:#fff;
+    color:#222;
+    border-bottom-left-radius:6px;
 }
 
 /* ==========================
