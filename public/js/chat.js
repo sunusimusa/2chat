@@ -382,7 +382,7 @@ async function loadMessages(autoScroll = true){
 <div class="${mine ? "me" : "other"}">
 
 <div
-class="${mine ? "bubble-me" : "bubble-other"}"
+class="${mine ? "bubble-me" : "bubble-other"} ${msg.image ? "image-message" : ""}"
 
 oncontextmenu="showMessageMenu(event,${JSON.stringify(msg).replace(/"/g,"&quot;")})"
 
@@ -400,23 +400,13 @@ ontouchend="touchEnd(event)"
 
 </span>
 
-${
-msg.image
-?
-`<img
-src="${msg.image}"
-onclick="openImage('${msg.image}')"
-style="
-width:100%;
-max-width:220px;
-border-radius:12px;
-display:block;
-margin-bottom:8px;
-cursor:pointer;
-">`
-:
-""
-}
+${msg.image ? `
+<div class="message-image">
+    <img
+        src="${msg.image}"
+        onclick="openImage('${msg.image}')">
+</div>
+` : ""}
 
 ${
 
