@@ -16,27 +16,27 @@ let audioBlob = null;
 let paused = false;
 let selectedMsg = null;
 
-
-
 if (!user) {
     location.href = "/login.html";
 }
 
 const socket = io();
 
-if(user && user.username){
+if (user && user.username) {
     socket.emit("join", user.username);
 }
 
 const params = new URLSearchParams(window.location.search);
-
-
 const receiver = params.get("user");
 
-console.log("Receiver =", receiver);
-alert("Receiver = " + receiver);
+console.log("Receiver:", receiver);
 
-loadChatUser();
+if (!receiver) {
+    console.error("Receiver not found in URL");
+    document.getElementById("chatUser").innerText = "User not found";
+} else {
+    loadChatUser();
+}
 
 async function loadChatUser(){
 
