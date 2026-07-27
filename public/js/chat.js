@@ -1,13 +1,5 @@
 const user = JSON.parse(localStorage.getItem("user"));
 
-window.onerror = function(message, source, line, col, error){
-    alert(
-        "JS ERROR:\n" +
-        message +
-        "\nLine: " + line
-    );
-};
-
 let selectedMessage = null;
 let replyMessage = null;
 let startX = 0;
@@ -38,12 +30,11 @@ if(user && user.username){
 
 const params = new URLSearchParams(window.location.search);
 
+
 const receiver = params.get("user");
 
-if (!receiver) {
-    alert("User not found.");
-    location.href = "/messages.html";
-}
+console.log("Receiver =", receiver);
+alert("Receiver = " + receiver);
 
 loadChatUser();
 
