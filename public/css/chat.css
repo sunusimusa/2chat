@@ -1053,3 +1053,216 @@ font-size:24px;
 
 }
 
+/* ==========================
+   DELETE / CLEAR CHAT
+========================== */
+
+.deleted-message{
+
+display:flex;
+align-items:center;
+gap:8px;
+
+padding:8px 10px;
+
+font-size:14px;
+font-style:italic;
+
+opacity:.75;
+
+color:#666;
+
+}
+
+.deleted-message i{
+
+font-size:15px;
+
+color:#ff3b30;
+
+}
+
+.bubble-me .deleted-message{
+
+color:#fff;
+
+opacity:.9;
+
+}
+
+.bubble-me .deleted-message i{
+
+color:#fff;
+
+}
+
+/* ==========================
+   CLEAR CHAT BUTTON
+========================== */
+
+.chat-menu div{
+
+display:flex;
+align-items:center;
+gap:10px;
+
+padding:14px 18px;
+
+font-size:15px;
+
+cursor:pointer;
+
+transition:.2s;
+
+}
+
+.chat-menu div:hover{
+
+background:#f5f5f5;
+
+}
+
+.chat-menu div i{
+
+width:20px;
+
+text-align:center;
+
+color:#1877f2;
+
+}
+
+/* Clear Chat */
+
+.chat-menu div:first-child i{
+
+color:#ff3b30;
+
+}
+
+.chat-menu div:first-child:hover{
+
+background:#fff3f3;
+
+color:#ff3b30;
+
+}
+
+/* ==========================
+   DELETE MENU
+========================== */
+
+.message-menu div{
+
+display:flex;
+align-items:center;
+gap:12px;
+
+padding:14px 18px;
+
+cursor:pointer;
+
+transition:.2s;
+
+font-size:15px;
+
+}
+
+.message-menu div i{
+
+width:22px;
+
+text-align:center;
+
+}
+
+/* Reply */
+
+.message-menu div:nth-child(1) i{
+
+color:#1877f2;
+
+}
+
+/* React */
+
+.message-menu div:nth-child(2) i{
+
+color:#ffb300;
+
+}
+
+/* Delete For Me */
+
+.message-menu div:nth-child(3){
+
+color:#ff9800;
+
+}
+
+.message-menu div:nth-child(3) i{
+
+color:#ff9800;
+
+}
+
+.message-menu div:nth-child(3):hover{
+
+background:#fff8e1;
+
+}
+
+/* Delete For Everyone */
+
+.message-menu div:nth-child(4){
+
+color:#e53935;
+
+font-weight:600;
+
+}
+
+.message-menu div:nth-child(4) i{
+
+color:#e53935;
+
+}
+
+.message-menu div:nth-child(4):hover{
+
+background:#ffebee;
+
+}
+
+/* ==========================
+   MENU ANIMATION
+========================== */
+
+.message-menu,
+.chat-menu{
+
+animation:menuFade .18s ease;
+
+transform-origin:top right;
+
+}
+
+@keyframes menuFade{
+
+from{
+
+opacity:0;
+
+transform:scale(.9);
+
+}
+
+to{
+
+opacity:1;
+
+transform:scale(1);
+
+}
+
+}
