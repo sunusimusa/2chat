@@ -1241,6 +1241,10 @@ socket.on("disconnect",()=>{
 
 });
 
+socket.on("messageDeleted", () => {
+    loadMessages(false);
+});
+
 /* ---------- Auto Scroll ---------- */
 
 const observer = new MutationObserver(()=>{
@@ -1263,7 +1267,7 @@ window.addEventListener("load",()=>{
 
     loadMessages();
 
-    messageInput.focus();
+    messageInput?.focus();
 
 });
 
