@@ -57,12 +57,17 @@ async function loadChatUser(){
 
         if(data.success && data.user){
 
-            document.getElementById("chatUser").innerText =
-            data.user.username;
+            const chatUser = document.getElementById("chatUser");
+const chatAvatar = document.getElementById("chatAvatar");
+const status = document.getElementById("status");
 
-            document.getElementById("chatAvatar").src =
-            data.user.avatar || "/images/default.png";
+chatUser.textContent = data.user.username;
+chatAvatar.src = data.user.avatar || "/images/default.png";
 
+status.innerHTML = data.user.online
+? '<i class="fa-solid fa-circle online-dot"></i> Online'
+: '<i class="fa-solid fa-circle online-dot"></i> Offline';
+            
         }else{
 
             document.getElementById("chatUser").innerText =
