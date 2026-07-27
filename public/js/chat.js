@@ -101,7 +101,41 @@ This message was deleted
 
 :
 
+
+msg.voice ?
+
+`
+<div class="voice-player">
+
+<button class="voice-play">
+
+<i class="fa-solid fa-play"></i>
+
+</button>
+
+<div class="voice-wave">
+
+<div class="voice-progress"></div>
+
+</div>
+
+<span class="voice-time">
+0:00
+</span>
+
+<audio class="voice-audio">
+
+<source src="${msg.voice}" type="audio/webm">
+
+</audio>
+
+</div>
+`
+
+:
+
 (msg.text || "")
+  
 
 }
 
@@ -723,6 +757,115 @@ async function sendVoice(){
         alert(data.message);
 
     }
+
+}
+
+/* ==========================
+   Voice Player
+========================== */
+
+function loadVoicePlayers(){
+
+    document.querySelectorAll(".voice-player").forEach(player=>{
+
+        const playBtn = player.querySelector(".voice-play");
+        const audio = player.querySelector(".voice-audio");
+        const progress = player.querySelector(".voice-progress");
+        const time = player.querySelector(".voice-time");
+
+        if(!playBtn || !audio) return;
+
+        playBtn.onclick = ()=>{
+
+            // Dakatar da sauran audio
+            document.querySelectorAll(".voice-audio").forEach(a=>{
+
+                if(a!==audio){
+
+                    a.pause();
+
+                    a.currentTime=0;
+
+                    const p=a.closest(".voice-player");
+
+                    if(p){
+
+                        p.querySelector(".voice-play").innerHTML=
+                        '<i class="fa-solid fa-play"></i>';
+
+                        p.querySelector(".voice-progress").style.width="0%";
+
+                    }
+
+                }
+
+            });
+
+            if(audio.paused){
+
+                audio.play();
+
+                playBtn.innerHTML=
+                '<i class="fa-solid fa-pause"></i>';
+
+            }else{
+
+                audio.pause();
+
+                playBtn.innerHTML=
+                '<i class="fa-solid fa-play"></i>';
+
+            }
+
+        };
+
+        audio.onloadedmetadata=()=>{
+
+            const total=Math.floor(audio.duration||0);
+
+            const m=Math.floor(total/60);
+
+            const s=String(total%60).padStart(2,"0");
+
+            time.innerText=`${m}:${s}`;
+
+        };
+
+        audio.ontimeupdate=()=>{
+
+            const percent=
+            (audio.currentTime/audio.duration)*100;
+
+            progress.style.width=percent+"%";
+
+            const current=Math.floor(audio.currentTime);
+
+            const m=Math.floor(current/60);
+
+            const s=String(current%60).padStart(2,"0");
+
+            time.innerText=`${m}:${s}`;
+
+        };
+
+        audio.onended=()=>{
+
+            playBtn.innerHTML=
+            '<i class="fa-solid fa-play"></i>';
+
+            progress.style.width="0%";
+
+            const total=Math.floor(audio.duration||0);
+
+            const m=Math.floor(total/60);
+
+            const s=String(total%60).padStart(2,"0");
+
+            time.innerText=`${m}:${s}`;
+
+        };
+
+    });
 
 }
 
