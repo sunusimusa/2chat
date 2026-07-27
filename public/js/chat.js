@@ -11,8 +11,6 @@ if (!user) {
 
 const socket = io();
 
-socket.emit("join", user.username);
-
 const params = new URLSearchParams(location.search);
 
 const receiver = params.get("user");
@@ -1254,9 +1252,11 @@ const observer = new MutationObserver(()=>{
 
 });
 
-observer.observe(chat,{
-    childList:true
-});
+if(chat){
+    observer.observe(chat,{
+        childList:true
+    });
+}
 
 /* ---------- Focus Input ---------- */
 
