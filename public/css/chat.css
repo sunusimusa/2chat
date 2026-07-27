@@ -117,6 +117,12 @@ body{
    MESSAGE ROW
 ========================== */
 
+.me,
+.other{
+    display:flex;
+    width:100%;
+    margin:8px 0;
+}
 
 .me{
     justify-content:flex-end;
@@ -126,6 +132,24 @@ body{
     justify-content:flex-start;
 }
 
+/* ==========================
+   MESSAGE BUBBLE
+========================== */
+
+.bubble-me,
+.bubble-other{
+    position:relative;
+    display:inline-block;
+    width:fit-content;
+    max-width:75%;
+    padding:12px 14px;
+    border-radius:18px;
+    font-size:15px;
+    line-height:1.45;
+    white-space:pre-wrap;
+    word-break:break-word;
+    overflow-wrap:break-word;
+}
 
 .bubble-me{
     background:#1877f2;
@@ -137,22 +161,6 @@ body{
     background:#fff;
     color:#222;
     border-bottom-left-radius:6px;
-}
-
-/* ==========================
-   MESSAGE BUBBLE
-========================== */
-
-.bubble-me{
-    background:#1877f2;
-    color:#fff;
-    border-bottom-right-radius:5px;
-}
-
-.bubble-other{
-    background:#fff;
-    color:#222;
-    border-bottom-left-radius:5px;
     box-shadow:0 2px 6px rgba(0,0,0,.08);
 }
 
