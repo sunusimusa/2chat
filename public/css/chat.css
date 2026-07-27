@@ -1296,3 +1296,41 @@ transform:scale(1);
 }
 
 }
+
+.me,
+.other{
+    display:flex;
+    width:100%;
+    margin:8px 0;
+    align-items:flex-end;
+}
+
+.me{
+    justify-content:flex-end;
+}
+
+.other{
+    justify-content:flex-start;
+}
+
+.bubble-me,
+.bubble-other{
+    display:inline-block;
+    flex:none;
+
+    width:auto;
+    height:auto;
+
+    max-width:75%;
+
+    padding:12px 15px;
+
+    border-radius:18px;
+
+    position:relative;
+
+    white-space:pre-wrap;
+    word-break:break-word;
+
+    align-self:flex-start;
+}
