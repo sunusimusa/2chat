@@ -380,12 +380,6 @@ async function sendMessage(){
 }
 
 /* ==========================
-   Send Button
-========================== */
-
-sendBtn.addEventListener("click", sendMessage);
-
-/* ==========================
    Press Enter
 ========================== */
 
@@ -1218,14 +1212,6 @@ function closeImage(){
 }
 
 /* ==========================
-   Start
-========================== */
-
-loadChatUser();
-
-loadMessages();
-
-/* ==========================
    PART 10
    Final Polish
 ========================== */
@@ -1251,8 +1237,6 @@ function scrollToBottom(smooth = true){
 socket.on("connect",()=>{
 
     console.log("Socket Connected");
-
-    socket.emit("join",user.username);
 
 });
 
