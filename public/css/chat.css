@@ -1265,3 +1265,52 @@ transform:scale(1);
 }
 
 }
+
+/* ==========================
+   MESSAGE ROW
+========================== */
+
+.me,
+.other{
+    display:flex;
+    width:100%;
+    margin:8px 0;
+}
+
+.me{
+    justify-content:flex-end;
+}
+
+.other{
+    justify-content:flex-start;
+}
+
+/* ==========================
+   MESSAGE BUBBLE
+========================== */
+
+.bubble-me,
+.bubble-other{
+    position:relative;
+    display:inline-block;
+    width:fit-content;
+    max-width:75%;
+    padding:12px 14px;
+    border-radius:18px;
+    word-break:break-word;
+    overflow-wrap:break-word;
+    white-space:pre-wrap;
+}
+
+.bubble-me{
+    background:#1877f2;
+    color:#fff;
+    border-bottom-right-radius:6px;
+}
+
+.bubble-other{
+    background:#fff;
+    color:#222;
+    border-bottom-left-radius:6px;
+    box-shadow:0 2px 6px rgba(0,0,0,.08);
+}
