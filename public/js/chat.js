@@ -1427,3 +1427,164 @@ function closeImage(){
 loadChatUser();
 
 loadMessages();
+
+/* ==========================
+   PART 10
+   Final Polish
+========================== */
+
+/* ---------- Helpers ---------- */
+
+function scrollToBottom(smooth = true){
+
+    if(!chat) return;
+
+    chat.scrollTo({
+
+        top: chat.scrollHeight,
+
+        behavior: smooth ? "smooth" : "auto"
+
+    });
+
+}
+
+/* ---------- Socket Connect ---------- */
+
+socket.on("connect",()=>{
+
+    console.log("Socket Connected");
+
+    socket.emit("join",user.username);
+
+});
+
+socket.on("disconnect",()=>{
+
+    console.log("Socket Disconnected");
+
+});
+
+/* ---------- Auto Scroll ---------- */
+
+const observer = new MutationObserver(()=>{
+
+    scrollToBottom();
+
+});
+
+observer.observe(chat,{
+    childList:true
+});
+
+/* ---------- Focus Input ---------- */
+
+window.addEventListener("load",()=>{
+
+    loadChatUser();
+
+    loadMessages();
+
+    messageInput.focus();
+
+});
+
+/* ---------- Escape Key ---------- */
+
+document.addEventListener("keydown",(e)=>{
+
+    if(e.key==="Escape"){
+
+        const popup=document.getElementById("reactionPopup");
+
+        const menu=document.getElementById("messageMenu");
+
+        const viewer=document.getElementById("imageViewer");
+
+        if(popup){
+
+            popup.style.display="none";
+
+        }
+
+        if(menu){
+
+            menu.style.display="none";
+
+        }
+
+        if(viewer){
+
+            viewer.style.display="none";
+
+        }
+
+    }
+
+});
+
+/* ---------- Image Viewer ---------- */
+
+document.getElementById("imageViewer")
+?.addEventListener("click",(e)=>{
+
+    if(e.target.id==="imageViewer"){
+
+        closeImage();
+
+    }
+
+});
+
+/* ---------- Message Input ---------- */
+
+messageInput.addEventListener("input",()=>{
+
+    sendBtn.style.opacity=
+    messageInput.value.trim()!=="" ? "1" : ".8";
+
+});
+
+/* ---------- Prevent Double Send ---------- */
+
+let sending=false;
+
+async function safeSend(){
+
+    if(sending) return;
+
+    sending=true;
+
+    try{
+
+        await sendMessage();
+
+    }finally{
+
+        sending=false;
+
+    }
+
+}
+
+sendBtn.onclick=safeSend;
+
+/* ---------- Network ---------- */
+
+window.addEventListener("offline",()=>{
+
+    console.log("Offline");
+
+});
+
+window.addEventListener("online",()=>{
+
+    console.log("Online");
+
+    loadMessages(false);
+
+});
+
+/* ---------- Finished ---------- */
+
+console.log("2Chat Messenger Loaded Successfully");
