@@ -869,4 +869,204 @@ function loadVoicePlayers(){
 
 }
 
+/* ==========================
+   Message Menu
+========================== */
+
+function showMessageMenu(e,msg){
+
+    e.preventDefault();
+
+    selectedMsg=msg;
+
+    const menu=document.getElementById("messageMenu");
+
+    if(!menu) return;
+
+    menu.style.display="block";
+
+    const x=e.pageX || e.touches?.[0]?.pageX || 0;
+
+    const y=e.pageY || e.touches?.[0]?.pageY || 0;
+
+    menu.style.left=x+"px";
+
+    menu.style.top=y+"px";
+
+}
+
+document.addEventListener("click",e=>{
+
+    if(!e.target.closest("#messageMenu")){
+
+        const menu=document.getElementById("messageMenu");
+
+        if(menu){
+
+            menu.style.display="none";
+
+        }
+
+    }
+
+});
+
+/* ==========================
+   Reply Menu
+========================== */
+
+function replySelected(){
+
+    if(!selectedMsg) return;
+
+    startReply(selectedMsg);
+
+    document.getElementById("messageMenu").style.display="none";
+
+}
+
+/* ==========================
+   Reaction Popup
+========================== */
+
+function reactSelected(){
+
+    if(!selectedMsg) return;
+
+    selectedMessage=selectedMsg._id;
+
+    document.getElementById("messageMenu").style.display="none";
+
+    const popup=document.getElementById("reactionPopup");
+
+    popup.style.display="flex";
+
+    popup.style.left="50%";
+
+    popup.style.top="50%";
+
+    popup.style.transform="translate(-50%,-50%)";
+
+}
+
+async function selectReaction(emoji){
+
+    if(!selectedMessage) return;
+
+    const res=await fetch("/api/messages/react",{
+
+        method:"PUT",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+            messageId:selectedMessage,
+
+            username:user.username,
+
+            emoji
+
+        })
+
+    });
+
+    const data=await res.json();
+
+    if(data.success){
+
+        loadMessages();
+
+    }
+
+    document.getElementById("reactionPopup").style.display="none";
+
+    selectedMessage=null;
+
+}
+
+/* ==========================
+   Delete For Me
+========================== */
+
+async function deleteSelected(){
+
+    if(!selectedMsg) return;
+
+    if(!confirm("Delete this message?")) return;
+
+    const res=await fetch(`/api/messages/${selectedMsg._id}`,{
+
+        method:"DELETE",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+            username:user.username
+
+        })
+
+    });
+
+    const data=await res.json();
+
+    if(data.success){
+
+        loadMessages();
+
+    }
+
+    document.getElementById("messageMenu").style.display="none";
+
+}
+
+/* ==========================
+   Delete For Everyone
+========================== */
+
+async function deleteEveryoneSelected(){
+
+    if(!selectedMsg) return;
+
+    if(!confirm("Delete for everyone?")) return;
+
+    const res=await fetch(
+
+        `/api/messages/delete-everyone/${selectedMsg._id}`,
+
+        {
+
+            method:"PUT",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                username:user.username
+
+            })
+
+        }
+
+    );
+
+    const data=await res.json();
+
+    if(data.success){
+
+        loadMessages();
+
+    }
+
+    document.getElementById("messageMenu").style.display="none";
+
+}
+
 
