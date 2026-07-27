@@ -112,3 +112,130 @@ body{
     background:#c7c7c7;
     border-radius:20px;
 }
+
+/* ==========================
+   MESSAGE ROW
+========================== */
+
+.me,
+.other{
+    width:100%;
+    display:flex;
+    margin:8px 0;
+}
+
+.me{
+    justify-content:flex-end;
+}
+
+.other{
+    justify-content:flex-start;
+}
+
+/* ==========================
+   MESSAGE BUBBLE
+========================== */
+
+.bubble-me,
+.bubble-other{
+    position:relative;
+    display:inline-block;
+    max-width:75%;
+    min-width:65px;
+    padding:10px 14px;
+    border-radius:18px;
+    word-wrap:break-word;
+    overflow-wrap:break-word;
+    white-space:pre-wrap;
+    font-size:15px;
+    line-height:1.45;
+    transition:.2s;
+}
+
+.bubble-me{
+    background:#1877f2;
+    color:#fff;
+    border-bottom-right-radius:5px;
+}
+
+.bubble-other{
+    background:#fff;
+    color:#222;
+    border-bottom-left-radius:5px;
+    box-shadow:0 2px 6px rgba(0,0,0,.08);
+}
+
+.bubble-me:hover,
+.bubble-other:hover{
+    transform:translateY(-1px);
+}
+
+/* ==========================
+   BUBBLE TAIL
+========================== */
+
+.bubble-me::after{
+    content:"";
+    position:absolute;
+    right:-8px;
+    bottom:0;
+    width:16px;
+    height:16px;
+    background:#1877f2;
+    clip-path:polygon(0 0,100% 100%,0 100%);
+}
+
+.bubble-other::after{
+    content:"";
+    position:absolute;
+    left:-8px;
+    bottom:0;
+    width:16px;
+    height:16px;
+    background:#fff;
+    clip-path:polygon(100% 0,100% 100%,0 100%);
+}
+
+/* ==========================
+   MESSAGE IMAGE
+========================== */
+
+.message-image{
+    margin-bottom:8px;
+}
+
+.message-image img,
+.bubble-me img,
+.bubble-other img{
+    display:block;
+    width:100%;
+    max-width:220px;
+    height:auto;
+    border-radius:12px;
+    cursor:pointer;
+}
+
+/* ==========================
+   TIME & STATUS
+========================== */
+
+.message-time{
+    display:block;
+    margin-top:6px;
+    font-size:11px;
+    opacity:.75;
+    text-align:right;
+}
+
+.message-status{
+    display:block;
+    margin-top:3px;
+    text-align:right;
+    font-size:11px;
+    white-space:nowrap;
+}
+
+.message-status i{
+    margin-right:3px;
+}
+
