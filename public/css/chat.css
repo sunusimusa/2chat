@@ -1265,17 +1265,3 @@ transform:scale(1);
 }
 
 }
-
-.message-row{
-    display:flex;
-    width:100%;
-    margin:8px 0;
-}
-
-.message-row.me{
-    justify-content:flex-end;
-}
-
-.message-row.other{
-    justify-content:flex-start;
-}
