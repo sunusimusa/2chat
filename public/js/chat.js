@@ -367,4 +367,138 @@ messageInput.addEventListener("keydown",function(e){
 
 });
 
+/* ==========================
+   Reply System
+========================== */
+
+function startReply(msg){
+
+    if(!msg) return;
+
+    replyMessage = msg;
+
+    const preview = document.getElementById("replyPreview");
+    const replyText = document.getElementById("replyText");
+
+    if(!preview || !replyText) return;
+
+    let text = "Message";
+
+    if(msg.text){
+
+        text = msg.text;
+
+    }else if(msg.image){
+
+        text = "📷 Photo";
+
+    }else if(msg.voice){
+
+        text = "🎤 Voice message";
+
+    }
+
+    replyText.innerText = text;
+
+    preview.style.display = "flex";
+
+}
+
+function cancelReply(){
+
+    replyMessage = null;
+
+    const preview = document.getElementById("replyPreview");
+
+    if(preview){
+
+        preview.style.display = "none";
+
+    }
+
+}
+
+/* ==========================
+   Swipe Reply
+========================== */
+
+function touchStart(e,msg){
+
+    startX = e.touches[0].clientX;
+
+    currentBubble =
+    e.target.closest(".bubble-me,.bubble-other");
+
+    swipeMessage = msg;
+
+    if(currentBubble){
+
+        currentBubble.style.transition = "";
+
+    }
+
+}
+
+function touchMove(e){
+
+    if(!currentBubble) return;
+
+    const moveX = e.touches[0].clientX;
+
+    let diff = moveX - startX;
+
+    diff = Math.max(0,Math.min(diff,60));
+
+    currentBubble.style.transform =
+    `translateX(${diff}px)`;
+
+}
+
+function touchEnd(){
+
+    if(!currentBubble) return;
+
+    const style =
+    currentBubble.style.transform;
+
+    let moved = 0;
+
+    const match =
+    style.match(/translateX\(([\d.]+)px\)/);
+
+    if(match){
+
+        moved = parseFloat(match[1]);
+
+    }
+
+    currentBubble.style.transition = ".2s";
+
+    currentBubble.style.transform =
+    "translateX(0px)";
+
+    if(moved >= 35){
+
+        navigator.vibrate?.(30);
+
+        startReply(swipeMessage);
+
+    }
+
+    setTimeout(()=>{
+
+        if(currentBubble){
+
+            currentBubble.style.transition = "";
+
+        }
+
+    },200);
+
+    currentBubble = null;
+
+    swipeMessage = null;
+
+}
+
 
