@@ -254,4 +254,117 @@ function appendMessage(msg){
 
 }
 
+/* ==========================
+   Send Message
+========================== */
+
+async function sendMessage(){
+
+    const text = messageInput.value.trim();
+    const image = imageInput.files[0];
+
+    if(text === "" && !image && !replyMessage){
+        return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("sender", user.username);
+    formData.append("receiver", receiver);
+    formData.append("text", text);
+
+    if(image){
+        formData.append("file", image);
+    }
+
+    if(replyMessage){
+
+        formData.append("replyTo", replyMessage._id || "");
+
+        formData.append("replyUser", replyMessage.sender || "");
+
+        formData.append("replyText", replyMessage.text || "");
+
+        formData.append("replyImage", replyMessage.image || "");
+
+        formData.append("replyVoice", replyMessage.voice || "");
+
+    }
+
+    try{
+
+        const res = await fetch("/api/messages/send",{
+
+            method:"POST",
+
+            body:formData
+
+        });
+
+        const data = await res.json();
+
+        if(!data.success){
+
+            alert(data.message || "Failed to send message");
+
+            return;
+
+        }
+
+        appendMessage(data.message);
+
+        socket.emit("newMessage", data.message);
+
+        messageInput.value = "";
+
+        imageInput.value = "";
+
+        replyMessage = null;
+
+        const preview = document.getElementById("replyPreview");
+
+        if(preview){
+            preview.style.display = "none";
+        }
+
+        const previewBox = document.getElementById("previewBox");
+
+        if(previewBox){
+            previewBox.style.display = "none";
+        }
+
+        chat.scrollTop = chat.scrollHeight;
+
+    }catch(err){
+
+        console.error(err);
+
+        alert("Network Error");
+
+    }
+
+}
+
+/* ==========================
+   Send Button
+========================== */
+
+sendBtn.addEventListener("click", sendMessage);
+
+/* ==========================
+   Press Enter
+========================== */
+
+messageInput.addEventListener("keydown",function(e){
+
+    if(e.key==="Enter" && !e.shiftKey){
+
+        e.preventDefault();
+
+        sendMessage();
+
+    }
+
+});
+
 
