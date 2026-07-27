@@ -1069,4 +1069,182 @@ async function deleteEveryoneSelected(){
 
 }
 
+/* ==========================
+   PART 8
+   Menus & Delete
+========================== */
+
+let selectedMsg = null;
+let selectedMessage = null;
+
+function showMessageMenu(e, msg){
+
+    e.preventDefault();
+
+    selectedMsg = msg;
+
+    const menu = document.getElementById("messageMenu");
+
+    if(!menu) return;
+
+    menu.style.display = "block";
+
+    const x = e.pageX || (e.touches ? e.touches[0].pageX : 0);
+    const y = e.pageY || (e.touches ? e.touches[0].pageY : 0);
+
+    menu.style.left = x + "px";
+    menu.style.top = y + "px";
+
+    const deleteMe = document.getElementById("deleteMeOption");
+    const deleteAll = document.getElementById("deleteAllOption");
+
+    if(msg.sender === user.username){
+
+        if(deleteMe) deleteMe.style.display = "flex";
+        if(deleteAll) deleteAll.style.display = "flex";
+
+    }else{
+
+        if(deleteMe) deleteMe.style.display = "none";
+        if(deleteAll) deleteAll.style.display = "none";
+
+    }
+
+}
+
+function replySelected(){
+
+    if(!selectedMsg) return;
+
+    startReply(selectedMsg);
+
+    document.getElementById("messageMenu").style.display = "none";
+
+}
+
+function reactSelected(){
+
+    if(!selectedMsg) return;
+
+    document.getElementById("messageMenu").style.display = "none";
+
+    selectedMessage = selectedMsg._id;
+
+    const popup = document.getElementById("reactionPopup");
+
+    popup.style.display = "flex";
+    popup.style.left = "50%";
+    popup.style.top = "50%";
+    popup.style.transform = "translate(-50%,-50%)";
+
+}
+
+function deleteSelected(){
+
+    document.getElementById("messageMenu").style.display = "none";
+
+    if(!selectedMsg) return;
+
+    deleteMessage(selectedMsg._id);
+
+}
+
+function deleteEveryoneSelected(){
+
+    document.getElementById("messageMenu").style.display = "none";
+
+    if(!selectedMsg) return;
+
+    deleteForEveryone(selectedMsg._id);
+
+}
+
+function toggleChatMenu(){
+
+    const menu = document.getElementById("chatMenu");
+
+    if(!menu) return;
+
+    menu.style.display =
+    menu.style.display === "block"
+    ? "none"
+    : "block";
+
+}
+
+async function clearChat(){
+
+    if(!confirm("Delete all messages?")) return;
+
+    try{
+
+        const res = await fetch(
+            `/api/messages/clear/${user.username}/${receiver}`,
+            {
+                method:"DELETE"
+            }
+        );
+
+        const data = await res.json();
+
+        if(data.success){
+
+            document.getElementById("chat").innerHTML = "";
+
+        }else{
+
+            alert(data.message);
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+    }
+
+}
+
+document.addEventListener("click",(e)=>{
+
+    const messageMenu =
+    document.getElementById("messageMenu");
+
+    if(
+        messageMenu &&
+        !e.target.closest("#messageMenu")
+    ){
+
+        messageMenu.style.display = "none";
+
+    }
+
+    const chatMenu =
+    document.getElementById("chatMenu");
+
+    if(
+        chatMenu &&
+        !e.target.closest("#chatMenu") &&
+        !e.target.closest(".header-btn")
+    ){
+
+        chatMenu.style.display = "none";
+
+    }
+
+    const popup =
+    document.getElementById("reactionPopup");
+
+    if(
+        popup &&
+        !e.target.closest("#reactionPopup")
+    ){
+
+        popup.style.display = "none";
+        popup.style.transform = "";
+
+    }
+
+});
+
 
