@@ -1044,14 +1044,12 @@ document.addEventListener("click",(e)=>{
 
 socket.on("receiveMessage",(msg)=>{
 
-    if(
-        msg.sender===receiver ||
-        msg.receiver===receiver
-    ){
-
-        appendMessage(msg);
-
-    }
+    if (
+    (msg.sender === receiver && msg.receiver === user.username) ||
+    (msg.sender === user.username && msg.receiver === receiver)
+) {
+    appendMessage(msg);
+}
 
 });
 
@@ -1232,10 +1230,9 @@ function scrollToBottom(smooth = true){
 
 /* ---------- Socket Connect ---------- */
 
-socket.on("connect",()=>{
-
+socket.on("connect", () => {
     console.log("Socket Connected");
-
+    socket.emit("join", user.username);
 });
 
 socket.on("disconnect",()=>{
