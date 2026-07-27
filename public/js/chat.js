@@ -1248,3 +1248,182 @@ document.addEventListener("click",(e)=>{
 });
 
 
+/* ==========================
+   PART 9
+   Socket & Image
+========================== */
+
+socket.on("receiveMessage",(msg)=>{
+
+    if(
+        msg.sender===receiver ||
+        msg.receiver===receiver
+    ){
+
+        appendMessage(msg);
+
+    }
+
+});
+
+socket.on("messageDelivered",(data)=>{
+
+    loadMessages(false);
+
+});
+
+socket.on("messageSeen",(data)=>{
+
+    loadMessages(false);
+
+});
+
+socket.on("typing",(data)=>{
+
+    if(data.sender!==receiver) return;
+
+    const status=document.getElementById("status");
+
+    if(status){
+
+        status.innerHTML=
+        '<i class="fa-solid fa-pen"></i> Typing...';
+
+    }
+
+});
+
+socket.on("stopTyping",()=>{
+
+    const status=document.getElementById("status");
+
+    if(status){
+
+        status.innerHTML=
+        '<i class="fa-solid fa-circle online-dot"></i> Online';
+
+    }
+
+});
+
+socket.on("userOnline",(username)=>{
+
+    if(username!==receiver) return;
+
+    const status=document.getElementById("status");
+
+    if(status){
+
+        status.innerHTML=
+        '<i class="fa-solid fa-circle online-dot"></i> Online';
+
+    }
+
+});
+
+socket.on("userOffline",(username)=>{
+
+    if(username!==receiver) return;
+
+    const status=document.getElementById("status");
+
+    if(status){
+
+        status.innerHTML=
+        '<i class="fa-regular fa-clock"></i> Offline';
+
+    }
+
+});
+
+/* ==========================
+   Typing
+========================== */
+
+messageInput.addEventListener("input",()=>{
+
+    socket.emit("typing",{
+
+        sender:user.username,
+
+        receiver
+
+    });
+
+    clearTimeout(window.typingTimeout);
+
+    window.typingTimeout=setTimeout(()=>{
+
+        socket.emit("stopTyping",{
+
+            sender:user.username,
+
+            receiver
+
+        });
+
+    },1000);
+
+});
+
+/* ==========================
+   Image Preview
+========================== */
+
+imageInput.addEventListener("change",()=>{
+
+    const file=imageInput.files[0];
+
+    if(!file) return;
+
+    const reader=new FileReader();
+
+    reader.onload=e=>{
+
+        document.getElementById("previewImage").src=e.target.result;
+
+        document.getElementById("previewBox").style.display="block";
+
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
+function removeImage(){
+
+    imageInput.value="";
+
+    document.getElementById("previewBox").style.display="none";
+
+}
+
+/* ==========================
+   Image Viewer
+========================== */
+
+function openImage(src){
+
+    const viewer=document.getElementById("imageViewer");
+
+    const img=document.getElementById("fullImage");
+
+    img.src=src;
+
+    viewer.style.display="flex";
+
+}
+
+function closeImage(){
+
+    document.getElementById("imageViewer").style.display="none";
+
+}
+
+/* ==========================
+   Start
+========================== */
+
+loadChatUser();
+
+loadMessages();
