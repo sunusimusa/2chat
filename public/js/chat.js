@@ -159,4 +159,99 @@ msg.delivered ?
 
 }
 
+/* ==========================
+   Load Messages
+========================== */
+
+async function loadMessages(autoScroll = true){
+
+    if(!receiver) return;
+
+    try{
+
+        const res = await fetch(
+            `/api/messages/chat?sender=${user.username}&receiver=${receiver}`
+        );
+
+        const data = await res.json();
+
+        if(!data.success){
+
+            chat.innerHTML = "";
+
+            return;
+
+        }
+
+        const messages = data.messages || [];
+
+        chat.innerHTML = "";
+
+        messages.forEach(msg=>{
+
+            chat.insertAdjacentHTML(
+                "beforeend",
+                renderMessage(msg)
+            );
+
+            if(
+                msg.receiver === user.username &&
+                !msg.seen
+            ){
+
+                socket.emit("messageSeen",{
+
+                    sender:msg.sender,
+
+                    messageId:msg._id
+
+                });
+
+            }
+
+        });
+
+        if(autoScroll){
+
+            requestAnimationFrame(()=>{
+
+                chat.scrollTop = chat.scrollHeight;
+
+            });
+
+        }
+
+        loadVoicePlayers();
+
+    }catch(err){
+
+        console.error("Load Messages Error:",err);
+
+    }
+
+}
+
+/* ==========================
+   Append One Message
+========================== */
+
+function appendMessage(msg){
+
+    if(!msg) return;
+
+    chat.insertAdjacentHTML(
+        "beforeend",
+        renderMessage(msg)
+    );
+
+    requestAnimationFrame(()=>{
+
+        chat.scrollTop = chat.scrollHeight;
+
+    });
+
+    loadVoicePlayers();
+
+}
+
 
