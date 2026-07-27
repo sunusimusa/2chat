@@ -387,7 +387,7 @@ messageInput.addEventListener("keydown",function(e){
 
         e.preventDefault();
 
-        sendMessage();
+        safeSend();
 
     }
 
