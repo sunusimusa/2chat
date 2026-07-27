@@ -116,12 +116,6 @@ body{
 /* ==========================
    MESSAGE ROW
 ========================== */
-.me,
-.other{
-    display:flex;
-    width:100%;
-    margin:8px 0;
-}
 
 .me{
     justify-content:flex-end;
@@ -131,28 +125,6 @@ body{
     justify-content:flex-start;
 }
 
-.bubble-me,
-.bubble-other{
-
-    position:relative;
-
-    display:inline-flex;
-    flex-direction:column;
-
-    width:fit-content;
-    max-width:78%;
-
-    padding:12px 14px;
-
-    border-radius:18px;
-
-    word-break:break-word;
-    white-space:pre-wrap;
-
-    height:auto;
-
-    flex:none;
-}
 
 .bubble-me{
     background:#1877f2;
@@ -169,22 +141,6 @@ body{
 /* ==========================
    MESSAGE BUBBLE
 ========================== */
-
-.bubble-me,
-.bubble-other{
-    position:relative;
-    display:inline-block;
-    max-width:75%;
-    min-width:65px;
-    padding:10px 14px;
-    border-radius:18px;
-    word-wrap:break-word;
-    overflow-wrap:break-word;
-    white-space:pre-wrap;
-    font-size:15px;
-    line-height:1.45;
-    transition:.2s;
-}
 
 .bubble-me{
     background:#1877f2;
@@ -1301,3 +1257,16 @@ transform:scale(1);
 
 }
 
+.message-row{
+    display:flex;
+    width:100%;
+    margin:8px 0;
+}
+
+.message-row.me{
+    justify-content:flex-end;
+}
+
+.message-row.other{
+    justify-content:flex-start;
+}
