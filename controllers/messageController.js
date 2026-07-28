@@ -574,50 +574,52 @@ exports.deleteForEveryone = async (req, res) => {
         const { username } = req.body;
 
         if (!id || !username) {
-
-            return res.json({
+            return res.status(400).json({
                 success: false,
                 message: "Missing data."
             });
-
         }
 
         const message = await Message.findById(id);
 
         if (!message) {
-
-            return res.json({
+            return res.status(404).json({
                 success: false,
                 message: "Message not found."
             });
-
         }
 
-        // Mai tura message kaɗai zai iya gogewa
+        // Sender kaɗai zai iya gogewa
         if (message.sender !== username) {
-
-            return res.json({
+            return res.status(403).json({
                 success: false,
                 message: "Permission denied."
             });
-
         }
 
-        // Idan an riga an goge shi
+        // Idan an riga an goge
         if (message.deletedForEveryone) {
-
             return res.json({
                 success: false,
                 message: "Message already deleted."
             });
-
         }
 
+        // Goge message ga kowa
         message.deletedForEveryone = true;
         message.deletedBy = username;
+
         message.text = "";
         message.image = "";
         message.voice = "";
+
+        message.replyTo = null;
+        message.replyText = "";
+        message.replyImage = "";
+        message.replyVoice = "";
+        message.replyUser = "";
+
+        message.reactions = [];
 
         await message.save();
 
@@ -628,11 +630,11 @@ exports.deleteForEveryone = async (req, res) => {
 
     } catch (err) {
 
-        console.error(err);
+        console.error("Delete For Everyone Error:", err);
 
         return res.status(500).json({
             success: false,
-            message: err.message
+            message: "Internal Server Error"
         });
 
     }
