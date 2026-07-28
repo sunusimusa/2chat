@@ -729,6 +729,7 @@ function toggleRecording() {
 /* ==========================
    Stop Recording
 ========================== */
+
 function stopRecording() {
 
     if (!recording) return;
@@ -736,12 +737,6 @@ function stopRecording() {
     recording = false;
 
     clearInterval(recordTimer);
-
-    document.getElementById("recordingBox").style.display = "none";
-    document.getElementById("stopRecordBtn").style.display = "none";
-
-    document.getElementById("recordBtn").innerHTML =
-        '<i class="fa-solid fa-microphone"></i>';
 
     if (mediaRecorder && mediaRecorder.state !== "inactive") {
 
@@ -755,41 +750,46 @@ function stopRecording() {
    Send Voice
 ========================== */
 
-async function sendVoice(){
+async function sendVoice() {
 
-    if(!audioBlob) return;
+    if (!audioBlob || audioBlob.size === 0) {
+        alert("No voice recorded.");
+        return;
+    }
 
-    const formData=new FormData();
+    const formData = new FormData();
 
-    formData.append("voice",audioBlob,"voice.webm");
+    formData.append("voice", audioBlob, "voice.webm");
+    formData.append("sender", user.username);
+    formData.append("receiver", receiver);
+    formData.append("duration", recordSeconds);
 
-    formData.append("sender",user.username);
-
-    formData.append("receiver",receiver);
-
-    formData.append("duration",recordSeconds);
-
-    const res=await fetch("/api/messages/voice",{
-
-        method:"POST",
-
-        body:formData
-
+    const res = await fetch("/api/messages/voice", {
+        method: "POST",
+        body: formData
     });
 
-    const data=await res.json();
+    const data = await res.json();
 
-   if(data.success){
+    if (data.success) {
 
-    appendMessage(data.message);
+        appendMessage(data.message);
+        socket.emit("newMessage", data.message);
 
-    socket.emit("newMessage", data.message);
+        // Reset
+        audioChunks = [];
+        audioBlob = null;
+        recordSeconds = 0;
 
-    audioChunks = [];
-    audioBlob = null;
-    recordSeconds = 0;
-   
-    }else{
+        document.getElementById("recordingBox").style.display = "none";
+        document.getElementById("stopRecordBtn").style.display = "none";
+        document.getElementById("sendVoiceBtn").style.display = "none";
+
+        document.getElementById("recordBtn").style.display = "flex";
+        document.getElementById("recordBtn").innerHTML =
+            '<i class="fa-solid fa-microphone"></i>';
+
+    } else {
 
         alert(data.message);
 
