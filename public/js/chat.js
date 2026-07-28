@@ -594,7 +594,7 @@ async function startRecording(){
 };
 
 
-       mediaRecorder.onstop = async () => {
+       mediaRecorder.onstop = () => {
 
     audioBlob = new Blob(audioChunks, {
         type: "audio/webm"
@@ -606,15 +606,21 @@ async function startRecording(){
 
     stream.getTracks().forEach(track => track.stop());
 
-    if (audioBlob.size > 0) {
-
-        await sendVoice();
-
-    } else {
+    if (audioBlob.size === 0) {
 
         alert("Voice recording failed.");
+        return;
 
     }
+
+    // Nuna Send Voice button
+    document.getElementById("sendVoiceBtn").style.display = "inline-flex";
+
+    // Ɓoye Stop button
+    document.getElementById("stopRecordBtn").style.display = "none";
+
+    // Canza rubutu
+    document.querySelector(".record-text").innerText = "Voice Ready";
 
 };
        
@@ -627,8 +633,7 @@ async function startRecording(){
 
         recordSeconds=0;
 
-       document.getElementById("sendVoiceBtn").style.display = "inline-flex";
-
+       document.getElementById("sendVoiceBtn").style.display = "none";
         document.getElementById("recordingBox").style.display="flex";
 
         document.getElementById("stopRecordBtn").style.display="flex";
