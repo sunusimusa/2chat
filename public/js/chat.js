@@ -581,15 +581,17 @@ async function startRecording(){
 
         audioChunks = [];
 
-        mediaRecorder.ondataavailable = e=>{
+        mediaRecorder.ondataavailable = (e) => {
 
-            if(e.data.size>0){
+    console.log("Chunk Size:", e.data.size);
 
-                audioChunks.push(e.data);
+    if (e.data && e.data.size > 0) {
 
-            }
+        audioChunks.push(e.data);
 
-        };
+    }
+
+};
 
 
        mediaRecorder.onstop = async () => {
@@ -598,6 +600,8 @@ async function startRecording(){
         type: "audio/webm"
     });
 
+    console.log("Audio Chunks:", audioChunks);
+    console.log("Chunks Length:", audioChunks.length);
     console.log("Audio Size:", audioBlob.size);
 
     stream.getTracks().forEach(track => track.stop());
@@ -614,7 +618,8 @@ async function startRecording(){
 
 };
        
-        mediaRecorder.start();
+       
+        mediaRecorder.start(1000);
 
         recording=true;
 
