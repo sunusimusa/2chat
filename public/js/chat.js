@@ -195,45 +195,46 @@ msg.delivered ?
    Load Chat User
 ========================== */
 
-async function loadChatUser(){
+async function loadChatUser() {
 
-    if(!receiver) return;
+    if (!receiver) return;
 
-    try{
+    try {
 
-        const res = await fetch(`/api/users/${receiver}`);
+        const res = await fetch(`/api/users/profile/${receiver}`);
         const data = await res.json();
 
-        if(!data.success) return;
+        if (!data.success) return;
 
         const chatUser = data.user;
 
-        const avatar = document.getElementById("chatAvatar");
-        const name = document.getElementById("chatName");
+        document.getElementById("chatName").innerText =
+            chatUser.username;
+
+        document.getElementById("chatAvatar").src =
+            chatUser.avatar || "/images/default.png";
+
         const status = document.getElementById("status");
 
-        if(avatar){
-            avatar.src = chatUser.avatar || "/images/default-avatar.png";
+        if (chatUser.online) {
+
+            status.innerHTML =
+            '<i class="fa-solid fa-circle online-dot"></i> Online';
+
+        } else {
+
+            status.innerHTML =
+            '<i class="fa-regular fa-clock"></i> Offline';
+
         }
 
-        if(name){
-            name.textContent = chatUser.username;
-        }
-
-        if(status){
-            status.innerHTML = chatUser.online
-                ? '<i class="fa-solid fa-circle online-dot"></i> Online'
-                : '<i class="fa-regular fa-clock"></i> Offline';
-        }
-
-    }catch(err){
+    } catch (err) {
 
         console.error("Load Chat User Error:", err);
 
     }
 
 }
-
 /* ==========================
    Load Messages
 ========================== */
