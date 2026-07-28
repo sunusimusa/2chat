@@ -17,253 +17,312 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 
 <body>
 
-  <!-- MESSAGE MENU -->
+<!-- ==========================
+MESSAGE MENU
+========================== -->
+
 <div id="messageMenu" class="message-menu">
 
     <div onclick="replySelected()">
         <i class="fa-solid fa-reply"></i>
-        Reply
+        <span>Reply</span>
     </div>
 
     <div onclick="reactSelected()">
         <i class="fa-regular fa-face-smile"></i>
-        React
+        <span>React</span>
     </div>
 
     <div id="deleteMeOption" onclick="deleteSelected()">
         <i class="fa-solid fa-trash"></i>
-        Delete for me
+        <span>Delete for me</span>
     </div>
 
     <div id="deleteAllOption" onclick="deleteEveryoneSelected()">
         <i class="fa-solid fa-trash-can"></i>
-        Delete for everyone
+        <span>Delete for everyone</span>
     </div>
 
 </div>
 
-  <div id="chatMenu" class="chat-menu">
+<!-- ==========================
+CHAT MENU
+========================== -->
+
+<div id="chatMenu" class="chat-menu">
 
     <div onclick="clearChat()">
         <i class="fa-solid fa-trash"></i>
-        Clear Chat
+        <span>Clear Chat</span>
     </div>
 
 </div>
 
-<!-- ===================== -->
-<!-- HEADER -->
-<!-- ===================== -->
+<!-- ==========================
+HEADER
+========================== -->
 
 <header class="chat-header">
 
-<button
-class="back-btn"
-onclick="history.back()">
+    <button
+    class="back-btn"
+    onclick="history.back()">
 
-<i class="fa-solid fa-arrow-left"></i>
+        <i class="fa-solid fa-arrow-left"></i>
 
-</button>
+    </button>
 
-<div class="chat-user">
+    <div class="chat-user">
 
-<img
-id="chatAvatar"
-src="/images/default.png"
-class="chat-avatar">
+        <img
+        id="chatAvatar"
+        src="/images/default.png"
+        class="chat-avatar">
 
-<div class="chat-info">
+        <div class="chat-info">
 
-<h3 id="chatUser">Loading...</h3>
+            <h3 id="chatName">
+                Loading...
+            </h3>
 
-<p id="status">
+            <p id="status">
 
-<i class="fa-solid fa-circle online-dot"></i>
+                <i class="fa-solid fa-circle online-dot"></i>
 
-Offline
+                Offline
 
-</p>
+            </p>
 
-<p
-id="typing"
-style="display:none;">
+            <p id="typing" style="display:none;">
 
-<i class="fa-solid fa-pen"></i>
+                <i class="fa-solid fa-pen"></i>
 
-Typing...
+                Typing...
 
-</p>
+            </p>
 
-</div>
+        </div>
 
-</div>
+    </div>
 
-<div class="header-actions">
+    <div class="header-actions">
 
-<button class="header-btn" onclick="toggleChatMenu()">
-    <i class="fa-solid fa-ellipsis-vertical"></i>
-</button>
-  
-</div>
+        <button
+        class="header-btn"
+        onclick="toggleChatMenu()">
+
+            <i class="fa-solid fa-ellipsis-vertical"></i>
+
+        </button>
+
+    </div>
 
 </header>
 
-<!-- CHAT AREA -->
+<!-- ==========================
+CHAT AREA
+========================== -->
 
-<div id="chat" class="chat-container"></div>
+<div
+id="chat"
+class="chat-container">
 
-<!-- IMAGE PREVIEW -->
+</div>
+
+  <!-- ==========================
+IMAGE PREVIEW
+========================== -->
 
 <div
 id="previewBox"
 class="preview-box"
 style="display:none;">
 
-<img id="previewImage">
+    <img id="previewImage">
 
-<br><br>
+    <div class="preview-actions">
 
-<button onclick="removeImage()">
+        <button
+        type="button"
+        onclick="removeImage()">
 
-<i class="fa-solid fa-trash"></i>
+            <i class="fa-solid fa-trash"></i>
 
-Remove
+            Remove
 
-</button>
+        </button>
+
+    </div>
 
 </div>
 
-<!-- REPLY PREVIEW -->
+<!-- ==========================
+REPLY PREVIEW
+========================== -->
 
 <div
 id="replyPreview"
 class="reply-preview"
 style="display:none;">
 
-<div class="reply-info">
+    <div class="reply-info">
 
-<small>Replying to</small>
+        <small>Replying to</small>
 
-<p id="replyText"></p>
+        <p id="replyText"></p>
+
+    </div>
+
+    <button
+    type="button"
+    onclick="cancelReply()">
+
+        <i class="fa-solid fa-xmark"></i>
+
+    </button>
 
 </div>
 
-<button onclick="cancelReply()">
-
-<i class="fa-solid fa-xmark"></i>
-
-</button>
-
-</div>
-
-<!-- MESSAGE BAR -->
+<!-- ==========================
+MESSAGE BAR
+========================== -->
 
 <div class="message-bar">
 
-<label for="image" class="icon-btn">
+    <label
+    for="image"
+    class="icon-btn">
 
-<i class="fa-solid fa-image"></i>
+        <i class="fa-solid fa-image"></i>
 
-</label>
+    </label>
 
-<input
-type="file"
-id="image"
-accept="image/*"
-hidden>
+    <input
+    type="file"
+    id="image"
+    accept="image/*"
+    hidden>
 
-<textarea
-id="message"
-placeholder="Type a message..."></textarea>
+    <textarea
+    id="message"
+    rows="1"
+    placeholder="Type a message..."></textarea>
 
-<button
-id="recordBtn"
-onclick="toggleRecording()">
+    <button
+    id="recordBtn"
+    type="button"
+    onclick="toggleRecording()">
 
-<i
-id="recordIcon"
-class="fa-solid fa-microphone"></i>
+        <i
+        id="recordIcon"
+        class="fa-solid fa-microphone"></i>
 
-</button>
+    </button>
 
-<button
-id="stopRecordBtn"
-onclick="stopRecording()"
-style="display:none;">
+    <button
+    id="stopRecordBtn"
+    type="button"
+    onclick="stopRecording()"
+    style="display:none;">
 
-<i class="fa-solid fa-stop"></i>
+        <i class="fa-solid fa-stop"></i>
 
-</button>
+    </button>
 
-  <button
-id="sendBtn"
-onclick="sendMessage()">
+    <button
+    id="sendBtn"
+    type="button">
 
-<i class="fa-solid fa-paper-plane"></i>
+        <i class="fa-solid fa-paper-plane"></i>
 
-</button>
+    </button>
 
 </div>
 
-<!-- RECORDING -->
+<!-- ==========================
+RECORDING BOX
+========================== -->
 
 <div
 id="recordingBox"
 class="recording-box"
 style="display:none;">
 
-<span class="record-dot"></span>
+    <span class="record-dot"></span>
 
-<span id="recordTime">00:00</span>
+    <span id="recordTime">
+        00:00
+    </span>
 
-<span class="record-text">
+    <span class="record-text">
 
-Recording...
+        Recording...
 
-</span>
+    </span>
+
+    <button
+    id="sendVoiceBtn"
+    type="button"
+    onclick="sendVoice()"
+    style="display:none;">
+
+        <i class="fa-solid fa-paper-plane"></i>
+
+    </button>
 
 </div>
 
-<!-- REACTION -->
+  <!-- ==========================
+REACTION POPUP
+========================== -->
 
 <div
 id="reactionPopup"
-class="reaction-popup">
+class="reaction-popup"
+style="display:none;">
 
-<span onclick="selectReaction('❤️')">❤️</span>
+    <span onclick="selectReaction('❤️')">❤️</span>
 
-<span onclick="selectReaction('👍')">👍</span>
+    <span onclick="selectReaction('👍')">👍</span>
 
-<span onclick="selectReaction('😂')">😂</span>
+    <span onclick="selectReaction('😂')">😂</span>
 
-<span onclick="selectReaction('😮')">😮</span>
+    <span onclick="selectReaction('😮')">😮</span>
 
-<span onclick="selectReaction('😢')">😢</span>
+    <span onclick="selectReaction('😢')">😢</span>
 
-<span onclick="selectReaction('😡')">😡</span>
+    <span onclick="selectReaction('😡')">😡</span>
 
 </div>
 
-<!-- IMAGE VIEWER -->
+<!-- ==========================
+IMAGE VIEWER
+========================== -->
 
 <div
 id="imageViewer"
 class="image-viewer"
 style="display:none;">
 
-<span
-class="close-image"
-onclick="closeImage()">
+    <button
+    class="close-image"
+    type="button"
+    onclick="closeImage()">
 
-<i class="fa-solid fa-xmark"></i>
+        <i class="fa-solid fa-xmark"></i>
 
-</span>
+    </button>
 
-<img id="fullImage">
+    <img
+    id="fullImage"
+    src=""
+    alt="Image Preview">
 
-  </div>
+</div>
 
-<!-- JAVASCRIPT -->
+<!-- ==========================
+SCRIPTS
+========================== -->
 
 <script src="/socket.io/socket.io.js"></script>
 
