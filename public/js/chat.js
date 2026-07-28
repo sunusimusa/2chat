@@ -789,10 +789,8 @@ async function sendVoice(){
 
     if(data.success){
 
-        appendMessage(data.message);
-
-        socket.emit("newMessage",data.message);
-
+        socket.emit("newMessage", data.message);
+       
        audioChunks = [];
        audioBlob = null;
        recordSeconds = 0;
