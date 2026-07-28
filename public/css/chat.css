@@ -1,1 +1,816 @@
+/* ==========================
+   2Chat Messenger CSS
+   PART 1
+========================== */
 
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+html,body{
+width:100%;
+height:100%;
+overflow:hidden;
+background:#0f172a;
+color:#fff;
+}
+
+/* ==========================
+   HEADER
+========================== */
+
+.chat-header{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:65px;
+background:#1e293b;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:10px 15px;
+z-index:1000;
+box-shadow:0 2px 8px rgba(0,0,0,.25);
+}
+
+.back-btn{
+width:42px;
+height:42px;
+border:none;
+border-radius:50%;
+background:transparent;
+color:#fff;
+font-size:20px;
+cursor:pointer;
+}
+
+.chat-user{
+display:flex;
+align-items:center;
+flex:1;
+margin-left:10px;
+overflow:hidden;
+}
+
+.chat-avatar{
+width:45px;
+height:45px;
+border-radius:50%;
+object-fit:cover;
+border:2px solid #22c55e;
+}
+
+.chat-info{
+margin-left:10px;
+overflow:hidden;
+}
+
+.chat-info h3{
+font-size:16px;
+font-weight:700;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.chat-info p{
+font-size:12px;
+margin-top:2px;
+color:#cbd5e1;
+}
+
+.online-dot{
+color:#22c55e;
+font-size:10px;
+margin-right:4px;
+}
+
+.header-actions{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.header-btn{
+width:40px;
+height:40px;
+border:none;
+border-radius:50%;
+background:transparent;
+color:#fff;
+font-size:20px;
+cursor:pointer;
+}
+
+/* ==========================
+   CHAT AREA
+========================== */
+
+.chat-container{
+position:fixed;
+top:65px;
+bottom:75px;
+left:0;
+right:0;
+overflow-y:auto;
+padding:15px;
+background:#0f172a;
+scroll-behavior:smooth;
+}
+
+.chat-container::-webkit-scrollbar{
+width:4px;
+}
+
+.chat-container::-webkit-scrollbar-thumb{
+background:#334155;
+border-radius:20px;
+}
+
+/* ==========================
+   MESSAGE ROW
+========================== */
+
+.me,
+.other{
+display:flex;
+margin-bottom:12px;
+animation:fadeIn .25s ease;
+}
+
+.me{
+justify-content:flex-end;
+}
+
+.other{
+justify-content:flex-start;
+}
+
+/* ==========================
+   MESSAGE BUBBLE
+========================== */
+
+.bubble-me,
+.bubble-other{
+max-width:78%;
+padding:10px 12px;
+border-radius:18px;
+word-wrap:break-word;
+position:relative;
+transition:.2s;
+}
+
+.bubble-me{
+background:#2563eb;
+color:#fff;
+border-bottom-right-radius:5px;
+}
+
+.bubble-other{
+background:#1e293b;
+color:#fff;
+border-bottom-left-radius:5px;
+}
+
+/* ==========================
+   MESSAGE IMAGE
+========================== */
+
+.message-image img{
+width:100%;
+max-width:240px;
+border-radius:12px;
+cursor:pointer;
+display:block;
+margin-bottom:6px;
+}
+
+/* ==========================
+   MESSAGE TIME
+========================== */
+
+.message-time{
+font-size:10px;
+opacity:.8;
+margin-top:6px;
+text-align:right;
+}
+
+.message-status{
+display:block;
+text-align:right;
+margin-top:2px;
+font-size:11px;
+}
+
+/* ==========================
+   DELETED MESSAGE
+========================== */
+
+.deleted-message{
+font-style:italic;
+opacity:.8;
+display:flex;
+align-items:center;
+gap:6px;
+}
+
+/* ==========================
+   ANIMATION
+========================== */
+
+@keyframes fadeIn{
+
+from{
+opacity:0;
+transform:translateY(8px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
+/* ==========================
+   PART 2
+   Reply Preview
+   Message Bar
+   Textarea
+   Buttons
+   Recording Box
+   Preview Image
+   Voice Player
+========================== */
+
+/* ==========================
+   REPLY PREVIEW
+========================== */
+
+.reply-preview{
+position:fixed;
+left:0;
+right:0;
+bottom:75px;
+background:#1e293b;
+border-top:1px solid #334155;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:10px 15px;
+z-index:950;
+animation:fadeIn .2s ease;
+}
+
+.reply-info{
+flex:1;
+overflow:hidden;
+}
+
+.reply-info small{
+display:block;
+color:#60a5fa;
+font-size:12px;
+margin-bottom:2px;
+}
+
+.reply-info p{
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+font-size:14px;
+color:#fff;
+}
+
+.reply-preview button{
+width:35px;
+height:35px;
+border:none;
+border-radius:50%;
+background:transparent;
+color:#fff;
+font-size:18px;
+cursor:pointer;
+}
+
+/* ==========================
+   MESSAGE BAR
+========================== */
+
+.message-bar{
+position:fixed;
+left:0;
+right:0;
+bottom:0;
+height:75px;
+background:#1e293b;
+display:flex;
+align-items:center;
+gap:10px;
+padding:10px;
+border-top:1px solid #334155;
+z-index:1000;
+}
+
+.message-bar label{
+cursor:pointer;
+}
+
+/* ==========================
+   TEXTAREA
+========================== */
+
+#message{
+flex:1;
+height:50px;
+resize:none;
+border:none;
+outline:none;
+border-radius:25px;
+background:#334155;
+color:#fff;
+padding:14px 16px;
+font-size:15px;
+overflow-y:auto;
+}
+
+#message::placeholder{
+color:#cbd5e1;
+}
+
+/* ==========================
+   BUTTONS
+========================== */
+
+.icon-btn,
+#recordBtn,
+#stopRecordBtn,
+#sendBtn{
+width:48px;
+height:48px;
+border:none;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+font-size:20px;
+transition:.2s;
+}
+
+.icon-btn{
+background:#2563eb;
+color:#fff;
+}
+
+#recordBtn{
+background:#475569;
+color:#fff;
+}
+
+#stopRecordBtn{
+background:#dc2626;
+color:#fff;
+}
+
+#sendBtn{
+background:#22c55e;
+color:#fff;
+}
+
+.icon-btn:hover,
+#recordBtn:hover,
+#stopRecordBtn:hover,
+#sendBtn:hover{
+transform:scale(1.06);
+}
+
+.icon-btn:active,
+#recordBtn:active,
+#stopRecordBtn:active,
+#sendBtn:active{
+transform:scale(.95);
+}
+
+/* ==========================
+   RECORDING BOX
+========================== */
+
+.recording-box{
+position:fixed;
+left:50%;
+bottom:90px;
+transform:translateX(-50%);
+background:#111827;
+padding:12px 20px;
+border-radius:30px;
+display:flex;
+align-items:center;
+gap:10px;
+box-shadow:0 8px 20px rgba(0,0,0,.35);
+z-index:1200;
+}
+
+.record-dot{
+width:12px;
+height:12px;
+background:red;
+border-radius:50%;
+animation:pulse 1s infinite;
+}
+
+.record-text{
+font-size:14px;
+color:#fff;
+}
+
+#recordTime{
+font-weight:bold;
+color:#22c55e;
+}
+
+/* ==========================
+   IMAGE PREVIEW
+========================== */
+
+.preview-box{
+position:fixed;
+left:50%;
+bottom:90px;
+transform:translateX(-50%);
+background:#1e293b;
+padding:15px;
+border-radius:18px;
+text-align:center;
+box-shadow:0 10px 25px rgba(0,0,0,.35);
+z-index:1200;
+max-width:280px;
+}
+
+#previewImage{
+width:220px;
+max-width:100%;
+border-radius:12px;
+display:block;
+margin:auto;
+}
+
+.preview-box button{
+margin-top:12px;
+border:none;
+background:#ef4444;
+color:#fff;
+padding:10px 18px;
+border-radius:10px;
+cursor:pointer;
+}
+
+/* ==========================
+   VOICE PLAYER
+========================== */
+
+.voice-player{
+display:flex;
+align-items:center;
+gap:10px;
+min-width:220px;
+margin-top:5px;
+}
+
+.voice-play{
+width:36px;
+height:36px;
+border:none;
+border-radius:50%;
+background:#2563eb;
+color:#fff;
+cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:15px;
+}
+
+.voice-wave{
+flex:1;
+height:6px;
+background:#475569;
+border-radius:20px;
+overflow:hidden;
+position:relative;
+}
+
+.voice-progress{
+height:100%;
+width:0%;
+background:#22c55e;
+transition:width .15s linear;
+}
+
+.voice-time{
+font-size:12px;
+min-width:38px;
+text-align:right;
+color:#fff;
+}
+
+.voice-audio{
+display:none;
+}
+
+/* ==========================
+   ANIMATION
+========================== */
+
+@keyframes pulse{
+
+0%{
+transform:scale(.8);
+opacity:.6;
+}
+
+50%{
+transform:scale(1.2);
+opacity:1;
+}
+
+100%{
+transform:scale(.8);
+opacity:.6;
+}
+
+}
+
+/* ==========================
+   PART 3
+   Menus
+   Reaction
+   Image Viewer
+   Responsive
+========================== */
+
+/* ==========================
+   MESSAGE MENU
+========================== */
+
+.message-menu{
+position:fixed;
+display:none;
+min-width:210px;
+background:#1e293b;
+border-radius:14px;
+overflow:hidden;
+box-shadow:0 10px 25px rgba(0,0,0,.45);
+z-index:3000;
+animation:menuShow .18s ease;
+}
+
+.message-menu div{
+display:flex;
+align-items:center;
+gap:12px;
+padding:14px 16px;
+cursor:pointer;
+font-size:15px;
+transition:.2s;
+color:#fff;
+}
+
+.message-menu div:hover{
+background:#334155;
+}
+
+.message-menu i{
+width:20px;
+text-align:center;
+color:#60a5fa;
+}
+
+/* ==========================
+   CHAT MENU
+========================== */
+
+.chat-menu{
+position:fixed;
+top:70px;
+right:12px;
+display:none;
+min-width:180px;
+background:#1e293b;
+border-radius:14px;
+overflow:hidden;
+box-shadow:0 10px 25px rgba(0,0,0,.45);
+z-index:3000;
+animation:menuShow .18s ease;
+}
+
+.chat-menu div{
+display:flex;
+align-items:center;
+gap:10px;
+padding:14px 16px;
+cursor:pointer;
+color:#fff;
+transition:.2s;
+}
+
+.chat-menu div:hover{
+background:#334155;
+}
+
+.chat-menu i{
+color:#ef4444;
+}
+
+/* ==========================
+   REACTION POPUP
+========================== */
+
+.reaction-popup{
+position:fixed;
+display:none;
+background:#1e293b;
+padding:10px 14px;
+border-radius:40px;
+box-shadow:0 10px 30px rgba(0,0,0,.4);
+gap:8px;
+z-index:3500;
+}
+
+.reaction-popup span{
+font-size:28px;
+cursor:pointer;
+transition:.18s;
+}
+
+.reaction-popup span:hover{
+transform:scale(1.35);
+}
+
+/* ==========================
+   IMAGE VIEWER
+========================== */
+
+.image-viewer{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.92);
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:5000;
+}
+
+#fullImage{
+max-width:95%;
+max-height:90%;
+border-radius:12px;
+object-fit:contain;
+}
+
+.close-image{
+position:absolute;
+top:20px;
+right:20px;
+width:42px;
+height:42px;
+border-radius:50%;
+background:rgba(255,255,255,.15);
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+font-size:22px;
+color:#fff;
+}
+
+/* ==========================
+   REPLY BUBBLE
+========================== */
+
+.reply-bubble{
+background:rgba(255,255,255,.08);
+border-left:4px solid #60a5fa;
+padding:8px;
+margin-bottom:8px;
+border-radius:10px;
+}
+
+.reply-user{
+font-size:12px;
+font-weight:bold;
+color:#60a5fa;
+margin-bottom:4px;
+}
+
+.reply-message{
+font-size:13px;
+color:#ddd;
+}
+
+/* ==========================
+   MOBILE
+========================== */
+
+@media(max-width:600px){
+
+.chat-header{
+padding:8px;
+height:60px;
+}
+
+.chat-container{
+top:60px;
+bottom:72px;
+padding:10px;
+}
+
+.bubble-me,
+.bubble-other{
+max-width:86%;
+font-size:14px;
+}
+
+.message-bar{
+height:72px;
+padding:8px;
+gap:8px;
+}
+
+#message{
+height:46px;
+font-size:14px;
+}
+
+.chat-avatar{
+width:42px;
+height:42px;
+}
+
+.chat-info h3{
+font-size:15px;
+}
+
+.chat-info p{
+font-size:11px;
+}
+
+}
+
+/* ==========================
+   SMOOTH EFFECTS
+========================== */
+
+img{
+user-select:none;
+-webkit-user-drag:none;
+}
+
+button{
+outline:none;
+}
+
+button:active{
+transform:scale(.95);
+}
+
+.bubble-me,
+.bubble-other,
+.message-menu,
+.chat-menu,
+.reaction-popup,
+.preview-box,
+.recording-box{
+transition:.2s;
+}
+
+/* ==========================
+   MENU ANIMATION
+========================== */
+
+@keyframes menuShow{
+
+from{
+
+opacity:0;
+transform:scale(.9);
+
+}
+
+to{
+
+opacity:1;
+transform:scale(1);
+
+}
+
+}
+
+/* ==========================
+   FINISHED
+========================== */
