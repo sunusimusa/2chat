@@ -99,6 +99,75 @@ const messageSchema = new mongoose.Schema(
         default:false
     },
 
+    // Nau'in message
+type: {
+    type: String,
+    enum: ["text","image","video","voice","file"],
+    default: "text"
+},
+
+// Edit
+edited: {
+    type: Boolean,
+    default: false
+},
+
+editedAt: {
+    type: Date,
+    default: null
+},
+
+// Forward
+forwarded: {
+    type: Boolean,
+    default: false
+},
+
+forwardedFrom: {
+    type: String,
+    default: ""
+},
+
+// File
+file: {
+    type: String,
+    default: ""
+},
+
+fileName: {
+    type: String,
+    default: ""
+},
+
+fileSize: {
+    type: Number,
+    default: 0
+},
+
+// Delete for me
+deletedForMe: {
+    type: [String],
+    default: []
+},
+
+// Starred
+starredBy: {
+    type: [String],
+    default: []
+},
+
+// Pin
+pinned: {
+    type: Boolean,
+    default: false
+},
+
+// Reply preview
+replyType: {
+    type: String,
+    default: ""
+},
+
     deletedBy:{
         type:String,
         default:""
