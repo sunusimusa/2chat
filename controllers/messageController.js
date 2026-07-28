@@ -112,6 +112,9 @@ message:err.message
 // ================= SEND VOICE =================
 exports.sendVoice = async (req, res) => {
 
+console.log(req.body);
+console.log(req.file);
+
 try{
 
 const { sender, receiver } = req.body;
