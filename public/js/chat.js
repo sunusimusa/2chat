@@ -787,14 +787,16 @@ async function sendVoice(){
 
     const data=await res.json();
 
-    if(data.success){
+   if(data.success){
 
-        socket.emit("newMessage", data.message);
-       
-       audioChunks = [];
-       audioBlob = null;
-       recordSeconds = 0;
-       
+    appendMessage(data.message);
+
+    socket.emit("newMessage", data.message);
+
+    audioChunks = [];
+    audioBlob = null;
+    recordSeconds = 0;
+   
     }else{
 
         alert(data.message);
