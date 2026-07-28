@@ -146,6 +146,9 @@ folder:"2chat-voice"
 
 async(error, result)=>{
 
+  console.log("Cloudinary Error:", error);
+console.log("Cloudinary Result:", result);
+
 if(error){
 
 console.log(error);
