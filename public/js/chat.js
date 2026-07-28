@@ -864,17 +864,23 @@ function loadVoicePlayers(){
 
         };
 
-        audio.onloadedmetadata=()=>{
+        audio.onloadedmetadata = () => {
 
-            const total=Math.floor(audio.duration||0);
+    if (isNaN(audio.duration) || !isFinite(audio.duration)) {
 
-            const m=Math.floor(total/60);
+        time.innerText = "0:00";
+        return;
 
-            const s=String(total%60).padStart(2,"0");
+    }
 
-            time.innerText=`${m}:${s}`;
+    const total = Math.floor(audio.duration);
 
-        };
+    const m = Math.floor(total / 60);
+    const s = String(total % 60).padStart(2, "0");
+
+    time.innerText = `${m}:${s}`;
+
+};
 
         audio.ontimeupdate=()=>{
 
