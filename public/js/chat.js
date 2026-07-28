@@ -99,37 +99,29 @@ This message was deleted
 
 :
 
-
 msg.voice ?
 
 `
 <div class="voice-player">
 
-<button class="voice-play">
+    <button class="voice-play">
+        <i class="fa-solid fa-play"></i>
+    </button>
 
-<i class="fa-solid fa-play"></i>
+    <div class="voice-wave">
+        <div class="voice-progress"></div>
+    </div>
 
-</button>
+    <span class="voice-time">0:00</span>
 
-<div class="voice-wave">
-
-<div class="voice-progress"></div>
-
-</div>
-
-<span class="voice-time">
-0:00
-</span>
-
-<audio class="voice-audio">
-
-<source src="${msg.voice}" type="audio/webm">
-
-</audio>
+    <audio
+        class="voice-audio"
+        preload="metadata"
+        src="${msg.voice}">
+    </audio>
 
 </div>
 `
-
 :
 
 (msg.text || "")
