@@ -54,7 +54,7 @@ router.put(
 
 // Delete for me
 router.delete(
-    "/:id",
+    "/delete/:id",
     deleteMessage
 );
 
