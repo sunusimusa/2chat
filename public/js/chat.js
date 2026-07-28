@@ -710,23 +710,15 @@ function resumeRecording(){
    Toggle
 ========================== */
 
-function toggleRecording(){
+function toggleRecording() {
 
-    if(!recording){
+    if (!recording) {
 
         startRecording();
 
-        return;
+    } else {
 
-    }
-
-    if(paused){
-
-        resumeRecording();
-
-    }else{
-
-        pauseRecording();
+        stopRecording();
 
     }
 
