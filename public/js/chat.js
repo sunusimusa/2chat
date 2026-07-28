@@ -741,12 +741,21 @@ function stopRecording(){
     document.getElementById("recordBtn").innerHTML=
     '<i class="fa-solid fa-microphone"></i>';
 
-    if(mediaRecorder &&
-       mediaRecorder.state!=="inactive"){
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
 
-        mediaRecorder.stop();
+    mediaRecorder.onstop = async () => {
 
-    }
+        audioBlob = new Blob(audioChunks, {
+            type: "audio/webm"
+        });
+
+        await sendVoice();
+
+    };
+
+    mediaRecorder.stop();
+
+}
 
 }
 
@@ -784,10 +793,10 @@ async function sendVoice(){
 
         socket.emit("newMessage",data.message);
 
-        audioBlob=null;
-
-        recordSeconds=0;
-
+       audioChunks = [];
+       audioBlob = null;
+       recordSeconds = 0;
+       
     }else{
 
         alert(data.message);
