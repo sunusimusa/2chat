@@ -809,7 +809,7 @@ async function sendVoice(){
    Voice Player
 ========================== */
 
-function loadVoicePlayers(){
+    function loadVoicePlayers(){
 
     document.querySelectorAll(".voice-player").forEach(player=>{
 
@@ -820,22 +820,37 @@ function loadVoicePlayers(){
 
         if(!playBtn || !audio) return;
 
+        // Load duration
+        audio.addEventListener("loadedmetadata",()=>{
+
+            if(isNaN(audio.duration) || !isFinite(audio.duration)){
+                time.innerText = "0:00";
+                return;
+            }
+
+            const total = Math.floor(audio.duration);
+            const m = Math.floor(total/60);
+            const s = String(total%60).padStart(2,"0");
+
+            time.innerText = `${m}:${s}`;
+
+        });
+
         playBtn.onclick = ()=>{
 
-            // Dakatar da sauran audio
+            // Stop sauran audio
             document.querySelectorAll(".voice-audio").forEach(a=>{
 
-                if(a!==audio){
+                if(a !== audio){
 
                     a.pause();
+                    a.currentTime = 0;
 
-                    a.currentTime=0;
-
-                    const p=a.closest(".voice-player");
+                    const p = a.closest(".voice-player");
 
                     if(p){
 
-                        p.querySelector(".voice-play").innerHTML=
+                        p.querySelector(".voice-play").innerHTML =
                         '<i class="fa-solid fa-play"></i>';
 
                         p.querySelector(".voice-progress").style.width="0%";
@@ -850,75 +865,60 @@ function loadVoicePlayers(){
 
                 audio.play();
 
-                playBtn.innerHTML=
+                playBtn.innerHTML =
                 '<i class="fa-solid fa-pause"></i>';
 
             }else{
 
                 audio.pause();
 
-                playBtn.innerHTML=
+                playBtn.innerHTML =
                 '<i class="fa-solid fa-play"></i>';
 
             }
 
         };
 
-        audio.onloadedmetadata = () => {
+        audio.ontimeupdate = ()=>{
 
-    if (isNaN(audio.duration) || !isFinite(audio.duration)) {
+            if(audio.duration && isFinite(audio.duration)){
 
-        time.innerText = "0:00";
-        return;
+                const percent =
+                (audio.currentTime/audio.duration)*100;
 
-    }
+                progress.style.width = percent + "%";
 
-    const total = Math.floor(audio.duration);
+            }
 
-    const m = Math.floor(total / 60);
-    const s = String(total % 60).padStart(2, "0");
+            const current = Math.floor(audio.currentTime);
 
-    time.innerText = `${m}:${s}`;
+            const m = Math.floor(current/60);
+            const s = String(current%60).padStart(2,"0");
 
-};
-
-        audio.ontimeupdate=()=>{
-
-            const percent=
-            (audio.currentTime/audio.duration)*100;
-
-            progress.style.width=percent+"%";
-
-            const current=Math.floor(audio.currentTime);
-
-            const m=Math.floor(current/60);
-
-            const s=String(current%60).padStart(2,"0");
-
-            time.innerText=`${m}:${s}`;
+            time.innerText = `${m}:${s}`;
 
         };
 
-        audio.onended=()=>{
+        audio.onended = ()=>{
 
-            playBtn.innerHTML=
+            playBtn.innerHTML =
             '<i class="fa-solid fa-play"></i>';
 
             progress.style.width="0%";
 
-            const total=Math.floor(audio.duration||0);
+        };
 
-            const m=Math.floor(total/60);
+        audio.onerror = ()=>{
 
-            const s=String(total%60).padStart(2,"0");
+            time.innerText = "Error";
 
-            time.innerText=`${m}:${s}`;
+            console.log("Voice failed to load:", audio.src);
 
         };
 
     });
 
-}     
+}
 
 /* ==========================
    PART 8
