@@ -1464,7 +1464,13 @@ async function deleteForEveryone(messageId){
     try{
 
         const res = await fetch(`/api/messages/delete-everyone/${messageId}`,{
-            method:"PUT"
+            method:"PUT",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                username:user.username
+            })
         });
 
         const data = await res.json();
@@ -1485,11 +1491,14 @@ async function deleteForEveryone(messageId){
 
     }catch(err){
 
-        console.error(err);
+        console.error("Delete For Everyone Error:",err);
+
+        alert("Network Error");
 
     }
 
 }
+
 /* ---------- Finished ---------- */
 
 console.log("2Chat Messenger Loaded Successfully");
