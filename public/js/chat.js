@@ -627,6 +627,8 @@ async function startRecording(){
 
         recordSeconds=0;
 
+       document.getElementById("sendVoiceBtn").style.display = "inline-flex";
+
         document.getElementById("recordingBox").style.display="flex";
 
         document.getElementById("stopRecordBtn").style.display="flex";
