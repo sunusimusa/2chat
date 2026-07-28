@@ -591,16 +591,29 @@ async function startRecording(){
 
         };
 
-        mediaRecorder.onstop=()=>{
 
-            audioBlob=new Blob(audioChunks,{
-                type:"audio/webm"
-            });
+       mediaRecorder.onstop = async () => {
 
-            stream.getTracks().forEach(track=>track.stop());
+    audioBlob = new Blob(audioChunks, {
+        type: "audio/webm"
+    });
 
-        };
+    console.log("Audio Size:", audioBlob.size);
 
+    stream.getTracks().forEach(track => track.stop());
+
+    if (audioBlob.size > 0) {
+
+        await sendVoice();
+
+    } else {
+
+        alert("Voice recording failed.");
+
+    }
+
+};
+       
         mediaRecorder.start();
 
         recording=true;
@@ -717,37 +730,25 @@ function toggleRecording(){
 /* ==========================
    Stop Recording
 ========================== */
+function stopRecording() {
 
-function stopRecording(){
+    if (!recording) return;
 
-    if(!recording) return;
-
-    recording=false;
+    recording = false;
 
     clearInterval(recordTimer);
 
-    document.getElementById("recordingBox").style.display="none";
+    document.getElementById("recordingBox").style.display = "none";
+    document.getElementById("stopRecordBtn").style.display = "none";
 
-    document.getElementById("stopRecordBtn").style.display="none";
-
-    document.getElementById("recordBtn").innerHTML=
-    '<i class="fa-solid fa-microphone"></i>';
+    document.getElementById("recordBtn").innerHTML =
+        '<i class="fa-solid fa-microphone"></i>';
 
     if (mediaRecorder && mediaRecorder.state !== "inactive") {
 
-    mediaRecorder.onstop = async () => {
+        mediaRecorder.stop();
 
-        audioBlob = new Blob(audioChunks, {
-            type: "audio/webm"
-        });
-
-        await sendVoice();
-
-    };
-
-    mediaRecorder.stop();
-
-}
+    }
 
 }
 
