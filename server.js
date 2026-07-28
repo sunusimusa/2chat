@@ -94,16 +94,16 @@ socket.to(data.receiver).emit("stopTyping");
 
 socket.on("newMessage", (msg) => {
 
-io.to(msg.receiver).emit("messageDelivered",{
-messageId:msg._id
+    // A sanar da receiver cewa an isar da message
+    io.to(msg.receiver).emit("messageDelivered", {
+        messageId: msg._id
+    });
+
+    // Receiver kaɗai zai karɓi sabon message
+    io.to(msg.receiver).emit("receiveMessage", msg);
+
 });
-
-io.to(msg.receiver).emit("receiveMessage", msg);
-
-io.to(msg.sender).emit("receiveMessage", msg);
-
-});
-
+   
 socket.on("messageSeen",(data)=>{
 
 io.to(data.sender).emit("messageSeen",{
