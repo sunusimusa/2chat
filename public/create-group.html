@@ -17,31 +17,34 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 
 <body>
 
+<header class="header">
+
+<button onclick="history.back()">
+
+<i class="fa-solid fa-arrow-left"></i>
+
+</button>
+
+<h2>Create Group</h2>
+
+</header>
+
 <div class="container">
 
-<h2>Create New Group</h2>
-
-<div class="avatar-box">
+<label for="groupImage">
 
 <img
-id="groupAvatarPreview"
-src="/images/default-group.png">
-
-<input
-type="file"
-id="groupAvatar"
-accept="image/*"
-hidden>
-
-<label for="groupAvatar">
-
-<i class="fa-solid fa-camera"></i>
-
-Change Photo
+id="previewImage"
+src="/images/default-group.png"
+class="group-avatar">
 
 </label>
 
-</div>
+<input
+type="file"
+id="groupImage"
+accept="image/*"
+hidden>
 
 <input
 type="text"
@@ -52,7 +55,9 @@ placeholder="Group Name">
 id="groupDescription"
 placeholder="Group Description"></textarea>
 
-<button id="createGroupBtn">
+<button
+id="createBtn"
+onclick="createGroup()">
 
 <i class="fa-solid fa-users"></i>
 
