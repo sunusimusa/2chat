@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>2Chat Groups</title>
+
+<link rel="stylesheet" href="/css/groups.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<header class="group-header">
+
+<button onclick="history.back()">
+<i class="fa-solid fa-arrow-left"></i>
+</button>
+
+<h2>Groups</h2>
+
+<button>
+<i class="fa-solid fa-magnifying-glass"></i>
+</button>
+
+</header>
+
+<div class="group-top">
+
+<button
+class="create-group-btn"
+onclick="location.href='/create-group.html'">
+
+<i class="fa-solid fa-plus"></i>
+
+Create Group
+
+</button>
+
+</div>
+
+<div id="groupList">
+
+<!-- Groups will load here -->
+
+</div>
+
+<button
+class="floating-btn"
+onclick="location.href='/create-group.html'">
+
+<i class="fa-solid fa-plus"></i>
+
+</button>
+
+<script src="/js/groups.js"></script>
+
+</body>
+
+</html>
