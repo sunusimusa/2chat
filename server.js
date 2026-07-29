@@ -10,6 +10,8 @@ const messageRoutes = require("./routes/messageRoutes");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const groupRoutes = require("./routes/groupRoutes");
+const groupMessageRoutes =
+require("./routes/groupMessageRoutes");
 const notificationRoutes =
 require("./routes/notificationRoutes");
 const friendRoutes =
@@ -40,6 +42,7 @@ app.use("/api/posts",postRoutes);
 app.use("/api/messages",messageRoutes);
 app.use("/api/users",userRoutes);
 app.use("/api/groups", groupRoutes);
+app.use("/api/group-messages", groupMessageRoutes);
 app.use("/api/notifications",
 notificationRoutes
 );
