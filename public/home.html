@@ -143,40 +143,29 @@ Logout
 
 <!-- CREATE POST -->
 
+<div class="create-post">
+
 <textarea
 id="postText"
 placeholder="What's happening?">
 </textarea>
 
-<br><br>
-
 <input
 type="file"
 id="postImage"
 accept="image/*"
-style="display:none;">
-
-<label
-for="postImage"
-class="image-btn">
-
-<i class="fa-solid fa-image"></i>
-
-Add Photo
-
-</label>
+hidden>
 
 <div
 id="postPreview"
-style="display:none;margin-top:10px;text-align:center;">
+style="display:none;">
 
 <img
-id="postPreviewImage"
-style="max-width:220px;max-height:220px;border-radius:12px;">
+id="postPreviewImage">
 
-<br><br>
-
-<button onclick="removePostImage()">
+<button
+type="button"
+onclick="removePostImage()">
 
 <i class="fa-solid fa-trash"></i>
 
@@ -185,6 +174,18 @@ Remove
 </button>
 
 </div>
+
+<div class="post-actions">
+
+<label
+for="postImage"
+class="image-btn">
+
+<i class="fa-solid fa-image"></i>
+
+Photo
+
+</label>
 
 <button
 id="postBtn"
@@ -196,7 +197,9 @@ Post
 
 </button>
 
-<hr>
+</div>
+
+</div>
 
 <!-- FEED -->
 
