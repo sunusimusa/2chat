@@ -23,19 +23,31 @@ exports.createGroup = async (req, res) => {
 
         const group = await Group.create({
 
-            name,
+    name,
 
-            description: description || "",
+    description: description || "",
 
-            avatar: avatar || "",
+    avatar: avatar || "",
 
-            owner,
+    cover:"",
 
-            admins:[owner],
+    owner,
 
-            members:[owner]
+    admins:[owner],
 
-        });
+    members:[owner],
+
+    memberCount:1,
+
+    privacy:"public",
+
+    lastMessage:"",
+
+    lastMessageSender:"",
+
+    lastMessageTime:null
+
+});
 
         res.json({
             success:true,
@@ -61,8 +73,8 @@ exports.getGroups = async (req, res) => {
     try{
 
         const groups = await Group.find()
-        .sort({createdAt:-1});
-
+.sort({lastMessageTime:-1, createdAt:-1});
+        
         res.json({
             success:true,
             groups
@@ -138,11 +150,13 @@ exports.joinGroup = async (req, res) => {
 
         if(!group.members.includes(username)){
 
-            group.members.push(username);
+    group.members.push(username);
 
-            await group.save();
+    group.memberCount = group.members.length;
 
-        }
+    await group.save();
+
+}
 
         res.json({
             success:true,
@@ -184,11 +198,13 @@ exports.leaveGroup = async (req, res) => {
         }
 
         group.members = group.members.filter(
-            m => m !== username
-        );
+    m => m !== username
+);
 
-        await group.save();
+group.memberCount = group.members.length;
 
+await group.save();
+        
         res.json({
             success:true
         });
