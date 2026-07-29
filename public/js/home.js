@@ -317,192 +317,201 @@ let html = "";
 
 data.posts.forEach(post=>{
 
-html += `
-<div style="
-border:1px solid #ddd;
-border-radius:10px;
-padding:15px;
-margin:15px 0;
-background:#fff;
-box-shadow:0 2px 5px rgba(0,0,0,.08);
-">
+const liked =
+post.likes &&
+post.likes.includes(user.username);
 
-<div style="
-display:flex;
-align-items:center;
-gap:10px;
-margin-bottom:10px;
-">
+html += `
+
+<div class="post-card">
+
+<div class="post-header">
+
+<div class="post-user">
 
 <img
-src="${post.avatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"
-style="
-width:50px;
-height:50px;
-border-radius:50%;
-object-fit:cover;
-border:2px solid #2196f3;
-">
+class="post-avatar"
+src="${post.avatar || '/images/default.png'}">
 
 <div>
 
-<h3
-style="margin:0;cursor:pointer;color:#1877f2;"
+<h4
 onclick="openProfile('${post.username}')">
+
 ${post.username}
-</h3>
+
+</h4>
 
 <small>
+
 ${new Date(post.createdAt).toLocaleString()}
+
 </small>
 
 </div>
 
 </div>
 
-${
-post.image
-?
-
-`
-<img
-src="${post.image}"
-style="
-width:100%;
-max-height:500px;
-object-fit:cover;
-border-radius:12px;
-margin:10px 0;
-cursor:pointer;
-"
-onclick="window.open('${post.image}','_blank')">
-`
-
-:
-
-""
-
-}
-
-<p style="
-font-size:18px;
-margin:10px 0;
-word-wrap:break-word;
-">
-${post.text}
-</p>
-
-<div class="post-actions">
-
-<button onclick="likePost('${post._id}')">
-
-<i class="fa-regular fa-heart"></i>
-
-<span>${post.likes ? post.likes.length : 0}</span>
-
-</button>
-
-<button onclick="viewPost('${post._id}')">
-
-<i class="fa-regular fa-comment"></i>
-
-<span>${post.comments.length}</span>
-
-</button>
-
-<button onclick="sharePost('${post._id}')">
-
-<i class="fa-solid fa-share"></i>
-
-<span>Share</span>
-
-</button>
-
-${
-post.username===user.username
-?
+${post.username===user.username ?
 
 `
 
-<button onclick="editPost('${post._id}',\`${post.text}\`)">
+<div class="post-menu">
+
+<button
+onclick="editPost('${post._id}',\`${post.text}\`)">
 
 <i class="fa-solid fa-pen"></i>
 
 </button>
 
-<button onclick="deletePost('${post._id}')">
+<button
+onclick="deletePost('${post._id}')">
 
 <i class="fa-solid fa-trash"></i>
 
 </button>
 
+</div>
+
 `
 
 :
 
-""
+``
 
 }
 
 </div>
 
-<hr>
+${post.text ?
 
-<input
-id="comment-${post._id}"
-placeholder="Write comment"
-style="
-width:95%;
-padding:8px;
-">
+`
 
-<br><br>
+<div class="post-text">
 
-<button class="comment-btn"
-onclick="commentPost('${post._id}')">
+${post.text}
 
-<i class="fa-regular fa-paper-plane"></i>
+</div>
 
-Comment
+`
+
+:
+
+``
+
+}
+
+${post.image ?
+
+`
+
+<div class="post-image">
+
+<img
+src="${post.image}"
+onclick="window.open('${post.image}','_blank')">
+
+</div>
+
+`
+
+:
+
+``
+
+}
+
+<div class="post-stats">
+
+<span>
+
+❤️ ${post.likes ? post.likes.length : 0}
+
+</span>
+
+<span>
+
+💬 ${post.comments ? post.comments.length : 0}
+
+</span>
+
+</div>
+
+<div class="post-actions">
+
+<button
+onclick="likePost('${post._id}')">
+
+<i class="${liked ?
+
+'fa-solid'
+
+:
+
+'fa-regular'
+
+} fa-heart"></i>
 
 </button>
 
-<div>
+<button
+onclick="toggleComment('${post._id}')">
+
+<i class="fa-regular fa-comment"></i>
+
+</button>
+
+<button
+onclick="sharePost('${post._id}')">
+
+<i class="fa-solid fa-share"></i>
+
+</button>
+
+</div>
+
+<div
+class="comment-box"
+id="commentBox-${post._id}"
+style="display:none;">
+
+<input
+id="comment-${post._id}"
+type="text"
+placeholder="Write comment...">
+
+<button
+onclick="commentPost('${post._id}')">
+
+<i class="fa-solid fa-paper-plane"></i>
+
+</button>
+
+</div>
+
+<div
+class="comments-list">
 
 ${
+
 post.comments && post.comments.length
 
 ?
 
 post.comments.map(comment=>`
 
-<div style="
-display:flex;
-gap:10px;
-margin:10px 0;
-padding:8px;
-background:#f7f7f7;
-border-radius:8px;
-">
+<div class="comment-item">
 
 <img
-src="${comment.avatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"
-style="
-width:35px;
-height:35px;
-border-radius:50%;
-object-fit:cover;
-">
+class="comment-avatar"
+src="${comment.avatar || '/images/default.png'}">
 
-<div>
+<div class="comment-body">
 
-<b>
-${comment.username}
-</b>
+<b>${comment.username}</b>
 
-<br>
-
-${comment.text}
+<p>${comment.text}</p>
 
 </div>
 
@@ -512,13 +521,18 @@ ${comment.text}
 
 :
 
-"<p>No comments yet.</p>"
+`<small class="no-comment">
+
+No comments yet
+
+</small>`
 
 }
 
 </div>
 
 </div>
+
 `;
 
 });
@@ -680,4 +694,24 @@ document.getElementById("menuOverlay").classList.remove("active");
 
 }
 
+function toggleComment(postId){
+
+const box =
+document.getElementById(
+`commentBox-${postId}`
+);
+
+if(!box) return;
+
+box.style.display =
+box.style.display==="flex"
+?
+
+"none"
+
+:
+
+"flex";
+
+}
 
