@@ -85,8 +85,16 @@ async function createGroup(){
 
             alert("✅ Group created successfully");
 
-            window.location.href="/home.html";
+            document.getElementById("groupName").value = "";
 
+          document.getElementById("groupDescription").value = "";
+
+          avatarPreview.src = "/images/default-group.png";
+
+          avatarBase64 = "";
+
+            window.location.href="/groups.html";
+            
         }else{
 
             alert(data.message);
