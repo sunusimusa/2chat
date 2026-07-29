@@ -409,3 +409,174 @@ padding-bottom:90px;
     border-radius:15px;
     color:#fff;
 }
+
+/* ==========================
+POST CARD
+========================== */
+
+.post-card{
+background:#fff;
+border-radius:16px;
+margin:18px 0;
+overflow:hidden;
+box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+.post-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:14px;
+}
+
+.post-user{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+.post-avatar{
+width:48px;
+height:48px;
+border-radius:50%;
+object-fit:cover;
+border:2px solid #2196f3;
+}
+
+.post-user h4{
+margin:0;
+font-size:16px;
+cursor:pointer;
+color:#1877f2;
+}
+
+.post-user small{
+color:#777;
+font-size:12px;
+}
+
+.post-menu{
+display:flex;
+gap:8px;
+}
+
+.post-menu button{
+border:none;
+background:none;
+cursor:pointer;
+font-size:16px;
+color:#666;
+}
+
+.post-text{
+padding:0 14px 14px;
+font-size:16px;
+line-height:1.5;
+word-break:break-word;
+}
+
+.post-image img{
+width:100%;
+display:block;
+object-fit:cover;
+max-height:500px;
+cursor:pointer;
+}
+
+.post-stats{
+display:flex;
+justify-content:space-between;
+padding:10px 14px;
+font-size:14px;
+color:#666;
+border-bottom:1px solid #eee;
+}
+
+.post-actions{
+display:flex;
+justify-content:space-around;
+padding:8px 0;
+}
+
+.post-actions button{
+border:none;
+background:none;
+font-size:22px;
+cursor:pointer;
+color:#666;
+transition:.2s;
+}
+
+.post-actions button:hover{
+transform:scale(1.15);
+color:#1877f2;
+}
+
+/* ==========================
+COMMENTS
+========================== */
+
+.comment-box{
+display:flex;
+gap:8px;
+padding:12px;
+border-top:1px solid #eee;
+}
+
+.comment-box input{
+flex:1;
+padding:10px;
+border-radius:20px;
+border:1px solid #ddd;
+outline:none;
+}
+
+.comment-box button{
+width:42px;
+height:42px;
+border:none;
+border-radius:50%;
+background:#1877f2;
+color:#fff;
+cursor:pointer;
+}
+
+.comments-list{
+padding:10px 14px;
+}
+
+.comment-item{
+display:flex;
+gap:10px;
+margin-bottom:12px;
+}
+
+.comment-avatar{
+width:36px;
+height:36px;
+border-radius:50%;
+object-fit:cover;
+}
+
+.comment-body{
+background:#f3f3f3;
+padding:10px 14px;
+border-radius:14px;
+flex:1;
+}
+
+.comment-body b{
+display:block;
+margin-bottom:4px;
+}
+
+.comment-body p{
+margin:0;
+word-break:break-word;
+}
+
+.no-comment{
+color:#888;
+display:block;
+padding:10px 0;
+}
