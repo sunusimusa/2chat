@@ -825,6 +825,25 @@ transform:scale(1);
     cursor: pointer;
 }
 
+.message-reactions{
+
+display:flex;
+gap:4px;
+margin-top:6px;
+flex-wrap:wrap;
+
+}
+
+.reaction{
+
+background:#fff;
+padding:2px 8px;
+border-radius:20px;
+font-size:18px;
+box-shadow:0 1px 3px rgba(0,0,0,.2);
+
+}
+
 /* ==========================
    FINISHED
 ========================== */
