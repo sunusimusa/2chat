@@ -1,1 +1,104 @@
+const avatarInput = document.getElementById("groupAvatar");
+const avatarPreview = document.getElementById("groupAvatarPreview");
 
+let avatarBase64 = "";
+
+// =======================
+// Avatar Preview
+// =======================
+
+avatarInput.addEventListener("change", () => {
+
+    const file = avatarInput.files[0];
+
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+
+        avatarPreview.src = reader.result;
+        avatarBase64 = reader.result;
+
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
+// =======================
+// Create Group
+// =======================
+
+document
+.getElementById("createGroupBtn")
+.addEventListener("click", createGroup);
+
+async function createGroup(){
+
+    const user = JSON.parse(
+        localStorage.getItem("user")
+    );
+
+    const name =
+    document.getElementById("groupName")
+    .value
+    .trim();
+
+    const description =
+    document.getElementById("groupDescription")
+    .value
+    .trim();
+
+    if(!name){
+
+        alert("Enter group name");
+
+        return;
+
+    }
+
+    try{
+
+        const res = await fetch("/api/groups/create",{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                name,
+                description,
+                owner:user.username,
+                avatar:avatarBase64
+
+            })
+
+        });
+
+        const data = await res.json();
+
+        if(data.success){
+
+            alert("✅ Group created successfully");
+
+            window.location.href="/home.html";
+
+        }else{
+
+            alert(data.message);
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+        alert("Network Error");
+
+    }
+
+}
