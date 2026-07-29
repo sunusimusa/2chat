@@ -87,11 +87,11 @@ async function createGroup(){
 
             document.getElementById("groupName").value = "";
 
-          document.getElementById("groupDescription").value = "";
+           document.getElementById("groupDescription").value = "";
 
-          avatarPreview.src = "/images/default-group.png";
+           avatarPreview.src = "/images/default-group.png";
 
-          avatarBase64 = "";
+           avatarBase64 = "";
 
             window.location.href="/groups.html";
             
