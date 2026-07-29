@@ -1545,15 +1545,19 @@ async function selectReaction(emoji){
 
         const data = await res.json();
 
-        if(data.success){
+       const data = await res.json();
 
-            loadMessages();
+if(data.success){
 
-        }else{
+    console.log(data.message);
 
-            alert(data.message);
+    await loadMessages();
 
-        }
+}else{
+
+    alert(data.message);
+
+}
 
     }catch(err){
 
