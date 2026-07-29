@@ -13,6 +13,11 @@ const groupSchema = new mongoose.Schema({
         default:""
     },
 
+    cover:{
+        type:String,
+        default:""
+    },
+
     description:{
         type:String,
         default:""
@@ -33,7 +38,23 @@ const groupSchema = new mongoose.Schema({
         default:[]
     },
 
+    memberCount:{
+        type:Number,
+        default:1
+    },
+
+    privacy:{
+        type:String,
+        enum:["public","private"],
+        default:"public"
+    },
+
     lastMessage:{
+        type:String,
+        default:""
+    },
+
+    lastMessageSender:{
         type:String,
         default:""
     },
