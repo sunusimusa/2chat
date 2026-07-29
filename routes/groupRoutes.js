@@ -1,26 +1,36 @@
 const router = require("express").Router();
 
 const {
+
     createGroup,
+
     getGroups,
+
     getGroup,
+
     joinGroup,
+
     leaveGroup
+
 } = require("../controllers/groupController");
+
+/* ==========================
+   GROUPS
+========================== */
 
 // Create Group
 router.post("/create", createGroup);
 
-// Get all groups
+// Get All Groups
 router.get("/all", getGroups);
 
-// Get single group
-router.get("/:id", getGroup);
+// Get Single Group
+router.get("/group/:id", getGroup);
 
-// Join group
+// Join Group
 router.put("/join", joinGroup);
 
-// Leave group
+// Leave Group
 router.put("/leave", leaveGroup);
 
 module.exports = router;
