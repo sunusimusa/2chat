@@ -1543,8 +1543,6 @@ async function selectReaction(emoji){
 
         });
 
-        const data = await res.json();
-
        const data = await res.json();
 
 if(data.success){
