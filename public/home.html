@@ -10,57 +10,138 @@
 
 <link rel="stylesheet" href="/css/home.css">
 
-  <link rel="stylesheet"
+<link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-  
+
 </head>
-  
+
 <body>
 
-<h1>2Chat</h1>
+<!-- HEADER -->
 
-<p>
+<header class="app-header">
+
+<button id="menuBtn" onclick="openMenu()">
+
+<i class="fa-solid fa-bars"></i>
+
+</button>
+
+<h2>2Chat</h2>
+
+<button id="searchBtn">
+
+<i class="fa-solid fa-magnifying-glass"></i>
+
+</button>
+
+</header>
+
+<!-- SIDE MENU -->
+
+<div id="menuOverlay" class="menu-overlay" onclick="closeMenu()"></div>
+
+<div id="sideMenu" class="side-menu">
+
+<div class="menu-header">
+
+<h2>2Chat</h2>
+
+<button onclick="closeMenu()">
+
+<i class="fa-solid fa-xmark"></i>
+
+</button>
+
+</div>
+
+<div class="menu-user">
+
 <i class="fa-solid fa-user"></i>
-Logged in as:
+
 <b id="userName"></b>
-</p>
 
-<!-- Top Menu -->
-<div class="top-menu">
+</div>
 
-<button onclick="location.href='/users.html'">
+<a href="/home.html">
+
+<i class="fa-solid fa-house"></i>
+
+Home
+
+</a>
+
+<a href="/messenger.html">
+
+<i class="fa-solid fa-comments"></i>
+
+Chats
+
+</a>
+
+<a href="/groups.html">
+
+<i class="fa-solid fa-users"></i>
+
+Groups
+
+</a>
+
+<a href="/users.html">
+
 <i class="fa-solid fa-user-group"></i>
+
 Friends
-</button>
 
-<button onclick="location.href='/shorts.html'">
+</a>
+
+<a href="/shorts.html">
+
 <i class="fa-solid fa-clapperboard"></i>
-Shorts
-</button>
 
-<button onclick="location.href='/notification.html'">
+Shorts
+
+</a>
+
+<a href="/trending.html">
+
+<i class="fa-solid fa-fire"></i>
+
+Trending
+
+</a>
+
+<a href="/notification.html">
 
 <i class="fa-solid fa-bell"></i>
 
+Notifications
+
 <span id="notificationCount"></span>
 
-</button>
+</a>
 
-<button onclick="goProfile()">
+<a href="/profile.html">
+
 <i class="fa-solid fa-user"></i>
-Profile
-</button>
 
-<button onclick="logout()">
+Profile
+
+</a>
+
+<a href="#" onclick="logout()">
+
 <i class="fa-solid fa-right-from-bracket"></i>
+
 Logout
-</button>
+
+</a>
 
 </div>
 
 <hr>
 
-<!-- Create Post -->
+<!-- CREATE POST -->
 
 <textarea
 id="postText"
@@ -80,31 +161,25 @@ for="postImage"
 class="image-btn">
 
 <i class="fa-solid fa-image"></i>
+
 Add Photo
 
 </label>
 
 <div
 id="postPreview"
-style="
-display:none;
-margin-top:10px;
-text-align:center;
-">
+style="display:none;margin-top:10px;text-align:center;">
 
 <img
 id="postPreviewImage"
-style="
-max-width:220px;
-max-height:220px;
-border-radius:12px;
-">
+style="max-width:220px;max-height:220px;border-radius:12px;">
 
 <br><br>
 
 <button onclick="removePostImage()">
 
 <i class="fa-solid fa-trash"></i>
+
 Remove
 
 </button>
@@ -116,42 +191,59 @@ id="postBtn"
 onclick="createPost()">
 
 <i class="fa-solid fa-paper-plane"></i>
+
 Post
 
 </button>
 
 <hr>
 
-<!-- Feed -->
+<!-- FEED -->
 
 <div id="feed"></div>
 
-<!-- Bottom Navigation -->
-  <div class="bottom-nav">
+<!-- BOTTOM NAVIGATION -->
+
+<div class="bottom-nav">
 
 <a href="/home.html" class="active">
+
 <i class="fa-solid fa-house"></i>
+
 <span>Home</span>
+
 </a>
 
 <a href="/shorts.html">
+
 <i class="fa-solid fa-clapperboard"></i>
+
 <span>Shorts</span>
+
 </a>
 
 <a href="/trending.html">
+
 <i class="fa-solid fa-fire"></i>
+
 <span>Trending</span>
+
 </a>
 
 <a href="/messenger.html">
+
 <i class="fa-solid fa-comments"></i>
+
 <span>Chats</span>
+
 </a>
 
 <a href="/profile.html">
+
 <i class="fa-solid fa-user"></i>
+
 <span>Profile</span>
+
 </a>
 
 </div>
