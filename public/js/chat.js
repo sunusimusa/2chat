@@ -1502,6 +1502,54 @@ async function deleteForEveryone(messageId){
 
 }
 
+async function selectReaction(emoji){
+
+    document.getElementById("reactionPopup").style.display = "none";
+
+    if(!selectedMessage) return;
+
+    try{
+
+        const res = await fetch("/api/messages/react",{
+
+            method:"PUT",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                messageId:selectedMessage,
+                username:user.username,
+                emoji
+
+            })
+
+        });
+
+        const data = await res.json();
+
+        if(data.success){
+
+            loadMessages();
+
+        }else{
+
+            alert(data.message);
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+    }
+
+    selectedMessage = null;
+
+}
+
 /* ---------- Finished ---------- */
 
 console.log("2Chat Messenger Loaded Successfully");
