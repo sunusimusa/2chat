@@ -179,3 +179,100 @@ START
 loadGroup();
 
 loadMessages();
+
+/* ==========================
+SEND MESSAGE
+========================== */
+
+sendBtn.addEventListener("click", sendMessage);
+
+messageInput.addEventListener("keydown",(e)=>{
+
+    if(e.key==="Enter" && !e.shiftKey){
+
+        e.preventDefault();
+
+        sendMessage();
+
+    }
+
+});
+
+async function sendMessage(){
+
+    const text =
+    messageInput.value.trim();
+
+    if(text==="") return;
+
+    try{
+
+        const res =
+        await fetch("/api/group-messages/send",{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                groupId,
+
+                sender:user.username,
+
+                text
+
+            })
+
+        });
+
+        const data =
+        await res.json();
+
+        if(!data.success){
+
+            alert(data.message);
+
+            return;
+
+        }
+
+        appendMessage(data.message);
+
+        socket.emit("groupMessage", data.message);
+
+        messageInput.value="";
+
+        messageInput.style.height="auto";
+
+        chat.scrollTop=
+        chat.scrollHeight;
+
+    }catch(err){
+
+        console.error(err);
+
+    }
+
+}
+
+/* ==========================
+SOCKET
+========================== */
+
+socket.emit("joinGroup", groupId);
+
+socket.on("newGroupMessage",(msg)=>{
+
+    if(msg.sender===user.username) return;
+
+    appendMessage(msg);
+
+    chat.scrollTop=
+    chat.scrollHeight;
+
+});
+
+
