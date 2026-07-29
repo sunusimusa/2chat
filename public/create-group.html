@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Create Group</title>
+
+<link rel="stylesheet" href="/css/create-group.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Create New Group</h2>
+
+<div class="avatar-box">
+
+<img
+id="groupAvatarPreview"
+src="/images/default-group.png">
+
+<input
+type="file"
+id="groupAvatar"
+accept="image/*"
+hidden>
+
+<label for="groupAvatar">
+
+<i class="fa-solid fa-camera"></i>
+
+Change Photo
+
+</label>
+
+</div>
+
+<input
+type="text"
+id="groupName"
+placeholder="Group Name">
+
+<textarea
+id="groupDescription"
+placeholder="Group Description"></textarea>
+
+<button id="createGroupBtn">
+
+<i class="fa-solid fa-users"></i>
+
+Create Group
+
+</button>
+
+</div>
+
+<script src="/js/create-group.js"></script>
+
+</body>
+
+</html>
