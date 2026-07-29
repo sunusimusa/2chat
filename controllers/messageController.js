@@ -20,7 +20,6 @@ replyVoice,
 replyUser
 } = req.body;
 
-// Tabbatar sender da receiver suna nan
 if(!sender || !receiver){
 
 return res.json({
@@ -32,23 +31,29 @@ message:"Sender or receiver missing."
 
 let image = "";
 
-// Upload image idan akwai
 if(req.file){
 
-const result = await cloudinary.uploader.upload(
-req.file.path,
+const uploadStream = cloudinary.uploader.upload_stream(
+
 {
 resource_type:"image",
 folder:"2chat-images"
+},
+
+async(error,result)=>{
+
+if(error){
+
+return res.status(500).json({
+success:false,
+message:"Image upload failed."
+});
+
 }
-);
 
 image = result.secure_url;
 
-}
-
-// Kada a aika message mara text kuma babu image
-if((!text || text.trim() === "") && !image){
+if((!text || text.trim()==="") && !image){
 
 return res.json({
 success:false,
@@ -62,16 +67,74 @@ const message = await Message.create({
 sender,
 receiver,
 
-text: text || "",
+text:text || "",
 image,
 
-replyTo: replyTo || null,
-replyText: replyText || "",
-replyImage: replyImage || "",
-replyVoice: replyVoice || "",
-replyUser: replyUser || "",
+replyTo:replyTo || null,
+replyText:replyText || "",
+replyImage:replyImage || "",
+replyVoice:replyVoice || "",
+replyUser:replyUser || "",
 
-reactions: [],
+reactions:[],
+
+delivered:true,
+deliveredAt:new Date()
+
+});
+
+await Notification.create({
+
+receiver,
+sender,
+type:"message",
+text:`${sender} sent you a message 📨`
+
+});
+
+return res.json({
+
+success:true,
+message
+
+});
+
+}
+
+);
+
+streamifier
+.createReadStream(req.file.buffer)
+.pipe(uploadStream);
+
+return;
+
+}
+
+if((!text || text.trim()==="") && !image){
+
+return res.json({
+success:false,
+message:"Message cannot be empty."
+});
+
+}
+
+const message = await Message.create({
+
+sender,
+receiver,
+
+text:text || "",
+image,
+
+replyTo:replyTo || null,
+replyText:replyText || "",
+replyImage:replyImage || "",
+replyVoice:replyVoice || "",
+replyUser:replyUser || "",
+
+reactions:[],
 
 delivered:true,
 deliveredAt:new Date()
