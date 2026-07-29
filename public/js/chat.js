@@ -129,6 +129,21 @@ msg.voice ?
 
 }
 
+
+${msg.reactions && msg.reactions.length ? `
+
+<div class="message-reactions">
+
+${msg.reactions.map(r=>`
+
+<span class="reaction">${r.emoji}</span>
+
+`).join("")}
+
+</div>
+
+` : ""}
+
 <div class="message-time">
 
 ${msg.createdAt ?
