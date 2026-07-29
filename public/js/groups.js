@@ -1,50 +1,74 @@
 const groupList =
 document.getElementById("groupList");
 
-groupList.innerHTML = `
+async function loadGroups(){
 
-<div class="group-card">
+    try{
 
-<img src="/images/default-group.png">
+        const res =
+        await fetch("/api/groups/all");
 
-<div>
+        const data =
+        await res.json();
 
-<div class="group-name">
+        if(!data.success){
 
-2Chat Community
+            groupList.innerHTML =
+            "<p>No groups found.</p>";
 
-</div>
+            return;
 
-<div class="group-members">
+        }
 
-1,240 Members
+        let html = "";
 
-</div>
+        data.groups.forEach(group=>{
 
-</div>
+            html += `
 
-</div>
+            <div class="group-card"
+            onclick="openGroup('${group._id}')">
 
-<div class="group-card">
+                <img
+                src="${group.avatar || '/images/default-group.png'}">
 
-<img src="/images/default-group.png">
+                <div>
 
-<div>
+                    <div class="group-name">
 
-<div class="group-name">
+                        ${group.name}
 
-Developers
+                    </div>
 
-</div>
+                    <div class="group-members">
 
-<div class="group-members">
+                        ${group.memberCount} Members
 
-230 Members
+                    </div>
 
-</div>
+                </div>
 
-</div>
+            </div>
 
-</div>
+            `;
 
-`;
+        });
+
+        groupList.innerHTML = html;
+
+    }catch(err){
+
+        console.error(err);
+
+    }
+
+}
+
+function openGroup(id){
+
+    location.href =
+    "/group-chat.html?id=" + id;
+
+}
+
+loadGroups();
