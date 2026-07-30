@@ -41,6 +41,16 @@ async function loadGroup(){
 
         console.log("Status:", res.status);
 
+        const res =
+await fetch("/api/groups/group/" + groupId);
+
+alert("Status: " + res.status);
+
+const data =
+await res.json();
+
+alert(JSON.stringify(data));
+
         const data = await res.json();
 
         console.log("Response:", data);
