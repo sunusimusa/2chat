@@ -33,7 +33,7 @@ async function loadGroup(){
     try{
 
         const res =
-        await fetch("/api/groups/group/" + groupId);
+        await fetch("/api/groups/" + groupId);
 
         const data =
         await res.json();
@@ -55,9 +55,13 @@ async function loadGroup(){
         data.group.memberCount + " Members";
 
         document.getElementById("groupAvatar").src =
-        data.group.avatar || "/images/default-group.png"
+        data.group.avatar || "/images/default-group.png";
+
+    }catch(err){
 
         console.error(err);
+
+        alert("Failed to load group.");
 
     }
 
@@ -72,8 +76,7 @@ async function loadMessages(){
     try{
 
         const res =
-        await fetch("/api/group-messages/" + groupId);
-
+        await fetch("/api/groups/" + groupId);
         const data =
         await res.json();
 
@@ -270,15 +273,5 @@ socket.on("newGroupMessage",(msg)=>{
 
     chat.scrollTop=
     chat.scrollHeight;
-
-});
-
-socket.emit("joinGroup", groupId);
-
-socket.on("newGroupMessage",(msg)=>{
-
-    appendMessage(msg);
-
-    chat.scrollTop = chat.scrollHeight;
 
 });
