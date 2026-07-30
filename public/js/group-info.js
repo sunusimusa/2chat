@@ -127,3 +127,127 @@ function renderMembers(){
 
 }
 
+/* ==========================
+LEAVE GROUP
+========================== */
+
+document
+.getElementById("leaveGroupBtn")
+.addEventListener("click", leaveGroup);
+
+async function leaveGroup(){
+
+    if(!confirm("Leave this group?")) return;
+
+    try{
+
+        const res = await fetch("/api/groups/leave",{
+
+            method:"PUT",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                groupId,
+
+                username:user.username
+
+            })
+
+        });
+
+        const data = await res.json();
+
+        if(data.success){
+
+            alert("✅ You left the group.");
+
+            location.href="/groups.html";
+
+        }else{
+
+            alert(data.message);
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+    }
+
+}
+
+/* ==========================
+DELETE GROUP
+========================== */
+
+const deleteBtn =
+document.getElementById("deleteGroupBtn");
+
+if(user.username !== currentGroup?.owner){
+
+    deleteBtn.style.display = "none";
+
+}
+
+deleteBtn.addEventListener("click", deleteGroup);
+
+async function deleteGroup(){
+
+    if(user.username !== currentGroup.owner){
+
+        return;
+
+    }
+
+    if(!confirm("Delete this group permanently?")){
+
+        return;
+
+    }
+
+    try{
+
+        const res = await fetch("/api/groups/delete",{
+
+            method:"DELETE",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                groupId,
+
+                username:user.username
+
+            })
+
+        });
+
+        const data = await res.json();
+
+        if(data.success){
+
+            alert("🗑️ Group deleted.");
+
+            location.href="/groups.html";
+
+        }else{
+
+            alert(data.message);
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+    }
+
+}
