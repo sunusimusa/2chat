@@ -33,8 +33,8 @@ async function loadGroup(){
 
     try{
 
-        const res = await fetch("/api/groups/group/" + groupId);
-
+        const res = await fetch("/api/groups/" + groupId);
+        
         const data = await res.json();
 
         if(!data.success){
