@@ -67,6 +67,20 @@ function renderGroup(){
 
     renderMembers();
 
+    // Show Delete button only for Owner
+    const deleteBtn =
+    document.getElementById("deleteGroupBtn");
+
+    if(user.username === currentGroup.owner){
+
+        deleteBtn.style.display = "block";
+
+    }else{
+
+        deleteBtn.style.display = "none";
+
+    }
+
 }
 
 function renderMembers(){
