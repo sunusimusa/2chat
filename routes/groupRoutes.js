@@ -21,7 +21,7 @@ router.post("/create", createGroup);
 router.get("/all", getGroups);
 
 // Get Single Group
-router.get("/group/:id", getGroup);
+router.get("/:id", getGroup);
 
 // Join Group
 router.put("/join", joinGroup);
