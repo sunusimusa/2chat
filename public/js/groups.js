@@ -1,5 +1,20 @@
-const groupList =
-document.getElementById("groupList");
+const user =
+JSON.parse(localStorage.getItem("user"));
+
+const myGroups =
+document.getElementById("myGroups");
+
+const groupsList =
+document.getElementById("groupsList");
+
+const searchInput =
+document.getElementById("searchGroup");
+
+let allGroups = [];
+
+/* ==========================
+LOAD GROUPS
+========================== */
 
 async function loadGroups(){
 
@@ -13,48 +28,13 @@ async function loadGroups(){
 
         if(!data.success){
 
-            groupList.innerHTML =
-            "<p>No groups found.</p>";
-
             return;
 
         }
 
-        let html = "";
+        allGroups = data.groups;
 
-        data.groups.forEach(group=>{
-
-            html += `
-
-            <div class="group-card"
-            onclick="openGroup('${group._id}')">
-
-                <img
-                src="${group.avatar || '/images/default-group.png'}">
-
-                <div>
-
-                    <div class="group-name">
-
-                        ${group.name}
-
-                    </div>
-
-                    <div class="group-members">
-
-                        ${group.memberCount} Members
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            `;
-
-        });
-
-        groupList.innerHTML = html;
+        renderGroups(allGroups);
 
     }catch(err){
 
@@ -64,10 +44,175 @@ async function loadGroups(){
 
 }
 
+/* ==========================
+RENDER GROUPS
+========================== */
+
+function renderGroups(groups){
+
+    myGroups.innerHTML = "";
+
+    groupsList.innerHTML = "";
+
+    groups.forEach(group=>{
+
+        const joined =
+        group.members.includes(user.username);
+
+        const card = `
+
+        <div class="group-card">
+
+            <img
+            src="${
+            group.avatar ||
+            "/images/default-group.png"
+            }">
+
+            <div class="group-details">
+
+                <div class="group-name">
+
+                    ${group.name}
+
+                </div>
+
+                <div class="group-desc">
+
+                    ${group.description || "No description"}
+
+                </div>
+
+                <div class="group-members">
+
+                    👥 ${group.memberCount} Members
+
+                </div>
+
+            </div>
+
+            <div class="group-action">
+
+            ${
+            joined ?
+
+            `<button
+            onclick="openGroup('${group._id}')">
+
+            Open
+
+            </button>`
+
+            :
+
+            `<button
+            onclick="joinGroup('${group._id}')">
+
+            Join
+
+            </button>`
+
+            }
+
+            </div>
+
+        </div>
+
+        `;
+
+        if(joined){
+
+            myGroups.innerHTML += card;
+
+        }else{
+
+            groupsList.innerHTML += card;
+
+        }
+
+    });
+
+}
+
+/* ==========================
+SEARCH
+========================== */
+
+searchInput.addEventListener("input",()=>{
+
+    const value =
+    searchInput.value
+    .toLowerCase();
+
+    const filtered =
+    allGroups.filter(group=>
+
+        group.name
+        .toLowerCase()
+        .includes(value)
+
+    );
+
+    renderGroups(filtered);
+
+});
+
+/* ==========================
+OPEN GROUP
+========================== */
+
 function openGroup(id){
 
     location.href =
-    "/group-chat.html?id=" + id;
+    "/group-chat.html?id="+id;
+
+}
+
+/* ==========================
+JOIN GROUP
+========================== */
+
+async function joinGroup(groupId){
+
+    try{
+
+        const res =
+        await fetch("/api/groups/join",{
+
+            method:"PUT",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                groupId,
+
+                username:user.username
+
+            })
+
+        });
+
+        const data =
+        await res.json();
+
+        if(data.success){
+
+            loadGroups();
+
+        }else{
+
+            alert(data.message);
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+    }
 
 }
 
