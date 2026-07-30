@@ -73,11 +73,25 @@ exports.getGroups = async (req, res) => {
     try{
 
         const groups = await Group.find()
-.sort({lastMessageTime:-1, createdAt:-1});
-        
+        .sort({
+            lastMessageTime:-1,
+            createdAt:-1
+        })
+        .lean();
+
+        groups.forEach(group=>{
+
+            group.memberCount =
+            group.members.length;
+
+        });
+
         res.json({
+
             success:true,
+
             groups
+
         });
 
     }catch(err){
@@ -85,8 +99,11 @@ exports.getGroups = async (req, res) => {
         console.error(err);
 
         res.status(500).json({
+
             success:false,
+
             message:err.message
+
         });
 
     }
