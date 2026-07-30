@@ -1,5 +1,8 @@
-const avatarInput = document.getElementById("groupImage");
-const avatarPreview = document.getElementById("previewImage");
+const avatarInput =
+document.getElementById("groupImage");
+
+const avatarPreview =
+document.getElementById("previewImage");
 
 let avatarBase64 = "";
 
