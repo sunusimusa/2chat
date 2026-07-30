@@ -28,6 +28,7 @@ router.put("/join", joinGroup);
 // Leave Group
 router.put("/leave", leaveGroup);
 
-
+// Delete group
+router.delete("/delete", deleteGroup);
 
 module.exports = router;
