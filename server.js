@@ -61,6 +61,23 @@ mongoose.connect(process.env.MONGO_URI)
 
 
  io.on("connection",(socket)=>{
+
+   /* ==========================
+GROUP CHAT
+========================== */
+
+socket.on("joinGroup",(groupId)=>{
+
+    socket.join(groupId);
+
+});
+
+socket.on("groupMessage",(message)=>{
+
+    socket.to(message.groupId)
+    .emit("newGroupMessage", message);
+
+});
    
 console.log("🟢 User Connected");
 
