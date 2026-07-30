@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Group Info</title>
+
+<link rel="stylesheet"
+href="/css/group-info.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<!-- Header -->
+
+<header class="info-header">
+
+<button onclick="history.back()">
+
+<i class="fa-solid fa-arrow-left"></i>
+
+</button>
+
+<h2>Group Info</h2>
+
+</header>
+
+<!-- Cover -->
+
+<div class="group-cover">
+
+<img
+id="groupCover"
+src="/images/default-cover.jpg">
+
+</div>
+
+<!-- Avatar -->
+
+<div class="avatar-wrapper">
+
+<img
+id="groupAvatar"
+src="/images/default-group.png">
+
+</div>
+
+<!-- Name -->
+
+<h2 id="groupName">
+
+Loading...
+
+</h2>
+
+<!-- Description -->
+
+<p id="groupDescription">
+
+No description
+
+</p>
+
+<!-- Stats -->
+
+<div class="group-stats">
+
+<div>
+
+<h3 id="memberCount">
+
+0
+
+</h3>
+
+<span>Members</span>
+
+</div>
+
+<div>
+
+<h3 id="adminCount">
+
+0
+
+</h3>
+
+<span>Admins</span>
+
+</div>
+
+</div>
+
+<hr>
+
+<!-- Members -->
+
+<h3 class="section-title">
+
+Members
+
+</h3>
+
+<div id="membersList">
+
+</div>
+
+<hr>
+
+<!-- Actions -->
+
+<div class="group-actions">
+
+<button id="addMemberBtn">
+
+<i class="fa-solid fa-user-plus"></i>
+
+Add Member
+
+</button>
+
+<button id="leaveGroupBtn">
+
+<i class="fa-solid fa-right-from-bracket"></i>
+
+Leave Group
+
+</button>
+
+<button id="deleteGroupBtn">
+
+<i class="fa-solid fa-trash"></i>
+
+Delete Group
+
+</button>
+
+</div>
+
+<script src="/js/group-info.js"></script>
+
+</body>
+
+</html>
