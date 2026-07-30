@@ -35,8 +35,8 @@ async function loadGroup(){
     try{
 
         const res =
-        await fetch("/api/groups/" + groupId);
-
+        await fetch("/api/groups/group/" + groupId);
+        
         const data =
         await res.json();
 
@@ -101,17 +101,6 @@ async function loadMessages(){
             });
 
         }
-
-        chat.scrollTop = chat.scrollHeight;
-
-    }catch(err){
-
-        console.error(err);
-
-    }
-
-}
-
 
         chat.scrollTop = chat.scrollHeight;
 
