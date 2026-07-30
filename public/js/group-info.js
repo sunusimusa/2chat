@@ -265,3 +265,76 @@ async function deleteGroup(){
     }
 
 }
+
+/* ==========================
+ADD MEMBER
+========================== */
+
+document
+.getElementById("addMemberBtn")
+.addEventListener("click", addMember);
+
+async function addMember(){
+
+    // Owner ko Admin ne kawai
+    if(
+        user.username !== currentGroup.owner &&
+        !currentGroup.admins.includes(user.username)
+    ){
+
+        alert("Only Owner or Admin can add members.");
+
+        return;
+
+    }
+
+    const member =
+    prompt("Enter username to add:");
+
+    if(!member) return;
+
+    try{
+
+        const res = await fetch("/api/groups/add-member",{
+
+            method:"PUT",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                groupId,
+
+                username:user.username,
+
+                member
+
+            })
+
+        });
+
+        const data = await res.json();
+
+        if(data.success){
+
+            alert("✅ Member added successfully.");
+
+            loadGroup();
+
+        }else{
+
+            alert(data.message);
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+        alert("Network Error");
+
+    }
+
+}
