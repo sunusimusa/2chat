@@ -42,3 +42,30 @@ async function loadGroup(){
     }
 
 }
+
+function renderGroup(){
+
+    document.getElementById("groupName").innerText =
+    currentGroup.name;
+
+    document.getElementById("groupDescription").innerText =
+    currentGroup.description || "No description";
+
+    document.getElementById("groupAvatar").src =
+    currentGroup.avatar ||
+    "/images/default-group.png";
+
+    document.getElementById("groupCover").src =
+    currentGroup.cover ||
+    "/images/default-cover.jpg";
+
+    document.getElementById("memberCount").innerText =
+    currentGroup.members.length;
+
+    document.getElementById("adminCount").innerText =
+    currentGroup.admins.length;
+
+    renderMembers();
+
+}
+
