@@ -288,3 +288,71 @@ exports.deleteGroup = async (req, res) => {
     }
 
 };
+
+// ================= ADD MEMBER =================
+exports.addMember = async (req, res) => {
+
+    try{
+
+        const {
+            groupId,
+            username,
+            member
+        } = req.body;
+
+        const group = await Group.findById(groupId);
+
+        if(!group){
+
+            return res.json({
+                success:false,
+                message:"Group not found."
+            });
+
+        }
+
+        // Owner ko Admin ne kawai zai iya ƙara member
+        if(
+            group.owner !== username &&
+            !group.admins.includes(username)
+        ){
+
+            return res.json({
+                success:false,
+                message:"Only owner or admins can add members."
+            });
+
+        }
+
+        if(group.members.includes(member)){
+
+            return res.json({
+                success:false,
+                message:"User is already in this group."
+            });
+
+        }
+
+        group.members.push(member);
+        group.memberCount = group.members.length;
+
+        await group.save();
+
+        res.json({
+            success:true,
+            message:"Member added successfully.",
+            group
+        });
+
+    }catch(err){
+
+        console.error(err);
+
+        res.status(500).json({
+            success:false,
+            message:err.message
+        });
+
+    }
+
+};
