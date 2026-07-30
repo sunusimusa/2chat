@@ -1,7 +1,5 @@
 const socket = io();
 
-alert("JS Loaded");
-
 const user =
 JSON.parse(localStorage.getItem("user"));
 
@@ -192,8 +190,6 @@ START
 loadGroup();
 
 loadMessages();
-
-alert("Finished Loading");
 
 /* ==========================
 SEND MESSAGE
