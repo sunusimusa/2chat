@@ -6,7 +6,8 @@ const {
     getGroup,
     joinGroup,
     leaveGroup,
-    deleteGroup
+    deleteGroup,
+    addMember
 } = require("../controllers/groupController");
 
 /* ==========================
@@ -30,5 +31,8 @@ router.put("/leave", leaveGroup);
 
 // Delete group
 router.delete("/delete", deleteGroup);
+
+// Add member
+router.put("/add-member", addMember);
 
 module.exports = router;
