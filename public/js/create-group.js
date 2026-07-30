@@ -91,7 +91,7 @@ async function createGroup(){
 
 
             avatarPreview.src = "/images/default-group.png";
-
+            
             avatarInput.value = "";
 
             avatarBase64 = "";
