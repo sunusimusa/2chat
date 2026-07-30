@@ -29,16 +29,21 @@ document.getElementById("sendBtn");
 /* ==========================
 LOAD GROUP INFO
 ========================== */
-
 async function loadGroup(){
 
     try{
 
-        const res =
-        await fetch("/api/groups/group/" + groupId);
-        
-        const data =
-        await res.json();
+        const url = "/api/groups/group/" + groupId;
+
+        console.log("Request URL:", url);
+
+        const res = await fetch(url);
+
+        console.log("Status:", res.status);
+
+        const data = await res.json();
+
+        console.log("Response:", data);
 
         if(!data.success){
 
