@@ -16,8 +16,8 @@ async function loadGroup(){
     try{
 
         const res =
-        await fetch("/api/groups/" + groupId);
-
+await fetch("/api/groups/group/" + groupId);
+        
         const data =
         await res.json();
 
@@ -200,15 +200,6 @@ async function leaveGroup(){
 /* ==========================
 DELETE GROUP
 ========================== */
-
-const deleteBtn =
-document.getElementById("deleteGroupBtn");
-
-if(user.username !== currentGroup?.owner){
-
-    deleteBtn.style.display = "none";
-
-}
 
 deleteBtn.addEventListener("click", deleteGroup);
 
