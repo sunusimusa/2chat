@@ -4,7 +4,8 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
 <title>2Chat Groups</title>
 
@@ -17,47 +18,70 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 
 <body>
 
-<header class="group-header">
+<!-- ==========================
+HEADER
+========================== -->
+
+<header class="groups-header">
 
 <button onclick="history.back()">
+
 <i class="fa-solid fa-arrow-left"></i>
+
 </button>
 
 <h2>Groups</h2>
 
-<button>
-<i class="fa-solid fa-magnifying-glass"></i>
+<button onclick="location.href='/create-group.html'">
+
+<i class="fa-solid fa-plus"></i>
+
 </button>
 
 </header>
 
-<div class="group-top">
+<!-- ==========================
+SEARCH
+========================== -->
 
-<button
-class="create-group-btn"
-onclick="location.href='/create-group.html'">
+<div class="search-box">
 
-<i class="fa-solid fa-plus"></i>
+<i class="fa-solid fa-magnifying-glass"></i>
 
-Create Group
-
-</button>
-
-</div>
-
-<div id="groupList">
-
-<!-- Groups will load here -->
+<input
+type="text"
+id="searchGroup"
+placeholder="Search groups...">
 
 </div>
 
-<button
-class="floating-btn"
-onclick="location.href='/create-group.html'">
+<!-- ==========================
+MY GROUPS
+========================== -->
 
-<i class="fa-solid fa-plus"></i>
+<div class="section-title">
 
-</button>
+My Groups
+
+</div>
+
+<div id="myGroups">
+
+</div>
+
+<!-- ==========================
+DISCOVER GROUPS
+========================== -->
+
+<div class="section-title">
+
+Discover Groups
+
+</div>
+
+<div id="groupsList">
+
+</div>
 
 <script src="/js/groups.js"></script>
 
