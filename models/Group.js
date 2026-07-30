@@ -14,9 +14,9 @@ const groupSchema = new mongoose.Schema({
     },
 
     cover:{
-        type:String,
-        default:""
-    },
+    type:String,
+    default:"/images/default-group-cover.jpg"
+},
 
     description:{
         type:String,
