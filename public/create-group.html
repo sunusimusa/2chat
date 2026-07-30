@@ -17,19 +17,27 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 
 <body>
 
+<!-- Header -->
+
 <header class="header">
 
-<button onclick="history.back()">
+<button class="back-btn" onclick="history.back()">
 
 <i class="fa-solid fa-arrow-left"></i>
 
 </button>
 
-<h2>Create Group</h2>
+<h2>Create New Group</h2>
 
 </header>
 
+<!-- Container -->
+
 <div class="container">
+
+<!-- Avatar -->
+
+<div class="avatar-box">
 
 <label for="groupImage">
 
@@ -37,6 +45,12 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 id="previewImage"
 src="/images/default-group.png"
 class="group-avatar">
+
+<div class="camera-icon">
+
+<i class="fa-solid fa-camera"></i>
+
+</div>
 
 </label>
 
@@ -46,22 +60,43 @@ id="groupImage"
 accept="image/*"
 hidden>
 
+</div>
+
+<!-- Group Name -->
+
+<div class="input-box">
+
+<i class="fa-solid fa-users"></i>
+
 <input
 type="text"
 id="groupName"
-placeholder="Group Name">
+placeholder="Enter group name">
+
+</div>
+
+<!-- Description -->
+
+<div class="input-box textarea-box">
+
+<i class="fa-solid fa-align-left"></i>
 
 <textarea
 id="groupDescription"
-placeholder="Group Description"></textarea>
+placeholder="Group description (optional)"></textarea>
+
+</div>
+
+<!-- Create -->
 
 <button
 id="createBtn"
+class="create-btn"
 onclick="createGroup()">
 
 <i class="fa-solid fa-users"></i>
 
-Create Group
+<span>Create Group</span>
 
 </button>
 
