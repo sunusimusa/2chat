@@ -238,3 +238,53 @@ await group.save();
     }
 
 };
+
+// ================= DELETE GROUP =================
+exports.deleteGroup = async (req, res) => {
+
+    try{
+
+        const {
+            groupId,
+            username
+        } = req.body;
+
+        const group = await Group.findById(groupId);
+
+        if(!group){
+
+            return res.json({
+                success:false,
+                message:"Group not found."
+            });
+
+        }
+
+        if(group.owner !== username){
+
+            return res.json({
+                success:false,
+                message:"Only the group owner can delete this group."
+            });
+
+        }
+
+        await Group.findByIdAndDelete(groupId);
+
+        res.json({
+            success:true,
+            message:"Group deleted successfully."
+        });
+
+    }catch(err){
+
+        console.error(err);
+
+        res.status(500).json({
+            success:false,
+            message:err.message
+        });
+
+    }
+
+};
