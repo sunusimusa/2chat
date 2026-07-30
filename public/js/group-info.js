@@ -69,3 +69,61 @@ function renderGroup(){
 
 }
 
+function renderMembers(){
+
+    const list =
+    document.getElementById("membersList");
+
+    list.innerHTML = "";
+
+    currentGroup.members.forEach(member=>{
+
+        const isOwner =
+        member === currentGroup.owner;
+
+        const isAdmin =
+        currentGroup.admins.includes(member);
+
+        let role = "Member";
+
+        if(isOwner){
+
+            role = "Owner 👑";
+
+        }else if(isAdmin){
+
+            role = "Admin ⭐";
+
+        }
+
+        list.innerHTML += `
+
+        <div class="member-card">
+
+            <img
+            src="/images/default-avatar.png">
+
+            <div class="member-info">
+
+                <div class="member-name">
+
+                    ${member}
+
+                </div>
+
+                <div class="member-role">
+
+                    ${role}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+}
+
