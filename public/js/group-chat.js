@@ -275,4 +275,12 @@ socket.on("newGroupMessage",(msg)=>{
 
 });
 
+socket.emit("joinGroup", groupId);
 
+socket.on("newGroupMessage",(msg)=>{
+
+    appendMessage(msg);
+
+    chat.scrollTop = chat.scrollHeight;
+
+});
