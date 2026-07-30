@@ -51,14 +51,16 @@ function renderGroup(){
     document.getElementById("groupDescription").innerText =
     currentGroup.description || "No description";
 
-    document.getElementById("groupAvatar").src =
-    currentGroup.avatar ||
-    "/images/default-group.png";
+document.getElementById("groupAvatar").src =
+    currentGroup.avatar && currentGroup.avatar.trim() !== ""
+        ? currentGroup.avatar
+        : "/images/default-group.png";
 
-    document.getElementById("groupCover").src =
-    currentGroup.cover ||
-    "/images/default-cover.jpg";
-
+document.getElementById("groupCover").src =
+    currentGroup.cover && currentGroup.cover.trim() !== ""
+        ? currentGroup.cover
+        : "/images/default-group-cover.jpg";
+    
     document.getElementById("memberCount").innerText =
     currentGroup.members.length;
 
@@ -115,8 +117,8 @@ function renderMembers(){
         <div class="member-card">
 
             <img
-            src="/images/default-avatar.png">
-
+    src="/images/default-group.png">
+    
             <div class="member-info">
 
                 <div class="member-name">
