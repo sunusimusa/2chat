@@ -1,5 +1,5 @@
-const avatarInput = document.getElementById("groupAvatar");
-const avatarPreview = document.getElementById("groupAvatarPreview");
+const avatarInput = document.getElementById("groupImage");
+const avatarPreview = document.getElementById("previewImage");
 
 let avatarBase64 = "";
 
@@ -31,7 +31,7 @@ avatarInput.addEventListener("change", () => {
 // =======================
 
 document
-.getElementById("createGroupBtn")
+.getElementById("createBtn")
 .addEventListener("click", createGroup);
 
 async function createGroup(){
@@ -89,10 +89,13 @@ async function createGroup(){
 
            document.getElementById("groupDescription").value = "";
 
-           avatarPreview.src = "/images/default-group.png";
 
-           avatarBase64 = "";
+            avatarPreview.src = "/images/default-group.png";
 
+            avatarInput.value = "";
+
+            avatarBase64 = "";
+            
             window.location.href="/groups.html";
             
         }else{
