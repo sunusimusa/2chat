@@ -65,8 +65,7 @@ function renderGroups(groups){
 
             <img
             src="${
-            group.avatar ||
-            "/images/default-group.png"
+            group.avatar || "/images/default-group.png"
             }">
 
             <div class="group-details">
