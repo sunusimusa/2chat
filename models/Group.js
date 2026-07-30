@@ -64,11 +64,8 @@ const groupSchema = new mongoose.Schema({
         default:null
     },
 
-    createdAt:{
-        type:Date,
-        default:Date.now
-    }
-
+    },{
+    timestamps:true
 });
 
 module.exports = mongoose.model("Group", groupSchema);
