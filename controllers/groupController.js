@@ -28,9 +28,9 @@ exports.createGroup = async (req, res) => {
 
     description: description || "",
 
-    avatar: avatar || "",
+    avatar: avatar || "/images/default-group.png",
 
-    cover:"",
+    cover: "/images/default-group-cover.jpg",
 
     owner,
 
