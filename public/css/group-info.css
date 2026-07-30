@@ -1,0 +1,298 @@
+/* ==========================
+RESET
+========================== */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+
+background:#f5f7fb;
+color:#222;
+
+}
+
+/* ==========================
+HEADER
+========================== */
+
+.info-header{
+
+position:sticky;
+top:0;
+z-index:1000;
+
+display:flex;
+align-items:center;
+gap:15px;
+
+padding:16px;
+
+background:#1877f2;
+color:#fff;
+
+box-shadow:0 2px 8px rgba(0,0,0,.15);
+
+}
+
+.info-header button{
+
+background:none;
+border:none;
+
+color:#fff;
+
+font-size:22px;
+
+cursor:pointer;
+
+}
+
+.info-header h2{
+
+font-size:22px;
+font-weight:bold;
+
+}
+
+/* ==========================
+COVER
+========================== */
+
+.group-cover img{
+
+width:100%;
+height:180px;
+
+object-fit:cover;
+
+}
+
+/* ==========================
+AVATAR
+========================== */
+
+.avatar-wrapper{
+
+display:flex;
+justify-content:center;
+
+margin-top:-55px;
+
+}
+
+.avatar-wrapper img{
+
+width:110px;
+height:110px;
+
+border-radius:50%;
+
+object-fit:cover;
+
+background:#fff;
+
+border:5px solid #fff;
+
+box-shadow:0 3px 12px rgba(0,0,0,.2);
+
+}
+
+/* ==========================
+NAME
+========================== */
+
+#groupName{
+
+text-align:center;
+
+margin-top:15px;
+
+font-size:24px;
+font-weight:bold;
+
+}
+
+#groupDescription{
+
+text-align:center;
+
+margin:10px 20px;
+
+font-size:15px;
+
+color:#666;
+
+}
+
+/* ==========================
+STATS
+========================== */
+
+.group-stats{
+
+display:flex;
+justify-content:space-around;
+
+margin:25px 20px;
+
+background:#fff;
+
+padding:18px;
+
+border-radius:18px;
+
+box-shadow:0 3px 10px rgba(0,0,0,.08);
+
+}
+
+.group-stats div{
+
+text-align:center;
+
+}
+
+.group-stats h3{
+
+font-size:24px;
+
+color:#1877f2;
+
+}
+
+.group-stats span{
+
+font-size:14px;
+
+color:#666;
+
+}
+
+/* ==========================
+SECTION TITLE
+========================== */
+
+.section-title{
+
+margin:20px;
+
+font-size:18px;
+font-weight:bold;
+
+}
+
+/* ==========================
+MEMBERS
+========================== */
+
+#membersList{
+
+padding:0 15px 20px;
+
+}
+
+.member-card{
+
+display:flex;
+align-items:center;
+
+gap:12px;
+
+padding:12px;
+
+margin-bottom:12px;
+
+background:#fff;
+
+border-radius:16px;
+
+box-shadow:0 3px 10px rgba(0,0,0,.08);
+
+}
+
+.member-card img{
+
+width:55px;
+height:55px;
+
+border-radius:50%;
+
+object-fit:cover;
+
+}
+
+.member-info{
+
+flex:1;
+
+}
+
+.member-name{
+
+font-size:16px;
+font-weight:bold;
+
+}
+
+.member-role{
+
+font-size:13px;
+
+color:#777;
+
+}
+
+/* ==========================
+BUTTONS
+========================== */
+
+.group-actions{
+
+padding:20px;
+
+display:flex;
+flex-direction:column;
+
+gap:15px;
+
+}
+
+.group-actions button{
+
+padding:15px;
+
+border:none;
+
+border-radius:15px;
+
+font-size:16px;
+font-weight:bold;
+
+cursor:pointer;
+
+}
+
+#addMemberBtn{
+
+background:#1877f2;
+color:#fff;
+
+}
+
+#leaveGroupBtn{
+
+background:#ff9800;
+color:#fff;
+
+}
+
+#deleteGroupBtn{
+
+background:#f44336;
+color:#fff;
+
+}
