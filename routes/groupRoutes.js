@@ -1,17 +1,12 @@
 const router = require("express").Router();
 
 const {
-
     createGroup,
-
     getGroups,
-
     getGroup,
-
     joinGroup,
-
-    leaveGroup
-
+    leaveGroup,
+    deleteGroup
 } = require("../controllers/groupController");
 
 /* ==========================
@@ -32,5 +27,7 @@ router.put("/join", joinGroup);
 
 // Leave Group
 router.put("/leave", leaveGroup);
+
+
 
 module.exports = router;
