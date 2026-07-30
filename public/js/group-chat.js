@@ -1,5 +1,7 @@
 const socket = io();
 
+alert("1. JS Loaded");
+
 const user =
 JSON.parse(localStorage.getItem("user"));
 
@@ -35,6 +37,8 @@ async function loadGroup(){
 
         const url = "/api/groups/group/" + groupId;
 
+        alert("5. Fetch Status: " + res.status);
+
         console.log("Request URL:", url);
 
         const res = await fetch(url);
@@ -48,6 +52,7 @@ alert("Status: " + res.status);
 
 const data =
 await res.json();
+        alert("6. " + JSON.stringify(data));
 
 alert(JSON.stringify(data));
 
@@ -196,10 +201,15 @@ messageInput.scrollHeight+"px";
 /* ==========================
 START
 ========================== */
+alert("2. About to load group...");
 
 loadGroup();
 
+alert("3. loadGroup() finished");
+
 loadMessages();
+
+alert("4. loadMessages() finished");
 
 /* ==========================
 SEND MESSAGE
