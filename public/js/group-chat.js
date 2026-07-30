@@ -91,11 +91,15 @@ async function loadMessages(){
 
         chat.innerHTML = "";
 
-        data.messages.forEach(msg=>{
+if(Array.isArray(data.messages)){
 
-            appendMessage(msg);
+    data.messages.forEach(msg=>{
 
-        });
+        appendMessage(msg);
+
+    });
+
+}
 
         chat.scrollTop = chat.scrollHeight;
 
