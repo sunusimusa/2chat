@@ -55,9 +55,7 @@ async function loadGroup(){
         data.group.memberCount + " Members";
 
         document.getElementById("groupAvatar").src =
-        data.group.avatar || "/images/default-group.png";
-
-    }catch(err){
+        data.group.avatar || "/images/default-group.png"
 
         console.error(err);
 
