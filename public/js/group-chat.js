@@ -72,7 +72,6 @@ async function loadGroup(){
 /* ==========================
 LOAD MESSAGES
 ========================== */
-
 async function loadMessages(){
 
     try{
@@ -93,15 +92,26 @@ async function loadMessages(){
 
         chat.innerHTML = "";
 
-if(Array.isArray(data.messages)){
+        if(data.messages){
 
-    data.messages.forEach(msg=>{
+            data.messages.forEach(msg=>{
 
-        appendMessage(msg);
+                appendMessage(msg);
 
-    });
+            });
+
+        }
+
+        chat.scrollTop = chat.scrollHeight;
+
+    }catch(err){
+
+        console.error(err);
+
+    }
 
 }
+
 
         chat.scrollTop = chat.scrollHeight;
 
