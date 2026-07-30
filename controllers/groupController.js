@@ -325,6 +325,25 @@ exports.addMember = async (req, res) => {
 
         }
 
+        // Check if user exists
+const userExists = await User.findOne({
+
+    username:member
+
+});
+
+if(!userExists){
+
+    return res.json({
+
+        success:false,
+
+        message:"User not found."
+
+    });
+
+}
+
         if(group.members.includes(member)){
 
             return res.json({
