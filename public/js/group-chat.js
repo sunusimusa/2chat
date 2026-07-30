@@ -1,5 +1,7 @@
 const socket = io();
 
+alert("JS Loaded");
+
 const user =
 JSON.parse(localStorage.getItem("user"));
 
@@ -185,6 +187,8 @@ loadGroup();
 
 loadMessages();
 
+alert("Finished Loading");
+
 /* ==========================
 SEND MESSAGE
 ========================== */
@@ -279,3 +283,28 @@ socket.on("newGroupMessage",(msg)=>{
     chat.scrollHeight;
 
 });
+
+
+/* ==========================
+GROUP INFO BUTTON
+========================== */
+
+document
+.getElementById("groupInfoBtn")
+.addEventListener("click",()=>{
+
+    location.href =
+    "/group-info.html?id=" + groupId;
+
+});
+
+function removeImage(){
+
+    document.getElementById("previewBox").style.display = "none";
+
+    document.getElementById("groupImage").value = "";
+
+}
+
+
+            
