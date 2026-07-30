@@ -1,4 +1,5 @@
 const Group = require("../models/Group");
+const User = require("../models/User");
 
 // ================= CREATE GROUP =================
 exports.createGroup = async (req, res) => {
