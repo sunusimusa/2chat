@@ -303,10 +303,6 @@ function removeImage(){
 
 }
 
-
-const sendBtn =
-document.getElementById("sendBtn");
-
 const groupImage =
 document.getElementById("groupImage");
 
