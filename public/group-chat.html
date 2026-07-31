@@ -1,16 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2Chat Group Chat</title>
-
-<link rel="stylesheet" href="/css/group-chat.css">
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-
-</head>
-
 <body>
 
 <header class="chat-header">
@@ -36,27 +23,33 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 
 </header>
 
-<div style="background:red;color:#fff;padding:10px;text-align:center;">
-TEST MESSAGE BAR
-</div>
-
+<!-- CHAT -->
 <div id="groupChat" class="chat-container"></div>
 
+<!-- IMAGE PREVIEW -->
 <div id="previewBox" class="preview-box" style="display:none;">
+
 <img id="previewImage">
+
 <button onclick="removeImage()">
 <i class="fa-solid fa-trash"></i>
 Remove
 </button>
+
 </div>
 
+<!-- MESSAGE BAR -->
 <div class="message-bar">
 
 <label for="groupImage" class="icon-btn">
 <i class="fa-solid fa-image"></i>
 </label>
 
-<input type="file" id="groupImage" accept="image/*" hidden>
+<input
+type="file"
+id="groupImage"
+accept="image/*"
+hidden>
 
 <textarea
 id="message"
@@ -73,32 +66,7 @@ placeholder="Type a message..."></textarea>
 
 </div>
 
-  <div style="background:red;color:#fff;padding:15px;">
-TEST MESSAGE BAR
-</div>
-
-<div class="message-bar">
-
-<label for="groupImage" class="icon-btn">
-<i class="fa-solid fa-image"></i>
-</label>
-
-<input type="file" id="groupImage" hidden>
-
-<textarea id="message"></textarea>
-
-<button id="recordBtn">
-🎤
-</button>
-
-<button id="sendBtn">
-➤
-</button>
-
-</div>
-
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/group-chat.js"></script>
 
 </body>
-</html>
