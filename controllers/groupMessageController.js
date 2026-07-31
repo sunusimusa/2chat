@@ -71,7 +71,7 @@ exports.sendMessage = async (req, res) => {
 
         }
 
-        let image = "";
+        
 let voice = "";
 
 if(req.file){
