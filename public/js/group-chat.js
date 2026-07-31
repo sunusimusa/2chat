@@ -23,6 +23,16 @@ document.getElementById("message");
 
 const sendBtn =
 document.getElementById("sendBtn");
+const recordBtn =
+document.getElementById("recordBtn");
+
+let mediaRecorder;
+
+let audioChunks = [];
+
+let recordedVoice = null;
+
+let isRecording = false;
 
 /* ==========================
 LOAD GROUP INFO
@@ -393,3 +403,94 @@ imageViewer.onclick = function(e){
     }
 
 };
+
+/* ==========================
+VOICE RECORD
+========================== */
+
+recordBtn.addEventListener("mousedown", startRecording);
+
+recordBtn.addEventListener("mouseup", stopRecording);
+
+recordBtn.addEventListener("touchstart",(e)=>{
+
+    e.preventDefault();
+
+    startRecording();
+
+});
+
+recordBtn.addEventListener("touchend",(e)=>{
+
+    e.preventDefault();
+
+    stopRecording();
+
+});
+
+async function startRecording(){
+
+    if(isRecording) return;
+
+    try{
+
+        const stream =
+        await navigator.mediaDevices.getUserMedia({
+
+            audio:true
+
+        });
+
+        mediaRecorder =
+        new MediaRecorder(stream);
+
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = (e)=>{
+
+            audioChunks.push(e.data);
+
+        };
+
+        mediaRecorder.onstop = ()=>{
+
+            recordedVoice =
+            new Blob(audioChunks,{
+
+                type:"audio/webm"
+
+            });
+
+            console.log("Voice Ready");
+
+            alert("Voice Recorded Successfully");
+
+        };
+
+        mediaRecorder.start();
+
+        isRecording = true;
+
+        recordBtn.style.background = "red";
+
+    }catch(err){
+
+        console.error(err);
+
+        alert("Microphone Permission Denied");
+
+    }
+
+}
+
+function stopRecording(){
+
+    if(!isRecording) return;
+
+    mediaRecorder.stop();
+
+    isRecording = false;
+
+    recordBtn.style.background = "";
+
+}
