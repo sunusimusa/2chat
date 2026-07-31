@@ -132,7 +132,10 @@ msg.image
 
 `<div class="message-image">
 
-<img src="${msg.image}" loading="lazy">
+<img
+src="${msg.image}"
+loading="lazy"
+onclick="openImage('${msg.image}')">
 
 </div>`
 
@@ -351,4 +354,42 @@ groupImage.addEventListener("change",(e)=>{
     reader.readAsDataURL(file);
 
 });
-         
+
+/* ==========================
+IMAGE VIEWER
+========================== */
+
+const imageViewer =
+document.getElementById("imageViewer");
+
+const viewerImage =
+document.getElementById("viewerImage");
+
+const closeViewer =
+document.getElementById("closeViewer");
+
+function openImage(src){
+
+    viewerImage.src = src;
+
+    imageViewer.classList.add("show");
+
+}
+
+function closeImage(){
+
+    imageViewer.classList.remove("show");
+
+}
+
+closeViewer.onclick = closeImage;
+
+imageViewer.onclick = function(e){
+
+    if(e.target === imageViewer){
+
+        closeImage();
+
+    }
+
+};
