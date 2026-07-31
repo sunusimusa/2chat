@@ -298,9 +298,11 @@ await fetch("/api/group-messages/send",{
 
 });
 
-        const data =
-        await res.json();
+        const data = await res.json();
 
+console.log(data);
+alert(JSON.stringify(data));
+        
         if(!data.success){
 
             alert(data.message);
