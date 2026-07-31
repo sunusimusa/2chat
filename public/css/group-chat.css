@@ -507,3 +507,51 @@ cursor:pointer;
 user-select:none;
 
 }
+
+/* ==========================
+VOICE PREVIEW
+========================== */
+
+.voice-preview{
+
+display:none;
+
+align-items:center;
+
+gap:10px;
+
+padding:10px;
+
+background:#fff;
+
+border-top:1px solid #ddd;
+
+}
+
+.voice-preview audio{
+
+flex:1;
+
+height:42px;
+
+}
+
+#deleteVoice{
+
+width:45px;
+
+height:45px;
+
+border:none;
+
+border-radius:50%;
+
+background:#ff3b30;
+
+color:#fff;
+
+font-size:18px;
+
+cursor:pointer;
+
+}
