@@ -15,8 +15,6 @@ new URLSearchParams(window.location.search);
 const groupId =
 params.get("id");
 
-alert("Group ID: " + groupId);
-
 const chat =
 document.getElementById("groupChat");
 
