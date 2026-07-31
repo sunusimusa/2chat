@@ -1,4 +1,9 @@
 const router = require("express").Router();
+const multer = require("multer");
+
+const storage = multer.memoryStorage();
+
+const upload = multer({ storage });
 
 const {
 
@@ -13,7 +18,7 @@ GROUP MESSAGES
 ========================== */
 
 // Send Group Message
-router.post("/send", sendMessage);
+router.post("/send", upload.single("image"), sendMessage);
 
 // Load Group Messages
 router.get("/:groupId", getMessages);
