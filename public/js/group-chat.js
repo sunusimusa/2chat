@@ -31,6 +31,14 @@ let mediaRecorder;
 let audioChunks = [];
 
 let recordedVoice = null;
+const voicePreview =
+document.getElementById("voicePreview");
+
+const voicePlayer =
+document.getElementById("voicePlayer");
+
+const deleteVoice =
+document.getElementById("deleteVoice");
 
 let isRecording = false;
 
@@ -246,7 +254,21 @@ formData.append("text", text);
 
 if(selectedImage){
 
-    formData.append("image", selectedImage);
+    formData.append("file", selectedImage);
+
+}
+
+else if(recordedVoice){
+
+    formData.append(
+
+        "file",
+
+        recordedVoice,
+
+        "voice.webm"
+
+    );
 
 }
     
@@ -455,16 +477,17 @@ async function startRecording(){
         mediaRecorder.onstop = ()=>{
 
             recordedVoice =
-            new Blob(audioChunks,{
+new Blob(audioChunks,{
 
-                type:"audio/webm"
+type:"audio/webm"
 
-            });
+});
 
-            console.log("Voice Ready");
+voicePlayer.src =
+URL.createObjectURL(recordedVoice);
 
-            alert("Voice Recorded Successfully");
-
+voicePreview.style.display = "flex";
+            
         };
 
         mediaRecorder.start();
@@ -494,3 +517,13 @@ function stopRecording(){
     recordBtn.style.background = "";
 
 }
+
+deleteVoice.onclick = ()=>{
+
+    recordedVoice = null;
+
+    voicePlayer.src = "";
+
+    voicePreview.style.display = "none";
+
+};
