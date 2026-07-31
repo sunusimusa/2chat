@@ -294,19 +294,26 @@ await fetch("/api/group-messages/send",{
 
         }
 
+
         appendMessage(data.message);
 
-        socket.emit("groupMessage", data.message);
+socket.emit("groupMessage", data.message);
 
-        messageInput.value="";
+messageInput.value = "";
 
-        removeImage();
+removeImage();
 
-        messageInput.style.height="auto";
+// Clear recorded voice
+recordedVoice = null;
 
-        chat.scrollTop=
-        chat.scrollHeight;
+voicePlayer.src = "";
 
+voicePreview.style.display = "none";
+
+messageInput.style.height = "auto";
+
+chat.scrollTop = chat.scrollHeight;
+        
     }catch(err){
 
         console.error(err);
