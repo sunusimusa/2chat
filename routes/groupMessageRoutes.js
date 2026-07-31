@@ -18,7 +18,7 @@ GROUP MESSAGES
 ========================== */
 
 // Send Group Message
-router.post("/send", upload.single("image"), sendMessage);
+router.post("/send", upload.single("file"), sendMessage);
 
 // Load Group Messages
 router.get("/:groupId", getMessages);
