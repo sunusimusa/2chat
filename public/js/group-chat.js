@@ -126,17 +126,36 @@ chat.insertAdjacentHTML(
 
 <div class="${mine?"bubble-me":"bubble-other"}">
 
-${msg.image?
+${
+msg.image
+?
 
 `<div class="message-image">
 
-<img src="${msg.image}">
+<img src="${msg.image}" loading="lazy">
 
 </div>`
 
-:""}
+:
 
-${msg.text||""}
+""
+
+}
+
+${
+msg.text
+?
+
+`<div class="message-text">
+
+${msg.text}
+
+</div>`
+
+:
+
+""
+}
 
 <div class="message-time">
 
