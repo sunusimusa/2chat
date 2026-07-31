@@ -401,3 +401,31 @@ padding:8px;
 }
 
 }
+
+.message-text{
+
+margin-top:8px;
+
+font-size:15px;
+
+line-height:1.4;
+
+}
+
+.message-image{
+
+margin-bottom:6px;
+
+}
+
+.message-image img{
+
+width:100%;
+
+max-width:260px;
+
+border-radius:12px;
+
+display:block;
+
+}
