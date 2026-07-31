@@ -287,6 +287,8 @@ if(recordedVoice){
     
     try{
 
+        alert("Before Fetch");
+        
         const res =
 await fetch("/api/group-messages/send",{
 
@@ -295,6 +297,8 @@ await fetch("/api/group-messages/send",{
     body:formData
 
 });
+
+        alert("After Fetch");
 
         const data = await res.json();
 
