@@ -42,6 +42,8 @@ document.getElementById("deleteVoice");
 
 let isRecording = false;
 
+let recordTime = 0;
+
 /* ==========================
 LOAD GROUP INFO
 ========================== */
@@ -254,23 +256,28 @@ formData.append("text", text);
 
 if(selectedImage){
 
-    formData.append("file", selectedImage);
-
-}
-
-else if(recordedVoice){
-
     formData.append(
-
-        "file",
-
-        recordedVoice,
-
-        "voice.webm"
-
+        "image",
+        selectedImage
     );
 
 }
+
+if(recordedVoice){
+
+    formData.append(
+        "image",
+        recordedVoice,
+        "voice.webm"
+    );
+
+    formData.append(
+        "voiceDuration",
+        recordTime
+    );
+
+}
+
     
     try{
 
@@ -475,26 +482,40 @@ async function startRecording(){
 
         audioChunks = [];
 
+        recordTime = 0;
+
         mediaRecorder.ondataavailable = (e)=>{
 
             audioChunks.push(e.data);
 
         };
 
+        mediaRecorder.onstart = ()=>{
+
+            mediaRecorder.timer = setInterval(()=>{
+
+                recordTime++;
+
+            },1000);
+
+        };
+
         mediaRecorder.onstop = ()=>{
 
+            clearInterval(mediaRecorder.timer);
+
             recordedVoice =
-new Blob(audioChunks,{
+            new Blob(audioChunks,{
 
-type:"audio/webm"
+                type:"audio/webm"
 
-});
+            });
 
-voicePlayer.src =
-URL.createObjectURL(recordedVoice);
+            voicePlayer.src =
+            URL.createObjectURL(recordedVoice);
 
-voicePreview.style.display = "flex";
-            
+            voicePreview.style.display = "flex";
+
         };
 
         mediaRecorder.start();
