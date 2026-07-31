@@ -202,33 +202,32 @@ messageInput.addEventListener("keydown",(e)=>{
 
 async function sendMessage(){
 
-    const text =
-    messageInput.value.trim();
+    const text = messageInput.value.trim();
 
-    if(text==="") return;
+if(text==="" && !selectedImage) return;
 
+const formData = new FormData();
+
+formData.append("groupId", groupId);
+formData.append("sender", user.username);
+formData.append("text", text);
+
+if(selectedImage){
+
+    formData.append("image", selectedImage);
+
+}
+    
     try{
 
         const res =
-        await fetch("/api/group-messages/send",{
+await fetch("/api/group-messages/send",{
 
-            method:"POST",
+    method:"POST",
 
-            headers:{
-                "Content-Type":"application/json"
-            },
+    body:formData
 
-            body:JSON.stringify({
-
-                groupId,
-
-                sender:user.username,
-
-                text
-
-            })
-
-        });
+});
 
         const data =
         await res.json();
@@ -246,6 +245,8 @@ async function sendMessage(){
         socket.emit("groupMessage", data.message);
 
         messageInput.value="";
+
+        removeImage();
 
         messageInput.style.height="auto";
 
@@ -331,5 +332,4 @@ groupImage.addEventListener("change",(e)=>{
     reader.readAsDataURL(file);
 
 });
-
-            
+         
