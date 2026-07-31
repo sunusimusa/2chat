@@ -10,8 +10,13 @@ exports.sendMessage = async (req, res) => {
 
     try{
 
-        const { groupId, sender, text } = req.body;
-
+        const {
+    groupId,
+    sender,
+    text,
+    voiceDuration
+} = req.body;
+        
         if(!groupId || !sender){
 
             return res.json({
@@ -66,18 +71,68 @@ exports.sendMessage = async (req, res) => {
 
         }
 
+        let image = "";
+let voice = "";
+
+if(req.file){
+
+    const uploadResult = await new Promise((resolve,reject)=>{
+
+        const stream = cloudinary.uploader.upload_stream(
+
+            {
+                resource_type:"auto",
+                folder:"2chat/group-messages"
+            },
+
+            (err,result)=>{
+
+                if(err) reject(err);
+
+                else resolve(result);
+
+            }
+
+        );
+
+        streamifier
+        .createReadStream(req.file.buffer)
+        .pipe(stream);
+
+    });
+
+    if(req.file.mimetype.startsWith("image/")){
+
+        image = uploadResult.secure_url;
+
+    }
+
+    if(req.file.mimetype.startsWith("audio/")){
+
+        voice = uploadResult.secure_url;
+
+    }
+
+}
+        
+
         const message = await GroupMessage.create({
 
-            groupId,
+    groupId,
 
-            sender,
+    sender,
 
-            text:text || "",
+    text,
 
-            image
+    image,
 
-        });
+    voice,
 
+    voiceDuration:
+    voiceDuration || 0
+
+});
+        
         await Group.findByIdAndUpdate(
 
             groupId,
