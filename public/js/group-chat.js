@@ -293,11 +293,47 @@ document
 
 function removeImage(){
 
-    document.getElementById("previewBox").style.display = "none";
+    selectedImage = null;
 
-    document.getElementById("groupImage").value = "";
+    groupImage.value = "";
+
+    document.getElementById("previewImage").src = "";
+
+    document.getElementById("previewBox").style.display = "none";
 
 }
 
+
+const sendBtn =
+document.getElementById("sendBtn");
+
+const groupImage =
+document.getElementById("groupImage");
+
+let selectedImage = null;
+
+groupImage.addEventListener("change",(e)=>{
+
+    const file = e.target.files[0];
+
+    if(!file) return;
+
+    selectedImage = file;
+
+    const reader = new FileReader();
+
+    reader.onload = function(){
+
+        document.getElementById("previewImage").src =
+        reader.result;
+
+        document.getElementById("previewBox").style.display =
+        "block";
+
+    };
+
+    reader.readAsDataURL(file);
+
+});
 
             
