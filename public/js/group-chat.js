@@ -245,9 +245,15 @@ messageInput.addEventListener("keydown",(e)=>{
 async function sendMessage(){
 
     const text = messageInput.value.trim();
+    console.log("Text:", text);
+console.log("Image:", selectedImage);
+console.log("Voice:", recordedVoice);
 
-if(text==="" && !selectedImage) return;
+if(text==="" && !selectedImage && !recordedVoice){
 
+    return;
+
+}
 const formData = new FormData();
 
 formData.append("groupId", groupId);
