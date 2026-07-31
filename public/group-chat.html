@@ -1,16 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>2Chat Group Chat</title>
 
 <link rel="stylesheet" href="/css/group-chat.css">
-
 <link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
@@ -18,132 +13,68 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 
 <body>
 
-<!-- ==========================
-HEADER
-========================== -->
-
 <header class="chat-header">
 
-<button
-class="back-btn"
-onclick="history.back()">
-
+<button class="back-btn" onclick="history.back()">
 <i class="fa-solid fa-arrow-left"></i>
-
 </button>
 
 <div class="group-info">
 
-<img
-id="groupAvatar"
-src="/images/default-group.png">
+<img id="groupAvatar" src="/images/default-group.png">
 
 <div>
-
-<h3 id="groupName">
-Loading...
-</h3>
-
-<p id="groupMembers">
-0 Members
-</p>
-
+<h3 id="groupName">Loading...</h3>
+<p id="groupMembers">0 Members</p>
 </div>
 
 </div>
 
-<button
-id="groupInfoBtn">
-
+<button id="groupInfoBtn">
 <i class="fa-solid fa-circle-info"></i>
-
 </button>
 
 </header>
 
-<!-- ==========================
-CHAT
-========================== -->
-
-<div
-id="groupChat"
-class="chat-container">
-
+<div style="background:red;color:#fff;padding:10px;text-align:center;">
+TEST MESSAGE BAR
 </div>
 
-<!-- ==========================
-IMAGE PREVIEW
-========================== -->
+<div id="groupChat" class="chat-container"></div>
 
-<div
-id="previewBox"
-class="preview-box"
-style="display:none;">
-
+<div id="previewBox" class="preview-box" style="display:none;">
 <img id="previewImage">
-
-<button
-onclick="removeImage()">
-
+<button onclick="removeImage()">
 <i class="fa-solid fa-trash"></i>
-
 Remove
-
 </button>
-
 </div>
-
-<!-- ==========================
-MESSAGE BAR
-========================== -->
 
 <div class="message-bar">
 
-<label
-for="groupImage"
-class="icon-btn">
-
+<label for="groupImage" class="icon-btn">
 <i class="fa-solid fa-image"></i>
-
 </label>
 
-<input
-type="file"
-id="groupImage"
-accept="image/*"
-hidden>
+<input type="file" id="groupImage" accept="image/*" hidden>
 
 <textarea
 id="message"
 rows="1"
-placeholder="Type a message...">
+placeholder="Type a message..."></textarea>
 
-</textarea>
-
-<button
-id="recordBtn">
-
+<button id="recordBtn">
 <i class="fa-solid fa-microphone"></i>
-
 </button>
 
-<button
-id="sendBtn">
-
+<button id="sendBtn">
 <i class="fa-solid fa-paper-plane"></i>
-
 </button>
 
 </div>
 
-<!-- ==========================
-SOCKET
-========================== -->
-
 <script src="/socket.io/socket.io.js"></script>
-
 <script src="/js/group-chat.js"></script>
 
 </body>
-
 </html>
