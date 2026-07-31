@@ -300,8 +300,14 @@ await fetch("/api/group-messages/send",{
 
         alert("After Fetch");
 
-        const data = await res.json();
+        const responseText = await res.text();
 
+alert(responseText);
+
+console.log(responseText);
+
+return;
+        
 console.log(data);
 alert(JSON.stringify(data));
         
