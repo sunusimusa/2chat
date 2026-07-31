@@ -244,8 +244,6 @@ messageInput.addEventListener("keydown",(e)=>{
 
 async function sendMessage(){
     
-    alert("SEND CLICKED");
-
     const text = messageInput.value.trim();
     console.log("Text:", text);
 console.log("Image:", selectedImage);
