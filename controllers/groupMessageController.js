@@ -28,69 +28,24 @@ const file = req.file;
 
         }
 
-        let image = "";
-
-        if(req.file){
-
-            const uploadResult = await new Promise((resolve,reject)=>{
-
-                const stream =
-                cloudinary.uploader.upload_stream(
-
-                    {
-                        folder:"2chat/groups"
-                    },
-
-                    (err,result)=>{
-
-                        if(err) reject(err);
-
-                        else resolve(result);
-
-                    }
-
-                );
-
-                streamifier
-                .createReadStream(req.file.buffer)
-                .pipe(stream);
-
-            });
-
-            image = uploadResult.secure_url;
-
-        }
-
-        if((!text || text.trim()==="") && image===""){
-
-            return res.json({
-
-                success:false,
-
-                message:"Message cannot be empty."
-
-            });
-
-        }
-
         
+let image = "";
 let voice = "";
 
-if(req.file){
+if(file){
 
     const uploadResult = await new Promise((resolve,reject)=>{
 
         const stream = cloudinary.uploader.upload_stream(
 
             {
-                resource_type:"auto",
-                folder:"2chat/group-messages"
+                resource_type: "auto",
+                folder: "2chat/group-messages"
             },
 
             (err,result)=>{
 
                 if(err) reject(err);
-
                 else resolve(result);
 
             }
@@ -98,22 +53,34 @@ if(req.file){
         );
 
         streamifier
-        .createReadStream(req.file.buffer)
+        .createReadStream(file.buffer)
         .pipe(stream);
 
     });
 
-    if(req.file.mimetype.startsWith("image/")){
+    if(file.mimetype.startsWith("image/")){
 
         image = uploadResult.secure_url;
 
     }
 
-    if(req.file.mimetype.startsWith("audio/")){
+    if(file.mimetype.startsWith("audio/")){
 
         voice = uploadResult.secure_url;
 
     }
+
+}
+
+if((!text || text.trim()==="") && image==="" && voice===""){
+
+    return res.json({
+
+        success:false,
+
+        message:"Message cannot be empty."
+
+    });
 
 }
         
@@ -141,8 +108,14 @@ if(req.file){
 
             {
 
-                lastMessage:image ? "📷 Photo" : text,
+                lastMessage:
 
+voice ? "🎤 Voice Message"
+
+: image ? "📷 Photo"
+
+: text,
+                
                 lastMessageSender:sender,
 
                 lastMessageTime:new Date()
