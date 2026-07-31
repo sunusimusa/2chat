@@ -1,35 +1,60 @@
 const GroupMessage = require("../models/GroupMessage");
 const Group = require("../models/Group");
 
+const cloudinary = require("../config/cloudinary");
+const streamifier = require("streamifier");
+
 // ================= SEND GROUP MESSAGE =================
 
 exports.sendMessage = async (req, res) => {
 
     try{
 
-        const {
-
-            groupId,
-
-            sender,
-
-            text
-
-        } = req.body;
+        const { groupId, sender, text } = req.body;
 
         if(!groupId || !sender){
 
             return res.json({
-
                 success:false,
-
                 message:"Missing required fields."
-
             });
 
         }
 
-        if(!text || text.trim()===""){
+        let image = "";
+
+        if(req.file){
+
+            const uploadResult = await new Promise((resolve,reject)=>{
+
+                const stream =
+                cloudinary.uploader.upload_stream(
+
+                    {
+                        folder:"2chat/groups"
+                    },
+
+                    (err,result)=>{
+
+                        if(err) reject(err);
+
+                        else resolve(result);
+
+                    }
+
+                );
+
+                streamifier
+                .createReadStream(req.file.buffer)
+                .pipe(stream);
+
+            });
+
+            image = uploadResult.secure_url;
+
+        }
+
+        if((!text || text.trim()==="") && image===""){
 
             return res.json({
 
@@ -47,7 +72,9 @@ exports.sendMessage = async (req, res) => {
 
             sender,
 
-            text
+            text:text || "",
+
+            image
 
         });
 
@@ -57,7 +84,7 @@ exports.sendMessage = async (req, res) => {
 
             {
 
-                lastMessage:text,
+                lastMessage:image ? "📷 Photo" : text,
 
                 lastMessageSender:sender,
 
