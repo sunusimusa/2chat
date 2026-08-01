@@ -714,3 +714,68 @@ deleteVoice.onclick = ()=>{
     voicePreview.style.display = "none";
 
 };
+
+/* ==========================
+GROUP MESSAGE REACTION
+========================== */
+
+socket.on("groupMessageReaction", (message) => {
+
+    if(!message || !message._id){
+        return;
+    }
+
+    updateMessageReactions(message);
+
+});
+
+function updateMessageReactions(message){
+
+    const messageElement =
+        document.querySelector(
+            `[data-message-id="${message._id}"]`
+        );
+
+    if(!messageElement){
+        return;
+    }
+
+    const reactionBox =
+        messageElement.querySelector(
+            ".message-reactions"
+        );
+
+    if(!reactionBox){
+        return;
+    }
+
+    reactionBox.innerHTML = "";
+
+    if(!message.reactions ||
+       message.reactions.length === 0){
+
+        reactionBox.style.display = "none";
+
+        return;
+    }
+
+    reactionBox.style.display = "flex";
+
+    message.reactions.forEach(reaction => {
+
+        const span =
+            document.createElement("span");
+
+        span.className =
+            "reaction-item";
+
+        span.innerText =
+            reaction.emoji;
+
+        reactionBox.appendChild(span);
+
+    });
+
+}
+
+
