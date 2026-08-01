@@ -17,7 +17,8 @@ exports.sendMessage = async (req, res) => {
     voiceDuration
 } = req.body;
 
-const file = req.file;
+const imageFile = req.files?.image?.[0];
+const voiceFile = req.files?.voice?.[0];
         
         if(!groupId || !sender){
 
