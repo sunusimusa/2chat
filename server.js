@@ -81,6 +81,24 @@ socket.on("groupMessage",(message)=>{
     .emit("newGroupMessage", message);
 
 });
+
+   /* ==========================
+GROUP MESSAGE REACTION
+========================== */
+
+socket.on("groupMessageReaction",(data)=>{
+
+    if(!data || !data.message){
+        return;
+    }
+
+    socket.to(data.message.groupId)
+    .emit(
+        "groupMessageReaction",
+        data.message
+    );
+
+});
    
 
 socket.on("join", async (username) => {
