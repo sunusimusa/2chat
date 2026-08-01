@@ -796,41 +796,83 @@ function updateMessageReactions(message){
         return;
     }
 
-    const reactionBox =
+    let reactionBox =
         messageElement.querySelector(
             ".message-reactions"
         );
 
+    // ==========================
+    // CREATE REACTION BOX
+    // ==========================
+
     if(!reactionBox){
-        return;
+
+        reactionBox =
+            document.createElement("div");
+
+        reactionBox.className =
+            "message-reactions";
+
+        const bubble =
+            messageElement.querySelector(
+                ".bubble-me, .bubble-other"
+            );
+
+        if(bubble){
+
+            bubble.appendChild(
+                reactionBox
+            );
+
+        }
+
     }
+
+    // ==========================
+    // NO REACTIONS
+    // ==========================
+
+    if(
+        !message.reactions ||
+        message.reactions.length === 0
+    ){
+
+        reactionBox.innerHTML = "";
+
+        reactionBox.style.display =
+            "none";
+
+        return;
+
+    }
+
+    // ==========================
+    // SHOW REACTIONS
+    // ==========================
 
     reactionBox.innerHTML = "";
 
-    if(!message.reactions ||
-       message.reactions.length === 0){
+    reactionBox.style.display =
+        "flex";
 
-        reactionBox.style.display = "none";
+    message.reactions.forEach(
+        reaction => {
 
-        return;
-    }
+            const span =
+                document.createElement("span");
 
-    reactionBox.style.display = "flex";
+            span.className =
+                "reaction-item";
 
-    message.reactions.forEach(reaction => {
+            span.innerText =
+                reaction.emoji;
 
-        const span =
-            document.createElement("span");
+            reactionBox.appendChild(
+                span
+            );
 
-        span.className =
-            "reaction-item";
-
-        span.innerText =
-            reaction.emoji;
-
-        reactionBox.appendChild(span);
-
-    });
+        }
+    );
 
 }
 
