@@ -885,23 +885,100 @@ function openReactionPicker(e, messageElement){
 
 }
 
+/* ==========================
+   SEND MESSAGE REACTION
+========================== */
+
 reactionPicker
     .querySelectorAll("button")
     .forEach(button => {
 
-        button.addEventListener("click", () => {
+        button.addEventListener("click", async () => {
 
             const emoji =
                 button.dataset.emoji;
 
-            console.log(
-                "Reaction:",
-                emoji,
-                "Message:",
-                reactionMessageId
-            );
+            if(!reactionMessageId){
 
-            hideReactionPicker();
+                hideReactionPicker();
+
+                return;
+
+            }
+
+            try{
+
+                const res =
+                    await fetch(
+                        "/api/group-messages/react",
+                        {
+                            method:"PUT",
+
+                            headers:{
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:JSON.stringify({
+
+                                messageId:
+                                    reactionMessageId,
+
+                                username:
+                                    user.username,
+
+                                emoji:
+                                    emoji
+
+                            })
+                        }
+                    );
+
+                const data =
+                    await res.json();
+
+                if(!res.ok || !data.success){
+
+                    alert(
+                        data.message ||
+                        "Reaction failed."
+                    );
+
+                    return;
+
+                }
+
+                // ==========================
+                // UPDATE MESSAGE
+                // ==========================
+
+                updateMessageReactions(
+                    data.message
+                );
+
+                // ==========================
+                // SEND TO GROUP
+                // ==========================
+
+                socket.emit(
+                    "groupMessageReaction",
+                    data.message
+                );
+
+                hideReactionPicker();
+
+            }catch(err){
+
+                console.error(
+                    "REACTION ERROR:",
+                    err
+                );
+
+                alert(
+                    "Failed to send reaction."
+                );
+
+            }
 
         });
 
