@@ -237,10 +237,12 @@ function appendMessage(msg){
         "beforeend",
 
         `
+        
         <div
-            class="${mine ? "me" : "other"}"
-            data-message-id="${msg._id}"
-        >
+    class="${mine ? "me" : "other"}"
+    data-message-id="${msg._id}"
+    oncontextmenu="openReactionPicker(event, this)"
+>
 
             <div class="${
                 mine
@@ -832,3 +834,75 @@ function updateMessageReactions(message){
 
 }
 
+/* ==========================
+   REACTION PICKER
+========================== */
+
+const reactionPicker =
+    document.getElementById("reactionPicker");
+
+let reactionMessageId = null;
+
+
+function showReactionPicker(messageElement){
+
+    reactionMessageId =
+        messageElement.dataset.messageId;
+
+    const rect =
+        messageElement.getBoundingClientRect();
+
+    reactionPicker.style.left =
+        Math.max(
+            10,
+            rect.left
+        ) + "px";
+
+    reactionPicker.style.top =
+        Math.max(
+            10,
+            rect.top - 55
+        ) + "px";
+
+    reactionPicker.classList.add("show");
+
+}
+
+
+function hideReactionPicker(){
+
+    reactionPicker.classList.remove("show");
+
+    reactionMessageId = null;
+
+}
+
+function openReactionPicker(e, messageElement){
+
+    e.preventDefault();
+
+    showReactionPicker(messageElement);
+
+}
+
+reactionPicker
+    .querySelectorAll("button")
+    .forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            const emoji =
+                button.dataset.emoji;
+
+            console.log(
+                "Reaction:",
+                emoji,
+                "Message:",
+                reactionMessageId
+            );
+
+            hideReactionPicker();
+
+        });
+
+    });
