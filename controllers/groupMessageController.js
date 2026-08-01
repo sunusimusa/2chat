@@ -10,11 +10,17 @@ exports.sendMessage = async (req, res) => {
     try {
 
         const {
-            groupId,
-            sender,
-            text,
-            voiceDuration
-        } = req.body;
+    groupId,
+    sender,
+    text,
+    voiceDuration,
+
+    replyTo,
+    replyUser,
+    replyText,
+    replyImage
+
+} = req.body;
 
         const imageFile = req.files?.image?.[0];
         const voiceFile = req.files?.voice?.[0];
