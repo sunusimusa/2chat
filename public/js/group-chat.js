@@ -130,11 +130,14 @@ async function loadMessages(){
 /* ==========================
 APPEND MESSAGE
 ========================== */
-
 function appendMessage(msg){
 
     const mine =
         msg.sender === user.username;
+
+    // ==========================
+    // VOICE
+    // ==========================
 
     let voiceHTML = "";
 
@@ -161,6 +164,10 @@ function appendMessage(msg){
 
     }
 
+    // ==========================
+    // IMAGE
+    // ==========================
+
     let imageHTML = "";
 
     if(msg.image){
@@ -177,12 +184,63 @@ function appendMessage(msg){
 
     }
 
+    // ==========================
+    // TEXT
+    // ==========================
+
+    let textHTML = "";
+
+    if(msg.text){
+
+        textHTML = `
+            <div class="message-text">
+                ${msg.text}
+            </div>
+        `;
+
+    }
+
+    // ==========================
+    // REACTIONS
+    // ==========================
+
+    let reactionsHTML = "";
+
+    if(
+        msg.reactions &&
+        msg.reactions.length > 0
+    ){
+
+        reactionsHTML = `
+            <div class="message-reactions">
+
+                ${msg.reactions.map(
+                    reaction => `
+                        <span
+                            class="reaction-item">
+                            ${reaction.emoji}
+                        </span>
+                    `
+                ).join("")}
+
+            </div>
+        `;
+
+    }
+
+    // ==========================
+    // MESSAGE
+    // ==========================
+
     chat.insertAdjacentHTML(
 
         "beforeend",
 
         `
-        <div class="${mine ? "me" : "other"}">
+        <div
+            class="${mine ? "me" : "other"}"
+            data-message-id="${msg._id}"
+        >
 
             <div class="${
                 mine
@@ -194,13 +252,7 @@ function appendMessage(msg){
 
                 ${voiceHTML}
 
-                ${
-                    msg.text
-                    ? `<div class="message-text">
-                        ${msg.text}
-                       </div>`
-                    : ""
-                }
+                ${textHTML}
 
                 <div class="message-time">
 
@@ -214,6 +266,8 @@ function appendMessage(msg){
                     })}
 
                 </div>
+
+                ${reactionsHTML}
 
             </div>
 
