@@ -9,7 +9,8 @@ const upload = multer({
 
 const {
     sendMessage,
-    getMessages
+    getMessages,
+    reactToMessage
 } = require("../controllers/groupMessageController");
 
 /* ==========================
@@ -31,6 +32,9 @@ router.post(
     ]),
     sendMessage
 );
+
+// React to message
+router.put("/react", reactToMessage);
 
 // Load Group Messages
 router.get(
