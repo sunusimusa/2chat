@@ -133,72 +133,94 @@ APPEND MESSAGE
 
 function appendMessage(msg){
 
-const mine =
-msg.sender===user.username;
+    const mine =
+        msg.sender === user.username;
 
-chat.insertAdjacentHTML(
+    let voiceHTML = "";
 
-"beforeend",
+    if(msg.voice){
 
-`
+        const duration =
+            Number(msg.voiceDuration || 0);
 
-<div class="${mine?"me":"other"}">
+        voiceHTML = `
+            <div class="voice-message">
 
-<div class="${mine?"bubble-me":"bubble-other"}">
+                <audio
+                    controls
+                    preload="metadata"
+                    src="${msg.voice}">
+                </audio>
 
-${
-msg.image
-?
+                <span class="voice-duration">
+                    ${duration}s
+                </span>
 
-`<div class="message-image">
+            </div>
+        `;
 
-<img
-src="${msg.image}"
-loading="lazy"
-onclick="openImage('${msg.image}')">
+    }
 
-</div>`
+    let imageHTML = "";
 
-:
+    if(msg.image){
 
-""
+        imageHTML = `
+            <div class="message-image">
 
-}
+                <img
+                    src="${msg.image}"
+                    onclick="openImageViewer('${msg.image}')">
 
-${
-msg.text
-?
+            </div>
+        `;
 
-`<div class="message-text">
+    }
 
-${msg.text}
+    chat.insertAdjacentHTML(
 
-</div>`
+        "beforeend",
 
-:
+        `
+        <div class="${mine ? "me" : "other"}">
 
-""
-}
+            <div class="${
+                mine
+                ? "bubble-me"
+                : "bubble-other"
+            }">
 
-<div class="message-time">
+                ${imageHTML}
 
-${new Date(msg.createdAt).toLocaleTimeString([],{
+                ${voiceHTML}
 
-hour:"2-digit",
+                ${
+                    msg.text
+                    ? `<div class="message-text">
+                        ${msg.text}
+                       </div>`
+                    : ""
+                }
 
-minute:"2-digit"
+                <div class="message-time">
 
-})}
+                    ${new Date(
+                        msg.createdAt
+                    ).toLocaleTimeString([],{
 
-</div>
+                        hour:"2-digit",
+                        minute:"2-digit"
 
-</div>
+                    })}
 
-</div>
+                </div>
 
-`
+            </div>
 
-);
+        </div>
+        `
+
+    );
 
 }
 
