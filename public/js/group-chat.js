@@ -265,105 +265,224 @@ messageInput.addEventListener("keydown",(e)=>{
 });
 
 async function sendMessage(){
-    
+
     const text = messageInput.value.trim();
+
     console.log("Text:", text);
-console.log("Image:", selectedImage);
-console.log("Voice:", recordedVoice);
+    console.log("Image:", selectedImage);
+    console.log("Voice:", recordedVoice);
 
-if(text==="" && !selectedImage && !recordedVoice){
+    // ==========================
+    // CHECK MESSAGE
+    // ==========================
 
-    return;
+    if(
+        text === "" &&
+        !selectedImage &&
+        !recordedVoice
+    ){
 
-}
-const formData = new FormData();
+        return;
 
-formData.append("groupId", groupId);
-formData.append("sender", user.username);
-formData.append("text", text);
+    }
 
-if(selectedImage){
+    // ==========================
+    // FORM DATA
+    // ==========================
+
+    const formData = new FormData();
 
     formData.append(
-        "image",
-        selectedImage
+        "groupId",
+        groupId
     );
 
-}
-
-if(recordedVoice){
-
     formData.append(
-    "voice",
-    recordedVoice,
-    "voice.webm"
-);
-
-    formData.append(
-        "voiceDuration",
-        recordTime
+        "sender",
+        user.username
     );
 
-}
+    formData.append(
+        "text",
+        text
+    );
 
-    
+    // ==========================
+    // IMAGE
+    // ==========================
+
+    if(selectedImage){
+
+        formData.append(
+            "image",
+            selectedImage
+        );
+
+    }
+
+    // ==========================
+    // VOICE
+    // ==========================
+
+    if(recordedVoice){
+
+        formData.append(
+            "voice",
+            recordedVoice,
+            "voice.webm"
+        );
+
+        formData.append(
+            "voiceDuration",
+            recordTime
+        );
+
+    }
+
+    // ==========================
+    // SEND
+    // ==========================
+
     try{
 
-        alert("Before Fetch");
-        
-        const res =
-await fetch("/api/group-messages/send",{
+        const res = await fetch(
+            "/api/group-messages/send",
+            {
+                method:"POST",
+                body:formData
+            }
+        );
 
-    method:"POST",
+        // ==========================
+        // READ RESPONSE
+        // ==========================
 
-    body:formData
+        const responseText =
+            await res.text();
 
-});
+        console.log(
+            "Server Response:",
+            responseText
+        );
 
-        alert("After Fetch");
+        let data;
 
-        const responseText = await res.text();
+        try{
 
-alert(responseText);
+            data =
+                JSON.parse(responseText);
 
-console.log(responseText);
+        }catch(parseError){
 
-return;
-        
-console.log(data);
-alert(JSON.stringify(data));
-        
-        if(!data.success){
+            console.error(
+                "Invalid JSON response:",
+                parseError
+            );
 
-            alert(data.message);
+            alert(
+                "Server returned an invalid response."
+            );
 
             return;
 
         }
 
+        // ==========================
+        // SERVER ERROR
+        // ==========================
 
-        appendMessage(data.message);
+        if(!res.ok || !data.success){
 
-socket.emit("groupMessage", data.message);
+            alert(
+                data.message ||
+                "Message failed to send."
+            );
 
-messageInput.value = "";
+            return;
 
-removeImage();
+        }
 
-// Clear recorded voice
-recordedVoice = null;
+        // ==========================
+        // SHOW MESSAGE
+        // ==========================
 
-voicePlayer.src = "";
+        appendMessage(
+            data.message
+        );
 
-voicePreview.style.display = "none";
+        // ==========================
+        // SOCKET
+        // ==========================
 
-messageInput.style.height = "auto";
+        socket.emit(
+            "groupMessage",
+            data.message
+        );
 
-chat.scrollTop = chat.scrollHeight;
-        
+        // ==========================
+        // CLEAR TEXT
+        // ==========================
+
+        messageInput.value = "";
+
+        messageInput.style.height =
+            "auto";
+
+        // ==========================
+        // CLEAR IMAGE
+        // ==========================
+
+        removeImage();
+
+        // ==========================
+        // CLEAR VOICE
+        // ==========================
+
+        recordedVoice = null;
+
+        if(voicePlayer){
+
+            voicePlayer.pause();
+
+            voicePlayer.removeAttribute(
+                "src"
+            );
+
+            voicePlayer.load();
+
+        }
+
+        if(voicePreview){
+
+            voicePreview.style.display =
+                "none";
+
+        }
+
+        // Reset recording time
+        recordTime = 0;
+
+        // ==========================
+        // SCROLL CHAT
+        // ==========================
+
+        chat.scrollTop =
+            chat.scrollHeight;
+
+        console.log(
+            "Message sent successfully."
+        );
+
     }catch(err){
 
-        console.error(err);
+        console.error(
+            "SEND MESSAGE ERROR:",
+            err
+        );
+
+        alert(
+            "Failed to send message."
+        );
 
     }
 
