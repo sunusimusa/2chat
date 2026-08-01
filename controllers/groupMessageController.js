@@ -145,19 +145,32 @@ exports.sendMessage = async (req, res) => {
 
         const message = await GroupMessage.create({
 
-            groupId,
+    groupId,
 
-            sender,
+    sender,
 
-            text: text || "",
+    text: text || "",
 
-            image,
+    image,
 
-            voice,
+    voice,
 
-            voiceDuration: Number(voiceDuration) || 0
+    voiceDuration:
+        Number(voiceDuration) || 0,
 
-        });
+    replyTo:
+        replyTo || null,
+
+    replyUser:
+        replyUser || "",
+
+    replyText:
+        replyText || "",
+
+    replyImage:
+        replyImage || ""
+
+});
 
         // ==========================
         // LAST GROUP MESSAGE
