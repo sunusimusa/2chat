@@ -272,10 +272,10 @@ if(selectedImage){
 if(recordedVoice){
 
     formData.append(
-        "image",
-        recordedVoice,
-        "voice.webm"
-    );
+    "voice",
+    recordedVoice,
+    "voice.webm"
+);
 
     formData.append(
         "voiceDuration",
