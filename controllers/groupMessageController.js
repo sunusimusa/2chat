@@ -5,150 +5,212 @@ const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
 
 // ================= SEND GROUP MESSAGE =================
-
 exports.sendMessage = async (req, res) => {
 
-    try{
+    try {
 
         const {
-    groupId,
-    sender,
-    text,
-    voiceDuration
-} = req.body;
+            groupId,
+            sender,
+            text,
+            voiceDuration
+        } = req.body;
 
-const imageFile = req.files?.image?.[0];
-const voiceFile = req.files?.voice?.[0];
-        
-        if(!groupId || !sender){
+        const imageFile = req.files?.image?.[0];
+        const voiceFile = req.files?.voice?.[0];
 
-            return res.json({
-                success:false,
-                message:"Missing required fields."
+        // ==========================
+        // CHECK REQUIRED FIELDS
+        // ==========================
+
+        if (!groupId || !sender) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Missing required fields."
             });
 
         }
 
-        
-let image = "";
-let voice = "";
+        // ==========================
+        // VARIABLES
+        // ==========================
 
-if(file){
+        let image = "";
+        let voice = "";
 
-    const uploadResult = await new Promise((resolve,reject)=>{
+        // ==========================
+        // UPLOAD IMAGE
+        // ==========================
 
-        const stream = cloudinary.uploader.upload_stream(
+        if (imageFile) {
 
-            {
-                resource_type: "auto",
-                folder: "2chat/group-messages"
-            },
+            const uploadResult = await new Promise((resolve, reject) => {
 
-            (err,result)=>{
+                const stream = cloudinary.uploader.upload_stream(
 
-                if(err) reject(err);
-                else resolve(result);
+                    {
+                        resource_type: "image",
+                        folder: "2chat/group-messages"
+                    },
 
-            }
+                    (err, result) => {
 
-        );
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(result);
+                        }
 
-        streamifier
-        .createReadStream(file.buffer)
-        .pipe(stream);
+                    }
 
-    });
+                );
 
-    if(file.mimetype.startsWith("image/")){
+                streamifier
+                    .createReadStream(imageFile.buffer)
+                    .pipe(stream);
 
-        image = uploadResult.secure_url;
+            });
 
-    }
+            image = uploadResult.secure_url;
 
-    if(file.mimetype.startsWith("audio/")){
+        }
 
-        voice = uploadResult.secure_url;
+        // ==========================
+        // UPLOAD VOICE
+        // ==========================
 
-    }
+        if (voiceFile) {
 
-}
+            const uploadResult = await new Promise((resolve, reject) => {
 
-if((!text || text.trim()==="") && image==="" && voice===""){
+                const stream = cloudinary.uploader.upload_stream(
 
-    return res.json({
+                    {
+                        resource_type: "video",
+                        folder: "2chat/group-voices"
+                    },
 
-        success:false,
+                    (err, result) => {
 
-        message:"Message cannot be empty."
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(result);
+                        }
 
-    });
+                    }
 
-}
-        
+                );
+
+                streamifier
+                    .createReadStream(voiceFile.buffer)
+                    .pipe(stream);
+
+            });
+
+            voice = uploadResult.secure_url;
+
+        }
+
+        // ==========================
+        // CHECK MESSAGE
+        // ==========================
+
+        if (
+            (!text || text.trim() === "") &&
+            !image &&
+            !voice
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Message cannot be empty."
+
+            });
+
+        }
+
+        // ==========================
+        // CREATE MESSAGE
+        // ==========================
 
         const message = await GroupMessage.create({
 
-    groupId,
+            groupId,
 
-    sender,
+            sender,
 
-    text,
+            text: text || "",
 
-    image,
+            image,
 
-    voice,
+            voice,
 
-    voiceDuration:
-    voiceDuration || 0
+            voiceDuration: Number(voiceDuration) || 0
 
-});
-        
+        });
+
+        // ==========================
+        // LAST GROUP MESSAGE
+        // ==========================
+
+        let lastMessage = text || "";
+
+        if (image) {
+            lastMessage = "📷 Photo";
+        }
+
+        if (voice) {
+            lastMessage = "🎤 Voice message";
+        }
+
         await Group.findByIdAndUpdate(
 
             groupId,
 
             {
 
-                lastMessage:
+                lastMessage,
 
-voice ? "🎤 Voice Message"
+                lastMessageSender: sender,
 
-: image ? "📷 Photo"
-
-: text,
-                
-                lastMessageSender:sender,
-
-                lastMessageTime:new Date()
+                lastMessageTime: new Date()
 
             }
 
         );
 
-        res.json({
+        // ==========================
+        // RESPONSE
+        // ==========================
 
-            success:true,
+        return res.json({
+
+            success: true,
 
             message
 
         });
 
-    }catch(err){
+    } catch (err) {
 
-        console.error(err);
+        console.error("GROUP MESSAGE ERROR:", err);
 
-        res.status(500).json({
+        return res.status(500).json({
 
-            success:false,
+            success: false,
 
-            message:err.message
+            message: err.message
 
         });
 
     }
 
 };
-
+    
 // ================= LOAD GROUP MESSAGES =================
 
 exports.getMessages = async (req, res) => {
