@@ -573,7 +573,7 @@ cursor:pointer;
 .voice-message audio {
     width: 100%;
     max-width: 240px;
-    height: 42px;
+    height: 48px;
     display: block;
 }
 
