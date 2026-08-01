@@ -371,3 +371,168 @@ exports.reactToMessage = async (req, res) => {
     }
 
 };
+
+// ==========================
+// GROUP MESSAGE REACTION
+// ==========================
+
+exports.reactToMessage = async (req, res) => {
+
+    try {
+
+        const {
+            messageId,
+            username,
+            emoji
+        } = req.body;
+
+        // ==========================
+        // CHECK REQUIRED FIELDS
+        // ==========================
+
+        if (
+            !messageId ||
+            !username ||
+            !emoji
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "messageId, username and emoji are required."
+
+            });
+
+        }
+
+        // ==========================
+        // ALLOWED EMOJIS
+        // ==========================
+
+        const allowedEmojis = [
+            "👍",
+            "❤️",
+            "😂",
+            "😮",
+            "😢",
+            "😡"
+        ];
+
+        if (!allowedEmojis.includes(emoji)) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Invalid reaction."
+
+            });
+
+        }
+
+        // ==========================
+        // FIND MESSAGE
+        // ==========================
+
+        const message =
+            await GroupMessage.findById(messageId);
+
+        if (!message) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Message not found."
+
+            });
+
+        }
+
+        // ==========================
+        // CHECK USER REACTION
+        // ==========================
+
+        const existingIndex =
+            message.reactions.findIndex(
+                reaction =>
+                    reaction.username === username
+            );
+
+        // ==========================
+        // SAME EMOJI = REMOVE
+        // ==========================
+
+        if (
+            existingIndex !== -1 &&
+            message.reactions[existingIndex].emoji === emoji
+        ) {
+
+            message.reactions.splice(
+                existingIndex,
+                1
+            );
+
+        }
+
+        // ==========================
+        // DIFFERENT EMOJI = CHANGE
+        // ==========================
+
+        else if (existingIndex !== -1) {
+
+            message.reactions[existingIndex].emoji =
+                emoji;
+
+        }
+
+        // ==========================
+        // NEW REACTION
+        // ==========================
+
+        else {
+
+            message.reactions.push({
+
+                username,
+
+                emoji
+
+            });
+
+        }
+
+        await message.save();
+
+        // ==========================
+        // RESPONSE
+        // ==========================
+
+        return res.json({
+
+            success: true,
+
+            message
+
+        });
+
+    } catch (err) {
+
+        console.error(
+            "REACTION ERROR:",
+            err
+        );
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: err.message
+
+        });
+
+    }
+
+};
