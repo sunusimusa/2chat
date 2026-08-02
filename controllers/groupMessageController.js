@@ -787,3 +787,141 @@ exports.editMessage = async (req, res) => {
     }
 
 };
+
+// ==================================================
+// MARK GROUP MESSAGE AS SEEN
+// ==================================================
+
+exports.markMessageAsSeen = async (req, res) => {
+
+    try {
+
+        const {
+            messageId,
+            username
+        } = req.body;
+
+
+        // ==================================================
+        // CHECK REQUIRED
+        // ==================================================
+
+        if (!messageId || !username) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "messageId and username are required."
+
+            });
+
+        }
+
+
+        // ==================================================
+        // FIND MESSAGE
+        // ==================================================
+
+        const message =
+            await GroupMessage.findById(messageId);
+
+
+        if (!message) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Message not found."
+
+            });
+
+        }
+
+
+        // ==================================================
+        // DON'T COUNT MESSAGE OWNER
+        // ==================================================
+
+        if (message.sender === username) {
+
+            return res.json({
+
+                success: true,
+
+                message
+
+            });
+
+        }
+
+
+        // ==================================================
+        // CHECK IF ALREADY SEEN
+        // ==================================================
+
+        const alreadySeen =
+            message.seenBy.some(
+
+                seen =>
+                    seen.username === username
+
+            );
+
+
+        // ==================================================
+        // ADD USER TO SEEN BY
+        // ==================================================
+
+        if (!alreadySeen) {
+
+            message.seenBy.push({
+
+                username,
+
+                seenAt: new Date()
+
+            });
+
+            await message.save();
+
+        }
+
+
+        // ==================================================
+        // RESPONSE
+        // ==================================================
+
+        return res.json({
+
+            success: true,
+
+            message
+
+        });
+
+
+    } catch (err) {
+
+        console.error(
+            "MARK MESSAGE SEEN ERROR:",
+            err
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                err.message
+
+        });
+
+    }
+
+};
+
