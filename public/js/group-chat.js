@@ -640,11 +640,13 @@ messageInput.addEventListener("keydown",(e)=>{
 
 async function sendMessage(){
 
-    const text = messageInput.value.trim();
+    const text =
+        messageInput.value.trim();
 
     console.log("Text:", text);
     console.log("Image:", selectedImage);
     console.log("Voice:", recordedVoice);
+    console.log("Reply:", replyMessage);
 
     // ==========================
     // CHECK MESSAGE
@@ -664,7 +666,8 @@ async function sendMessage(){
     // FORM DATA
     // ==========================
 
-    const formData = new FormData();
+    const formData =
+        new FormData();
 
     formData.append(
         "groupId",
@@ -677,94 +680,59 @@ async function sendMessage(){
     );
 
     formData.append(
-    "text",
-    text
-);
+        "text",
+        text
+    );
 
     // ==========================
-// REPLY DATA
-// ==========================
+    // REPLY DATA
+    // ==========================
 
-if(replyMessage){
+    if(replyMessage){
 
-    formData.append(
-        "replyTo",
-        replyMessage._id || ""
-    );
+        formData.append(
+            "replyTo",
+            replyMessage._id || ""
+        );
 
-    formData.append(
-        "replyUser",
-        replyMessage.sender || ""
-    );
+        formData.append(
+            "replyUser",
+            replyMessage.sender || ""
+        );
 
-    formData.append(
-        "replyText",
-        replyMessage.text || ""
-    );
+        formData.append(
+            "replyText",
+            replyMessage.text || ""
+        );
 
-    formData.append(
-        "replyImage",
-        replyMessage.image || ""
-    );
+        formData.append(
+            "replyImage",
+            replyMessage.image || ""
+        );
 
-}else{
+    }else{
 
-    formData.append("replyTo", "");
-    formData.append("replyUser", "");
-    formData.append("replyText", "");
-    formData.append("replyImage", "");
+        formData.append(
+            "replyTo",
+            ""
+        );
 
-}
+        formData.append(
+            "replyUser",
+            ""
+        );
 
-/* ==========================
-   REPLY DATA
-========================== */
+        formData.append(
+            "replyText",
+            ""
+        );
 
-if(replyMessage){
+        formData.append(
+            "replyImage",
+            ""
+        );
 
-    formData.append(
-        "replyTo",
-        replyMessage._id
-    );
-
-    formData.append(
-        "replyUser",
-        replyMessage.sender || ""
-    );
-
-    formData.append(
-        "replyText",
-        replyMessage.text || ""
-    );
-
-    formData.append(
-        "replyImage",
-        replyMessage.image || ""
-    );
-
-}else{
-
-    formData.append(
-        "replyTo",
-        ""
-    );
-
-    formData.append(
-        "replyUser",
-        ""
-    );
-
-    formData.append(
-        "replyText",
-        ""
-    );
-
-    formData.append(
-        "replyImage",
-        ""
-    );
-
-}
+    }
 
     // ==========================
     // IMAGE
@@ -778,6 +746,183 @@ if(replyMessage){
         );
 
     }
+
+    // ==========================
+    // VOICE
+    // ==========================
+
+    if(recordedVoice){
+
+        formData.append(
+            "voice",
+            recordedVoice,
+            "voice.webm"
+        );
+
+        formData.append(
+            "voiceDuration",
+            recordTime
+        );
+
+    }
+
+    // ==========================
+    // SEND
+    // ==========================
+
+    try{
+
+        const res =
+            await fetch(
+                "/api/group-messages/send",
+                {
+                    method:"POST",
+                    body:formData
+                }
+            );
+
+        // ==========================
+        // RESPONSE
+        // ==========================
+
+        const responseText =
+            await res.text();
+
+        console.log(
+            "Server Response:",
+            responseText
+        );
+
+        let data;
+
+        try{
+
+            data =
+                JSON.parse(responseText);
+
+        }catch(err){
+
+            console.error(
+                "Invalid JSON:",
+                err
+            );
+
+            alert(
+                "Server returned invalid response."
+            );
+
+            return;
+
+        }
+
+        // ==========================
+        // ERROR
+        // ==========================
+
+        if(
+            !res.ok ||
+            !data.success
+        ){
+
+            alert(
+                data.message ||
+                "Message failed to send."
+            );
+
+            return;
+
+        }
+
+        // ==========================
+        // SHOW MESSAGE
+        // ==========================
+
+        appendMessage(
+            data.message
+        );
+
+        // ==========================
+        // SOCKET
+        // ==========================
+
+        socket.emit(
+            "groupMessage",
+            data.message
+        );
+
+        // ==========================
+        // CLEAR TEXT
+        // ==========================
+
+        messageInput.value = "";
+
+        messageInput.style.height =
+            "auto";
+
+        // ==========================
+        // CLEAR REPLY
+        // ==========================
+
+        cancelReplyMessage();
+
+        // ==========================
+        // CLEAR IMAGE
+        // ==========================
+
+        removeImage();
+
+        // ==========================
+        // CLEAR VOICE
+        // ==========================
+
+        recordedVoice = null;
+
+        if(voicePlayer){
+
+            voicePlayer.pause();
+
+            voicePlayer.removeAttribute(
+                "src"
+            );
+
+            voicePlayer.load();
+
+        }
+
+        if(voicePreview){
+
+            voicePreview.style.display =
+                "none";
+
+        }
+
+        recordTime = 0;
+
+        // ==========================
+        // SCROLL
+        // ==========================
+
+        chat.scrollTop =
+            chat.scrollHeight;
+
+        console.log(
+            "Message sent successfully."
+        );
+
+    }catch(err){
+
+        console.error(
+            "SEND MESSAGE ERROR:",
+            err
+        );
+
+        alert(
+            "Failed to send message."
+        );
+
+    }
+
+}
 
     // ==========================
     // VOICE
