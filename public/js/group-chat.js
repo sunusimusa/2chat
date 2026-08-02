@@ -1619,3 +1619,140 @@ function openReplyMenu(event, messageElement){
     startReply(message);
 
 }
+
+/* ==========================
+   DELETE MESSAGE
+========================== */
+
+const deleteAction =
+    document.getElementById("deleteAction");
+
+
+deleteAction.addEventListener(
+    "click",
+    async function(){
+
+        if(!selectedMessageForAction){
+
+            return;
+
+        }
+
+        const messageElement =
+            selectedMessageForAction;
+
+        const messageId =
+            messageElement.dataset.messageId;
+
+        const sender =
+            messageElement.dataset.sender;
+
+        if(!messageId){
+
+            return;
+
+        }
+
+        // Only owner can delete
+        if(sender !== user.username){
+
+            alert(
+                "You can only delete your own message."
+            );
+
+            closeMessageActionMenu();
+
+            return;
+
+        }
+
+        const confirmDelete =
+            confirm(
+                "Delete this message?"
+            );
+
+        if(!confirmDelete){
+
+            return;
+
+        }
+
+        try{
+
+            const res =
+                await fetch(
+                    "/api/group-messages/delete",
+                    {
+
+                        method:"PUT",
+
+                        headers:{
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:JSON.stringify({
+
+                            messageId:
+                                messageId,
+
+                            username:
+                                user.username
+
+                        })
+
+                    }
+                );
+
+            const data =
+                await res.json();
+
+            if(!res.ok || !data.success){
+
+                alert(
+                    data.message ||
+                    "Failed to delete message."
+                );
+
+                return;
+
+            }
+
+            /* ==========================
+               UPDATE MY SCREEN
+            ========================== */
+
+            updateDeletedMessage(
+                data.message
+            );
+
+            /* ==========================
+               SOCKET
+            ========================== */
+
+            socket.emit(
+                "groupMessageDeleted",
+                data.message
+            );
+
+            /* ==========================
+               CLOSE MENU
+            ========================== */
+
+            closeMessageActionMenu();
+
+        }catch(err){
+
+            console.error(
+                "DELETE MESSAGE ERROR:",
+                err
+            );
+
+            alert(
+                "Failed to delete message."
+            );
+
+        }
+
+    }
+);
