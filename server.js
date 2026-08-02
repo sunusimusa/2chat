@@ -110,30 +110,20 @@ socket.on("groupMessage",(message)=>{
 /* ==========================
 GROUP MESSAGE REACTION
 ========================== */
-
 socket.on("groupMessageReaction",(message)=>{
 
     if(!message || !message._id){
         return;
     }
 
-    if(!message.groupId){
-
-        console.log(
-            "❌ Reaction missing groupId"
-        );
-
-        return;
-    }
-
-    socket.to(
-        String(message.groupId)
-    ).emit(
+    socket.to(message.groupId)
+    .emit(
         "groupMessageReaction",
         message
     );
 
 });
+
 
 socket.on("join", async (username) => {
 
