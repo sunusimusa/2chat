@@ -682,3 +682,99 @@ cursor:pointer;
     transform:scale(.9);
 
 }
+
+/* ==========================
+   REPLY PREVIEW
+========================== */
+
+.reply-preview{
+
+    width:100%;
+
+    box-sizing:border-box;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:10px;
+
+    padding:8px 12px;
+
+    background:#f5f5f5;
+
+    border-left:4px solid #2196f3;
+
+    border-top:1px solid #ddd;
+
+    border-bottom:1px solid #ddd;
+
+}
+
+.reply-preview-content{
+
+    min-width:0;
+
+    flex:1;
+
+}
+
+.reply-preview-title{
+
+    font-size:13px;
+
+    font-weight:600;
+
+    color:#2196f3;
+
+    margin-bottom:3px;
+
+}
+
+.reply-preview-text{
+
+    font-size:13px;
+
+    color:#555;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+}
+
+.cancel-reply{
+
+    width:34px;
+
+    height:34px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:transparent;
+
+    color:#777;
+
+    font-size:18px;
+
+    cursor:pointer;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+}
+
+.cancel-reply:hover{
+
+    background:#e5e5e5;
+
+}
