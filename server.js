@@ -124,6 +124,21 @@ socket.on("groupMessageReaction",(message)=>{
 
 });
 
+   socket.on("groupMessageDeleted", (message) => {
+
+    if(!message || !message._id){
+
+        return;
+
+    }
+
+    socket.to(message.groupId).emit(
+        "groupMessageDeleted",
+        message
+    );
+
+});
+
 
 socket.on("join", async (username) => {
 
