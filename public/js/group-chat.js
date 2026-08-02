@@ -1049,6 +1049,10 @@ const cancelReply =
 let replyMessage = null;
 
 
+/* ==========================
+   START REPLY
+========================== */
+
 function startReply(message){
 
     replyMessage = message;
@@ -1086,6 +1090,10 @@ function startReply(message){
 }
 
 
+/* ==========================
+   CANCEL REPLY
+========================== */
+
 function cancelReplyMessage(){
 
     replyMessage = null;
@@ -1107,68 +1115,9 @@ cancelReply.addEventListener(
     cancelReplyMessage
 );
 
-/* ==========================
-   REPLY MESSAGE
-========================== */
-
-function openReplyMenu(event, messageElement){
-
-    event.preventDefault();
-
-    const messageId =
-        messageElement.dataset.messageId;
-
-    const message =
-        findMessageById(messageId);
-
-    if(!message){
-        return;
-    }
-
-    startReply(message);
-}
-
-
-function findMessageById(messageId){
-
-    const messageElement =
-        document.querySelector(
-            `[data-message-id="${messageId}"]`
-        );
-
-    if(!messageElement){
-        return null;
-    }
-
-    return {
-        _id: messageId,
-
-        sender:
-            messageElement.classList.contains("me")
-                ? user.username
-                : "User",
-
-        text:
-            messageElement
-                .querySelector(".message-text")
-                ?.textContent
-                .trim() || "",
-
-        image:
-            messageElement
-                .querySelector(".message-image img")
-                ?.src || "",
-
-        voice:
-            messageElement
-                .querySelector(".voice-message audio")
-                ?.src || ""
-    };
-
-}
 
 /* ==========================
-   OPEN REPLY
+   OPEN REPLY MENU
 ========================== */
 
 function openReplyMenu(event, messageElement){
