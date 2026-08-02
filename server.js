@@ -71,35 +71,69 @@ GROUP CHAT
 
 socket.on("joinGroup",(groupId)=>{
 
-    socket.join(groupId);
-
-});
-
-socket.on("groupMessage",(message)=>{
-
-    socket.to(message.groupId)
-    .emit("newGroupMessage", message);
-
-});
-
-   /* ==========================
-GROUP MESSAGE REACTION
-========================== */
-
-socket.on("groupMessageReaction",(data)=>{
-
-    if(!data || !data.message){
+    if(!groupId){
         return;
     }
 
-    socket.to(data.message.groupId)
-    .emit(
-        "groupMessageReaction",
-        data.message
+    socket.join(
+        String(groupId)
+    );
+
+    console.log(
+        "👥 Joined Group:",
+        groupId
     );
 
 });
-   
+
+
+/* ==========================
+GROUP MESSAGE
+========================== */
+
+socket.on("groupMessage",(message)=>{
+
+    if(!message || !message.groupId){
+        return;
+    }
+
+    socket.to(
+        String(message.groupId)
+    ).emit(
+        "newGroupMessage",
+        message
+    );
+
+});
+
+
+/* ==========================
+GROUP MESSAGE REACTION
+========================== */
+
+socket.on("groupMessageReaction",(message)=>{
+
+    if(!message || !message._id){
+        return;
+    }
+
+    if(!message.groupId){
+
+        console.log(
+            "❌ Reaction missing groupId"
+        );
+
+        return;
+    }
+
+    socket.to(
+        String(message.groupId)
+    ).emit(
+        "groupMessageReaction",
+        message
+    );
+
+});
 
 socket.on("join", async (username) => {
 
