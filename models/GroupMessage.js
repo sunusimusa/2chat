@@ -66,6 +66,20 @@ const groupMessageSchema = new mongoose.Schema({
 
     ],
 
+    seenBy:[
+    {
+        username:{
+            type:String,
+            required:true
+        },
+
+        seenAt:{
+            type:Date,
+            default:Date.now
+        }
+    }
+],
+
     deleted:{
         type:Boolean,
         default:false
