@@ -10,7 +10,8 @@ const upload = multer({
 const {
     sendMessage,
     getMessages,
-    reactToMessage
+    reactToMessage,
+    deleteMessage
 } = require("../controllers/groupMessageController");
 
 /* ==========================
@@ -43,6 +44,11 @@ router.put(
 router.get(
     "/:groupId",
     getMessages
+);
+
+router.put(
+    "/delete",
+    deleteMessage
 );
 
 module.exports = router;
