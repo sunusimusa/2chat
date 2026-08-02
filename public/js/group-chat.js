@@ -284,6 +284,269 @@ function appendMessage(msg){
 
 }
 
+const newMessage =
+    chat.querySelector(
+        `[data-message-id="${msg._id}"]`
+    );
+
+if(newMessage){
+
+    setupMessageLongPress(
+        newMessage
+    );
+
+}
+
+/* ==========================
+   MESSAGE ACTION MENU
+========================== */
+
+const messageActionMenu =
+    document.getElementById("messageActionMenu");
+
+const replyAction =
+    document.getElementById("replyAction");
+
+let selectedMessageForAction = null;
+
+let longPressTimer = null;
+
+
+/* ==========================
+   SHOW MENU
+========================== */
+
+function showMessageActionMenu(
+    messageElement,
+    x,
+    y
+){
+
+    selectedMessageForAction =
+        messageElement;
+
+    messageActionMenu.classList.add("show");
+
+    const menuWidth =
+        messageActionMenu.offsetWidth;
+
+    const menuHeight =
+        messageActionMenu.offsetHeight;
+
+    let left = x;
+
+    let top = y;
+
+    /* Don't go outside screen */
+
+    if(
+        left + menuWidth >
+        window.innerWidth - 10
+    ){
+
+        left =
+            window.innerWidth -
+            menuWidth -
+            10;
+
+    }
+
+    if(
+        top + menuHeight >
+        window.innerHeight - 10
+    ){
+
+        top =
+            window.innerHeight -
+            menuHeight -
+            10;
+
+    }
+
+    if(left < 10){
+
+        left = 10;
+
+    }
+
+    if(top < 10){
+
+        top = 10;
+
+    }
+
+    messageActionMenu.style.left =
+        left + "px";
+
+    messageActionMenu.style.top =
+        top + "px";
+
+}
+
+
+/* ==========================
+   CLOSE MENU
+========================== */
+
+function closeMessageActionMenu(){
+
+    messageActionMenu.classList.remove(
+        "show"
+    );
+
+    selectedMessageForAction = null;
+
+}
+
+
+/* ==========================
+   LONG PRESS
+========================== */
+
+function setupMessageLongPress(
+    messageElement
+){
+
+    messageElement.addEventListener(
+        "touchstart",
+        function(e){
+
+            if(e.touches.length !== 1){
+                return;
+            }
+
+            const touch =
+                e.touches[0];
+
+            longPressTimer =
+                setTimeout(()=>{
+
+                    showMessageActionMenu(
+                        messageElement,
+                        touch.clientX,
+                        touch.clientY
+                    );
+
+                },500);
+
+        },
+        {passive:true}
+    );
+
+
+    messageElement.addEventListener(
+        "touchend",
+        function(){
+
+            clearTimeout(
+                longPressTimer
+            );
+
+        }
+    );
+
+
+    messageElement.addEventListener(
+        "touchmove",
+        function(){
+
+            clearTimeout(
+                longPressTimer
+            );
+
+        }
+    );
+
+
+    /* Desktop */
+
+    messageElement.addEventListener(
+        "contextmenu",
+        function(e){
+
+            e.preventDefault();
+
+            showMessageActionMenu(
+                messageElement,
+                e.clientX,
+                e.clientY
+            );
+
+        }
+    );
+
+}
+
+
+/* ==========================
+   REPLY ACTION
+========================== */
+
+replyAction.addEventListener(
+    "click",
+    function(){
+
+        if(
+            !selectedMessageForAction
+        ){
+            return;
+        }
+
+        const element =
+            selectedMessageForAction;
+
+        const message = {
+
+            _id:
+                element.dataset.messageId,
+
+            sender:
+                element.dataset.sender || "",
+
+            text:
+                decodeURIComponent(
+                    element.dataset.text || ""
+                ),
+
+            image:
+                decodeURIComponent(
+                    element.dataset.image || ""
+                ),
+
+            voice:
+                decodeURIComponent(
+                    element.dataset.voice || ""
+                )
+
+        };
+
+        closeMessageActionMenu();
+
+        startReply(message);
+
+    }
+);
+
+
+/* ==========================
+   CLOSE WHEN CLICK OUTSIDE
+========================== */
+
+document.addEventListener(
+    "click",
+    function(e){
+
+        if(
+            !messageActionMenu.contains(e.target)
+        ){
+
+            closeMessageActionMenu();
+
+        }
+
+    }
+);
+
 /* ==========================
 AUTO RESIZE
 ========================== */
