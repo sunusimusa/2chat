@@ -415,6 +415,9 @@ const messageActionMenu =
 const replyAction =
     document.getElementById("replyAction");
 
+const editAction =
+    document.getElementById("editAction");
+
 let selectedMessageForAction = null;
 
 let longPressTimer = null;
@@ -1890,4 +1893,219 @@ socket.on(
 
     }
 );
+
+/* ==========================
+   EDIT MESSAGE
+========================== */
+
+editAction.addEventListener(
+    "click",
+    async function(){
+
+        if(!selectedMessageForAction){
+            return;
+        }
+
+        const messageElement =
+            selectedMessageForAction;
+
+        const messageId =
+            messageElement.dataset.messageId;
+
+        const sender =
+            messageElement.dataset.sender;
+
+        const oldText =
+            decodeURIComponent(
+                messageElement.dataset.text || ""
+            );
+
+        if(sender !== user.username){
+
+            alert(
+                "You can only edit your own message."
+            );
+
+            closeMessageActionMenu();
+
+            return;
+
+        }
+
+        if(!oldText){
+
+            alert(
+                "Only text messages can be edited."
+            );
+
+            closeMessageActionMenu();
+
+            return;
+
+        }
+
+        const newText =
+            prompt(
+                "Edit message:",
+                oldText
+            );
+
+        if(newText === null){
+            return;
+        }
+
+        if(newText.trim() === ""){
+
+            alert(
+                "Message cannot be empty."
+            );
+
+            return;
+
+        }
+
+        if(newText.trim() === oldText.trim()){
+
+            closeMessageActionMenu();
+
+            return;
+
+        }
+
+        try{
+
+            const res =
+                await fetch(
+                    "/api/group-messages/edit",
+                    {
+
+                        method:"PUT",
+
+                        headers:{
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:JSON.stringify({
+
+                            messageId:
+                                messageId,
+
+                            username:
+                                user.username,
+
+                            text:
+                                newText.trim()
+
+                        })
+
+                    }
+                );
+
+            const data =
+                await res.json();
+
+            if(!res.ok || !data.success){
+
+                alert(
+                    data.message ||
+                    "Failed to edit message."
+                );
+
+                return;
+
+            }
+
+            /* UPDATE MY SCREEN */
+
+            updateEditedMessage(
+                data.message
+            );
+
+            /* SEND SOCKET */
+
+            socket.emit(
+                "groupMessageEdited",
+                data.message
+            );
+
+            closeMessageActionMenu();
+
+        }catch(err){
+
+            console.error(
+                "EDIT MESSAGE ERROR:",
+                err
+            );
+
+            alert(
+                "Failed to edit message."
+            );
+
+        }
+
+    }
+);
+
+/* ==========================
+   UPDATE EDITED MESSAGE
+========================== */
+
+function updateEditedMessage(message){
+
+    if(!message || !message._id){
+        return;
+    }
+
+    const messageElement =
+        document.querySelector(
+            `[data-message-id="${message._id}"]`
+        );
+
+    if(!messageElement){
+        return;
+    }
+
+    const textElement =
+        messageElement.querySelector(
+            ".message-text"
+        );
+
+    if(textElement){
+
+        textElement.textContent =
+            message.text;
+
+    }
+
+    messageElement.dataset.text =
+        encodeURIComponent(
+            message.text || ""
+        );
+
+    const timeElement =
+        messageElement.querySelector(
+            ".message-time"
+        );
+
+    if(timeElement){
+
+        timeElement.innerHTML = `
+
+            ✏️ Edited • 
+
+            ${new Date(
+                message.createdAt
+            ).toLocaleTimeString([],{
+
+                hour:"2-digit",
+                minute:"2-digit"
+
+            })}
+
+        `;
+
+    }
+
+}
 
