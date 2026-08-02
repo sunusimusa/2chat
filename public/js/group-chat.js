@@ -241,6 +241,10 @@ function appendMessage(msg){
         <div
     class="${mine ? "me" : "other"}"
     data-message-id="${msg._id}"
+    data-sender="${msg.sender || ""}"
+    data-text="${encodeURIComponent(msg.text || "")}"
+    data-image="${encodeURIComponent(msg.image || "")}"
+    data-voice="${encodeURIComponent(msg.voice || "")}"
     oncontextmenu="openReplyMenu(event, this)"
 >
 
@@ -1163,4 +1167,39 @@ function findMessageById(messageId){
 
 }
 
+/* ==========================
+   OPEN REPLY
+========================== */
 
+function openReplyMenu(event, messageElement){
+
+    event.preventDefault();
+
+    const message = {
+
+        _id:
+            messageElement.dataset.messageId,
+
+        sender:
+            messageElement.dataset.sender || "",
+
+        text:
+            decodeURIComponent(
+                messageElement.dataset.text || ""
+            ),
+
+        image:
+            decodeURIComponent(
+                messageElement.dataset.image || ""
+            ),
+
+        voice:
+            decodeURIComponent(
+                messageElement.dataset.voice || ""
+            )
+
+    };
+
+    startReply(message);
+
+}
