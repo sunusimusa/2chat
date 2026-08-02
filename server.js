@@ -139,6 +139,28 @@ socket.on("groupMessageReaction",(message)=>{
 
 });
 
+   /* ==========================
+   GROUP MESSAGE EDITED
+========================== */
+
+socket.on(
+    "groupMessageEdited",
+    (message)=>{
+
+        if(!message || !message.groupId){
+            return;
+        }
+
+        socket.to(
+            message.groupId
+        ).emit(
+            "groupMessageEdited",
+            message
+        );
+
+    }
+);
+
 
 socket.on("join", async (username) => {
 
