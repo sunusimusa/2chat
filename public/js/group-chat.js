@@ -201,6 +201,58 @@ function appendMessage(msg){
     }
 
     // ==========================
+// REPLY
+// ==========================
+
+let replyHTML = "";
+
+if(msg.replyTo){
+
+    let replyContent = "";
+
+    if(msg.replyText){
+
+        replyContent = `
+            <div class="reply-text">
+                ${msg.replyText}
+            </div>
+        `;
+
+    }else if(msg.replyImage){
+
+        replyContent = `
+            <div class="reply-image">
+                <img
+                    src="${msg.replyImage}"
+                    onclick="openImageViewer('${msg.replyImage}')">
+            </div>
+        `;
+
+    }else{
+
+        replyContent = `
+            <div class="reply-text">
+                Message
+            </div>
+        `;
+
+    }
+
+    replyHTML = `
+        <div class="reply-message">
+
+            <div class="reply-user">
+                ${msg.replyUser || "User"}
+            </div>
+
+            ${replyContent}
+
+        </div>
+    `;
+
+}
+
+    // ==========================
     // REACTIONS
     // ==========================
 
@@ -253,13 +305,15 @@ function appendMessage(msg){
                 : "bubble-other"
             }">
 
-                ${imageHTML}
+                ${replyHTML}
 
-                ${voiceHTML}
+${imageHTML}
 
-                ${textHTML}
+${voiceHTML}
 
-                <div class="message-time">
+${textHTML}
+
+<div class="message-time">
 
                     ${new Date(
                         msg.createdAt
