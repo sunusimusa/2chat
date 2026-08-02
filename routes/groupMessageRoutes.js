@@ -12,7 +12,8 @@ const {
     getMessages,
     reactToMessage,
     deleteMessage,
-    editMessage
+    editMessage,
+    markMessageAsSeen
 } = require("../controllers/groupMessageController");
 
 /* ==========================
@@ -44,6 +45,12 @@ router.put(
 router.put(
     "/edit",
     editMessage
+);
+
+// Mark message as seen
+router.put(
+    "/seen",
+    markMessageAsSeen
 );
 
 // Load Group Messages
