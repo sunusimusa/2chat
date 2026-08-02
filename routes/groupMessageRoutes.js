@@ -34,7 +34,10 @@ router.post(
 );
 
 // React to message
-router.put("/react", reactToMessage);
+router.put(
+    "/react",
+    reactToMessage
+);
 
 // Load Group Messages
 router.get(
