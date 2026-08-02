@@ -620,3 +620,80 @@ exports.reactToMessage = async (req, res) => {
     }
 
 };
+
+exports.deleteMessage = async (req, res) => {
+
+    try {
+
+        const {
+            messageId,
+            username
+        } = req.body;
+
+        if(!messageId || !username){
+
+            return res.status(400).json({
+
+                success:false,
+                message:"messageId and username are required."
+
+            });
+
+        }
+
+        const message =
+            await GroupMessage.findById(messageId);
+
+        if(!message){
+
+            return res.status(404).json({
+
+                success:false,
+                message:"Message not found."
+
+            });
+
+        }
+
+        // Only message owner can delete
+        if(message.sender !== username){
+
+            return res.status(403).json({
+
+                success:false,
+                message:"You can only delete your own message."
+
+            });
+
+        }
+
+        message.deleted = true;
+
+        await message.save();
+
+        return res.json({
+
+            success:true,
+
+            message
+
+        });
+
+    }catch(err){
+
+        console.error(
+            "DELETE GROUP MESSAGE ERROR:",
+            err
+        );
+
+        return res.status(500).json({
+
+            success:false,
+
+            message:err.message
+
+        });
+
+    }
+
+};
