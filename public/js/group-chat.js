@@ -163,16 +163,19 @@ function appendMessage(msg){
 
                     <div class="message-time">
 
-                        ${new Date(
-                            msg.createdAt
-                        ).toLocaleTimeString([],{
+    ${msg.edited ? "✏️ Edited • " : ""}
 
-                            hour:"2-digit",
-                            minute:"2-digit"
+    ${new Date(
+        msg.createdAt
+    ).toLocaleTimeString([],{
 
-                        })}
+        hour:"2-digit",
+        minute:"2-digit"
 
-                    </div>
+    })}
+
+</div>
+
 
                 </div>
 
