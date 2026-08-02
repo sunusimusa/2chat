@@ -135,6 +135,55 @@ function appendMessage(msg){
     const mine =
         msg.sender === user.username;
 
+
+        if(msg.deleted){
+
+        const deletedMine =
+            msg.sender === user.username;
+
+        chat.insertAdjacentHTML(
+            "beforeend",
+            `
+            <div
+                class="${deletedMine ? "me" : "other"}"
+                data-message-id="${msg._id}"
+                data-sender="${msg.sender || ""}"
+                data-deleted="true"
+            >
+
+                <div class="${
+                    deletedMine
+                    ? "bubble-me"
+                    : "bubble-other"
+                }">
+
+                    <div class="deleted-message">
+                        🗑️ This message was deleted
+                    </div>
+
+                    <div class="message-time">
+
+                        ${new Date(
+                            msg.createdAt
+                        ).toLocaleTimeString([],{
+
+                            hour:"2-digit",
+                            minute:"2-digit"
+
+                        })}
+
+                    </div>
+
+                </div>
+
+            </div>
+            `
+        );
+
+        return;
+
+    }
+
     // ==========================
     // VOICE
     // ==========================
@@ -678,6 +727,142 @@ replyAction.addEventListener(
     }
 );
 
+/* ==========================
+   DELETE MESSAGE
+========================== */
+
+const deleteAction =
+    document.getElementById("deleteAction");
+
+
+deleteAction.addEventListener(
+    "click",
+    async function(){
+
+        if(!selectedMessageForAction){
+
+            return;
+
+        }
+
+        const messageElement =
+            selectedMessageForAction;
+
+        const messageId =
+            messageElement.dataset.messageId;
+
+        const sender =
+            messageElement.dataset.sender;
+
+        if(!messageId){
+
+            return;
+
+        }
+
+        // Only owner can delete
+        if(sender !== user.username){
+
+            alert(
+                "You can only delete your own message."
+            );
+
+            closeMessageActionMenu();
+
+            return;
+
+        }
+
+        const confirmDelete =
+            confirm(
+                "Delete this message?"
+            );
+
+        if(!confirmDelete){
+
+            return;
+
+        }
+
+        try{
+
+            const res =
+                await fetch(
+                    "/api/group-messages/delete",
+                    {
+
+                        method:"PUT",
+
+                        headers:{
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:JSON.stringify({
+
+                            messageId:
+                                messageId,
+
+                            username:
+                                user.username
+
+                        })
+
+                    }
+                );
+
+            const data =
+                await res.json();
+
+            if(!res.ok || !data.success){
+
+                alert(
+                    data.message ||
+                    "Failed to delete message."
+                );
+
+                return;
+
+            }
+
+            /* ==========================
+               UPDATE MY SCREEN
+            ========================== */
+
+            updateDeletedMessage(
+                data.message
+            );
+
+            /* ==========================
+               SOCKET
+            ========================== */
+
+            socket.emit(
+                "groupMessageDeleted",
+                data.message
+            );
+
+            /* ==========================
+               CLOSE MENU
+            ========================== */
+
+            closeMessageActionMenu();
+
+        }catch(err){
+
+            console.error(
+                "DELETE MESSAGE ERROR:",
+                err
+            );
+
+            alert(
+                "Failed to delete message."
+            );
+
+        }
+
+    }
+);
 
 /* ==========================
    CLOSE WHEN CLICK OUTSIDE
@@ -1621,138 +1806,85 @@ function openReplyMenu(event, messageElement){
 }
 
 /* ==========================
-   DELETE MESSAGE
+   UPDATE DELETED MESSAGE
 ========================== */
 
-const deleteAction =
-    document.getElementById("deleteAction");
+function updateDeletedMessage(message){
 
+    if(!message || !message._id){
 
-deleteAction.addEventListener(
-    "click",
-    async function(){
+        return;
 
-        if(!selectedMessageForAction){
+    }
+
+    const messageElement =
+        document.querySelector(
+            `[data-message-id="${message._id}"]`
+        );
+
+    if(!messageElement){
+
+        return;
+
+    }
+
+    const bubble =
+        messageElement.querySelector(
+            ".bubble-me, .bubble-other"
+        );
+
+    if(!bubble){
+
+        return;
+
+    }
+
+    bubble.innerHTML = `
+
+        <div class="deleted-message">
+
+            🗑️ This message was deleted
+
+        </div>
+
+        <div class="message-time">
+
+            ${new Date(
+                message.createdAt
+            ).toLocaleTimeString([],{
+
+                hour:"2-digit",
+                minute:"2-digit"
+
+            })}
+
+        </div>
+
+    `;
+
+    // Prevent actions on deleted message
+    messageElement.dataset.deleted = "true";
+
+}
+
+/* ==========================
+   REALTIME MESSAGE DELETE
+========================== */
+
+socket.on(
+    "groupMessageDeleted",
+    (message)=>{
+
+        if(!message || !message._id){
 
             return;
 
         }
 
-        const messageElement =
-            selectedMessageForAction;
-
-        const messageId =
-            messageElement.dataset.messageId;
-
-        const sender =
-            messageElement.dataset.sender;
-
-        if(!messageId){
-
-            return;
-
-        }
-
-        // Only owner can delete
-        if(sender !== user.username){
-
-            alert(
-                "You can only delete your own message."
-            );
-
-            closeMessageActionMenu();
-
-            return;
-
-        }
-
-        const confirmDelete =
-            confirm(
-                "Delete this message?"
-            );
-
-        if(!confirmDelete){
-
-            return;
-
-        }
-
-        try{
-
-            const res =
-                await fetch(
-                    "/api/group-messages/delete",
-                    {
-
-                        method:"PUT",
-
-                        headers:{
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body:JSON.stringify({
-
-                            messageId:
-                                messageId,
-
-                            username:
-                                user.username
-
-                        })
-
-                    }
-                );
-
-            const data =
-                await res.json();
-
-            if(!res.ok || !data.success){
-
-                alert(
-                    data.message ||
-                    "Failed to delete message."
-                );
-
-                return;
-
-            }
-
-            /* ==========================
-               UPDATE MY SCREEN
-            ========================== */
-
-            updateDeletedMessage(
-                data.message
-            );
-
-            /* ==========================
-               SOCKET
-            ========================== */
-
-            socket.emit(
-                "groupMessageDeleted",
-                data.message
-            );
-
-            /* ==========================
-               CLOSE MENU
-            ========================== */
-
-            closeMessageActionMenu();
-
-        }catch(err){
-
-            console.error(
-                "DELETE MESSAGE ERROR:",
-                err
-            );
-
-            alert(
-                "Failed to delete message."
-            );
-
-        }
+        updateDeletedMessage(
+            message
+        );
 
     }
 );
+
