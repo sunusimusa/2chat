@@ -623,9 +623,59 @@ async function sendMessage(){
     );
 
     formData.append(
-        "text",
-        text
+    "text",
+    text
+);
+
+/* ==========================
+   REPLY DATA
+========================== */
+
+if(replyMessage){
+
+    formData.append(
+        "replyTo",
+        replyMessage._id
     );
+
+    formData.append(
+        "replyUser",
+        replyMessage.sender || ""
+    );
+
+    formData.append(
+        "replyText",
+        replyMessage.text || ""
+    );
+
+    formData.append(
+        "replyImage",
+        replyMessage.image || ""
+    );
+
+}else{
+
+    formData.append(
+        "replyTo",
+        ""
+    );
+
+    formData.append(
+        "replyUser",
+        ""
+    );
+
+    formData.append(
+        "replyText",
+        ""
+    );
+
+    formData.append(
+        "replyImage",
+        ""
+    );
+
+}
 
     // ==========================
     // IMAGE
