@@ -297,6 +297,10 @@ if(msg.replyTo){
     data-text="${encodeURIComponent(msg.text || "")}"
     data-image="${encodeURIComponent(msg.image || "")}"
     data-voice="${encodeURIComponent(msg.voice || "")}"
+    data-reply-to="${msg.replyTo || ""}"
+    data-reply-user="${encodeURIComponent(msg.replyUser || "")}"
+    data-reply-text="${encodeURIComponent(msg.replyText || "")}"
+    data-reply-image="${encodeURIComponent(msg.replyImage || "")}"
 >
 
             <div class="${
@@ -741,13 +745,13 @@ async function sendMessage(){
 
     if(selectedImage){
 
-        formData.append(
-            "image",
-            selectedImage
-        );
+    formData.append(
+        "image",
+        selectedImage
+    );
 
-    }
-)
+}
+    
     // ==========================
     // VOICE
     // ==========================
