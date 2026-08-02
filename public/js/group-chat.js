@@ -456,6 +456,101 @@ function closeMessageActionMenu(){
 
 
 /* ==========================
+   REACTION BUTTONS IN ACTION MENU
+========================== */
+
+messageActionMenu
+    .querySelectorAll("[data-emoji]")
+    .forEach(button => {
+
+        button.addEventListener("click", async function(e){
+
+            e.stopPropagation();
+
+            const emoji =
+                this.dataset.emoji;
+
+            if(!selectedMessageForAction){
+                return;
+            }
+
+            const messageId =
+                selectedMessageForAction.dataset.messageId;
+
+            if(!messageId){
+                return;
+            }
+
+            try{
+
+                const res =
+                    await fetch(
+                        "/api/group-messages/react",
+                        {
+                            method:"PUT",
+
+                            headers:{
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:JSON.stringify({
+
+                                messageId:
+                                    messageId,
+
+                                username:
+                                    user.username,
+
+                                emoji:
+                                    emoji
+
+                            })
+                        }
+                    );
+
+                const data =
+                    await res.json();
+
+                if(!res.ok || !data.success){
+
+                    alert(
+                        data.message ||
+                        "Reaction failed."
+                    );
+
+                    return;
+                }
+
+                updateMessageReactions(
+                    data.message
+                );
+
+                socket.emit(
+                    "groupMessageReaction",
+                    data.message
+                );
+
+                closeMessageActionMenu();
+
+            }catch(err){
+
+                console.error(
+                    "REACTION ERROR:",
+                    err
+                );
+
+                alert(
+                    "Failed to send reaction."
+                );
+
+            }
+
+        });
+
+    });
+
+/* ==========================
    LONG PRESS
 ========================== */
 
