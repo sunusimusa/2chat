@@ -245,7 +245,6 @@ function appendMessage(msg){
     data-text="${encodeURIComponent(msg.text || "")}"
     data-image="${encodeURIComponent(msg.image || "")}"
     data-voice="${encodeURIComponent(msg.voice || "")}"
-    oncontextmenu="openReplyMenu(event, this)"
 >
 
             <div class="${
