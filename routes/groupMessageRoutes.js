@@ -11,7 +11,8 @@ const {
     sendMessage,
     getMessages,
     reactToMessage,
-    deleteMessage
+    deleteMessage,
+    editMessage
 } = require("../controllers/groupMessageController");
 
 /* ==========================
@@ -38,6 +39,11 @@ router.post(
 router.put(
     "/react",
     reactToMessage
+);
+
+router.put(
+    "/edit",
+    editMessage
 );
 
 // Load Group Messages
