@@ -905,3 +905,21 @@ cursor:pointer;
     display:block;
     cursor:pointer;
 }
+
+.deleted-message{
+
+    color:#777;
+
+    font-style:italic;
+
+    font-size:14px;
+
+    padding:4px 0;
+
+}
+
+#deleteAction{
+
+    color:#e53935;
+
+}
