@@ -241,7 +241,7 @@ function appendMessage(msg){
         <div
     class="${mine ? "me" : "other"}"
     data-message-id="${msg._id}"
-    oncontextmenu="openReactionPicker(event, this)"
+    oncontextmenu="openReplyMenu(event, this)"
 >
 
             <div class="${
@@ -1025,3 +1025,142 @@ reactionPicker
         });
 
     });
+
+/* ==========================
+   REPLY PREVIEW UI
+========================== */
+
+const replyPreview =
+    document.getElementById("replyPreview");
+
+const replyUser =
+    document.getElementById("replyUser");
+
+const replyPreviewText =
+    document.getElementById("replyPreviewText");
+
+const cancelReply =
+    document.getElementById("cancelReply");
+
+let replyMessage = null;
+
+
+function startReply(message){
+
+    replyMessage = message;
+
+    replyUser.textContent =
+        message.sender || "";
+
+    if(message.text){
+
+        replyPreviewText.textContent =
+            message.text;
+
+    }else if(message.image){
+
+        replyPreviewText.textContent =
+            "📷 Photo";
+
+    }else if(message.voice){
+
+        replyPreviewText.textContent =
+            "🎤 Voice message";
+
+    }else{
+
+        replyPreviewText.textContent =
+            "Message";
+
+    }
+
+    replyPreview.style.display =
+        "flex";
+
+    messageInput.focus();
+
+}
+
+
+function cancelReplyMessage(){
+
+    replyMessage = null;
+
+    replyPreview.style.display =
+        "none";
+
+    replyUser.textContent =
+        "";
+
+    replyPreviewText.textContent =
+        "";
+
+}
+
+
+cancelReply.addEventListener(
+    "click",
+    cancelReplyMessage
+);
+
+/* ==========================
+   REPLY MESSAGE
+========================== */
+
+function openReplyMenu(event, messageElement){
+
+    event.preventDefault();
+
+    const messageId =
+        messageElement.dataset.messageId;
+
+    const message =
+        findMessageById(messageId);
+
+    if(!message){
+        return;
+    }
+
+    startReply(message);
+}
+
+
+function findMessageById(messageId){
+
+    const messageElement =
+        document.querySelector(
+            `[data-message-id="${messageId}"]`
+        );
+
+    if(!messageElement){
+        return null;
+    }
+
+    return {
+        _id: messageId,
+
+        sender:
+            messageElement.classList.contains("me")
+                ? user.username
+                : "User",
+
+        text:
+            messageElement
+                .querySelector(".message-text")
+                ?.textContent
+                .trim() || "",
+
+        image:
+            messageElement
+                .querySelector(".message-image img")
+                ?.src || "",
+
+        voice:
+            messageElement
+                .querySelector(".voice-message audio")
+                ?.src || ""
+    };
+
+}
+
+
