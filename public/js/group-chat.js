@@ -282,8 +282,6 @@ function appendMessage(msg){
 
     );
 
-}
-
 const newMessage =
     chat.querySelector(
         `[data-message-id="${msg._id}"]`
