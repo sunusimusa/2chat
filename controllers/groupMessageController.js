@@ -4,187 +4,305 @@ const Group = require("../models/Group");
 const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
 
-// ================= SEND GROUP MESSAGE =================
+
+// ==================================================
+// SEND GROUP MESSAGE
+// ==================================================
+
 exports.sendMessage = async (req, res) => {
 
     try {
 
         const {
-    groupId,
-    sender,
-    text,
-    voiceDuration,
+            groupId,
+            sender,
+            text,
+            voiceDuration,
+            replyTo,
+            replyUser,
+            replyText,
+            replyImage
+        } = req.body;
 
-    replyTo,
-    replyUser,
-    replyText,
-    replyImage
 
-} = req.body;
+        const imageFile =
+            req.files?.image?.[0];
 
-        const imageFile = req.files?.image?.[0];
-        const voiceFile = req.files?.voice?.[0];
+        const voiceFile =
+            req.files?.voice?.[0];
 
-        // ==========================
-        // CHECK REQUIRED FIELDS
-        // ==========================
+
+        // ==================================================
+        // CHECK REQUIRED
+        // ==================================================
 
         if (!groupId || !sender) {
 
             return res.status(400).json({
+
                 success: false,
-                message: "Missing required fields."
+
+                message:
+                    "Missing required fields."
+
             });
 
         }
 
-        // ==========================
-        // VARIABLES
-        // ==========================
+
+        // ==================================================
+        // CHECK GROUP
+        // ==================================================
+
+        const group =
+            await Group.findById(groupId);
+
+        if (!group) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Group not found."
+
+            });
+
+        }
+
 
         let image = "";
         let voice = "";
 
-        // ==========================
+
+        // ==================================================
         // UPLOAD IMAGE
-        // ==========================
+        // ==================================================
 
         if (imageFile) {
 
-            const uploadResult = await new Promise((resolve, reject) => {
+            const uploadResult =
+                await new Promise(
+                    (resolve, reject) => {
 
-                const stream = cloudinary.uploader.upload_stream(
+                        const stream =
+                            cloudinary.uploader.upload_stream(
 
-                    {
-                        resource_type: "image",
-                        folder: "2chat/group-messages"
-                    },
+                                {
+                                    resource_type:
+                                        "image",
 
-                    (err, result) => {
+                                    folder:
+                                        "2chat/group-messages"
+                                },
 
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve(result);
-                        }
+                                (err, result) => {
+
+                                    if (err) {
+
+                                        reject(err);
+
+                                    } else {
+
+                                        resolve(result);
+
+                                    }
+
+                                }
+
+                            );
+
+
+                        streamifier
+                            .createReadStream(
+                                imageFile.buffer
+                            )
+                            .pipe(stream);
 
                     }
-
                 );
 
-                streamifier
-                    .createReadStream(imageFile.buffer)
-                    .pipe(stream);
 
-            });
-
-            image = uploadResult.secure_url;
+            image =
+                uploadResult.secure_url;
 
         }
 
-        // ==========================
+
+        // ==================================================
         // UPLOAD VOICE
-        // ==========================
+        // ==================================================
 
         if (voiceFile) {
 
-            const uploadResult = await new Promise((resolve, reject) => {
+            const uploadResult =
+                await new Promise(
+                    (resolve, reject) => {
 
-                const stream = cloudinary.uploader.upload_stream(
+                        const stream =
+                            cloudinary.uploader.upload_stream(
 
-                    {
-                        resource_type: "video",
-                        folder: "2chat/group-voices"
-                    },
+                                {
+                                    resource_type:
+                                        "video",
 
-                    (err, result) => {
+                                    folder:
+                                        "2chat/group-voices"
+                                },
 
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve(result);
-                        }
+                                (err, result) => {
+
+                                    if (err) {
+
+                                        reject(err);
+
+                                    } else {
+
+                                        resolve(result);
+
+                                    }
+
+                                }
+
+                            );
+
+
+                        streamifier
+                            .createReadStream(
+                                voiceFile.buffer
+                            )
+                            .pipe(stream);
 
                     }
-
                 );
 
-                streamifier
-                    .createReadStream(voiceFile.buffer)
-                    .pipe(stream);
 
-            });
-
-            voice = uploadResult.secure_url;
+            voice =
+                uploadResult.secure_url;
 
         }
 
-        // ==========================
-        // CHECK MESSAGE
-        // ==========================
+
+        // ==================================================
+        // CHECK EMPTY MESSAGE
+        // ==================================================
 
         if (
-            (!text || text.trim() === "") &&
+
+            (!text ||
+                text.trim() === "") &&
+
             !image &&
+
             !voice
+
         ) {
 
             return res.status(400).json({
 
                 success: false,
 
-                message: "Message cannot be empty."
+                message:
+                    "Message cannot be empty."
 
             });
 
         }
 
-        // ==========================
+
+        // ==================================================
+        // REPLY DATA
+        // ==================================================
+
+        let finalReplyTo = null;
+        let finalReplyUser = "";
+        let finalReplyText = "";
+        let finalReplyImage = "";
+
+
+        if (replyTo) {
+
+            finalReplyTo = replyTo;
+
+            finalReplyUser =
+                replyUser || "";
+
+            finalReplyText =
+                replyText || "";
+
+            finalReplyImage =
+                replyImage || "";
+
+        }
+
+
+        // ==================================================
         // CREATE MESSAGE
-        // ==========================
+        // ==================================================
 
-        const message = await GroupMessage.create({
+        const message =
+            await GroupMessage.create({
 
-    groupId,
+                groupId,
 
-    sender,
+                sender,
 
-    text: text || "",
+                text:
+                    text || "",
 
-    image,
+                image,
 
-    voice,
+                voice,
 
-    voiceDuration:
-        Number(voiceDuration) || 0,
+                voiceDuration:
+                    Number(voiceDuration) || 0,
 
-    replyTo:
-        replyTo || null,
+                replyTo:
+                    finalReplyTo,
 
-    replyUser:
-        replyUser || "",
+                replyUser:
+                    finalReplyUser,
 
-    replyText:
-        replyText || "",
+                replyText:
+                    finalReplyText,
 
-    replyImage:
-        replyImage || ""
+                replyImage:
+                    finalReplyImage
 
-});
+            });
 
-        // ==========================
+
+        // ==================================================
         // LAST GROUP MESSAGE
-        // ==========================
+        // ==================================================
 
-        let lastMessage = text || "";
+        let lastMessage =
+            text || "";
+
 
         if (image) {
-            lastMessage = "📷 Photo";
+
+            lastMessage =
+                "📷 Photo";
+
         }
 
+
         if (voice) {
-            lastMessage = "🎤 Voice message";
+
+            lastMessage =
+                "🎤 Voice message";
+
         }
+
+
+        if (replyTo && !text && !image && !voice) {
+
+            lastMessage =
+                "↩️ Reply";
+
+        }
+
 
         await Group.findByIdAndUpdate(
 
@@ -194,17 +312,20 @@ exports.sendMessage = async (req, res) => {
 
                 lastMessage,
 
-                lastMessageSender: sender,
+                lastMessageSender:
+                    sender,
 
-                lastMessageTime: new Date()
+                lastMessageTime:
+                    new Date()
 
             }
 
         );
 
-        // ==========================
+
+        // ==================================================
         // RESPONSE
-        // ==========================
+        // ==================================================
 
         return res.json({
 
@@ -214,57 +335,75 @@ exports.sendMessage = async (req, res) => {
 
         });
 
+
     } catch (err) {
 
-        console.error("GROUP MESSAGE ERROR:", err);
+        console.error(
+            "GROUP MESSAGE ERROR:",
+            err
+        );
+
 
         return res.status(500).json({
 
             success: false,
 
-            message: err.message
+            message:
+                err.message
 
         });
 
     }
 
 };
-    
-// ================= LOAD GROUP MESSAGES =================
+
+
+
+// ==================================================
+// GET GROUP MESSAGES
+// ==================================================
 
 exports.getMessages = async (req, res) => {
 
-    try{
+    try {
 
-        const messages = await GroupMessage.find({
+        const messages =
+            await GroupMessage.find({
 
-            groupId:req.params.groupId
+                groupId:
+                    req.params.groupId
 
-        })
+            })
+            .sort({
 
-        .sort({
+                createdAt: 1
 
-            createdAt:1
+            });
 
-        });
 
-        res.json({
+        return res.json({
 
-            success:true,
+            success: true,
 
             messages
 
         });
 
-    }catch(err){
 
-        console.error(err);
+    } catch (err) {
 
-        res.status(500).json({
+        console.error(
+            "GET GROUP MESSAGES ERROR:",
+            err
+        );
 
-            success:false,
 
-            message:err.message
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                err.message
 
         });
 
@@ -273,9 +412,10 @@ exports.getMessages = async (req, res) => {
 };
 
 
-// ==========================
-// GROUP MESSAGE REACTION
-// ==========================
+
+// ==================================================
+// REACT TO GROUP MESSAGE
+// ==================================================
 
 exports.reactToMessage = async (req, res) => {
 
@@ -287,9 +427,10 @@ exports.reactToMessage = async (req, res) => {
             emoji
         } = req.body;
 
-        // ==========================
-        // CHECK REQUIRED FIELDS
-        // ==========================
+
+        // ==================================================
+        // CHECK REQUIRED
+        // ==================================================
 
         if (
             !messageId ||
@@ -308,37 +449,50 @@ exports.reactToMessage = async (req, res) => {
 
         }
 
-        // ==========================
+
+        // ==================================================
         // ALLOWED EMOJIS
-        // ==========================
+        // ==================================================
 
         const allowedEmojis = [
+
             "👍",
             "❤️",
             "😂",
             "😮",
             "😢",
             "😡"
+
         ];
 
-        if (!allowedEmojis.includes(emoji)) {
+
+        if (
+            !allowedEmojis.includes(
+                emoji
+            )
+        ) {
 
             return res.status(400).json({
 
                 success: false,
 
-                message: "Invalid reaction."
+                message:
+                    "Invalid reaction."
 
             });
 
         }
 
-        // ==========================
+
+        // ==================================================
         // FIND MESSAGE
-        // ==========================
+        // ==================================================
 
         const message =
-            await GroupMessage.findById(messageId);
+            await GroupMessage.findById(
+                messageId
+            );
+
 
         if (!message) {
 
@@ -346,52 +500,76 @@ exports.reactToMessage = async (req, res) => {
 
                 success: false,
 
-                message: "Message not found."
+                message:
+                    "Message not found."
 
             });
 
         }
 
-        // ==========================
-        // CHECK USER REACTION
-        // ==========================
+
+        // ==================================================
+        // FIND USER REACTION
+        // ==================================================
 
         const existingIndex =
             message.reactions.findIndex(
+
                 reaction =>
-                    reaction.username === username
+
+                    reaction.username ===
+                    username
+
             );
 
-        // ==========================
+
+        // ==================================================
         // SAME EMOJI = REMOVE
-        // ==========================
+        // ==================================================
 
         if (
+
             existingIndex !== -1 &&
-            message.reactions[existingIndex].emoji === emoji
+
+            message
+                .reactions[
+                    existingIndex
+                ]
+                .emoji === emoji
+
         ) {
 
             message.reactions.splice(
+
                 existingIndex,
+
                 1
+
             );
 
         }
 
-        // ==========================
+
+        // ==================================================
         // DIFFERENT EMOJI = CHANGE
-        // ==========================
+        // ==================================================
 
-        else if (existingIndex !== -1) {
+        else if (
+            existingIndex !== -1
+        ) {
 
-            message.reactions[existingIndex].emoji =
-                emoji;
+            message
+                .reactions[
+                    existingIndex
+                ]
+                .emoji = emoji;
 
         }
 
-        // ==========================
+
+        // ==================================================
         // NEW REACTION
-        // ==========================
+        // ==================================================
 
         else {
 
@@ -405,11 +583,13 @@ exports.reactToMessage = async (req, res) => {
 
         }
 
+
         await message.save();
 
-        // ==========================
+
+        // ==================================================
         // RESPONSE
-        // ==========================
+        // ==================================================
 
         return res.json({
 
@@ -419,6 +599,7 @@ exports.reactToMessage = async (req, res) => {
 
         });
 
+
     } catch (err) {
 
         console.error(
@@ -426,11 +607,13 @@ exports.reactToMessage = async (req, res) => {
             err
         );
 
+
         return res.status(500).json({
 
             success: false,
 
-            message: err.message
+            message:
+                err.message
 
         });
 
