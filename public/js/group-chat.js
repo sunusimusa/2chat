@@ -1095,16 +1095,77 @@ document.addEventListener(
     }
 );
 
+
 /* ==========================
-AUTO RESIZE
+   GROUP TYPING INDICATOR
 ========================== */
 
-messageInput.addEventListener("input",()=>{
+let typingTimer = null;
 
-messageInput.style.height="auto";
+messageInput.addEventListener("input", () => {
 
-messageInput.style.height=
-messageInput.scrollHeight+"px";
+    // ==========================
+    // AUTO RESIZE
+    // ==========================
+
+    messageInput.style.height = "auto";
+
+    messageInput.style.height =
+        messageInput.scrollHeight + "px";
+
+
+    // ==========================
+    // CHECK TEXT
+    // ==========================
+
+    if(messageInput.value.trim() === ""){
+
+        socket.emit(
+            "groupStopTyping",
+            {
+                groupId: groupId,
+                username: user.username
+            }
+        );
+
+        clearTimeout(typingTimer);
+
+        return;
+
+    }
+
+
+    // ==========================
+    // TYPING
+    // ==========================
+
+    socket.emit(
+        "groupTyping",
+        {
+            groupId: groupId,
+            username: user.username
+        }
+    );
+
+
+    // ==========================
+    // RESET TIMER
+    // ==========================
+
+    clearTimeout(typingTimer);
+
+
+    typingTimer = setTimeout(() => {
+
+        socket.emit(
+            "groupStopTyping",
+            {
+                groupId: groupId,
+                username: user.username
+            }
+        );
+
+    }, 1500);
 
 });
 
