@@ -1637,6 +1637,7 @@ socket.on("groupMessageReaction", (message) => {
 
 });
 
+
 /* ==========================
    GROUP MESSAGE SEEN
 ========================== */
@@ -1661,22 +1662,12 @@ socket.on(
             return;
         }
 
-        const messageElement =
-            document.querySelector(
-                `[data-message-id="${messageId}"]`
-            );
-
-        if(!messageElement){
+        // Kada sender ya canza nasa UI
+        if(username === user.username){
             return;
         }
 
-        /*
-         * Daga baya a nan za mu canza UI
-         * zuwa ✓ / ✓✓ ko Seen.
-         */
-
-        messageElement.dataset.seenBy =
-            username;
+        updateMessageSeen(data);
 
     }
 );
