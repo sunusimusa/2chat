@@ -591,14 +591,13 @@ exports.reactToMessage = async (req, res) => {
         // RESPONSE
         // ==================================================
 
-        return re
-    n({
+        return res.json({
 
-            success: true,
+    success: true,
 
-            message
+    message
 
-        });
+});
 
 
     } catch (err) {
@@ -1016,6 +1015,8 @@ exports.pinMessage = async (req, res) => {
 
         message.pinnedBy = username;
 
+        message.pinnedAt = new Date();
+
         await message.save();
 
         return res.json({
@@ -1135,6 +1136,8 @@ exports.unpinMessage = async (req, res) => {
         message.pinned = false;
 
         message.pinnedBy = "";
+        
+        message.pinnedAt = null;
 
         await message.save();
 
