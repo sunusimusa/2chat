@@ -2690,6 +2690,15 @@ pinAction.addEventListener(
             }
 
             updatePinnedMessage(
+    data.message
+);
+
+socket.emit(
+    "groupMessagePinned",
+    data.message
+);
+
+            updatePinnedMessage(
                 data.message
             );
 
@@ -2925,3 +2934,24 @@ if(closePinnedMessage){
 
 }
 
+/* ==========================
+   REALTIME GROUP MESSAGE PIN
+========================== */
+
+socket.on(
+    "groupMessagePinned",
+    (message) => {
+
+        if(
+            !message ||
+            !message._id
+        ){
+            return;
+        }
+
+        updatePinnedMessage(
+            message
+        );
+
+    }
+);
