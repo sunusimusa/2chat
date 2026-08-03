@@ -547,16 +547,24 @@ ${textHTML}
 
 <div class="message-time">
 
-                    ${new Date(
-                        msg.createdAt
-                    ).toLocaleTimeString([],{
+    ${new Date(
+        msg.createdAt
+    ).toLocaleTimeString([],{
 
-                        hour:"2-digit",
-                        minute:"2-digit"
+        hour:"2-digit",
+        minute:"2-digit"
 
-                    })}
+    })}
 
-                </div>
+</div>
+
+${mine ? `
+    <div class="message-seen"
+         data-seen-message="${msg._id}">
+        ✓
+    </div>
+` : ""}
+
 
                 ${reactionsHTML}
 
@@ -1760,6 +1768,34 @@ function updateMessageReactions(message){
             );
 
         }
+    );
+
+}
+
+/* ==========================
+   UPDATE MESSAGE SEEN UI
+========================== */
+
+function updateMessageSeen(data){
+
+    if(!data || !data.messageId){
+        return;
+    }
+
+    const seenElement =
+        document.querySelector(
+            `[data-seen-message="${data.messageId}"]`
+        );
+
+    if(!seenElement){
+        return;
+    }
+
+    seenElement.innerHTML =
+        "✓✓ Seen";
+
+    seenElement.classList.add(
+        "seen"
     );
 
 }
