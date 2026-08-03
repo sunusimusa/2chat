@@ -1085,6 +1085,7 @@ deleteAction.addEventListener(
 
             }
 
+
             /* ==========================
                UPDATE MY SCREEN
             ========================== */
