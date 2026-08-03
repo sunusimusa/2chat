@@ -621,6 +621,11 @@ exports.reactToMessage = async (req, res) => {
 
 };
 
+// ==================================================
+// DELETE GROUP MESSAGE
+// OWNER / ADMIN / MESSAGE OWNER
+// ==================================================
+
 exports.deleteMessage = async (req, res) => {
 
     try {
@@ -630,67 +635,133 @@ exports.deleteMessage = async (req, res) => {
             username
         } = req.body;
 
-        if(!messageId || !username){
+        if (!messageId || !username) {
 
             return res.status(400).json({
 
-                success:false,
-                message:"messageId and username are required."
+                success: false,
+
+                message:
+                    "messageId and username are required."
 
             });
 
         }
 
-        const message =
-            await GroupMessage.findById(messageId);
 
-        if(!message){
+        // FIND MESSAGE
+        const message =
+            await GroupMessage.findById(
+                messageId
+            );
+
+        if (!message) {
 
             return res.status(404).json({
 
-                success:false,
-                message:"Message not found."
+                success: false,
+
+                message:
+                    "Message not found."
 
             });
 
         }
 
-        // Only message owner can delete
-        if(message.sender !== username){
+
+        // FIND GROUP
+        const group =
+            await Group.findById(
+                message.groupId
+            );
+
+        if (!group) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Group not found."
+
+            });
+
+        }
+
+
+        // ==================================================
+        // CHECK PERMISSION
+        // ==================================================
+
+        const isMessageOwner =
+            message.sender === username;
+
+        const isOwner =
+            group.owner === username;
+
+        const isAdmin =
+            group.admins &&
+            group.admins.includes(username);
+
+
+        // ==================================================
+        // ONLY MESSAGE OWNER / OWNER / ADMIN
+        // ==================================================
+
+        if (
+            !isMessageOwner &&
+            !isOwner &&
+            !isAdmin
+        ) {
 
             return res.status(403).json({
 
-                success:false,
-                message:"You can only delete your own message."
+                success: false,
+
+                message:
+                    "You don't have permission to delete this message."
 
             });
 
         }
+
+
+        // ==================================================
+        // DELETE MESSAGE
+        // ==================================================
 
         message.deleted = true;
 
         await message.save();
 
+
+        // ==================================================
+        // RESPONSE
+        // ==================================================
+
         return res.json({
 
-            success:true,
+            success: true,
 
             message
 
         });
 
-    }catch(err){
+
+    } catch (err) {
 
         console.error(
             "DELETE GROUP MESSAGE ERROR:",
             err
         );
 
+
         return res.status(500).json({
 
-            success:false,
+            success: false,
 
-            message:err.message
+            message:
+                err.message
 
         });
 
