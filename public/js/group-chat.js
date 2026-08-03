@@ -634,6 +634,21 @@ const editAction =
 const pinAction =
     document.getElementById("pinAction");
 
+function updatePinActionButton(messageElement){
+
+    if(!pinAction || !messageElement){
+        return;
+    }
+
+    const isPinned =
+        messageElement.dataset.pinned === "true";
+
+    pinAction.innerHTML =
+        isPinned
+        ? "📌 Unpin Message"
+        : "📌 Pin Message";
+}
+
 let selectedMessageForAction = null;
 
 let longPressTimer = null;
@@ -651,6 +666,10 @@ function showMessageActionMenu(
 
     selectedMessageForAction =
         messageElement;
+
+    updatePinActionButton(
+    messageElement
+);
 
     messageActionMenu.classList.add("show");
 
