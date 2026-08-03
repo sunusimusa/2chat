@@ -542,6 +542,7 @@ if(msg.replyTo){
     class="${mine ? "me" : "other"}"
     data-message-id="${msg._id}"
     data-sender="${msg.sender || ""}"
+    data-pinned="${msg.pinned ? "true" : "false"}"
     data-text="${encodeURIComponent(msg.text || "")}"
     data-image="${encodeURIComponent(msg.image || "")}"
     data-voice="${encodeURIComponent(msg.voice || "")}"
@@ -588,6 +589,12 @@ ${mine ? `
 ` : ""}
 
 
+${msg.pinned ? `
+    <div class="pinned-label">
+        📌 Pinned
+    </div>
+` : ""}
+
                 ${reactionsHTML}
 
             </div>
@@ -623,6 +630,9 @@ const replyAction =
 
 const editAction =
     document.getElementById("editAction");
+
+const pinAction =
+    document.getElementById("pinAction");
 
 let selectedMessageForAction = null;
 
@@ -2572,3 +2582,205 @@ function updateGroupTypingUI(){
     );
 
 }
+
+// ==================================================
+// PIN / UNPIN GROUP MESSAGE
+// ==================================================
+
+pinAction.addEventListener(
+    "click",
+    async function(){
+
+        if(!selectedMessageForAction){
+            return;
+        }
+
+        const messageElement =
+            selectedMessageForAction;
+
+        const messageId =
+            messageElement.dataset.messageId;
+
+        const isPinned =
+            messageElement.dataset.pinned === "true";
+
+        if(!messageId){
+            return;
+        }
+
+        try{
+
+            const endpoint =
+                isPinned
+                ? "/api/group-messages/unpin"
+                : "/api/group-messages/pin";
+
+            const res =
+                await fetch(
+                    endpoint,
+                    {
+                        method: "PUT",
+
+                        headers:{
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            messageId:
+                                messageId,
+
+                            username:
+                                user.username
+
+                        })
+                    }
+                );
+
+            const data =
+                await res.json();
+
+            if(!res.ok || !data.success){
+
+                alert(
+                    data.message ||
+                    "Failed to update pinned message."
+                );
+
+                return;
+            }
+
+            updatePinnedMessage(
+                data.message
+            );
+
+            socket.emit(
+                isPinned
+                ? "groupMessageUnpinned"
+                : "groupMessagePinned",
+                data.message
+            );
+
+            closeMessageActionMenu();
+
+        }catch(err){
+
+            console.error(
+                "PIN MESSAGE ERROR:",
+                err
+            );
+
+            alert(
+                "Failed to update pinned message."
+            );
+
+        }
+
+    }
+);
+
+function updatePinnedMessage(message){
+
+    if(!message || !message._id){
+        return;
+    }
+
+    const messageElement =
+        document.querySelector(
+            `[data-message-id="${message._id}"]`
+        );
+
+    if(!messageElement){
+        return;
+    }
+
+    messageElement.dataset.pinned =
+        message.pinned
+        ? "true"
+        : "false";
+
+    const bubble =
+        messageElement.querySelector(
+            ".bubble-me, .bubble-other"
+        );
+
+    if(!bubble){
+        return;
+    }
+
+    let pinnedLabel =
+        bubble.querySelector(
+            ".pinned-label"
+        );
+
+    if(message.pinned){
+
+        if(!pinnedLabel){
+
+            pinnedLabel =
+                document.createElement("div");
+
+            pinnedLabel.className =
+                "pinned-label";
+
+            pinnedLabel.innerText =
+                "📌 Pinned";
+
+            bubble.appendChild(
+                pinnedLabel
+            );
+
+        }
+
+    }else{
+
+        if(pinnedLabel){
+
+            pinnedLabel.remove();
+
+        }
+
+    }
+
+}
+
+// ==================================================
+// REALTIME PIN
+// ==================================================
+
+socket.on(
+    "groupMessagePinned",
+    (message) => {
+
+        if(!message || !message._id){
+            return;
+        }
+
+        updatePinnedMessage(
+            message
+        );
+
+    }
+);
+
+
+// ==================================================
+// REALTIME UNPIN
+// ==================================================
+
+socket.on(
+    "groupMessageUnpinned",
+    (message) => {
+
+        if(!message || !message._id){
+            return;
+        }
+
+        updatePinnedMessage(
+            message
+        );
+
+    }
+);
+
