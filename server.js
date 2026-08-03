@@ -255,21 +255,29 @@ socket.on("groupStopTyping", (data) => {
 
 });
 
-   
-   socket.on("groupMessageDeleted", (message) => {
+   /* ==========================
+   GROUP MESSAGE DELETED
+========================== */
 
-    if(!message || !message._id){
+socket.on("groupMessageDeleted", (message) => {
 
+    if(
+        !message ||
+        !message._id ||
+        !message.groupId
+    ){
         return;
-
     }
 
-    socket.to(message.groupId).emit(
+    socket.to(
+        String(message.groupId)
+    ).emit(
         "groupMessageDeleted",
         message
     );
 
 });
+   
 
    /* ==========================
    GROUP MESSAGE EDITED
