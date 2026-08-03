@@ -591,7 +591,8 @@ exports.reactToMessage = async (req, res) => {
         // RESPONSE
         // ==================================================
 
-        return res.json({
+        return re
+    n({
 
             success: true,
 
@@ -1148,6 +1149,245 @@ exports.unpinMessage = async (req, res) => {
 
             message:
                 err.message
+
+        });
+
+    }
+
+};
+
+// ==================================================
+// PIN GROUP MESSAGE
+// ==================================================
+
+exports.pinMessage = async (req, res) => {
+
+    try {
+
+        const {
+            messageId,
+            username
+        } = req.body;
+
+        if (!messageId || !username) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "messageId and username are required."
+
+            });
+
+        }
+
+        // FIND MESSAGE
+        const message =
+            await GroupMessage.findById(messageId);
+
+        if (!message) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Message not found."
+
+            });
+
+        }
+
+        // FIND GROUP
+        const group =
+            await Group.findById(message.groupId);
+
+        if (!group) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Group not found."
+
+            });
+
+        }
+
+        // ==================================================
+        // OWNER / ADMIN ONLY
+        // ==================================================
+
+        const isOwner =
+            group.owner === username;
+
+        const isAdmin =
+            group.admins &&
+            group.admins.includes(username);
+
+        if (!isOwner && !isAdmin) {
+
+            return res.status(403).json({
+
+                success: false,
+
+                message:
+                    "Only group owner or admin can pin messages."
+
+            });
+
+        }
+
+        // ==================================================
+        // PIN MESSAGE
+        // ==================================================
+
+        message.pinned = true;
+
+        message.pinnedBy = username;
+
+        await message.save();
+
+        return res.json({
+
+            success: true,
+
+            message
+
+        });
+
+    } catch (err) {
+
+        console.error(
+            "PIN MESSAGE ERROR:",
+            err
+        );
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: err.message
+
+        });
+
+    }
+
+};
+
+
+// ==================================================
+// UNPIN GROUP MESSAGE
+// ==================================================
+
+exports.unpinMessage = async (req, res) => {
+
+    try {
+
+        const {
+            messageId,
+            username
+        } = req.body;
+
+        if (!messageId || !username) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "messageId and username are required."
+
+            });
+
+        }
+
+        // FIND MESSAGE
+        const message =
+            await GroupMessage.findById(messageId);
+
+        if (!message) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Message not found."
+
+            });
+
+        }
+
+        // FIND GROUP
+        const group =
+            await Group.findById(message.groupId);
+
+        if (!group) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Group not found."
+
+            });
+
+        }
+
+        // ==================================================
+        // OWNER / ADMIN ONLY
+        // ==================================================
+
+        const isOwner =
+            group.owner === username;
+
+        const isAdmin =
+            group.admins &&
+            group.admins.includes(username);
+
+        if (!isOwner && !isAdmin) {
+
+            return res.status(403).json({
+
+                success: false,
+
+                message:
+                    "Only group owner or admin can unpin messages."
+
+            });
+
+        }
+
+        // ==================================================
+        // UNPIN
+        // ==================================================
+
+        message.pinned = false;
+
+        message.pinnedBy = "";
+
+        await message.save();
+
+        return res.json({
+
+            success: true,
+
+            message
+
+        });
+
+    } catch (err) {
+
+        console.error(
+            "UNPIN MESSAGE ERROR:",
+            err
+        );
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: err.message
 
         });
 
