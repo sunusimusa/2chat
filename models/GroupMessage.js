@@ -85,9 +85,29 @@ const groupMessageSchema = new mongoose.Schema({
         default:false
     },
 
+
     edited: {
     type: Boolean,
     default: false
+},
+
+// ==========================
+// PINNED MESSAGE
+// ==========================
+
+pinned: {
+    type: Boolean,
+    default: false
+},
+
+pinnedBy: {
+    type: String,
+    default: ""
+},
+
+pinnedAt: {
+    type: Date,
+    default: null
 }
 
 },{
