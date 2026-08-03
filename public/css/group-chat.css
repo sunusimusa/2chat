@@ -923,3 +923,29 @@ cursor:pointer;
     color:#e53935;
 
 }
+
+/* ==========================
+   MESSAGE SEEN
+========================== */
+
+.message-seen{
+
+    font-size:11px;
+
+    color:#999;
+
+    text-align:right;
+
+    margin-top:2px;
+
+    padding-right:4px;
+
+}
+
+.message-seen.seen{
+
+    color:#2196f3;
+
+    font-weight:600;
+
+}
