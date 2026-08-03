@@ -13,7 +13,9 @@ const {
     reactToMessage,
     deleteMessage,
     editMessage,
-    markMessageAsSeen
+    markMessageAsSeen,
+    pinMessage,
+    unpinMessage
 } = require("../controllers/groupMessageController");
 
 /* ==========================
@@ -52,6 +54,18 @@ router.put(
     "/seen",
     markMessageAsSeen
 );
+
+    // Pin group message
+router.put(
+    "/pin",
+    pinMessage
+);
+
+// Unpin group message
+router.put(
+    "/unpin",
+    unpinMessage
+);    
 
 // Load Group Messages
 router.get(
