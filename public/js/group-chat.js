@@ -15,6 +15,19 @@ new URLSearchParams(window.location.search);
 const groupId =
 params.get("id");
 
+// ==========================
+// JOIN GROUP SOCKET ROOM
+// ==========================
+
+if(groupId){
+
+    socket.emit(
+        "joinGroup",
+        groupId
+    );
+
+}
+
 const chat =
 document.getElementById("groupChat");
 
