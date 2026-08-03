@@ -128,7 +128,26 @@ async function loadMessages(){
 
             });
 
-        }
+            const pinnedMessage =
+    data.messages.find(
+        msg => msg.pinned === true
+    );
+
+if(pinnedMessage){
+
+    showPinnedMessage(
+        pinnedMessage
+    );
+
+}else{
+
+    hidePinnedMessage();
+
+}
+            
+
+ }
+        
 
         setTimeout(() => {
 
@@ -2758,6 +2777,18 @@ function updatePinnedMessage(message){
 
             pinnedLabel.remove();
 
+            if(message.pinned){
+
+    showPinnedMessage(
+        message
+    );
+
+}else{
+
+    hidePinnedMessage();
+
+}
+
         }
 
     }
@@ -2802,4 +2833,98 @@ socket.on(
 
     }
 );
+
+// ==================================================
+// PINNED MESSAGE BAR
+// ==================================================
+
+const pinnedMessageBar =
+    document.getElementById(
+        "pinnedMessageBar"
+    );
+
+const pinnedMessageText =
+    document.getElementById(
+        "pinnedMessageText"
+    );
+
+const pinnedMessageTitle =
+    document.getElementById(
+        "pinnedMessageTitle"
+    );
+
+const closePinnedMessage =
+    document.getElementById(
+        "closePinnedMessage"
+    );
+
+
+function showPinnedMessage(message){
+
+    if(
+        !message ||
+        !message._id ||
+        !message.pinned
+    ){
+        return;
+    }
+
+    if(!pinnedMessageBar){
+        return;
+    }
+
+    let text = "";
+
+    if(message.text){
+
+        text = message.text;
+
+    }else if(message.image){
+
+        text = "📷 Photo";
+
+    }else if(message.voice){
+
+        text = "🎤 Voice message";
+
+    }else{
+
+        text = "Message";
+
+    }
+
+    pinnedMessageTitle.textContent =
+        "Pinned by " +
+        (message.pinnedBy || "User");
+
+    pinnedMessageText.textContent =
+        text;
+
+    pinnedMessageBar.classList.add(
+        "show"
+    );
+
+}
+
+
+function hidePinnedMessage(){
+
+    if(!pinnedMessageBar){
+        return;
+    }
+
+    pinnedMessageBar.classList.remove(
+        "show"
+    );
+
+}
+
+if(closePinnedMessage){
+
+    closePinnedMessage.addEventListener(
+        "click",
+        hidePinnedMessage
+    );
+
+}
 
