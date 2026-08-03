@@ -2718,7 +2718,8 @@ pinAction.addEventListener(
     }
 );
 
-function updatePinnedMessage(message){
+
+    function updatePinnedMessage(message){
 
     if(!message || !message._id){
         return;
@@ -2771,29 +2772,25 @@ function updatePinnedMessage(message){
 
         }
 
+        // SHOW PINNED BAR
+        showPinnedMessage(
+            message
+        );
+
     }else{
 
         if(pinnedLabel){
 
             pinnedLabel.remove();
 
-            if(message.pinned){
-
-    showPinnedMessage(
-        message
-    );
-
-}else{
-
-    hidePinnedMessage();
-
-}
-
         }
+
+        // HIDE PINNED BAR
+        hidePinnedMessage();
 
     }
 
-}
+}        
 
 // ==================================================
 // REALTIME PIN
