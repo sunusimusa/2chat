@@ -311,6 +311,13 @@ function appendMessage(msg){
     const mine =
         msg.sender === user.username;
 
+    const hasBeenSeen =
+    mine &&
+    msg.seenBy &&
+    msg.seenBy.some(
+        seen => seen.username !== user.username
+    );
+
 
         if(msg.deleted){
 
@@ -559,9 +566,11 @@ ${textHTML}
 </div>
 
 ${mine ? `
-    <div class="message-seen"
-         data-seen-message="${msg._id}">
-        ✓
+    <div
+        class="message-seen ${hasBeenSeen ? "seen" : ""}"
+        data-seen-message="${msg._id}"
+    >
+        ${hasBeenSeen ? "✓✓ Seen" : "✓"}
     </div>
 ` : ""}
 
