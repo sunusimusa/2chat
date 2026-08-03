@@ -1386,16 +1386,22 @@ async function sendMessage(){
 SOCKET
 ========================== */
 
-socket.emit("joinGroup", groupId);
-
 socket.on("newGroupMessage",(msg)=>{
 
-    if(msg.sender===user.username) return;
+    if(msg.sender === user.username){
+        return;
+    }
 
     appendMessage(msg);
 
-    chat.scrollTop=
-    chat.scrollHeight;
+    chat.scrollTop =
+        chat.scrollHeight;
+
+    setTimeout(() => {
+
+        observeMessagesForSeen();
+
+    }, 100);
 
 });
 
