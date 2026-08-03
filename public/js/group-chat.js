@@ -1020,18 +1020,43 @@ deleteAction.addEventListener(
 
         }
 
-        // Only owner can delete
-        if(sender !== user.username){
+        // ==================================================
+// CHECK DELETE PERMISSION
+// ==================================================
 
-            alert(
-                "You can only delete your own message."
-            );
+const isMessageOwner =
+    sender === user.username;
 
-            closeMessageActionMenu();
+const isGroupOwner =
+    currentGroup &&
+    currentGroup.owner === user.username;
 
-            return;
+const isGroupAdmin =
+    currentGroup &&
+    Array.isArray(currentGroup.admins) &&
+    currentGroup.admins.includes(
+        user.username
+    );
 
-        }
+
+// Member zai iya delete nasa kawai
+// Owner/Admin zai iya delete na kowa
+
+if(
+    !isMessageOwner &&
+    !isGroupOwner &&
+    !isGroupAdmin
+){
+
+    alert(
+        "You don't have permission to delete this message."
+    );
+
+    closeMessageActionMenu();
+
+    return;
+
+}
 
         const confirmDelete =
             confirm(
