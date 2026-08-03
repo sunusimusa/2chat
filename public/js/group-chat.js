@@ -2690,15 +2690,6 @@ pinAction.addEventListener(
             }
 
             updatePinnedMessage(
-    data.message
-);
-
-socket.emit(
-    "groupMessagePinned",
-    data.message
-);
-
-            updatePinnedMessage(
                 data.message
             );
 
