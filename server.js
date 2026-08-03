@@ -124,6 +124,41 @@ socket.on("groupMessageReaction",(message)=>{
 
 });
 
+/* ==========================
+GROUP MESSAGE SEEN
+========================== */
+
+socket.on("groupMessageSeen", (data) => {
+
+    if (!data) {
+        return;
+    }
+
+    const {
+        groupId,
+        messageId,
+        username
+    } = data;
+
+    if (
+        !groupId ||
+        !messageId ||
+        !username
+    ) {
+        return;
+    }
+
+    socket.to(groupId).emit(
+        "groupMessageSeen",
+        {
+            groupId,
+            messageId,
+            username
+        }
+    );
+
+});
+   
    socket.on("groupMessageDeleted", (message) => {
 
     if(!message || !message._id){
