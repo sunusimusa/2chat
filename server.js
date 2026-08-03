@@ -160,6 +160,45 @@ socket.on("groupMessageSeen", (data) => {
 });
 
    /* ==========================
+   GROUP MESSAGE PINNED
+========================== */
+
+socket.on("groupMessagePinned", (message) => {
+
+    if (!message || !message._id || !message.groupId) {
+        return;
+    }
+
+    socket.to(
+        String(message.groupId)
+    ).emit(
+        "groupMessagePinned",
+        message
+    );
+
+});
+
+
+/* ==========================
+   GROUP MESSAGE UNPINNED
+========================== */
+
+socket.on("groupMessageUnpinned", (message) => {
+
+    if (!message || !message._id || !message.groupId) {
+        return;
+    }
+
+    socket.to(
+        String(message.groupId)
+    ).emit(
+        "groupMessageUnpinned",
+        message
+    );
+
+});
+
+   /* ==========================
    GROUP TYPING
 ========================== */
 
@@ -215,6 +254,7 @@ socket.on("groupStopTyping", (data) => {
     );
 
 });
+
    
    socket.on("groupMessageDeleted", (message) => {
 
