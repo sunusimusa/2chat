@@ -158,6 +158,63 @@ socket.on("groupMessageSeen", (data) => {
     );
 
 });
+
+   /* ==========================
+   GROUP TYPING
+========================== */
+
+socket.on("groupTyping", (data) => {
+
+    if (!data) {
+        return;
+    }
+
+    const {
+        groupId,
+        username
+    } = data;
+
+    if (!groupId || !username) {
+        return;
+    }
+
+    socket.to(String(groupId)).emit(
+        "groupTyping",
+        {
+            username
+        }
+    );
+
+});
+
+
+/* ==========================
+   GROUP STOP TYPING
+========================== */
+
+socket.on("groupStopTyping", (data) => {
+
+    if (!data) {
+        return;
+    }
+
+    const {
+        groupId,
+        username
+    } = data;
+
+    if (!groupId || !username) {
+        return;
+    }
+
+    socket.to(String(groupId)).emit(
+        "groupStopTyping",
+        {
+            username
+        }
+    );
+
+});
    
    socket.on("groupMessageDeleted", (message) => {
 
