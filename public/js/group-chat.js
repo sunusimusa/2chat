@@ -117,11 +117,187 @@ async function loadMessages(){
 
         }
 
+        setTimeout(() => {
+
+    observeMessagesForSeen();
+
+}, 300);
+
         chat.scrollTop = chat.scrollHeight;
 
     }catch(err){
 
         console.error(err);
+
+    }
+
+}
+
+/* ==========================
+   OBSERVE MESSAGES FOR SEEN
+========================== */
+
+let seenObserver = null;
+
+function observeMessagesForSeen(){
+
+    if(seenObserver){
+
+        seenObserver.disconnect();
+
+    }
+
+    seenObserver =
+        new IntersectionObserver(
+            (entries) => {
+
+                entries.forEach(
+                    entry => {
+
+                        if(
+                            entry.isIntersecting
+                        ){
+
+                            markMessageAsSeen(
+                                entry.target
+                            );
+
+                        }
+
+                    }
+                );
+
+            },
+            {
+                root: chat,
+
+                threshold: 0.7
+            }
+        );
+
+    const messages =
+        chat.querySelectorAll(
+            "[data-message-id]"
+        );
+
+    messages.forEach(
+        messageElement => {
+
+            if(
+                messageElement.dataset.deleted ===
+                "true"
+            ){
+                return;
+            }
+
+            seenObserver.observe(
+                messageElement
+            );
+
+        }
+    );
+
+}
+
+/* ==========================
+   MARK GROUP MESSAGE AS SEEN
+========================== */
+
+async function markMessageAsSeen(messageElement){
+
+    if(!messageElement){
+        return;
+    }
+
+    const messageId =
+        messageElement.dataset.messageId;
+
+    const messageSender =
+        messageElement.dataset.sender;
+
+    // Ba sai mun mark own message ba
+    if(
+        !messageId ||
+        !messageSender ||
+        messageSender === user.username
+    ){
+        return;
+    }
+
+    // Kada mu aika sau biyu
+    if(
+        messageElement.dataset.seen === "true"
+    ){
+        return;
+    }
+
+    try{
+
+        const res =
+            await fetch(
+                "/api/group-messages/seen",
+                {
+                    method:"PUT",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:JSON.stringify({
+
+                        messageId:
+                            messageId,
+
+                        username:
+                            user.username
+
+                    })
+                }
+            );
+
+        const data =
+            await res.json();
+
+        if(
+            !res.ok ||
+            !data.success
+        ){
+
+            console.error(
+                "MARK SEEN ERROR:",
+                data.message
+            );
+
+            return;
+
+        }
+
+        // Mark locally
+        messageElement.dataset.seen =
+            "true";
+
+        // Notify other group members
+        socket.emit(
+            "groupMessageSeen",
+            {
+                groupId:
+                    groupId,
+
+                messageId:
+                    messageId,
+
+                username:
+                    user.username
+            }
+        );
+
+    }catch(err){
+
+        console.error(
+            "MARK SEEN ERROR:",
+            err
+        );
 
     }
 
@@ -1446,6 +1622,50 @@ socket.on("groupMessageReaction", (message) => {
     updateMessageReactions(message);
 
 });
+
+/* ==========================
+   GROUP MESSAGE SEEN
+========================== */
+
+socket.on(
+    "groupMessageSeen",
+    (data) => {
+
+        if(!data){
+            return;
+        }
+
+        const {
+            messageId,
+            username
+        } = data;
+
+        if(
+            !messageId ||
+            !username
+        ){
+            return;
+        }
+
+        const messageElement =
+            document.querySelector(
+                `[data-message-id="${messageId}"]`
+            );
+
+        if(!messageElement){
+            return;
+        }
+
+        /*
+         * Daga baya a nan za mu canza UI
+         * zuwa ✓ / ✓✓ ko Seen.
+         */
+
+        messageElement.dataset.seenBy =
+            username;
+
+    }
+);
 
 function updateMessageReactions(message){
 
