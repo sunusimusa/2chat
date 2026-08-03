@@ -2445,3 +2445,130 @@ function updateEditedMessage(message){
 
 }
 
+/* ==========================
+   GROUP TYPING UI
+========================== */
+
+const groupTypingIndicator =
+    document.getElementById(
+        "groupTypingIndicator"
+    );
+
+const typingUsername =
+    document.getElementById(
+        "typingUsername"
+    );
+
+
+let typingUsers = new Set();
+
+
+/* ==========================
+   USER IS TYPING
+========================== */
+
+socket.on(
+    "groupTyping",
+    (data) => {
+
+        if(!data || !data.username){
+            return;
+        }
+
+        // Kada mu nuna typing ɗin kanmu
+        if(
+            data.username ===
+            user.username
+        ){
+            return;
+        }
+
+
+        typingUsers.add(
+            data.username
+        );
+
+
+        updateGroupTypingUI();
+
+    }
+);
+
+
+/* ==========================
+   USER STOP TYPING
+========================== */
+
+socket.on(
+    "groupStopTyping",
+    (data) => {
+
+        if(!data || !data.username){
+            return;
+        }
+
+
+        typingUsers.delete(
+            data.username
+        );
+
+
+        updateGroupTypingUI();
+
+    }
+);
+
+
+/* ==========================
+   UPDATE TYPING UI
+========================== */
+
+function updateGroupTypingUI(){
+
+    if(!groupTypingIndicator){
+        return;
+    }
+
+
+    if(typingUsers.size === 0){
+
+        groupTypingIndicator.classList.remove(
+            "show"
+        );
+
+        typingUsername.textContent = "";
+
+        return;
+
+    }
+
+
+    const users =
+        Array.from(typingUsers);
+
+
+    if(users.length === 1){
+
+        typingUsername.textContent =
+            users[0];
+
+    }
+    else if(users.length === 2){
+
+        typingUsername.textContent =
+            users.join(" and ");
+
+    }
+    else{
+
+        typingUsername.textContent =
+            users.length + " people";
+
+    }
+
+
+    groupTypingIndicator.classList.add(
+        "show"
+    );
+
+}
