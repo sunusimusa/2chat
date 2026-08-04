@@ -11,6 +11,7 @@ const searchInput =
 document.getElementById("searchGroup");
 
 let allGroups = [];
+let ownedGroup = null;
 
 /* ==========================
 LOAD GROUPS
@@ -53,6 +54,25 @@ function renderGroups(groups){
     myGroups.innerHTML = "";
 
     groupsList.innerHTML = "";
+
+    ownedGroup = groups.find(
+    group =>
+        group.owner === user.username
+);
+
+const adminManagementSection =
+    document.getElementById(
+        "adminManagementSection"
+    );
+
+if(adminManagementSection){
+
+    adminManagementSection.style.display =
+        ownedGroup
+        ? "block"
+        : "none";
+
+}
 
     groups.forEach(group=>{
 
@@ -164,6 +184,40 @@ function openGroup(id){
 
     location.href =
     "/group-chat.html?id="+id;
+
+}
+
+/* ==========================
+ADMIN MANAGEMENT
+========================== */
+
+function manageGroupAdmins(){
+
+    if(!ownedGroup || !ownedGroup._id){
+
+        return;
+
+    }
+
+    location.href =
+        "/group-admins.html?groupId=" +
+        encodeURIComponent(
+            ownedGroup._id
+        );
+
+}
+
+const openAdminManagement =
+    document.getElementById(
+        "openAdminManagement"
+    );
+
+if(openAdminManagement){
+
+    openAdminManagement.addEventListener(
+        "click",
+        manageGroupAdmins
+    );
 
 }
 
