@@ -661,8 +661,8 @@ exports.removeAdmin = async (req, res) => {
 // UPDATE GROUP SETTINGS
 // ==================================================
 
-const updateGroupSettings = async (req, res) => {
-
+exports.updateGroupSettings = async (req, res) => {
+    
     try {
 
         const {
