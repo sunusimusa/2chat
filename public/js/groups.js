@@ -200,10 +200,10 @@ function manageGroupAdmins(){
     }
 
     location.href =
-        "/group-admins.html?groupId=" +
-        encodeURIComponent(
-            ownedGroup._id
-        );
+    "/group-admins.html?id=" +
+    encodeURIComponent(
+        ownedGroup._id
+    );
 
 }
 
