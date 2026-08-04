@@ -1,5 +1,11 @@
 const router = require("express").Router();
 
+const multer = require("multer");
+
+const upload = multer({
+    storage: multer.memoryStorage()
+});
+
 const {
     createGroup,
     getGroups,
@@ -50,9 +56,21 @@ router.put(
     removeAdmin
 );
 
+
 router.put(
     "/settings",
+    upload.fields([
+        {
+            name: "avatar",
+            maxCount: 1
+        },
+        {
+            name: "cover",
+            maxCount: 1
+        }
+    ]),
     updateGroupSettings
 );
+
 
 module.exports = router;
