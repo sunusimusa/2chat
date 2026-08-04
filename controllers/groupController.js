@@ -662,21 +662,19 @@ exports.removeAdmin = async (req, res) => {
 // ==================================================
 
 exports.updateGroupSettings = async (req, res) => {
-    
+
     try {
 
         const {
             groupId,
             username,
             name,
-            description,
-            avatar,
-            cover
+            description
         } = req.body;
 
 
         // ==========================
-        // CHECK DATA
+        // CHECK REQUIRED DATA
         // ==========================
 
         if (!groupId || !username) {
@@ -762,44 +760,130 @@ exports.updateGroupSettings = async (req, res) => {
 
 
         // ==========================
-        // UPDATE AVATAR
+        // AVATAR UPLOAD
         // ==========================
 
         if (
-            typeof avatar === "string" &&
-            avatar.trim() !== ""
+            req.files &&
+            req.files.avatar &&
+            req.files.avatar[0]
         ) {
+
+            const file =
+                req.files.avatar[0];
+
+            const result =
+                await new Promise(
+                    (resolve, reject) => {
+
+                        const stream =
+                            cloudinary.uploader.upload_stream(
+
+                                {
+                                    folder:
+                                        "2chat/groups/avatars",
+
+                                    resource_type:
+                                        "image"
+                                },
+
+                                (error, result) => {
+
+                                    if(error){
+
+                                        reject(error);
+
+                                    }else{
+
+                                        resolve(result);
+
+                                    }
+
+                                }
+
+                            );
+
+                        stream.end(
+                            file.buffer
+                        );
+
+                    }
+                );
+
 
             group.avatar =
-                avatar.trim();
+                result.secure_url;
 
         }
 
 
         // ==========================
-        // UPDATE COVER
+        // COVER UPLOAD
         // ==========================
 
         if (
-            typeof cover === "string" &&
-            cover.trim() !== ""
+            req.files &&
+            req.files.cover &&
+            req.files.cover[0]
         ) {
 
+            const file =
+                req.files.cover[0];
+
+            const result =
+                await new Promise(
+                    (resolve, reject) => {
+
+                        const stream =
+                            cloudinary.uploader.upload_stream(
+
+                                {
+                                    folder:
+                                        "2chat/groups/covers",
+
+                                    resource_type:
+                                        "image"
+                                },
+
+                                (error, result) => {
+
+                                    if(error){
+
+                                        reject(error);
+
+                                    }else{
+
+                                        resolve(result);
+
+                                    }
+
+                                }
+
+                            );
+
+                        stream.end(
+                            file.buffer
+                        );
+
+                    }
+                );
+
+
             group.cover =
-                cover.trim();
+                result.secure_url;
 
         }
 
 
         // ==========================
-        // SAVE
+        // SAVE GROUP
         // ==========================
 
         await group.save();
 
 
         // ==========================
-        // RESPONSE
+        // SUCCESS
         // ==========================
 
         return res.json({
