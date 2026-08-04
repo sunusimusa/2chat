@@ -37,9 +37,9 @@ router.delete("/delete", deleteGroup);
 // Add member
 router.put("/add-member", addMember);
 
-// Promote member to admin
+// Make member admin
 router.put(
-    "/promote-admin",
+    "/make-admin",
     promoteToAdmin
 );
 
