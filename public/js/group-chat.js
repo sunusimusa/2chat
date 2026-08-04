@@ -57,6 +57,8 @@ let isRecording = false;
 
 let recordTime = 0;
 
+let currentGroup = null;
+
 /* ==========================
 LOAD GROUP INFO
 ========================== */
@@ -78,6 +80,8 @@ async function loadGroup(){
 
         }
 
+        currentGroup = data.group;
+        
         document.getElementById("groupName").innerText =
         data.group.name;
 
