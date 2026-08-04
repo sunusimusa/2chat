@@ -656,3 +656,181 @@ exports.removeAdmin = async (req, res) => {
     }
 
 };
+
+// ==================================================
+// UPDATE GROUP SETTINGS
+// ==================================================
+
+const updateGroupSettings = async (req, res) => {
+
+    try {
+
+        const {
+            groupId,
+            username,
+            name,
+            description,
+            avatar,
+            cover
+        } = req.body;
+
+
+        // ==========================
+        // CHECK DATA
+        // ==========================
+
+        if (!groupId || !username) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Group ID and username are required."
+
+            });
+
+        }
+
+
+        // ==========================
+        // FIND GROUP
+        // ==========================
+
+        const group =
+            await Group.findById(groupId);
+
+        if (!group) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Group not found."
+
+            });
+
+        }
+
+
+        // ==========================
+        // OWNER ONLY
+        // ==========================
+
+        if (group.owner !== username) {
+
+            return res.status(403).json({
+
+                success: false,
+
+                message:
+                    "Only the group owner can change settings."
+
+            });
+
+        }
+
+
+        // ==========================
+        // UPDATE NAME
+        // ==========================
+
+        if (
+            typeof name === "string" &&
+            name.trim() !== ""
+        ) {
+
+            group.name =
+                name.trim();
+
+        }
+
+
+        // ==========================
+        // UPDATE DESCRIPTION
+        // ==========================
+
+        if (
+            typeof description === "string"
+        ) {
+
+            group.description =
+                description.trim();
+
+        }
+
+
+        // ==========================
+        // UPDATE AVATAR
+        // ==========================
+
+        if (
+            typeof avatar === "string" &&
+            avatar.trim() !== ""
+        ) {
+
+            group.avatar =
+                avatar.trim();
+
+        }
+
+
+        // ==========================
+        // UPDATE COVER
+        // ==========================
+
+        if (
+            typeof cover === "string" &&
+            cover.trim() !== ""
+        ) {
+
+            group.cover =
+                cover.trim();
+
+        }
+
+
+        // ==========================
+        // SAVE
+        // ==========================
+
+        await group.save();
+
+
+        // ==========================
+        // RESPONSE
+        // ==========================
+
+        return res.json({
+
+            success: true,
+
+            message:
+                "Group settings updated successfully.",
+
+            group
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "UPDATE GROUP SETTINGS ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Failed to update group settings."
+
+        });
+
+    }
+
+};
+
