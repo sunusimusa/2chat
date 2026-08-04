@@ -330,3 +330,26 @@ async function addMember(){
     }
 
 }
+
+
+/* ==========================
+ADMIN MANAGEMENT
+========================== */
+
+const adminManagementBtn =
+document.getElementById("adminManagementBtn");
+
+if(adminManagementBtn){
+
+    adminManagementBtn.addEventListener(
+        "click",
+        () => {
+
+            location.href =
+                "/group-admins.html?id=" +
+                encodeURIComponent(groupId);
+
+        }
+    );
+
+}
