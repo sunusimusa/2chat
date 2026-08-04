@@ -264,3 +264,131 @@ background:#bbb;
 border-radius:20px;
 
 }
+
+/* ==========================
+ADMIN MANAGEMENT
+========================== */
+
+.admin-management-section{
+
+    padding-bottom:10px;
+
+}
+
+
+.admin-management-card{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin:0 12px 15px;
+
+    padding:14px;
+
+    background:#fff;
+
+    border-radius:18px;
+
+    box-shadow:0 3px 12px rgba(0,0,0,.08);
+
+}
+
+
+.admin-management-icon{
+
+    width:48px;
+
+    height:48px;
+
+    flex-shrink:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:#e8f1ff;
+
+    color:#1877f2;
+
+    font-size:20px;
+
+}
+
+
+.admin-management-info{
+
+    flex:1;
+
+    min-width:0;
+
+}
+
+
+.admin-management-info h3{
+
+    font-size:15px;
+
+    color:#222;
+
+    margin-bottom:4px;
+
+}
+
+
+.admin-management-info p{
+
+    font-size:12px;
+
+    line-height:1.4;
+
+    color:#777;
+
+}
+
+
+.admin-management-btn{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    padding:9px 13px;
+
+    border:none;
+
+    border-radius:20px;
+
+    background:#1877f2;
+
+    color:#fff;
+
+    font-size:12px;
+
+    cursor:pointer;
+
+    white-space:nowrap;
+
+}
+
+
+.admin-management-btn:hover{
+
+    background:#1664c4;
+
+}
+
+
+.admin-management-btn i{
+
+    font-size:12px;
+
+}
