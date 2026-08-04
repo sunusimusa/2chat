@@ -7,7 +7,9 @@ const {
     joinGroup,
     leaveGroup,
     deleteGroup,
-    addMember
+    addMember,
+    promoteToAdmin,
+    removeAdmin
 } = require("../controllers/groupController");
 
 /* ==========================
@@ -34,5 +36,17 @@ router.delete("/delete", deleteGroup);
 
 // Add member
 router.put("/add-member", addMember);
+
+// Promote member to admin
+router.put(
+    "/promote-admin",
+    promoteToAdmin
+);
+
+// Remove admin
+router.put(
+    "/remove-admin",
+    removeAdmin
+);
 
 module.exports = router;
