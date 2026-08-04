@@ -352,3 +352,25 @@ if(adminManagementBtn){
     );
 
 }
+
+/* ==========================
+GROUP SETTINGS
+========================== */
+
+const groupSettingsBtn =
+    document.getElementById("groupSettingsBtn");
+
+if(groupSettingsBtn){
+
+    groupSettingsBtn.addEventListener(
+        "click",
+        () => {
+
+            location.href =
+                "/group-settings.html?id=" +
+                encodeURIComponent(groupId);
+
+        }
+    );
+
+}
