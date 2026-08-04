@@ -376,3 +376,283 @@ if(!userExists){
     }
 
 };
+
+// ==================================================
+// PROMOTE MEMBER TO ADMIN
+// ==================================================
+
+exports.promoteToAdmin = async (req, res) => {
+
+    try {
+
+        const {
+            groupId,
+            username,
+            member
+        } = req.body;
+
+
+        // CHECK REQUIRED
+        if (!groupId || !username || !member) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "groupId, username and member are required."
+
+            });
+
+        }
+
+
+        // FIND GROUP
+        const group =
+            await Group.findById(groupId);
+
+        if (!group) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Group not found."
+
+            });
+
+        }
+
+
+        // ONLY OWNER CAN PROMOTE ADMIN
+        if (group.owner !== username) {
+
+            return res.status(403).json({
+
+                success: false,
+
+                message:
+                    "Only the group owner can promote admins."
+
+            });
+
+        }
+
+
+        // CHECK MEMBER EXISTS IN GROUP
+        if (!group.members.includes(member)) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "This user is not a member of the group."
+
+            });
+
+        }
+
+
+        // OWNER IS ALREADY OWNER
+        if (group.owner === member) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Group owner is already the owner."
+
+            });
+
+        }
+
+
+        // ALREADY ADMIN
+        if (group.admins.includes(member)) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "This user is already an admin."
+
+            });
+
+        }
+
+
+        // ADD ADMIN
+        group.admins.push(member);
+
+        await group.save();
+
+
+        return res.json({
+
+            success: true,
+
+            message:
+                "Member promoted to admin successfully.",
+
+            group
+
+        });
+
+    } catch (err) {
+
+        console.error(
+            "PROMOTE ADMIN ERROR:",
+            err
+        );
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                err.message
+
+        });
+
+    }
+
+};
+
+
+
+// ==================================================
+// REMOVE ADMIN
+// ==================================================
+
+exports.removeAdmin = async (req, res) => {
+
+    try {
+
+        const {
+            groupId,
+            username,
+            member
+        } = req.body;
+
+
+        // CHECK REQUIRED
+        if (!groupId || !username || !member) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "groupId, username and member are required."
+
+            });
+
+        }
+
+
+        // FIND GROUP
+        const group =
+            await Group.findById(groupId);
+
+        if (!group) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Group not found."
+
+            });
+
+        }
+
+
+        // ONLY OWNER CAN REMOVE ADMIN
+        if (group.owner !== username) {
+
+            return res.status(403).json({
+
+                success: false,
+
+                message:
+                    "Only the group owner can remove admins."
+
+            });
+
+        }
+
+
+        // CANNOT REMOVE OWNER
+        if (group.owner === member) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "The group owner cannot be removed as admin."
+
+            });
+
+        }
+
+
+        // CHECK ADMIN
+        if (!group.admins.includes(member)) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "This user is not an admin."
+
+            });
+
+        }
+
+
+        // REMOVE ADMIN
+        group.admins =
+            group.admins.filter(
+                admin => admin !== member
+            );
+
+        await group.save();
+
+
+        return res.json({
+
+            success: true,
+
+            message:
+                "Admin removed successfully.",
+
+            group
+
+        });
+
+    } catch (err) {
+
+        console.error(
+            "REMOVE ADMIN ERROR:",
+            err
+        );
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                err.message
+
+        });
+
+    }
+
+};
