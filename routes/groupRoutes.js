@@ -9,7 +9,8 @@ const {
     deleteGroup,
     addMember,
     promoteToAdmin,
-    removeAdmin
+    removeAdmin,
+    updateGroupSettings
 } = require("../controllers/groupController");
 
 /* ==========================
@@ -47,6 +48,11 @@ router.put(
 router.put(
     "/remove-admin",
     removeAdmin
+);
+
+router.put(
+    "/settings",
+    updateGroupSettings
 );
 
 module.exports = router;
