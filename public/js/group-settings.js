@@ -23,7 +23,7 @@ const groupId =
 // CHECK LOGIN
 // ==================================================
 
-if(!user || !user.username){
+if (!user || !user.username) {
 
     alert("Please login first.");
 
@@ -37,7 +37,7 @@ if(!user || !user.username){
 // CHECK GROUP ID
 // ==================================================
 
-if(!groupId){
+if (!groupId) {
 
     alert("Group ID is missing.");
 
@@ -51,54 +51,53 @@ if(!groupId){
 // ==================================================
 
 const groupNameInput =
-    document.getElementById(
-        "groupName"
-    );
+    document.getElementById("groupName");
 
 const groupDescriptionInput =
-    document.getElementById(
-        "groupDescription"
-    );
+    document.getElementById("groupDescription");
 
-const groupAvatarInput =
-    document.getElementById(
-        "groupAvatar"
-    );
+const avatarInput =
+    document.getElementById("avatarInput");
 
-const groupCoverInput =
-    document.getElementById(
-        "groupCover"
-    );
+const coverInput =
+    document.getElementById("coverInput");
 
-const avatarPreview =
-    document.getElementById(
-        "avatarPreview"
-    );
+const groupAvatar =
+    document.getElementById("groupAvatar");
 
-const coverPreview =
-    document.getElementById(
-        "coverPreview"
-    );
+const groupCover =
+    document.getElementById("groupCover");
+
+const previewGroupName =
+    document.getElementById("previewGroupName");
+
+const changeAvatarBtn =
+    document.getElementById("changeAvatarBtn");
+
+const changeCoverBtn =
+    document.getElementById("changeCoverBtn");
 
 const saveSettingsBtn =
-    document.getElementById(
-        "saveSettingsBtn"
-    );
+    document.getElementById("saveSettingsBtn");
 
 const backButton =
-    document.getElementById(
-        "backButton"
-    );
+    document.getElementById("backButton");
 
 const settingsMessage =
-    document.getElementById(
-        "settingsMessage"
-    );
+    document.getElementById("settingsMessage");
 
+const publicGroup =
+    document.getElementById("publicGroup");
 
-// ==================================================
-// CURRENT GROUP
-// ==================================================
+const privateGroup =
+    document.getElementById("privateGroup");
+
+const leaveGroupBtn =
+    document.getElementById("leaveGroupBtn");
+
+const deleteGroupBtn =
+    document.getElementById("deleteGroupBtn");
+
 
 let currentGroup = null;
 
@@ -110,40 +109,30 @@ let currentGroup = null;
 function showMessage(
     message,
     isError = false
-){
+) {
 
-    if(!settingsMessage){
-        return;
-    }
+    if (!settingsMessage) return;
 
     settingsMessage.textContent =
         message;
 
-    settingsMessage.classList.add(
-        "show"
-    );
+    settingsMessage.classList.add("show");
 
-    if(isError){
+    if (isError) {
 
-        settingsMessage.classList.add(
-            "error"
-        );
+        settingsMessage.classList.add("error");
 
-    }else{
+    } else {
 
-        settingsMessage.classList.remove(
-            "error"
-        );
+        settingsMessage.classList.remove("error");
 
     }
 
     setTimeout(() => {
 
-        settingsMessage.classList.remove(
-            "show"
-        );
+        settingsMessage.classList.remove("show");
 
-    },3000);
+    }, 3000);
 
 }
 
@@ -152,9 +141,9 @@ function showMessage(
 // LOAD GROUP
 // ==================================================
 
-async function loadGroup(){
+async function loadGroup() {
 
-    try{
+    try {
 
         const res =
             await fetch(
@@ -164,11 +153,11 @@ async function loadGroup(){
         const data =
             await res.json();
 
-        if(
+        if (
             !res.ok ||
             !data.success ||
             !data.group
-        ){
+        ) {
 
             showMessage(
                 data.message ||
@@ -185,7 +174,7 @@ async function loadGroup(){
 
 
         // ==================================================
-        // CHECK PERMISSION
+        // CHECK OWNER / ADMIN
         // ==================================================
 
         const isOwner =
@@ -201,10 +190,7 @@ async function loadGroup(){
             );
 
 
-        if(
-            !isOwner &&
-            !isAdmin
-        ){
+        if (!isOwner && !isAdmin) {
 
             alert(
                 "Only Owner or Admin can access Group Settings."
@@ -218,18 +204,30 @@ async function loadGroup(){
 
 
         // ==================================================
-        // FILL INPUTS
+        // GROUP NAME
         // ==================================================
 
-        if(groupNameInput){
+        if (groupNameInput) {
 
             groupNameInput.value =
                 currentGroup.name || "";
 
         }
 
+        if (previewGroupName) {
 
-        if(groupDescriptionInput){
+            previewGroupName.textContent =
+                currentGroup.name ||
+                "Group";
+
+        }
+
+
+        // ==================================================
+        // DESCRIPTION
+        // ==================================================
+
+        if (groupDescriptionInput) {
 
             groupDescriptionInput.value =
                 currentGroup.description || "";
@@ -238,32 +236,59 @@ async function loadGroup(){
 
 
         // ==================================================
-        // AVATAR PREVIEW
+        // AVATAR
         // ==================================================
 
-        if(avatarPreview){
+        if (groupAvatar) {
 
-            avatarPreview.src =
-                currentGroup.avatar ||
-                "/images/default-group.png";
+            groupAvatar.src =
+                currentGroup.avatar &&
+                currentGroup.avatar.trim() !== ""
+                    ? currentGroup.avatar
+                    : "/images/default-group.png";
 
         }
 
 
         // ==================================================
-        // COVER PREVIEW
+        // COVER
         // ==================================================
 
-        if(coverPreview){
+        if (groupCover) {
 
-            coverPreview.src =
-                currentGroup.cover ||
-                "/images/default-group-cover.jpg";
+            groupCover.src =
+                currentGroup.cover &&
+                currentGroup.cover.trim() !== ""
+                    ? currentGroup.cover
+                    : "/images/default-group-cover.jpg";
 
         }
 
 
-    }catch(err){
+        // ==================================================
+        // PRIVACY
+        // ==================================================
+
+        if (currentGroup.privacy === "private") {
+
+            if (privateGroup) {
+
+                privateGroup.checked = true;
+
+            }
+
+        } else {
+
+            if (publicGroup) {
+
+                publicGroup.checked = true;
+
+            }
+
+        }
+
+
+    } catch (err) {
 
         console.error(
             "LOAD GROUP SETTINGS ERROR:",
@@ -281,27 +306,68 @@ async function loadGroup(){
 
 
 // ==================================================
+// CHANGE AVATAR BUTTON
+// ==================================================
+
+if (changeAvatarBtn) {
+
+    changeAvatarBtn.addEventListener(
+        "click",
+        () => {
+
+            if (avatarInput) {
+
+                avatarInput.click();
+
+            }
+
+        }
+    );
+
+}
+
+
+// ==================================================
+// CHANGE COVER BUTTON
+// ==================================================
+
+if (changeCoverBtn) {
+
+    changeCoverBtn.addEventListener(
+        "click",
+        () => {
+
+            if (coverInput) {
+
+                coverInput.click();
+
+            }
+
+        }
+    );
+
+}
+
+
+// ==================================================
 // AVATAR PREVIEW
 // ==================================================
 
-if(groupAvatarInput){
+if (avatarInput) {
 
-    groupAvatarInput.addEventListener(
+    avatarInput.addEventListener(
         "change",
-        function(){
+        function () {
 
             const file =
                 this.files[0];
 
-            if(!file){
-                return;
-            }
+            if (!file) return;
 
-            if(
-                !file.type.startsWith(
-                    "image/"
-                )
-            ){
+
+            if (
+                !file.type.startsWith("image/")
+            ) {
 
                 alert(
                     "Please select an image."
@@ -318,11 +384,11 @@ if(groupAvatarInput){
                 new FileReader();
 
             reader.onload =
-                function(){
+                function () {
 
-                    if(avatarPreview){
+                    if (groupAvatar) {
 
-                        avatarPreview.src =
+                        groupAvatar.src =
                             reader.result;
 
                     }
@@ -341,24 +407,21 @@ if(groupAvatarInput){
 // COVER PREVIEW
 // ==================================================
 
-if(groupCoverInput){
+if (coverInput) {
 
-    groupCoverInput.addEventListener(
+    coverInput.addEventListener(
         "change",
-        function(){
+        function () {
 
             const file =
                 this.files[0];
 
-            if(!file){
-                return;
-            }
+            if (!file) return;
 
-            if(
-                !file.type.startsWith(
-                    "image/"
-                )
-            ){
+
+            if (
+                !file.type.startsWith("image/")
+            ) {
 
                 alert(
                     "Please select an image."
@@ -375,11 +438,11 @@ if(groupCoverInput){
                 new FileReader();
 
             reader.onload =
-                function(){
+                function () {
 
-                    if(coverPreview){
+                    if (groupCover) {
 
-                        coverPreview.src =
+                        groupCover.src =
                             reader.result;
 
                     }
@@ -395,10 +458,34 @@ if(groupCoverInput){
 
 
 // ==================================================
+// LIVE GROUP NAME PREVIEW
+// ==================================================
+
+if (groupNameInput) {
+
+    groupNameInput.addEventListener(
+        "input",
+        () => {
+
+            if (previewGroupName) {
+
+                previewGroupName.textContent =
+                    groupNameInput.value ||
+                    "Group";
+
+            }
+
+        }
+    );
+
+}
+
+
+// ==================================================
 // SAVE SETTINGS
 // ==================================================
 
-if(saveSettingsBtn){
+if (saveSettingsBtn) {
 
     saveSettingsBtn.addEventListener(
         "click",
@@ -408,9 +495,9 @@ if(saveSettingsBtn){
 }
 
 
-async function saveSettings(){
+async function saveSettings() {
 
-    if(!currentGroup){
+    if (!currentGroup) {
 
         showMessage(
             "Group information is not loaded.",
@@ -424,20 +511,20 @@ async function saveSettings(){
 
     const name =
         groupNameInput
-        ? groupNameInput.value.trim()
-        : "";
+            ? groupNameInput.value.trim()
+            : "";
 
     const description =
         groupDescriptionInput
-        ? groupDescriptionInput.value.trim()
-        : "";
+            ? groupDescriptionInput.value.trim()
+            : "";
 
 
     // ==================================================
     // VALIDATION
     // ==================================================
 
-    if(!name){
+    if (!name) {
 
         showMessage(
             "Group name cannot be empty.",
@@ -449,7 +536,7 @@ async function saveSettings(){
     }
 
 
-    if(name.length < 2){
+    if (name.length < 2) {
 
         showMessage(
             "Group name is too short.",
@@ -461,7 +548,7 @@ async function saveSettings(){
     }
 
 
-    if(name.length > 50){
+    if (name.length > 100) {
 
         showMessage(
             "Group name is too long.",
@@ -473,7 +560,7 @@ async function saveSettings(){
     }
 
 
-    if(description.length > 500){
+    if (description.length > 500) {
 
         showMessage(
             "Description is too long.",
@@ -486,20 +573,36 @@ async function saveSettings(){
 
 
     // ==================================================
-    // DISABLE BUTTON
+    // PRIVACY
     // ==================================================
 
-    saveSettingsBtn.disabled =
-        true;
+    let privacy = "public";
 
-    saveSettingsBtn.textContent =
-        "Saving...";
+    if (
+        privateGroup &&
+        privateGroup.checked
+    ) {
+
+        privacy = "private";
+
+    }
 
 
-    try{
+    // ==================================================
+    // BUTTON
+    // ==================================================
+
+    saveSettingsBtn.disabled = true;
+
+    saveSettingsBtn.innerHTML =
+        '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+
+    try {
 
         const formData =
             new FormData();
+
 
         formData.append(
             "groupId",
@@ -521,19 +624,25 @@ async function saveSettings(){
             description
         );
 
+        formData.append(
+            "privacy",
+            privacy
+        );
+
 
         // ==================================================
         // AVATAR
         // ==================================================
 
-        if(
-            groupAvatarInput &&
-            groupAvatarInput.files[0]
-        ){
+        if (
+            avatarInput &&
+            avatarInput.files &&
+            avatarInput.files[0]
+        ) {
 
             formData.append(
                 "avatar",
-                groupAvatarInput.files[0]
+                avatarInput.files[0]
             );
 
         }
@@ -543,14 +652,15 @@ async function saveSettings(){
         // COVER
         // ==================================================
 
-        if(
-            groupCoverInput &&
-            groupCoverInput.files[0]
-        ){
+        if (
+            coverInput &&
+            coverInput.files &&
+            coverInput.files[0]
+        ) {
 
             formData.append(
                 "cover",
-                groupCoverInput.files[0]
+                coverInput.files[0]
             );
 
         }
@@ -564,9 +674,11 @@ async function saveSettings(){
             await fetch(
                 "/api/groups/settings",
                 {
-                    method:"PUT",
 
-                    body:formData
+                    method: "PUT",
+
+                    body: formData
+
                 }
             );
 
@@ -575,10 +687,10 @@ async function saveSettings(){
             await res.json();
 
 
-        if(
+        if (
             !res.ok ||
             !data.success
-        ){
+        ) {
 
             showMessage(
                 data.message ||
@@ -592,7 +704,7 @@ async function saveSettings(){
 
 
         // ==================================================
-        // SUCCESS
+        // UPDATE CURRENT GROUP
         // ==================================================
 
         currentGroup =
@@ -600,34 +712,38 @@ async function saveSettings(){
             currentGroup;
 
 
+        // ==================================================
+        // UPDATE UI
+        // ==================================================
+
+        if (previewGroupName) {
+
+            previewGroupName.textContent =
+                currentGroup.name;
+
+        }
+
+        if (groupAvatar) {
+
+            groupAvatar.src =
+                currentGroup.avatar;
+
+        }
+
+        if (groupCover) {
+
+            groupCover.src =
+                currentGroup.cover;
+
+        }
+
+
         showMessage(
             "✅ Group settings updated successfully."
         );
 
 
-        // ==================================================
-        // UPDATE PREVIEWS
-        // ==================================================
-
-        if(avatarPreview){
-
-            avatarPreview.src =
-                currentGroup.avatar ||
-                avatarPreview.src;
-
-        }
-
-
-        if(coverPreview){
-
-            coverPreview.src =
-                currentGroup.cover ||
-                coverPreview.src;
-
-        }
-
-
-    }catch(err){
+    } catch (err) {
 
         console.error(
             "SAVE GROUP SETTINGS ERROR:",
@@ -639,13 +755,12 @@ async function saveSettings(){
             true
         );
 
-    }finally{
+    } finally {
 
-        saveSettingsBtn.disabled =
-            false;
+        saveSettingsBtn.disabled = false;
 
-        saveSettingsBtn.textContent =
-            "Save Changes";
+        saveSettingsBtn.innerHTML =
+            '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
 
     }
 
@@ -653,16 +768,178 @@ async function saveSettings(){
 
 
 // ==================================================
-// BACK BUTTON
+// BACK
 // ==================================================
 
-if(backButton){
+if (backButton) {
 
     backButton.addEventListener(
         "click",
-        function(){
+        () => {
 
             history.back();
+
+        }
+    );
+
+}
+
+
+// ==================================================
+// LEAVE GROUP
+// ==================================================
+
+if (leaveGroupBtn) {
+
+    leaveGroupBtn.addEventListener(
+        "click",
+        async () => {
+
+            if (
+                !confirm(
+                    "Are you sure you want to leave this group?"
+                )
+            ) return;
+
+
+            try {
+
+                const res =
+                    await fetch(
+                        "/api/groups/leave",
+                        {
+
+                            method: "PUT",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                groupId,
+
+                                username:
+                                    user.username
+
+                            })
+
+                        }
+                    );
+
+
+                const data =
+                    await res.json();
+
+
+                if (data.success) {
+
+                    alert(
+                        "✅ You left the group."
+                    );
+
+                    location.href =
+                        "/groups.html";
+
+                } else {
+
+                    alert(
+                        data.message
+                    );
+
+                }
+
+            } catch (err) {
+
+                console.error(err);
+
+                alert(
+                    "Network Error"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+// ==================================================
+// DELETE GROUP
+// ==================================================
+
+if (deleteGroupBtn) {
+
+    deleteGroupBtn.addEventListener(
+        "click",
+        async () => {
+
+            if (
+                !confirm(
+                    "Delete this group permanently?"
+                )
+            ) return;
+
+
+            try {
+
+                const res =
+                    await fetch(
+                        "/api/groups/delete",
+                        {
+
+                            method: "DELETE",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                groupId,
+
+                                username:
+                                    user.username
+
+                            })
+
+                        }
+                    );
+
+
+                const data =
+                    await res.json();
+
+
+                if (data.success) {
+
+                    alert(
+                        "🗑️ Group deleted."
+                    );
+
+                    location.href =
+                        "/groups.html";
+
+                } else {
+
+                    alert(
+                        data.message
+                    );
+
+                }
+
+            } catch (err) {
+
+                console.error(err);
+
+                alert(
+                    "Network Error"
+                );
+
+            }
 
         }
     );
