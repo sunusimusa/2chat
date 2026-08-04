@@ -9,6 +9,9 @@ params.get("id");
 
 let currentGroup = null;
 
+const deleteBtn =
+document.getElementById("deleteGroupBtn");
+
 loadGroup();
 
 async function loadGroup(){
@@ -67,10 +70,6 @@ document.getElementById("groupCover").src =
     currentGroup.admins.length;
 
     renderMembers();
-
-    // Show Delete button only for Owner
-    const deleteBtn =
-    document.getElementById("deleteGroupBtn");
 
     if(user.username === currentGroup.owner){
 
