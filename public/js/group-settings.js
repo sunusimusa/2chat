@@ -234,6 +234,29 @@ async function loadGroup() {
 
         }
 
+        // ==================================================
+// GROUP PRIVACY
+// ==================================================
+
+const publicGroup =
+    document.getElementById("publicGroup");
+
+const privateGroup =
+    document.getElementById("privateGroup");
+
+if(currentGroup.privacy === "private"){
+
+    if(privateGroup){
+        privateGroup.checked = true;
+    }
+
+}else{
+
+    if(publicGroup){
+        publicGroup.checked = true;
+    }
+
+}
 
         // ==================================================
         // AVATAR
@@ -519,6 +542,19 @@ async function saveSettings() {
             ? groupDescriptionInput.value.trim()
             : "";
 
+    // ==================================================
+// GET PRIVACY
+// ==================================================
+
+const selectedPrivacy =
+    document.querySelector(
+        'input[name="groupPrivacy"]:checked'
+    );
+
+const privacy =
+    selectedPrivacy
+    ? selectedPrivacy.value
+    : "public";
 
     // ==================================================
     // VALIDATION
