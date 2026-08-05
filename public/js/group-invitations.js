@@ -2,30 +2,28 @@
 // 2CHAT GROUP INVITATIONS
 // ==================================================
 
+const user = JSON.parse(
+    localStorage.getItem("user")
+);
 
-// ==================================================
-// USER
-// ==================================================
+const params = new URLSearchParams(
+    window.location.search
+);
 
-const user =
-    JSON.parse(
-        localStorage.getItem("user")
-    );
+const groupId = params.get("id");
 
 
 // ==================================================
 // CHECK LOGIN
 // ==================================================
 
-if(
-    !user ||
-    !user.username
-){
+if (!user || !user.username) {
 
     alert("Please login first.");
 
-    location.href =
-        "/login.html";
+    window.location.href = "/login.html";
+
+    throw new Error("User is not logged in.");
 
 }
 
@@ -34,83 +32,41 @@ if(
 // ELEMENTS
 // ==================================================
 
-const invitationsList =
-    document.getElementById(
-        "invitationsList"
-    );
-
-const loading =
-    document.getElementById(
-        "loading"
-    );
-
-const emptyState =
-    document.getElementById(
-        "emptyState"
-    );
-
 const backButton =
-    document.getElementById(
-        "backButton"
-    );
+    document.getElementById("backButton");
+
+const invitationsContainer =
+    document.getElementById("invitationsContainer");
 
 
 // ==================================================
 // LOAD INVITATIONS
 // ==================================================
 
-async function loadInvitations(){
+async function loadInvitations() {
 
-    if(
-        !user ||
-        !user.username
-    ){
+    try {
 
-        return;
+        if (!invitationsContainer) return;
 
-    }
-
-    try{
-
-        if(loading){
-
-            loading.style.display =
-                "block";
-
-        }
-
-        if(emptyState){
-
-            emptyState.style.display =
-                "none";
-
-        }
-
-        if(invitationsList){
-
-            invitationsList.innerHTML =
-                "";
-
-        }
+        invitationsContainer.innerHTML = `
+            <div class="loading">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                Loading invitations...
+            </div>
+        `;
 
 
-        const res =
-            await fetch(
-                "/api/groups/invitations/" +
-                encodeURIComponent(
-                    user.username
-                )
-            );
+        const res = await fetch(
+            "/api/groups/invitations/" +
+            encodeURIComponent(user.username)
+        );
 
 
-        const data =
-            await res.json();
+        const data = await res.json();
 
 
-        if(
-            !res.ok ||
-            !data.success
-        ){
+        if (!res.ok || !data.success) {
 
             throw new Error(
                 data.message ||
@@ -124,66 +80,178 @@ async function loadInvitations(){
             data.invitations || [];
 
 
-        if(loading){
+        // ==================================================
+        // NO INVITATIONS
+        // ==================================================
 
-            loading.style.display =
-                "none";
+        if (!invitations.length) {
 
-        }
+            invitationsContainer.innerHTML = `
+                <div class="empty-invitations">
 
+                    <i class="fa-solid fa-envelope-open-text"></i>
 
-        if(
-            invitations.length === 0
-        ){
+                    <h3>No Invitations</h3>
 
-            if(emptyState){
+                    <p>
+                        You don't have any pending group invitations.
+                    </p>
 
-                emptyState.style.display =
-                    "block";
-
-            }
+                </div>
+            `;
 
             return;
 
         }
 
 
-        renderInvitations(
-            invitations
-        );
+        // ==================================================
+        // DISPLAY INVITATIONS
+        // ==================================================
+
+        invitationsContainer.innerHTML = "";
 
 
-    }catch(err){
+        invitations.forEach(invitation => {
 
-        console.error(
-            "LOAD INVITATIONS ERROR:",
-            err
-        );
+            const card =
+                document.createElement("div");
 
-
-        if(loading){
-
-            loading.style.display =
-                "none";
-
-        }
+            card.className =
+                "invitation-card";
 
 
-        if(invitationsList){
+            card.innerHTML = `
 
-            invitationsList.innerHTML = `
+                <div class="invitation-icon">
 
-                <div class="empty-state">
+                    <i class="fa-solid fa-users"></i>
 
-                    <i class="fa-solid fa-circle-exclamation"></i>
+                </div>
+
+
+                <div class="invitation-info">
 
                     <h3>
-                        Error
+                        ${escapeHtml(
+                            invitation.groupName ||
+                            "Group"
+                        )}
                     </h3>
 
                     <p>
-                        ${escapeHTML(
-                            err.message ||
+                        <strong>
+                            ${escapeHtml(
+                                invitation.inviter ||
+                                "Someone"
+                            )}
+                        </strong>
+                        invited you to join this group.
+                    </p>
+
+                </div>
+
+
+                <div class="invitation-actions">
+
+                    <button
+                        class="accept-btn"
+                        data-id="${invitation._id}"
+                    >
+
+                        <i class="fa-solid fa-check"></i>
+
+                        Accept
+
+                    </button>
+
+
+                    <button
+                        class="reject-btn"
+                        data-id="${invitation._id}"
+                    >
+
+                        <i class="fa-solid fa-xmark"></i>
+
+                        Reject
+
+                    </button>
+
+                </div>
+
+            `;
+
+
+            invitationsContainer.appendChild(card);
+
+        });
+
+
+        // ==================================================
+        // ACCEPT BUTTONS
+        // ==================================================
+
+        document
+            .querySelectorAll(".accept-btn")
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        acceptInvitation(
+                            button.dataset.id
+                        );
+
+                    }
+                );
+
+            });
+
+
+        // ==================================================
+        // REJECT BUTTONS
+        // ==================================================
+
+        document
+            .querySelectorAll(".reject-btn")
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        rejectInvitation(
+                            button.dataset.id
+                        );
+
+                    }
+                );
+
+            });
+
+
+    } catch (error) {
+
+        console.error(
+            "LOAD INVITATIONS ERROR:",
+            error
+        );
+
+
+        if (invitationsContainer) {
+
+            invitationsContainer.innerHTML = `
+
+                <div class="error-message">
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                    <h3>Error</h3>
+
+                    <p>
+                        ${escapeHtml(
+                            error.message ||
                             "Failed to load invitations."
                         )}
                     </p>
@@ -200,208 +268,47 @@ async function loadInvitations(){
 
 
 // ==================================================
-// RENDER INVITATIONS
-// ==================================================
-
-function renderInvitations(
-    invitations
-){
-
-    if(!invitationsList){
-
-        return;
-
-    }
-
-
-    invitationsList.innerHTML =
-        "";
-
-
-    invitations.forEach(
-        invitation => {
-
-            const group =
-                invitation.groupId || {};
-
-
-            const groupName =
-                group.name ||
-                "2Chat Group";
-
-
-            const groupAvatar =
-                group.avatar &&
-                group.avatar.trim() !== ""
-                    ? group.avatar
-                    : "/images/default-group.png";
-
-
-            const inviter =
-                invitation.inviter ||
-                "Someone";
-
-
-            const invitationId =
-                invitation._id;
-
-
-            invitationsList.innerHTML += `
-
-                <div
-                    class="invitation-card"
-                    data-id="${escapeHTML(
-                        invitationId
-                    )}"
-                >
-
-                    <img
-                        class="invitation-avatar"
-                        src="${escapeHTML(
-                            groupAvatar
-                        )}"
-                        alt="Group"
-                        onerror="this.src='/images/default-group.png'"
-                    >
-
-
-                    <div class="invitation-info">
-
-                        <h3>
-
-                            ${escapeHTML(
-                                groupName
-                            )}
-
-                        </h3>
-
-                        <p>
-
-                            Invited by
-
-                            <span class="inviter">
-
-                                ${escapeHTML(
-                                    inviter
-                                )}
-
-                            </span>
-
-                        </p>
-
-                        <p>
-
-                            Join this group on 2Chat
-
-                        </p>
-
-                    </div>
-
-
-                    <div
-                        class="invitation-actions"
-                    >
-
-                        <button
-                            class="accept-btn"
-                            onclick="acceptInvitation('${escapeHTML(
-                                invitationId
-                            )}')"
-                        >
-
-                            <i class="fa-solid fa-check"></i>
-
-                            Accept
-
-                        </button>
-
-
-                        <button
-                            class="reject-btn"
-                            onclick="rejectInvitation('${escapeHTML(
-                                invitationId
-                            )}')"
-                        >
-
-                            <i class="fa-solid fa-xmark"></i>
-
-                            Reject
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-            `;
-
-        }
-    );
-
-}
-
-
-// ==================================================
 // ACCEPT INVITATION
 // ==================================================
 
 async function acceptInvitation(
     invitationId
-){
+) {
 
-    if(!invitationId){
-
-        return;
-
-    }
+    if (!invitationId) return;
 
 
-    if(
-        !confirm(
-            "Accept this group invitation?"
-        )
-    ){
+    try {
 
-        return;
+        const res = await fetch(
+            "/api/groups/invite/accept",
+            {
 
-    }
+                method: "PUT",
 
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
 
-    try{
+                body: JSON.stringify({
 
-        const res =
-            await fetch(
-                "/api/groups/invite/accept",
-                {
+                    invitationId,
 
-                    method:"PUT",
+                    username:
+                        user.username
 
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
+                })
 
-                    body:JSON.stringify({
-
-                        invitationId,
-
-                        username:
-                            user.username
-
-                    })
-
-                }
-            );
+            }
+        );
 
 
         const data =
             await res.json();
 
 
-        if(
-            !res.ok ||
-            !data.success
-        ){
+        if (!res.ok || !data.success) {
 
             alert(
                 data.message ||
@@ -421,11 +328,11 @@ async function acceptInvitation(
         loadInvitations();
 
 
-    }catch(err){
+    } catch (error) {
 
         console.error(
             "ACCEPT INVITATION ERROR:",
-            err
+            error
         );
 
         alert(
@@ -443,61 +350,42 @@ async function acceptInvitation(
 
 async function rejectInvitation(
     invitationId
-){
+) {
 
-    if(!invitationId){
-
-        return;
-
-    }
+    if (!invitationId) return;
 
 
-    if(
-        !confirm(
-            "Reject this group invitation?"
-        )
-    ){
+    try {
 
-        return;
+        const res = await fetch(
+            "/api/groups/invite/reject",
+            {
 
-    }
+                method: "PUT",
 
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
 
-    try{
+                body: JSON.stringify({
 
-        const res =
-            await fetch(
-                "/api/groups/invite/reject",
-                {
+                    invitationId,
 
-                    method:"PUT",
+                    username:
+                        user.username
 
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
+                })
 
-                    body:JSON.stringify({
-
-                        invitationId,
-
-                        username:
-                            user.username
-
-                    })
-
-                }
-            );
+            }
+        );
 
 
         const data =
             await res.json();
 
 
-        if(
-            !res.ok ||
-            !data.success
-        ){
+        if (!res.ok || !data.success) {
 
             alert(
                 data.message ||
@@ -517,11 +405,11 @@ async function rejectInvitation(
         loadInvitations();
 
 
-    }catch(err){
+    } catch (error) {
 
         console.error(
             "REJECT INVITATION ERROR:",
-            err
+            error
         );
 
         alert(
@@ -537,19 +425,13 @@ async function rejectInvitation(
 // ESCAPE HTML
 // ==================================================
 
-function escapeHTML(
-    value
-){
+function escapeHtml(value) {
 
     const div =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     div.textContent =
-        value == null
-            ? ""
-            : String(value);
+        value || "";
 
     return div.innerHTML;
 
@@ -557,10 +439,10 @@ function escapeHTML(
 
 
 // ==================================================
-// BACK
+// BACK BUTTON
 // ==================================================
 
-if(backButton){
+if (backButton) {
 
     backButton.addEventListener(
         "click",
