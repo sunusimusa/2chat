@@ -147,48 +147,142 @@ exports.getGroup = async (req, res) => {
 };
 
 // ================= JOIN GROUP =================
+// ================= JOIN GROUP =================
 exports.joinGroup = async (req, res) => {
 
-    try{
+    try {
 
         const {
             groupId,
             username
         } = req.body;
 
-        const group = await Group.findById(groupId);
 
-        if(!group){
+        // ==========================
+        // CHECK REQUIRED DATA
+        // ==========================
 
-            return res.json({
-                success:false,
-                message:"Group not found."
+        if (!groupId || !username) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Group ID and username are required."
+
             });
 
         }
 
-        if(!group.members.includes(username)){
 
-    group.members.push(username);
+        // ==========================
+        // FIND GROUP
+        // ==========================
 
-    group.memberCount = group.members.length;
+        const group =
+            await Group.findById(groupId);
 
-    await group.save();
+        if (!group) {
 
-}
+            return res.status(404).json({
 
-        res.json({
-            success:true,
+                success: false,
+
+                message:
+                    "Group not found."
+
+            });
+
+        }
+
+
+        // ==========================
+        // CHECK ALREADY MEMBER
+        // ==========================
+
+        if (group.members.includes(username)) {
+
+            return res.json({
+
+                success: true,
+
+                message:
+                    "You are already a member of this group.",
+
+                group
+
+            });
+
+        }
+
+
+        // ==========================
+        // PRIVATE GROUP
+        // ==========================
+
+        if (group.privacy === "private") {
+
+            return res.status(403).json({
+
+                success: false,
+
+                private: true,
+
+                message:
+                    "This is a private group. You need an invitation to join."
+
+            });
+
+        }
+
+
+        // ==========================
+        // PUBLIC GROUP
+        // ==========================
+
+        group.members.push(username);
+
+        group.memberCount =
+            group.members.length;
+
+
+        await group.save();
+
+
+        // ==========================
+        // SUCCESS
+        // ==========================
+
+        return res.json({
+
+            success: true,
+
+            private: false,
+
+            message:
+                "You joined the group successfully.",
+
             group
+
         });
 
-    }catch(err){
 
-        console.error(err);
+    } catch (error) {
 
-        res.status(500).json({
-            success:false,
-            message:err.message
+        console.error(
+            "JOIN GROUP ERROR:",
+            error
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Failed to join group."
+
         });
 
     }
