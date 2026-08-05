@@ -1234,13 +1234,22 @@ exports.sendGroupInvitation = async (req, res) => {
 // GET MY GROUP INVITATIONS
 // ==================================================
 
+// ==================================================
+// GET MY GROUP INVITATIONS
+// ==================================================
+
 exports.getMyGroupInvitations = async (req, res) => {
 
     try {
 
-        const {
+        const username =
+            String(req.params.username || "").trim();
+
+
+        console.log(
+            "GET GROUP INVITATIONS:",
             username
-        } = req.query;
+        );
 
 
         if (!username) {
@@ -1267,10 +1276,17 @@ exports.getMyGroupInvitations = async (req, res) => {
             })
             .sort({
                 createdAt: -1
-            });
+            })
+            .lean();
 
 
-        return res.json({
+        console.log(
+            "INVITATIONS FOUND:",
+            invitations.length
+        );
+
+
+        return res.status(200).json({
 
             success: true,
 
@@ -1285,6 +1301,7 @@ exports.getMyGroupInvitations = async (req, res) => {
             "GET GROUP INVITATIONS ERROR:",
             error
         );
+
 
         return res.status(500).json({
 
