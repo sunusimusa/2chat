@@ -2,24 +2,8 @@
 // 2CHAT GROUP SETTINGS
 // ==================================================
 
-const user = JSON.parse(
-    localStorage.getItem("user")
-);
-
-
-// ==================================================
-// CHECK LOGIN
-// ==================================================
-
-if (!user || !user.username) {
-
-    alert("Please login first.");
-
-    location.href = "/login.html";
-
-    throw new Error("User not logged in.");
-
-}
+const user =
+    JSON.parse(localStorage.getItem("user"));
 
 
 // ==================================================
@@ -31,22 +15,33 @@ const params =
         window.location.search
     );
 
-// Support both:
-// group-settings.html?id=...
-// group-settings.html?groupId=...
-
 const groupId =
-    params.get("id") ||
-    params.get("groupId");
+    params.get("id");
 
+
+// ==================================================
+// CHECK LOGIN
+// ==================================================
+
+if (!user || !user.username) {
+
+    alert("Please login first.");
+
+    location.href =
+        "/login.html";
+
+}
+
+
+// ==================================================
+// CHECK GROUP ID
+// ==================================================
 
 if (!groupId) {
 
     alert("Group ID is missing.");
 
     history.back();
-
-    throw new Error("Group ID missing.");
 
 }
 
@@ -56,84 +51,52 @@ if (!groupId) {
 // ==================================================
 
 const groupNameInput =
-    document.getElementById(
-        "groupName"
-    );
+    document.getElementById("groupName");
 
 const groupDescriptionInput =
-    document.getElementById(
-        "groupDescription"
-    );
-
-const groupAvatar =
-    document.getElementById(
-        "groupAvatar"
-    );
-
-const groupCover =
-    document.getElementById(
-        "groupCover"
-    );
+    document.getElementById("groupDescription");
 
 const avatarInput =
-    document.getElementById(
-        "avatarInput"
-    );
+    document.getElementById("avatarInput");
 
 const coverInput =
-    document.getElementById(
-        "coverInput"
-    );
+    document.getElementById("coverInput");
 
-const changeAvatarBtn =
-    document.getElementById(
-        "changeAvatarBtn"
-    );
+const groupAvatar =
+    document.getElementById("groupAvatar");
 
-const changeCoverBtn =
-    document.getElementById(
-        "changeCoverBtn"
-    );
+const groupCover =
+    document.getElementById("groupCover");
 
 const previewGroupName =
-    document.getElementById(
-        "previewGroupName"
-    );
+    document.getElementById("previewGroupName");
+
+const changeAvatarBtn =
+    document.getElementById("changeAvatarBtn");
+
+const changeCoverBtn =
+    document.getElementById("changeCoverBtn");
 
 const saveSettingsBtn =
-    document.getElementById(
-        "saveSettingsBtn"
-    );
+    document.getElementById("saveSettingsBtn");
 
 const backButton =
-    document.getElementById(
-        "backButton"
-    );
+    document.getElementById("backButton");
 
 const settingsMessage =
-    document.getElementById(
-        "settingsMessage"
-    );
+    document.getElementById("settingsMessage");
 
 const publicGroup =
-    document.getElementById(
-        "publicGroup"
-    );
+    document.getElementById("publicGroup");
 
 const privateGroup =
-    document.getElementById(
-        "privateGroup"
-    );
+    document.getElementById("privateGroup");
 
 const leaveGroupBtn =
-    document.getElementById(
-        "leaveGroupBtn"
-    );
+    document.getElementById("leaveGroupBtn");
 
 const deleteGroupBtn =
-    document.getElementById(
-        "deleteGroupBtn"
-    );
+    document.getElementById("deleteGroupBtn");
 
 
 let currentGroup = null;
@@ -148,29 +111,26 @@ function showMessage(
     isError = false
 ) {
 
-    if (!settingsMessage) {
-
-        alert(message);
-
-        return;
-
-    }
+    if (!settingsMessage) return;
 
     settingsMessage.textContent =
         message;
 
-    settingsMessage.style.display =
-        "block";
+    settingsMessage.classList.add("show");
 
-    settingsMessage.classList.toggle(
-        "error",
-        isError
-    );
+    if (isError) {
+
+        settingsMessage.classList.add("error");
+
+    } else {
+
+        settingsMessage.classList.remove("error");
+
+    }
 
     setTimeout(() => {
 
-        settingsMessage.style.display =
-            "none";
+        settingsMessage.classList.remove("show");
 
     }, 3000);
 
@@ -185,34 +145,13 @@ async function loadGroup() {
 
     try {
 
-        console.log(
-            "Loading group:",
-            groupId
-        );
-
-
         const res =
             await fetch(
-                "/api/groups/" +
-                encodeURIComponent(groupId)
+                "/api/groups/" + groupId
             );
-
-
-        console.log(
-            "GET GROUP STATUS:",
-            res.status
-        );
-
 
         const data =
             await res.json();
-
-
-        console.log(
-            "GET GROUP RESPONSE:",
-            data
-        );
-
 
         if (
             !res.ok ||
@@ -220,29 +159,41 @@ async function loadGroup() {
             !data.group
         ) {
 
-            throw new Error(
+            showMessage(
                 data.message ||
-                "Group not found."
+                "Group not found.",
+                true
             );
 
-        }
+            return;
 
+        }
 
         currentGroup =
             data.group;
 
 
         // ==================================================
-        // CHECK OWNER
+        // CHECK OWNER / ADMIN
         // ==================================================
 
-        if (
-            currentGroup.owner !==
-            user.username
-        ) {
+        const isOwner =
+            currentGroup.owner ===
+            user.username;
+
+        const isAdmin =
+            Array.isArray(
+                currentGroup.admins
+            ) &&
+            currentGroup.admins.includes(
+                user.username
+            );
+
+
+        if (!isOwner && !isAdmin) {
 
             alert(
-                "Only the group owner can access Group Settings."
+                "Only Owner or Admin can access Group Settings."
             );
 
             history.back();
@@ -262,7 +213,6 @@ async function loadGroup() {
                 currentGroup.name || "";
 
         }
-
 
         if (previewGroupName) {
 
@@ -284,6 +234,29 @@ async function loadGroup() {
 
         }
 
+        // ==================================================
+// GROUP PRIVACY
+// ==================================================
+
+const publicGroup =
+    document.getElementById("publicGroup");
+
+const privateGroup =
+    document.getElementById("privateGroup");
+
+if(currentGroup.privacy === "private"){
+
+    if(privateGroup){
+        privateGroup.checked = true;
+    }
+
+}else{
+
+    if(publicGroup){
+        publicGroup.checked = true;
+    }
+
+}
 
         // ==================================================
         // AVATAR
@@ -292,8 +265,10 @@ async function loadGroup() {
         if (groupAvatar) {
 
             groupAvatar.src =
-                currentGroup.avatar ||
-                "/images/default-group.png";
+                currentGroup.avatar &&
+                currentGroup.avatar.trim() !== ""
+                    ? currentGroup.avatar
+                    : "/images/default-group.png";
 
         }
 
@@ -305,8 +280,10 @@ async function loadGroup() {
         if (groupCover) {
 
             groupCover.src =
-                currentGroup.cover ||
-                "/images/default-group-cover.jpg";
+                currentGroup.cover &&
+                currentGroup.cover.trim() !== ""
+                    ? currentGroup.cover
+                    : "/images/default-group-cover.jpg";
 
         }
 
@@ -315,15 +292,11 @@ async function loadGroup() {
         // PRIVACY
         // ==================================================
 
-        if (
-            currentGroup.privacy ===
-            "private"
-        ) {
+        if (currentGroup.privacy === "private") {
 
             if (privateGroup) {
 
-                privateGroup.checked =
-                    true;
+                privateGroup.checked = true;
 
             }
 
@@ -331,37 +304,21 @@ async function loadGroup() {
 
             if (publicGroup) {
 
-                publicGroup.checked =
-                    true;
+                publicGroup.checked = true;
 
             }
 
         }
 
 
-        console.log(
-            "GROUP SETTINGS LOADED SUCCESSFULLY"
-        );
-
-
-    } catch (error) {
+    } catch (err) {
 
         console.error(
             "LOAD GROUP SETTINGS ERROR:",
-            error
+            err
         );
 
-
-        if (previewGroupName) {
-
-            previewGroupName.textContent =
-                "Failed to load";
-
-        }
-
-
         showMessage(
-            error.message ||
             "Failed to load group settings.",
             true
         );
@@ -375,13 +332,17 @@ async function loadGroup() {
 // CHANGE AVATAR BUTTON
 // ==================================================
 
-if (changeAvatarBtn && avatarInput) {
+if (changeAvatarBtn) {
 
     changeAvatarBtn.addEventListener(
         "click",
         () => {
 
-            avatarInput.click();
+            if (avatarInput) {
+
+                avatarInput.click();
+
+            }
 
         }
     );
@@ -393,13 +354,17 @@ if (changeAvatarBtn && avatarInput) {
 // CHANGE COVER BUTTON
 // ==================================================
 
-if (changeCoverBtn && coverInput) {
+if (changeCoverBtn) {
 
     changeCoverBtn.addEventListener(
         "click",
         () => {
 
-            coverInput.click();
+            if (coverInput) {
+
+                coverInput.click();
+
+            }
 
         }
     );
@@ -415,29 +380,23 @@ if (avatarInput) {
 
     avatarInput.addEventListener(
         "change",
-        () => {
+        function () {
 
             const file =
-                avatarInput.files[0];
+                this.files[0];
 
-            if (!file) {
-
-                return;
-
-            }
+            if (!file) return;
 
 
             if (
-                !file.type.startsWith(
-                    "image/"
-                )
+                !file.type.startsWith("image/")
             ) {
 
                 alert(
                     "Please select an image."
                 );
 
-                avatarInput.value = "";
+                this.value = "";
 
                 return;
 
@@ -447,18 +406,17 @@ if (avatarInput) {
             const reader =
                 new FileReader();
 
+            reader.onload =
+                function () {
 
-            reader.onload = () => {
+                    if (groupAvatar) {
 
-                if (groupAvatar) {
+                        groupAvatar.src =
+                            reader.result;
 
-                    groupAvatar.src =
-                        reader.result;
+                    }
 
-                }
-
-            };
-
+                };
 
             reader.readAsDataURL(file);
 
@@ -476,29 +434,23 @@ if (coverInput) {
 
     coverInput.addEventListener(
         "change",
-        () => {
+        function () {
 
             const file =
-                coverInput.files[0];
+                this.files[0];
 
-            if (!file) {
-
-                return;
-
-            }
+            if (!file) return;
 
 
             if (
-                !file.type.startsWith(
-                    "image/"
-                )
+                !file.type.startsWith("image/")
             ) {
 
                 alert(
                     "Please select an image."
                 );
 
-                coverInput.value = "";
+                this.value = "";
 
                 return;
 
@@ -508,20 +460,43 @@ if (coverInput) {
             const reader =
                 new FileReader();
 
+            reader.onload =
+                function () {
 
-            reader.onload = () => {
+                    if (groupCover) {
 
-                if (groupCover) {
+                        groupCover.src =
+                            reader.result;
 
-                    groupCover.src =
-                        reader.result;
+                    }
 
-                }
-
-            };
-
+                };
 
             reader.readAsDataURL(file);
+
+        }
+    );
+
+}
+
+
+// ==================================================
+// LIVE GROUP NAME PREVIEW
+// ==================================================
+
+if (groupNameInput) {
+
+    groupNameInput.addEventListener(
+        "input",
+        () => {
+
+            if (previewGroupName) {
+
+                previewGroupName.textContent =
+                    groupNameInput.value ||
+                    "Group";
+
+            }
 
         }
     );
@@ -562,19 +537,28 @@ async function saveSettings() {
             ? groupNameInput.value.trim()
             : "";
 
-
     const description =
         groupDescriptionInput
             ? groupDescriptionInput.value.trim()
             : "";
 
+    // ==================================================
+// GET PRIVACY
+// ==================================================
 
-    const privacy =
-        privateGroup &&
-        privateGroup.checked
-            ? "private"
-            : "public";
+const selectedPrivacy =
+    document.querySelector(
+        'input[name="groupPrivacy"]:checked'
+    );
 
+const privacy =
+    selectedPrivacy
+    ? selectedPrivacy.value
+    : "public";
+
+    // ==================================================
+    // VALIDATION
+    // ==================================================
 
     if (!name) {
 
@@ -588,8 +572,63 @@ async function saveSettings() {
     }
 
 
-    saveSettingsBtn.disabled =
-        true;
+    if (name.length < 2) {
+
+        showMessage(
+            "Group name is too short.",
+            true
+        );
+
+        return;
+
+    }
+
+
+    if (name.length > 100) {
+
+        showMessage(
+            "Group name is too long.",
+            true
+        );
+
+        return;
+
+    }
+
+
+    if (description.length > 500) {
+
+        showMessage(
+            "Description is too long.",
+            true
+        );
+
+        return;
+
+    }
+
+
+    // ==================================================
+    // PRIVACY
+    // ==================================================
+
+    let privacy = "public";
+
+    if (
+        privateGroup &&
+        privateGroup.checked
+    ) {
+
+        privacy = "private";
+
+    }
+
+
+    // ==================================================
+    // BUTTON
+    // ==================================================
+
+    saveSettingsBtn.disabled = true;
 
     saveSettingsBtn.innerHTML =
         '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
@@ -606,24 +645,20 @@ async function saveSettings() {
             groupId
         );
 
-
         formData.append(
             "username",
             user.username
         );
-
 
         formData.append(
             "name",
             name
         );
 
-
         formData.append(
             "description",
             description
         );
-
 
         formData.append(
             "privacy",
@@ -631,10 +666,13 @@ async function saveSettings() {
         );
 
 
-        // Avatar
+        // ==================================================
+        // AVATAR
+        // ==================================================
 
         if (
             avatarInput &&
+            avatarInput.files &&
             avatarInput.files[0]
         ) {
 
@@ -646,10 +684,13 @@ async function saveSettings() {
         }
 
 
-        // Cover
+        // ==================================================
+        // COVER
+        // ==================================================
 
         if (
             coverInput &&
+            coverInput.files &&
             coverInput.files[0]
         ) {
 
@@ -660,6 +701,10 @@ async function saveSettings() {
 
         }
 
+
+        // ==================================================
+        // SEND
+        // ==================================================
 
         const res =
             await fetch(
@@ -678,36 +723,34 @@ async function saveSettings() {
             await res.json();
 
 
-        console.log(
-            "UPDATE GROUP RESPONSE:",
-            data
-        );
-
-
         if (
             !res.ok ||
             !data.success
         ) {
 
-            throw new Error(
+            showMessage(
                 data.message ||
-                "Failed to update group settings."
+                "Failed to update group.",
+                true
             );
+
+            return;
 
         }
 
+
+        // ==================================================
+        // UPDATE CURRENT GROUP
+        // ==================================================
 
         currentGroup =
             data.group ||
             currentGroup;
 
 
-        showMessage(
-            "✅ Group settings updated successfully."
-        );
-
-
-        // Update preview name
+        // ==================================================
+        // UPDATE UI
+        // ==================================================
 
         if (previewGroupName) {
 
@@ -716,56 +759,41 @@ async function saveSettings() {
 
         }
 
-
-        // Update avatar
-
-        if (
-            groupAvatar &&
-            currentGroup.avatar
-        ) {
+        if (groupAvatar) {
 
             groupAvatar.src =
-                currentGroup.avatar +
-                "?t=" +
-                Date.now();
+                currentGroup.avatar;
 
         }
 
-
-        // Update cover
-
-        if (
-            groupCover &&
-            currentGroup.cover
-        ) {
+        if (groupCover) {
 
             groupCover.src =
-                currentGroup.cover +
-                "?t=" +
-                Date.now();
+                currentGroup.cover;
 
         }
-
-
-    } catch (error) {
-
-        console.error(
-            "SAVE GROUP SETTINGS ERROR:",
-            error
-        );
 
 
         showMessage(
-            error.message ||
+            "✅ Group settings updated successfully."
+        );
+
+
+    } catch (err) {
+
+        console.error(
+            "SAVE GROUP SETTINGS ERROR:",
+            err
+        );
+
+        showMessage(
             "Failed to update group settings.",
             true
         );
 
-
     } finally {
 
-        saveSettingsBtn.disabled =
-            false;
+        saveSettingsBtn.disabled = false;
 
         saveSettingsBtn.innerHTML =
             '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
@@ -776,7 +804,7 @@ async function saveSettings() {
 
 
 // ==================================================
-// BACK BUTTON
+// BACK
 // ==================================================
 
 if (backButton) {
@@ -786,6 +814,168 @@ if (backButton) {
         () => {
 
             history.back();
+
+        }
+    );
+
+}
+
+
+// ==================================================
+// LEAVE GROUP
+// ==================================================
+
+if (leaveGroupBtn) {
+
+    leaveGroupBtn.addEventListener(
+        "click",
+        async () => {
+
+            if (
+                !confirm(
+                    "Are you sure you want to leave this group?"
+                )
+            ) return;
+
+
+            try {
+
+                const res =
+                    await fetch(
+                        "/api/groups/leave",
+                        {
+
+                            method: "PUT",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                groupId,
+
+                                username:
+                                    user.username
+
+                            })
+
+                        }
+                    );
+
+
+                const data =
+                    await res.json();
+
+
+                if (data.success) {
+
+                    alert(
+                        "✅ You left the group."
+                    );
+
+                    location.href =
+                        "/groups.html";
+
+                } else {
+
+                    alert(
+                        data.message
+                    );
+
+                }
+
+            } catch (err) {
+
+                console.error(err);
+
+                alert(
+                    "Network Error"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+// ==================================================
+// DELETE GROUP
+// ==================================================
+
+if (deleteGroupBtn) {
+
+    deleteGroupBtn.addEventListener(
+        "click",
+        async () => {
+
+            if (
+                !confirm(
+                    "Delete this group permanently?"
+                )
+            ) return;
+
+
+            try {
+
+                const res =
+                    await fetch(
+                        "/api/groups/delete",
+                        {
+
+                            method: "DELETE",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                groupId,
+
+                                username:
+                                    user.username
+
+                            })
+
+                        }
+                    );
+
+
+                const data =
+                    await res.json();
+
+
+                if (data.success) {
+
+                    alert(
+                        "🗑️ Group deleted."
+                    );
+
+                    location.href =
+                        "/groups.html";
+
+                } else {
+
+                    alert(
+                        data.message
+                    );
+
+                }
+
+            } catch (err) {
+
+                console.error(err);
+
+                alert(
+                    "Network Error"
+                );
+
+            }
 
         }
     );
