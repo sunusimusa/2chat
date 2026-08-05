@@ -14,6 +14,12 @@ const groupInvitationSchema = new mongoose.Schema(
             index: true
         },
 
+        groupName: {
+    type: String,
+    required: true,
+    trim: true
+},
+
 
         // =========================================
         // WHO SENT THE INVITATION
