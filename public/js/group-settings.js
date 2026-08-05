@@ -542,19 +542,15 @@ async function saveSettings() {
             ? groupDescriptionInput.value.trim()
             : "";
 
-    // ==================================================
-// GET PRIVACY
-// ==================================================
-
-const selectedPrivacy =
+    const selectedPrivacy =
     document.querySelector(
         'input[name="groupPrivacy"]:checked'
     );
 
 const privacy =
     selectedPrivacy
-    ? selectedPrivacy.value
-    : "public";
+        ? selectedPrivacy.value
+        : "public";
 
     // ==================================================
     // VALIDATION
@@ -604,22 +600,6 @@ const privacy =
         );
 
         return;
-
-    }
-
-
-    // ==================================================
-    // PRIVACY
-    // ==================================================
-
-    let privacy = "public";
-
-    if (
-        privateGroup &&
-        privateGroup.checked
-    ) {
-
-        privacy = "private";
 
     }
 
