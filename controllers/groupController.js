@@ -1056,6 +1056,19 @@ exports.sendGroupInvitation = async (req, res) => {
 
         if (!groupId || !username || !invitee) {
 
+            if (username === invitee) {
+
+    return res.status(400).json({
+
+        success: false,
+
+        message:
+            "You cannot invite yourself."
+
+    });
+
+}
+
             return res.status(400).json({
 
                 success: false,
