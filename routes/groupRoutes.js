@@ -53,11 +53,22 @@ router.post(
     sendGroupInvitation
 );
 
-// Get user's invitations
+
 router.get(
     "/invitations/:username",
+    (req, res, next) => {
+
+        console.log(
+            "🔥 INVITATIONS ROUTE HIT:",
+            req.params.username
+        );
+
+        next();
+
+    },
     getMyGroupInvitations
 );
+    
 
 // Accept invitation
 router.put(
