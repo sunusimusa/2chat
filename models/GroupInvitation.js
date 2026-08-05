@@ -1,47 +1,80 @@
 const mongoose = require("mongoose");
 
-const groupInvitationSchema = new mongoose.Schema({
+const groupInvitationSchema = new mongoose.Schema(
+    {
 
-    groupId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Group",
-        required: true
+        // =========================================
+        // GROUP
+        // =========================================
+
+        groupId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Group",
+            required: true,
+            index: true
+        },
+
+
+        // =========================================
+        // WHO SENT THE INVITATION
+        // =========================================
+
+        inviter: {
+            type: String,
+            required: true,
+            trim: true,
+            index: true
+        },
+
+
+        // =========================================
+        // WHO RECEIVED THE INVITATION
+        // =========================================
+
+        invitee: {
+            type: String,
+            required: true,
+            trim: true,
+            index: true
+        },
+
+
+        // =========================================
+        // INVITATION STATUS
+        // =========================================
+
+        status: {
+            type: String,
+            enum: [
+                "pending",
+                "accepted",
+                "rejected"
+            ],
+            default: "pending",
+            index: true
+        },
+
+
+        // =========================================
+        // WHEN INVITATION WAS ACCEPTED/REJECTED
+        // =========================================
+
+        respondedAt: {
+            type: Date,
+            default: null
+        }
+
     },
-
-    groupName: {
-        type: String,
-        required: true,
-        trim: true
-    },
-
-    inviter: {
-        type: String,
-        required: true,
-        trim: true
-    },
-
-    invitee: {
-        type: String,
-        required: true,
-        trim: true
-    },
-
-    status: {
-        type: String,
-        enum: [
-            "pending",
-            "accepted",
-            "rejected"
-        ],
-        default: "pending"
+    {
+        timestamps: true
     }
-
-}, {
-    timestamps: true
-});
+);
 
 
-// Prevent duplicate pending invitations
+// =========================================
+// PREVENT DUPLICATE PENDING INVITATIONS
+// =========================================
+
 groupInvitationSchema.index(
     {
         groupId: 1,
