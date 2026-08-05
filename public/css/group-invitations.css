@@ -1,0 +1,338 @@
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+
+    font-family:Arial,sans-serif;
+
+    background:#f4f7fb;
+
+    color:#222;
+
+}
+
+
+/* =========================
+HEADER
+========================= */
+
+.invitations-header{
+
+    height:60px;
+
+    background:#2196f3;
+
+    color:white;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    padding:0 15px;
+
+    position:sticky;
+
+    top:0;
+
+    z-index:10;
+
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+
+}
+
+.invitations-header button{
+
+    width:40px;
+
+    height:40px;
+
+    border:none;
+
+    background:transparent;
+
+    color:white;
+
+    font-size:20px;
+
+    cursor:pointer;
+
+}
+
+.invitations-header h2{
+
+    font-size:20px;
+
+}
+
+
+/* =========================
+CONTAINER
+========================= */
+
+.invitations-container{
+
+    max-width:600px;
+
+    margin:auto;
+
+    padding:20px 15px;
+
+}
+
+
+/* =========================
+LOADING
+========================= */
+
+.loading{
+
+    text-align:center;
+
+    padding:50px 20px;
+
+    color:#777;
+
+    font-size:15px;
+
+}
+
+.loading i{
+
+    margin-right:8px;
+
+    color:#2196f3;
+
+}
+
+
+/* =========================
+EMPTY
+========================= */
+
+.empty-state{
+
+    text-align:center;
+
+    padding:70px 20px;
+
+    color:#777;
+
+}
+
+.empty-state > i{
+
+    font-size:55px;
+
+    color:#bbb;
+
+    margin-bottom:20px;
+
+}
+
+.empty-state h3{
+
+    color:#444;
+
+    margin-bottom:8px;
+
+}
+
+.empty-state p{
+
+    font-size:14px;
+
+}
+
+
+/* =========================
+INVITATION CARD
+========================= */
+
+.invitation-card{
+
+    background:white;
+
+    border-radius:15px;
+
+    padding:15px;
+
+    margin-bottom:15px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    box-shadow:
+        0 3px 12px
+        rgba(0,0,0,.08);
+
+}
+
+
+/* =========================
+GROUP AVATAR
+========================= */
+
+.invitation-avatar{
+
+    width:65px;
+
+    height:65px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    border:2px solid #2196f3;
+
+    flex-shrink:0;
+
+}
+
+
+/* =========================
+INFO
+========================= */
+
+.invitation-info{
+
+    flex:1;
+
+    min-width:0;
+
+}
+
+.invitation-info h3{
+
+    font-size:17px;
+
+    margin-bottom:5px;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+    white-space:nowrap;
+
+}
+
+.invitation-info p{
+
+    font-size:13px;
+
+    color:#777;
+
+    margin-bottom:4px;
+
+}
+
+.invitation-info .inviter{
+
+    color:#2196f3;
+
+    font-weight:bold;
+
+}
+
+
+/* =========================
+ACTIONS
+========================= */
+
+.invitation-actions{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:7px;
+
+    flex-shrink:0;
+
+}
+
+.invitation-actions button{
+
+    border:none;
+
+    border-radius:8px;
+
+    padding:8px 12px;
+
+    font-size:13px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+}
+
+
+/* ACCEPT */
+
+.accept-btn{
+
+    background:#2196f3;
+
+    color:white;
+
+}
+
+.accept-btn:hover{
+
+    background:#1976d2;
+
+}
+
+
+/* REJECT */
+
+.reject-btn{
+
+    background:#eee;
+
+    color:#555;
+
+}
+
+.reject-btn:hover{
+
+    background:#ddd;
+
+}
+
+
+/* =========================
+MOBILE
+========================= */
+
+@media(max-width:500px){
+
+    .invitation-card{
+
+        align-items:flex-start;
+
+    }
+
+    .invitation-avatar{
+
+        width:55px;
+
+        height:55px;
+
+    }
+
+    .invitation-actions button{
+
+        padding:7px 10px;
+
+    }
+
+}
