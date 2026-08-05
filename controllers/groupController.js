@@ -1234,10 +1234,6 @@ exports.sendGroupInvitation = async (req, res) => {
 // GET MY GROUP INVITATIONS
 // ==================================================
 
-// ==================================================
-// GET MY GROUP INVITATIONS
-// ==================================================
-
 exports.getMyGroupInvitations = async (req, res) => {
 
     try {
@@ -1245,46 +1241,34 @@ exports.getMyGroupInvitations = async (req, res) => {
         const username =
             String(req.params.username || "").trim();
 
-
         console.log(
-            "GET GROUP INVITATIONS:",
+            "🔥 GET GROUP INVITATIONS:",
             username
         );
-
 
         if (!username) {
 
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "Username is required."
-
+                message: "Username is required."
             });
 
         }
 
-
         const invitations =
             await GroupInvitation.find({
-
                 invitee: username,
-
                 status: "pending"
-
             })
             .sort({
                 createdAt: -1
             })
             .lean();
 
-
         console.log(
-            "INVITATIONS FOUND:",
+            "🔥 INVITATIONS FOUND:",
             invitations.length
         );
-
 
         return res.status(200).json({
 
@@ -1294,14 +1278,12 @@ exports.getMyGroupInvitations = async (req, res) => {
 
         });
 
-
     } catch (error) {
 
         console.error(
             "GET GROUP INVITATIONS ERROR:",
             error
         );
-
 
         return res.status(500).json({
 
@@ -1315,7 +1297,6 @@ exports.getMyGroupInvitations = async (req, res) => {
     }
 
 };
-
 
 // ==================================================
 // ACCEPT GROUP INVITATION
