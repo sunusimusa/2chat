@@ -1,5 +1,6 @@
 const Group = require("../models/Group");
 const User = require("../models/User");
+const cloudinary = require("../config/cloudinary");
 
 // ================= CREATE GROUP =================
 exports.createGroup = async (req, res) => {
