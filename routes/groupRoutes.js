@@ -16,7 +16,12 @@ const {
     addMember,
     promoteToAdmin,
     removeAdmin,
-    updateGroupSettings
+    updateGroupSettings,
+    // GROUP INVITATION
+    createGroupInvitation,
+    getGroupInvitations,
+    acceptGroupInvitation,
+    rejectGroupInvitation
 } = require("../controllers/groupController");
 
 /* ==========================
@@ -72,5 +77,32 @@ router.put(
     updateGroupSettings
 );
 
+// ==================================================
+// GROUP INVITATIONS
+// ==================================================
+
+// Create invitation
+router.post(
+    "/invite",
+    createGroupInvitation
+);
+
+// Get user's invitations
+router.get(
+    "/invitations/:username",
+    getGroupInvitations
+);
+
+// Accept invitation
+router.put(
+    "/invite/accept",
+    acceptGroupInvitation
+);
+
+// Reject invitation
+router.put(
+    "/invite/reject",
+    rejectGroupInvitation
+);
 
 module.exports = router;
