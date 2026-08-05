@@ -672,3 +672,108 @@ body{
     }
 
 }
+
+/* ==================================================
+   INVITE MEMBERS SECTION
+================================================== */
+
+.invite-section {
+    margin: 25px 0;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.invite-section h3 {
+    margin: 0 0 8px;
+    color: #222;
+    font-size: 19px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.invite-section h3 i {
+    color: #2196f3;
+}
+
+.invite-section p {
+    margin: 0 0 18px;
+    color: #777;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+/* ==================================================
+   INVITE BUTTON
+================================================== */
+
+.invite-members-btn {
+    width: 100%;
+    border: none;
+    outline: none;
+    padding: 14px 18px;
+    border-radius: 12px;
+
+    background: #2196f3;
+    color: #fff;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.invite-members-btn i {
+    font-size: 17px;
+}
+
+.invite-members-btn:hover {
+    background: #1976d2;
+    box-shadow: 0 6px 15px rgba(33, 150, 243, 0.25);
+}
+
+.invite-members-btn:active {
+    transform: scale(0.97);
+}
+
+
+/* ==================================================
+   MOBILE
+================================================== */
+
+@media (max-width: 600px) {
+
+    .invite-section {
+        margin: 20px 0;
+        padding: 17px;
+        border-radius: 14px;
+    }
+
+    .invite-section h3 {
+        font-size: 18px;
+    }
+
+    .invite-section p {
+        font-size: 13px;
+    }
+
+    .invite-members-btn {
+        padding: 13px 16px;
+        font-size: 15px;
+    }
+
+}
