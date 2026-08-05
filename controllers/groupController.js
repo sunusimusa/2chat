@@ -766,7 +766,8 @@ exports.updateGroupSettings = async (req, res) => {
             groupId,
             username,
             name,
-            description
+            description,
+            privacy
         } = req.body;
 
 
@@ -971,6 +972,25 @@ exports.updateGroupSettings = async (req, res) => {
 
         }
 
+        // ==========================
+// UPDATE PRIVACY
+// ==========================
+
+if (
+    privacy === "public" ||
+    privacy === "private"
+) {
+
+    group.privacy = privacy;
+
+}
+
+
+// ==========================
+// SAVE GROUP
+// ==========================
+
+await group.save();
 
         // ==========================
         // SAVE GROUP
