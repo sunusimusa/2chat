@@ -1,1 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Group Invitations</title>
+
+<link
+    rel="stylesheet"
+    href="/css/group-invitations.css"
+>
+
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+>
+
+</head>
+
+<body>
+
+<header class="invitations-header">
+
+    <button
+        id="backButton"
+        type="button"
+    >
+
+        <i class="fa-solid fa-arrow-left"></i>
+
+    </button>
+
+    <h2>
+
+        Group Invitations
+
+    </h2>
+
+</header>
+
+
+<main class="invitations-container">
+
+    <div
+        id="loading"
+        class="loading"
+    >
+
+        <i class="fa-solid fa-spinner fa-spin"></i>
+
+        Loading invitations...
+
+    </div>
+
+
+    <div
+        id="emptyState"
+        class="empty-state"
+        style="display:none;"
+    >
+
+        <i class="fa-solid fa-envelope-open"></i>
+
+        <h3>
+
+            No Invitations
+
+        </h3>
+
+        <p>
+
+            You don't have any pending group invitations.
+
+        </p>
+
+    </div>
+
+
+    <div
+        id="invitationsList"
+        class="invitations-list"
+    ></div>
+
+</main>
+
+
+<script src="/js/group-invitations.js"></script>
+
+</body>
+
+</html>
