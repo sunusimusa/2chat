@@ -18,8 +18,8 @@ const {
     removeAdmin,
     updateGroupSettings,
     // GROUP INVITATION
-    createGroupInvitation,
-    getGroupInvitations,
+    sendGroupInvitation,
+    getMyGroupInvitations,
     acceptGroupInvitation,
     rejectGroupInvitation
 } = require("../controllers/groupController");
@@ -84,13 +84,13 @@ router.put(
 // Create invitation
 router.post(
     "/invite",
-    createGroupInvitation
+    sendGroupInvitation
 );
 
 // Get user's invitations
 router.get(
     "/invitations/:username",
-    getGroupInvitations
+    getMyGroupInvitations
 );
 
 // Accept invitation
