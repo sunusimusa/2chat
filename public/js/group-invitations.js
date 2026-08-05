@@ -45,26 +45,79 @@ const invitationsContainer =
 
 async function loadInvitations() {
 
+    if (!invitationsContainer) return;
+
+    invitationsContainer.innerHTML = `
+        <div class="loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Loading invitations...
+        </div>
+    `;
+
     try {
 
-        if (!invitationsContainer) return;
+        const username =
+            String(user.username || "").trim();
 
-        invitationsContainer.innerHTML = `
-            <div class="loading">
-                <i class="fa-solid fa-spinner fa-spin"></i>
-                Loading invitations...
-            </div>
-        `;
+        if (!username) {
+            throw new Error("Username is missing.");
+        }
 
-
-        const res = await fetch(
+        const url =
             "/api/groups/invitations/" +
-            encodeURIComponent(user.username)
+            encodeURIComponent(username);
+
+        console.log(
+            "LOADING GROUP INVITATIONS:",
+            url
         );
 
+        // Timeout after 15 seconds
+        const controller =
+            new AbortController();
 
-        const data = await res.json();
+        const timeout =
+            setTimeout(() => {
+                controller.abort();
+            }, 15000);
 
+        const res =
+            await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json"
+                },
+                signal: controller.signal
+            });
+
+        clearTimeout(timeout);
+
+        console.log(
+            "INVITATIONS STATUS:",
+            res.status
+        );
+
+        const text =
+            await res.text();
+
+        console.log(
+            "INVITATIONS RESPONSE:",
+            text
+        );
+
+        let data;
+
+        try {
+
+            data = JSON.parse(text);
+
+        } catch (e) {
+
+            throw new Error(
+                "Server returned an invalid response."
+            );
+
+        }
 
         if (!res.ok || !data.success) {
 
@@ -75,14 +128,15 @@ async function loadInvitations() {
 
         }
 
-
         const invitations =
-            data.invitations || [];
+            Array.isArray(data.invitations)
+                ? data.invitations
+                : [];
 
 
-        // ==================================================
+        // ==========================
         // NO INVITATIONS
-        // ==================================================
+        // ==========================
 
         if (!invitations.length) {
 
@@ -101,13 +155,12 @@ async function loadInvitations() {
             `;
 
             return;
-
         }
 
 
-        // ==================================================
-        // DISPLAY INVITATIONS
-        // ==================================================
+        // ==========================
+        // DISPLAY
+        // ==========================
 
         invitationsContainer.innerHTML = "";
 
@@ -124,11 +177,8 @@ async function loadInvitations() {
             card.innerHTML = `
 
                 <div class="invitation-icon">
-
                     <i class="fa-solid fa-users"></i>
-
                 </div>
-
 
                 <div class="invitation-info">
 
@@ -146,11 +196,11 @@ async function loadInvitations() {
                                 "Someone"
                             )}
                         </strong>
+
                         invited you to join this group.
                     </p>
 
                 </div>
-
 
                 <div class="invitation-actions">
 
@@ -158,38 +208,30 @@ async function loadInvitations() {
                         class="accept-btn"
                         data-id="${invitation._id}"
                     >
-
                         <i class="fa-solid fa-check"></i>
-
                         Accept
-
                     </button>
-
 
                     <button
                         class="reject-btn"
                         data-id="${invitation._id}"
                     >
-
                         <i class="fa-solid fa-xmark"></i>
-
                         Reject
-
                     </button>
 
                 </div>
 
             `;
 
-
             invitationsContainer.appendChild(card);
 
         });
 
 
-        // ==================================================
-        // ACCEPT BUTTONS
-        // ==================================================
+        // ==========================
+        // ACCEPT
+        // ==========================
 
         document
             .querySelectorAll(".accept-btn")
@@ -209,9 +251,9 @@ async function loadInvitations() {
             });
 
 
-        // ==================================================
-        // REJECT BUTTONS
-        // ==================================================
+        // ==========================
+        // REJECT
+        // ==========================
 
         document
             .querySelectorAll(".reject-btn")
@@ -239,33 +281,48 @@ async function loadInvitations() {
         );
 
 
-        if (invitationsContainer) {
+        let message =
+            error.message ||
+            "Failed to load invitations.";
 
-            invitationsContainer.innerHTML = `
 
-                <div class="error-message">
+        if (
+            error.name === "AbortError"
+        ) {
 
-                    <i class="fa-solid fa-circle-exclamation"></i>
-
-                    <h3>Error</h3>
-
-                    <p>
-                        ${escapeHtml(
-                            error.message ||
-                            "Failed to load invitations."
-                        )}
-                    </p>
-
-                </div>
-
-            `;
+            message =
+                "Server took too long to respond.";
 
         }
+
+
+        invitationsContainer.innerHTML = `
+
+            <div class="error-message">
+
+                <i class="fa-solid fa-circle-exclamation"></i>
+
+                <h3>Error</h3>
+
+                <p>
+                    ${escapeHtml(message)}
+                </p>
+
+                <button
+                    onclick="loadInvitations()"
+                    class="retry-btn"
+                >
+                    <i class="fa-solid fa-rotate-right"></i>
+                    Try Again
+                </button>
+
+            </div>
+
+        `;
 
     }
 
 }
-
 
 // ==================================================
 // ACCEPT INVITATION
