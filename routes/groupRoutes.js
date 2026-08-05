@@ -17,71 +17,37 @@ const {
     promoteToAdmin,
     removeAdmin,
     updateGroupSettings,
-    // GROUP INVITATION
+
+    // GROUP INVITATIONS
     sendGroupInvitation,
     getMyGroupInvitations,
     acceptGroupInvitation,
     rejectGroupInvitation
+
 } = require("../controllers/groupController");
 
-/* ==========================
-   GROUPS
-========================== */
 
-// Create Group
-router.post("/create", createGroup);
+// ==================================================
+// GROUPS
+// ==================================================
 
-// Get All Groups
-router.get("/all", getGroups);
-
-// Get Single Group
-router.get("/:id", getGroup);
-
-// Join Group
-router.put("/join", joinGroup);
-
-// Leave Group
-router.put("/leave", leaveGroup);
-
-// Delete group
-router.delete("/delete", deleteGroup);
-
-// Add member
-router.put("/add-member", addMember);
-
-// Make member admin
-router.put(
-    "/make-admin",
-    promoteToAdmin
+router.post(
+    "/create",
+    createGroup
 );
 
-// Remove admin
-router.put(
-    "/remove-admin",
-    removeAdmin
+router.get(
+    "/all",
+    getGroups
 );
 
-
-router.put(
-    "/settings",
-    upload.fields([
-        {
-            name: "avatar",
-            maxCount: 1
-        },
-        {
-            name: "cover",
-            maxCount: 1
-        }
-    ]),
-    updateGroupSettings
-);
 
 // ==================================================
 // GROUP INVITATIONS
+// IMPORTANT: THESE MUST COME BEFORE /:id
 // ==================================================
 
-// Create invitation
+// Send invitation
 router.post(
     "/invite",
     sendGroupInvitation
@@ -104,5 +70,74 @@ router.put(
     "/invite/reject",
     rejectGroupInvitation
 );
+
+
+// ==================================================
+// GROUP ACTIONS
+// ==================================================
+
+router.put(
+    "/join",
+    joinGroup
+);
+
+router.put(
+    "/leave",
+    leaveGroup
+);
+
+router.delete(
+    "/delete",
+    deleteGroup
+);
+
+router.put(
+    "/add-member",
+    addMember
+);
+
+router.put(
+    "/make-admin",
+    promoteToAdmin
+);
+
+router.put(
+    "/remove-admin",
+    removeAdmin
+);
+
+
+// ==================================================
+// GROUP SETTINGS
+// ==================================================
+
+router.put(
+    "/settings",
+
+    upload.fields([
+        {
+            name: "avatar",
+            maxCount: 1
+        },
+        {
+            name: "cover",
+            maxCount: 1
+        }
+    ]),
+
+    updateGroupSettings
+);
+
+
+// ==================================================
+// GET SINGLE GROUP
+// IMPORTANT: KEEP THIS AT THE VERY END
+// ==================================================
+
+router.get(
+    "/:id",
+    getGroup
+);
+
 
 module.exports = router;
