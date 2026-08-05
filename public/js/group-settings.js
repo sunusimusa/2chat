@@ -98,6 +98,9 @@ const leaveGroupBtn =
 const deleteGroupBtn =
     document.getElementById("deleteGroupBtn");
 
+const inviteMembersBtn =
+    document.getElementById("inviteMembersBtn");
+
 
 let currentGroup = null;
 
@@ -956,6 +959,33 @@ if (deleteGroupBtn) {
                 );
 
             }
+
+        }
+    );
+
+}
+
+// ==================================================
+// INVITE MEMBERS
+// ==================================================
+
+if (inviteMembersBtn) {
+
+    inviteMembersBtn.addEventListener(
+        "click",
+        () => {
+
+            if (!groupId) {
+
+                alert("Group ID is missing.");
+
+                return;
+
+            }
+
+            window.location.href =
+                "/group-invitations.html?id=" +
+                encodeURIComponent(groupId);
 
         }
     );
