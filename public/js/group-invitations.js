@@ -6,13 +6,6 @@ const user = JSON.parse(
     localStorage.getItem("user")
 );
 
-const params = new URLSearchParams(
-    window.location.search
-);
-
-const groupId = params.get("id");
-
-
 // ==================================================
 // CHECK LOGIN
 // ==================================================
