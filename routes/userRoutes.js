@@ -1,21 +1,40 @@
 const router = require("express").Router();
 
 const {
-followUser,
-getUserProfile,
-getAllUsers
+    followUser,
+    getUserProfile,
+    getAllUsers
 } = require("../controllers/userController");
 
+
+// ==========================
+// FOLLOW USER
+// ==========================
+
 router.put(
-"/follow",
-followUser
+    "/follow",
+    followUser
 );
+
+
+// ==========================
+// GET USER PROFILE
+// ==========================
 
 router.get(
-"/profile/:username",
-getUserProfile
+    "/profile/:username",
+    getUserProfile
 );
 
-router.get("/all", getAllUsers);
+
+// ==========================
+// GET ALL USERS
+// ==========================
+
+router.get(
+    "/all",
+    getAllUsers
+);
+
 
 module.exports = router;
