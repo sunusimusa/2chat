@@ -444,8 +444,10 @@ if (
 ) {
 
     avatar =
-        "/images/default.png
+        "/images/default.png";
+
 }
+    
     // ------------------------------------------
     // ONLINE STATUS
     // ------------------------------------------
@@ -461,10 +463,9 @@ if (
         <img
     class="user-avatar"
     src="${escapeHtml(avatar)}"
-    alt="${escapeHtml(
-        targetUser.username
-    )}"onerror="this.onerror=null; this.src='/images/default.png';"
-
+    alt="${escapeHtml(targetUser.username)}"
+    onerror="this.onerror=null; this.src='/images/default.png';"
+>
 
         <div class="user-info">
 
