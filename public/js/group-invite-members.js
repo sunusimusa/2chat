@@ -419,23 +419,28 @@ function renderUser(
 
     card.className =
         "user-card";
+    
+    // ==================================================
+// USER AVATAR
+// ==================================================
+
+let avatar = String(
+    targetUser.avatar || ""
+).trim();
 
 
-    // ------------------------------------------
-    // AVATAR
-    // ------------------------------------------
+// Idan babu avatar ko URL ɗin ba daidai ba,
+// yi amfani da default avatar
+if (
+    !avatar ||
+    avatar === "undefined" ||
+    avatar === "null"
+) {
 
-    const avatar =
-        targetUser.avatar &&
-        String(
-            targetUser.avatar
-        ).trim() !== ""
+    avatar =
+        "/images/default-avatar.png";
 
-            ? targetUser.avatar
-
-            : "/images/default-avatar.png";
-
-
+}
     // ------------------------------------------
     // ONLINE STATUS
     // ------------------------------------------
