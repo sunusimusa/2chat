@@ -2,29 +2,19 @@
 // 2CHAT GROUP INVITE MEMBERS
 // ==================================================
 
-
-// ==================================================
-// GET USER
-// ==================================================
-
 const user = JSON.parse(
     localStorage.getItem("user")
 );
-
 
 // ==================================================
 // GET GROUP ID
 // ==================================================
 
-const params =
-    new URLSearchParams(
-        window.location.search
-    );
+const params = new URLSearchParams(
+    window.location.search
+);
 
-
-const groupId =
-    params.get("id");
-
+const groupId = params.get("id");
 
 // ==================================================
 // CHECK LOGIN
@@ -34,15 +24,11 @@ if (!user || !user.username) {
 
     alert("Please login first.");
 
-    window.location.href =
-        "/login.html";
+    window.location.href = "/login.html";
 
-    throw new Error(
-        "User is not logged in."
-    );
+    throw new Error("User is not logged in.");
 
 }
-
 
 // ==================================================
 // CHECK GROUP ID
@@ -52,48 +38,30 @@ if (!groupId) {
 
     alert("Group ID is missing.");
 
-    window.location.href =
-        "/groups.html";
+    history.back();
 
-    throw new Error(
-        "Group ID is missing."
-    );
+    throw new Error("Group ID is missing.");
 
 }
-
 
 // ==================================================
 // ELEMENTS
 // ==================================================
 
 const backButton =
-    document.getElementById(
-        "backButton"
-    );
+    document.getElementById("backButton");
 
+const searchInput =
+    document.getElementById("searchInput");
 
-const usernameInput =
-    document.getElementById(
-        "usernameInput"
-    );
+const usersList =
+    document.getElementById("usersList");
 
+const loading =
+    document.getElementById("loading");
 
-const inviteButton =
-    document.getElementById(
-        "inviteButton"
-    );
-
-
-const inviteMessage =
-    document.getElementById(
-        "inviteMessage"
-    );
-
-
-const inviteResult =
-    document.getElementById(
-        "inviteResult"
-    );
+const message =
+    document.getElementById("inviteMessage");
 
 
 // ==================================================
@@ -101,201 +69,256 @@ const inviteResult =
 // ==================================================
 
 function showMessage(
-    message,
-    type = "success"
+    text,
+    error = false
 ) {
 
-    if (!inviteMessage) return;
+    if (!message) return;
 
+    message.textContent = text;
 
-    inviteMessage.textContent =
-        message;
+    message.className =
+        error
+        ? "invite-message error show"
+        : "invite-message success show";
 
+    setTimeout(() => {
 
-    inviteMessage.className =
-        "invite-message show " +
-        type;
+        message.classList.remove("show");
 
-
-    clearTimeout(
-        showMessage.timer
-    );
-
-
-    showMessage.timer =
-        setTimeout(() => {
-
-            inviteMessage.className =
-                "invite-message";
-
-        }, 4000);
+    }, 3000);
 
 }
 
 
 // ==================================================
-// CLEAR RESULT
+// LOAD USERS
 // ==================================================
 
-function clearResult() {
+async function loadUsers(search = "") {
 
-    if (!inviteResult) return;
+    try {
 
-    inviteResult.innerHTML = "";
+        if (loading) {
+
+            loading.style.display =
+                "block";
+
+        }
+
+        if (usersList) {
+
+            usersList.innerHTML = "";
+
+        }
+
+        const url =
+            "/api/users/search?query=" +
+            encodeURIComponent(search);
+
+        const res =
+            await fetch(url);
+
+        const data =
+            await res.json();
+
+        if (
+            !res.ok ||
+            !data.success
+        ) {
+
+            throw new Error(
+                data.message ||
+                "Failed to load users."
+            );
+
+        }
+
+        const users =
+            data.users || [];
+
+
+        if (!users.length) {
+
+            if (usersList) {
+
+                usersList.innerHTML = `
+
+                    <div class="empty-users">
+
+                        <i class="fa-solid fa-user-slash"></i>
+
+                        <p>
+                            No users found.
+                        </p>
+
+                    </div>
+
+                `;
+
+            }
+
+            return;
+
+        }
+
+
+        users.forEach(
+            renderUser
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "LOAD USERS ERROR:",
+            error
+        );
+
+        showMessage(
+            error.message ||
+            "Failed to load users.",
+            true
+        );
+
+    } finally {
+
+        if (loading) {
+
+            loading.style.display =
+                "none";
+
+        }
+
+    }
 
 }
 
 
 // ==================================================
-// SHOW SUCCESS RESULT
+// RENDER USER
 // ==================================================
 
-function showSuccess(
-    username
-) {
+function renderUser(targetUser) {
 
-    if (!inviteResult) return;
+    if (
+        !targetUser ||
+        !targetUser.username
+    ) {
+
+        return;
+
+    }
+
+
+    // Don't show yourself
+
+    if (
+        targetUser.username ===
+        user.username
+    ) {
+
+        return;
+
+    }
 
 
     const card =
         document.createElement("div");
 
-
     card.className =
-        "invited-card";
+        "user-card";
+
+
+    const avatar =
+        targetUser.avatar ||
+        "/images/default-avatar.png";
 
 
     card.innerHTML = `
 
-        <div class="invited-avatar">
+        <img
+            class="user-avatar"
+            src="${escapeHtml(avatar)}"
+            alt="Avatar"
+        >
 
-            <i class="fa-solid fa-user"></i>
+        <div class="user-info">
 
-        </div>
-
-
-        <div class="invited-info">
-
-            <strong></strong>
-
-            <span>
-                Invitation sent successfully
-            </span>
-
-        </div>
-
-
-        <div class="invited-check">
-
-            <i class="fa-solid fa-circle-check"></i>
+            <strong>
+                ${escapeHtml(
+                    targetUser.username
+                )}
+            </strong>
 
         </div>
+
+        <button
+            type="button"
+            class="invite-btn"
+        >
+
+            <i class="fa-solid fa-user-plus"></i>
+
+            Invite
+
+        </button>
 
     `;
 
 
-    const strong =
-        card.querySelector("strong");
+    const inviteButton =
+        card.querySelector(
+            ".invite-btn"
+        );
 
 
-    strong.textContent =
-        username;
+    inviteButton.addEventListener(
+        "click",
+        () => {
 
+            sendInvitation(
+                targetUser.username,
+                inviteButton
+            );
 
-    inviteResult.innerHTML = "";
-
-
-    inviteResult.appendChild(
-        card
+        }
     );
+
+
+    usersList.appendChild(card);
 
 }
 
 
 // ==================================================
-// INVITE USER
+// SEND INVITATION
 // ==================================================
 
-async function inviteUser() {
+async function sendInvitation(
+    invitee,
+    button
+) {
 
-    if (!usernameInput) return;
+    if (!invitee) return;
 
 
-    const invitee =
-        usernameInput.value.trim();
+    if (button) {
 
+        button.disabled = true;
 
-    // ==================================================
-    // VALIDATION
-    // ==================================================
+        button.innerHTML = `
 
-    if (!invitee) {
+            <i class="fa-solid fa-spinner fa-spin"></i>
 
-        showMessage(
-            "Please enter a username.",
-            "error"
-        );
+            Sending...
 
-        usernameInput.focus();
-
-        return;
+        `;
 
     }
-
-
-    if (invitee.length < 2) {
-
-        showMessage(
-            "Username is too short.",
-            "error"
-        );
-
-        usernameInput.focus();
-
-        return;
-
-    }
-
-
-    if (invitee === user.username) {
-
-        showMessage(
-            "You cannot invite yourself.",
-            "error"
-        );
-
-        usernameInput.focus();
-
-        return;
-
-    }
-
-
-    // ==================================================
-    // BUTTON LOADING
-    // ==================================================
-
-    inviteButton.disabled =
-        true;
-
-
-    inviteButton.innerHTML = `
-
-        <i class="fa-solid fa-spinner fa-spin"></i>
-
-        Sending...
-
-    `;
-
-
-    clearResult();
 
 
     try {
-
-        // ==================================================
-        // SEND INVITATION
-        // ==================================================
 
         const res =
             await fetch(
@@ -313,14 +336,12 @@ async function inviteUser() {
 
                     body: JSON.stringify({
 
-                        groupId:
-                            groupId,
+                        groupId,
 
                         username:
                             user.username,
 
-                        invitee:
-                            invitee
+                        invitee
 
                     })
 
@@ -328,98 +349,75 @@ async function inviteUser() {
             );
 
 
-        // ==================================================
-        // READ RESPONSE
-        // ==================================================
+        const data =
+            await res.json();
 
-        let data = {};
-
-
-        try {
-
-            data =
-                await res.json();
-
-        } catch (jsonError) {
-
-            throw new Error(
-                "Server returned an invalid response."
-            );
-
-        }
-
-
-        // ==================================================
-        // ERROR
-        // ==================================================
 
         if (
             !res.ok ||
             !data.success
         ) {
 
-            showMessage(
+            throw new Error(
                 data.message ||
-                "Failed to send invitation.",
-                "error"
+                "Failed to send invitation."
             );
-
-            return;
 
         }
 
 
-        // ==================================================
-        // SUCCESS
-        // ==================================================
-
         showMessage(
-            "✅ Invitation sent successfully to @" +
-            invitee,
-            "success"
+            "✅ Invitation sent successfully."
         );
 
 
-        showSuccess(
-            invitee
-        );
+        if (button) {
 
+            button.disabled = true;
 
-        usernameInput.value = "";
+            button.innerHTML = `
+
+                <i class="fa-solid fa-check"></i>
+
+                Invited
+
+            `;
+
+            button.classList.add(
+                "invited"
+            );
+
+        }
 
 
     } catch (error) {
 
         console.error(
-            "SEND GROUP INVITATION ERROR:",
+            "SEND INVITATION ERROR:",
             error
         );
 
 
         showMessage(
             error.message ||
-            "Network error. Please try again.",
-            "error"
+            "Failed to send invitation.",
+            true
         );
 
 
-    } finally {
+        if (button) {
 
-        // ==================================================
-        // RESTORE BUTTON
-        // ==================================================
+            button.disabled = false;
 
-        inviteButton.disabled =
-            false;
+            button.innerHTML = `
 
+                <i class="fa-solid fa-user-plus"></i>
 
-        inviteButton.innerHTML = `
+                Invite
 
-            <i class="fa-solid fa-paper-plane"></i>
+            `;
 
-            Invite
-
-        `;
+        }
 
     }
 
@@ -427,38 +425,32 @@ async function inviteUser() {
 
 
 // ==================================================
-// INVITE BUTTON
+// SEARCH
 // ==================================================
 
-if (inviteButton) {
+let searchTimer;
 
-    inviteButton.addEventListener(
-        "click",
-        inviteUser
-    );
+if (searchInput) {
 
-}
+    searchInput.addEventListener(
+        "input",
+        () => {
 
+            clearTimeout(
+                searchTimer
+            );
 
-// ==================================================
-// ENTER KEY
-// ==================================================
+            searchTimer =
+                setTimeout(
+                    () => {
 
-if (usernameInput) {
+                        loadUsers(
+                            searchInput.value.trim()
+                        );
 
-    usernameInput.addEventListener(
-        "keydown",
-        (event) => {
-
-            if (
-                event.key === "Enter"
-            ) {
-
-                event.preventDefault();
-
-                inviteUser();
-
-            }
+                    },
+                    400
+                );
 
         }
     );
@@ -467,7 +459,26 @@ if (usernameInput) {
 
 
 // ==================================================
-// BACK BUTTON
+// ESCAPE HTML
+// ==================================================
+
+function escapeHtml(value) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.textContent =
+        value || "";
+
+    return div.innerHTML;
+
+}
+
+
+// ==================================================
+// BACK
 // ==================================================
 
 if (backButton) {
@@ -488,8 +499,4 @@ if (backButton) {
 // START
 // ==================================================
 
-if (usernameInput) {
-
-    usernameInput.focus();
-
-}
+loadUsers();
