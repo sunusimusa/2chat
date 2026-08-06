@@ -12,20 +12,10 @@
 
     <title>Invite Members</title>
 
-
-    <!-- ==========================
-         CSS
-    =========================== -->
-
     <link
         rel="stylesheet"
         href="/css/group-invite-members.css"
     >
-
-
-    <!-- ==========================
-         FONT AWESOME
-    =========================== -->
 
     <link
         rel="stylesheet"
@@ -34,179 +24,129 @@
 
 </head>
 
-
 <body>
 
+<header class="invite-header">
 
-    <!-- ==========================
-         HEADER
-    =========================== -->
+    <button
+        id="backButton"
+        type="button"
+        aria-label="Go back"
+    >
 
-    <header class="invite-header">
+        <i class="fa-solid fa-arrow-left"></i>
 
-        <button
-            id="backButton"
-            type="button"
-            aria-label="Go back"
-        >
+    </button>
 
-            <i class="fa-solid fa-arrow-left"></i>
+    <h2>
+        Invite Members
+    </h2>
 
-        </button>
-
-
-        <h2>
-            Invite Members
-        </h2>
-
-    </header>
+</header>
 
 
+<main class="invite-container">
 
-    <!-- ==========================
-         MAIN
-    =========================== -->
+    <!-- INTRO -->
 
-    <main class="invite-container">
+    <section class="invite-intro">
+
+        <div class="invite-icon">
+
+            <i class="fa-solid fa-user-plus"></i>
+
+        </div>
+
+        <h3>
+            Invite People
+        </h3>
+
+        <p>
+            Search for 2Chat users and invite them
+            to join this group.
+        </p>
+
+    </section>
 
 
-        <!-- ==========================
-             TITLE
-        =========================== -->
+    <!-- SEARCH -->
 
-        <section class="invite-intro">
+    <section class="search-section">
 
-            <div class="invite-icon">
+        <div class="search-box">
 
-                <i class="fa-solid fa-user-plus"></i>
+            <i class="fa-solid fa-magnifying-glass"></i>
 
-            </div>
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search username..."
+                autocomplete="off"
+            >
+
+        </div>
+
+    </section>
 
 
-            <h3>
-                Invite People
-            </h3>
+    <!-- MESSAGE -->
 
+    <div
+        id="inviteMessage"
+        class="invite-message"
+    ></div>
+
+
+    <!-- LOADING -->
+
+    <div
+        id="loading"
+        class="loading"
+    >
+
+        <i class="fa-solid fa-spinner fa-spin"></i>
+
+        Loading users...
+
+    </div>
+
+
+    <!-- USERS -->
+
+    <section
+        id="usersList"
+        class="users-list"
+    ></section>
+
+
+    <!-- INFO -->
+
+    <section class="invite-info-box">
+
+        <i class="fa-solid fa-circle-info"></i>
+
+        <div>
+
+            <strong>
+                How invitations work
+            </strong>
 
             <p>
-                Enter a 2Chat username to invite them
-                to join this group.
+                When you invite someone, they will
+                receive the invitation in their
+                Group Invitations page.
             </p>
 
-        </section>
+        </div>
+
+    </section>
+
+</main>
 
 
-
-        <!-- ==========================
-             SEARCH / USERNAME
-        =========================== -->
-
-        <section class="search-section">
-
-            <label for="usernameInput">
-
-                <i class="fa-solid fa-user"></i>
-
-                Username
-
-            </label>
-
-
-            <div class="search-box">
-
-                <input
-                    type="text"
-                    id="usernameInput"
-                    placeholder="Enter username..."
-                    autocomplete="off"
-                    maxlength="50"
-                >
-
-
-                <button
-                    id="inviteButton"
-                    type="button"
-                >
-
-                    <i class="fa-solid fa-paper-plane"></i>
-
-                    Invite
-
-                </button>
-
-            </div>
-
-
-            <small>
-
-                Enter the exact username of the person
-                you want to invite.
-
-            </small>
-
-        </section>
-
-
-
-        <!-- ==========================
-             MESSAGE
-        =========================== -->
-
-        <div
-            id="inviteMessage"
-            class="invite-message"
-        ></div>
-
-
-
-        <!-- ==========================
-             RESULT
-        =========================== -->
-
-        <section
-            id="inviteResult"
-            class="invite-result"
-        ></section>
-
-
-
-        <!-- ==========================
-             INFO
-        =========================== -->
-
-        <section class="invite-info-box">
-
-            <i class="fa-solid fa-circle-info"></i>
-
-            <div>
-
-                <strong>
-                    How invitations work
-                </strong>
-
-                <p>
-                    The person you invite will receive
-                    the invitation in their Group
-                    Invitations page.
-                </p>
-
-            </div>
-
-        </section>
-
-
-    </main>
-
-
-
-    <!-- ==========================
-         JAVASCRIPT
-    =========================== -->
-
-    <script
-        src="/js/group-invite-members.js"
-    ></script>
-
+<script
+    src="/js/group-invite-members.js"
+></script>
 
 </body>
 
