@@ -1244,6 +1244,101 @@ exports.sendGroupInvitation = async (req, res) => {
 };
 
 // ==================================================
+// GET SENT GROUP INVITATIONS
+// ==================================================
+
+exports.getSentGroupInvitations = async (req, res) => {
+
+    try {
+
+        const {
+            groupId,
+            username
+        } = req.params;
+
+
+        // ==========================
+        // CHECK DATA
+        // ==========================
+
+        if (!groupId || !username) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Group ID and username are required."
+
+            });
+
+        }
+
+
+        // ==========================
+        // FIND SENT PENDING INVITATIONS
+        // ==========================
+
+        const invitations =
+            await GroupInvitation.find({
+
+                groupId: groupId,
+
+                inviter: username,
+
+                status: "pending"
+
+            })
+            .select("invitee")
+            .lean();
+
+
+        // ==========================
+        // GET USERNAMES ONLY
+        // ==========================
+
+        const invitedUsers =
+            invitations.map(
+                invitation =>
+                    invitation.invitee
+            );
+
+
+        // ==========================
+        // RESPONSE
+        // ==========================
+
+        return res.json({
+
+            success: true,
+
+            invitedUsers
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "GET SENT GROUP INVITATIONS ERROR:",
+            error
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Failed to load sent invitations."
+
+        });
+
+    }
+
+};
+
+// ==================================================
 // GET MY GROUP INVITATIONS
 // ==================================================
 
