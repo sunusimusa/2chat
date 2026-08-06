@@ -20,10 +20,11 @@ const {
 
     // GROUP INVITATIONS
     sendGroupInvitation,
-    getMyGroupInvitations,
-    acceptGroupInvitation,
-    rejectGroupInvitation
-
+getMyGroupInvitations,
+getSentGroupInvitations,
+acceptGroupInvitation,
+rejectGroupInvitation
+    
 } = require("../controllers/groupController");
 
 
@@ -51,6 +52,13 @@ router.get(
 router.post(
     "/invite",
     sendGroupInvitation
+);
+
+
+// GET INVITATIONS ALREADY SENT BY THIS USER
+router.get(
+    "/invitations/sent/:groupId/:username",
+    getSentGroupInvitations
 );
 
 
