@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Invite Members</title>
+
+
+    <!-- ==========================
+         CSS
+    =========================== -->
+
+    <link
+        rel="stylesheet"
+        href="/css/group-invite-members.css"
+    >
+
+
+    <!-- ==========================
+         FONT AWESOME
+    =========================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- ==========================
+         HEADER
+    =========================== -->
+
+    <header class="invite-header">
+
+        <button
+            id="backButton"
+            type="button"
+            aria-label="Go back"
+        >
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+        </button>
+
+
+        <h2>
+            Invite Members
+        </h2>
+
+    </header>
+
+
+
+    <!-- ==========================
+         MAIN
+    =========================== -->
+
+    <main class="invite-container">
+
+
+        <!-- ==========================
+             TITLE
+        =========================== -->
+
+        <section class="invite-intro">
+
+            <div class="invite-icon">
+
+                <i class="fa-solid fa-user-plus"></i>
+
+            </div>
+
+
+            <h3>
+                Invite People
+            </h3>
+
+
+            <p>
+                Enter a 2Chat username to invite them
+                to join this group.
+            </p>
+
+        </section>
+
+
+
+        <!-- ==========================
+             SEARCH / USERNAME
+        =========================== -->
+
+        <section class="search-section">
+
+            <label for="usernameInput">
+
+                <i class="fa-solid fa-user"></i>
+
+                Username
+
+            </label>
+
+
+            <div class="search-box">
+
+                <input
+                    type="text"
+                    id="usernameInput"
+                    placeholder="Enter username..."
+                    autocomplete="off"
+                    maxlength="50"
+                >
+
+
+                <button
+                    id="inviteButton"
+                    type="button"
+                >
+
+                    <i class="fa-solid fa-paper-plane"></i>
+
+                    Invite
+
+                </button>
+
+            </div>
+
+
+            <small>
+
+                Enter the exact username of the person
+                you want to invite.
+
+            </small>
+
+        </section>
+
+
+
+        <!-- ==========================
+             MESSAGE
+        =========================== -->
+
+        <div
+            id="inviteMessage"
+            class="invite-message"
+        ></div>
+
+
+
+        <!-- ==========================
+             RESULT
+        =========================== -->
+
+        <section
+            id="inviteResult"
+            class="invite-result"
+        ></section>
+
+
+
+        <!-- ==========================
+             INFO
+        =========================== -->
+
+        <section class="invite-info-box">
+
+            <i class="fa-solid fa-circle-info"></i>
+
+            <div>
+
+                <strong>
+                    How invitations work
+                </strong>
+
+                <p>
+                    The person you invite will receive
+                    the invitation in their Group
+                    Invitations page.
+                </p>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- ==========================
+         JAVASCRIPT
+    =========================== -->
+
+    <script
+        src="/js/group-invite-members.js"
+    ></script>
+
+
+</body>
+
+</html>
