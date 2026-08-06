@@ -1,0 +1,572 @@
+/* ==================================================
+   2CHAT GROUP INVITE MEMBERS
+================================================== */
+
+
+/* ==================================================
+   RESET
+================================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+body {
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: #f4f7fb;
+
+    color: #222;
+
+    min-height: 100vh;
+
+}
+
+
+/* ==================================================
+   HEADER
+================================================== */
+
+.invite-header {
+
+    height: 70px;
+
+    background: #2196f3;
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 0 18px;
+
+    gap: 18px;
+
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.15);
+
+}
+
+
+.invite-header button {
+
+    width: 44px;
+
+    height: 44px;
+
+    border: none;
+
+    background: transparent;
+
+    color: white;
+
+    font-size: 24px;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+}
+
+
+.invite-header button:active {
+
+    background:
+        rgba(255, 255, 255, 0.18);
+
+}
+
+
+.invite-header h2 {
+
+    font-size: 22px;
+
+    font-weight: 700;
+
+}
+
+
+/* ==================================================
+   MAIN
+================================================== */
+
+.invite-container {
+
+    width: 100%;
+
+    max-width: 650px;
+
+    margin: 0 auto;
+
+    padding: 25px 18px 50px;
+
+}
+
+
+/* ==================================================
+   INTRO
+================================================== */
+
+.invite-intro {
+
+    text-align: center;
+
+    padding: 20px 10px 25px;
+
+}
+
+
+.invite-icon {
+
+    width: 70px;
+
+    height: 70px;
+
+    margin: 0 auto 15px;
+
+    border-radius: 50%;
+
+    background: #e3f2fd;
+
+    color: #2196f3;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 28px;
+
+}
+
+
+.invite-intro h3 {
+
+    font-size: 24px;
+
+    margin-bottom: 8px;
+
+}
+
+
+.invite-intro p {
+
+    color: #666;
+
+    font-size: 15px;
+
+    line-height: 1.5;
+
+}
+
+
+/* ==================================================
+   SEARCH SECTION
+================================================== */
+
+.search-section {
+
+    background: white;
+
+    border-radius: 14px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 3px 15px rgba(0, 0, 0, 0.08);
+
+}
+
+
+.search-section label {
+
+    display: block;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    margin-bottom: 10px;
+
+    color: #333;
+
+}
+
+
+.search-section label i {
+
+    color: #2196f3;
+
+    margin-right: 6px;
+
+}
+
+
+/* ==================================================
+   SEARCH BOX
+================================================== */
+
+.search-box {
+
+    display: flex;
+
+    gap: 10px;
+
+}
+
+
+.search-box input {
+
+    flex: 1;
+
+    min-width: 0;
+
+    height: 50px;
+
+    border: 1px solid #d8dee7;
+
+    border-radius: 10px;
+
+    padding: 0 14px;
+
+    font-size: 16px;
+
+    outline: none;
+
+    background: #fafbfc;
+
+}
+
+
+.search-box input:focus {
+
+    border-color: #2196f3;
+
+    background: white;
+
+    box-shadow:
+        0 0 0 3px rgba(33, 150, 243, 0.12);
+
+}
+
+
+/* ==================================================
+   INVITE BUTTON
+================================================== */
+
+#inviteButton {
+
+    height: 50px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    padding: 0 18px;
+
+    background: #2196f3;
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition: 0.2s;
+
+}
+
+
+#inviteButton:hover {
+
+    background: #1976d2;
+
+}
+
+
+#inviteButton:active {
+
+    transform: scale(0.97);
+
+}
+
+
+#inviteButton:disabled {
+
+    opacity: 0.65;
+
+    cursor: not-allowed;
+
+}
+
+
+.search-section small {
+
+    display: block;
+
+    color: #777;
+
+    margin-top: 9px;
+
+    line-height: 1.4;
+
+}
+
+
+/* ==================================================
+   MESSAGE
+================================================== */
+
+.invite-message {
+
+    display: none;
+
+    margin-top: 18px;
+
+    padding: 14px 16px;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+
+    line-height: 1.4;
+
+}
+
+
+.invite-message.show {
+
+    display: block;
+
+}
+
+
+.invite-message.success {
+
+    background: #e8f5e9;
+
+    color: #2e7d32;
+
+    border: 1px solid #c8e6c9;
+
+}
+
+
+.invite-message.error {
+
+    background: #ffebee;
+
+    color: #c62828;
+
+    border: 1px solid #ffcdd2;
+
+}
+
+
+/* ==================================================
+   RESULT
+================================================== */
+
+.invite-result {
+
+    margin-top: 18px;
+
+}
+
+
+/* ==================================================
+   SUCCESS CARD
+================================================== */
+
+.invited-card {
+
+    background: white;
+
+    border-radius: 14px;
+
+    padding: 16px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    box-shadow:
+        0 3px 15px rgba(0, 0, 0, 0.07);
+
+}
+
+
+.invited-avatar {
+
+    width: 48px;
+
+    height: 48px;
+
+    border-radius: 50%;
+
+    background: #e3f2fd;
+
+    color: #2196f3;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 20px;
+
+}
+
+
+.invited-info {
+
+    flex: 1;
+
+}
+
+
+.invited-info strong {
+
+    display: block;
+
+    font-size: 16px;
+
+}
+
+
+.invited-info span {
+
+    display: block;
+
+    color: #777;
+
+    font-size: 13px;
+
+    margin-top: 4px;
+
+}
+
+
+.invited-check {
+
+    color: #43a047;
+
+    font-size: 24px;
+
+}
+
+
+/* ==================================================
+   INFO BOX
+================================================== */
+
+.invite-info-box {
+
+    margin-top: 25px;
+
+    background: #e3f2fd;
+
+    color: #1565c0;
+
+    border-radius: 12px;
+
+    padding: 16px;
+
+    display: flex;
+
+    gap: 12px;
+
+    line-height: 1.45;
+
+}
+
+
+.invite-info-box > i {
+
+    font-size: 20px;
+
+    margin-top: 2px;
+
+}
+
+
+.invite-info-box strong {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+}
+
+
+.invite-info-box p {
+
+    font-size: 14px;
+
+}
+
+
+/* ==================================================
+   MOBILE
+================================================== */
+
+@media (max-width: 500px) {
+
+    .invite-header {
+
+        height: 64px;
+
+    }
+
+
+    .invite-header h2 {
+
+        font-size: 20px;
+
+    }
+
+
+    .invite-container {
+
+        padding:
+            18px 12px 40px;
+
+    }
+
+
+    .search-box {
+
+        flex-direction: column;
+
+    }
+
+
+    #inviteButton {
+
+        width: 100%;
+
+    }
+
+}
