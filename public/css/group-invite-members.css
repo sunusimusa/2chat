@@ -185,7 +185,7 @@ body {
 
     border-radius: 14px;
 
-    padding: 20px;
+    padding: 15px;
 
     box-shadow:
         0 3px 15px rgba(0, 0, 0, 0.08);
@@ -193,50 +193,15 @@ body {
 }
 
 
-.search-section label {
-
-    display: block;
-
-    font-size: 15px;
-
-    font-weight: 700;
-
-    margin-bottom: 10px;
-
-    color: #333;
-
-}
-
-
-.search-section label i {
-
-    color: #2196f3;
-
-    margin-right: 6px;
-
-}
-
-
-/* ==================================================
-   SEARCH BOX
-================================================== */
-
 .search-box {
+
+    height: 50px;
 
     display: flex;
 
+    align-items: center;
+
     gap: 10px;
-
-}
-
-
-.search-box input {
-
-    flex: 1;
-
-    min-width: 0;
-
-    height: 50px;
 
     border: 1px solid #d8dee7;
 
@@ -244,16 +209,12 @@ body {
 
     padding: 0 14px;
 
-    font-size: 16px;
-
-    outline: none;
-
     background: #fafbfc;
 
 }
 
 
-.search-box input:focus {
+.search-box:focus-within {
 
     border-color: #2196f3;
 
@@ -265,69 +226,39 @@ body {
 }
 
 
-/* ==================================================
-   INVITE BUTTON
-================================================== */
+.search-box i {
 
-#inviteButton {
+    color: #2196f3;
 
-    height: 50px;
+    font-size: 17px;
+
+}
+
+
+.search-box input {
+
+    flex: 1;
+
+    width: 100%;
+
+    height: 100%;
 
     border: none;
 
-    border-radius: 10px;
+    outline: none;
 
-    padding: 0 18px;
+    background: transparent;
 
-    background: #2196f3;
+    font-size: 16px;
 
-    color: white;
-
-    font-size: 15px;
-
-    font-weight: 700;
-
-    cursor: pointer;
-
-    white-space: nowrap;
-
-    transition: 0.2s;
+    color: #222;
 
 }
 
 
-#inviteButton:hover {
+.search-box input::placeholder {
 
-    background: #1976d2;
-
-}
-
-
-#inviteButton:active {
-
-    transform: scale(0.97);
-
-}
-
-
-#inviteButton:disabled {
-
-    opacity: 0.65;
-
-    cursor: not-allowed;
-
-}
-
-
-.search-section small {
-
-    display: block;
-
-    color: #777;
-
-    margin-top: 9px;
-
-    line-height: 1.4;
+    color: #999;
 
 }
 
@@ -383,51 +314,168 @@ body {
 
 
 /* ==================================================
-   RESULT
+   LOADING
 ================================================== */
 
-.invite-result {
+.loading {
 
-    margin-top: 18px;
+    text-align: center;
+
+    padding: 35px 15px;
+
+    color: #777;
+
+    font-size: 15px;
+
+}
+
+
+.loading i {
+
+    color: #2196f3;
+
+    margin-right: 7px;
 
 }
 
 
 /* ==================================================
-   SUCCESS CARD
+   USERS LIST
 ================================================== */
 
-.invited-card {
+.users-list {
+
+    margin-top: 18px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+}
+
+
+/* ==================================================
+   USER CARD
+================================================== */
+
+.user-card {
 
     background: white;
 
     border-radius: 14px;
 
-    padding: 16px;
+    padding: 13px 14px;
 
     display: flex;
 
     align-items: center;
 
-    gap: 14px;
+    gap: 12px;
 
     box-shadow:
-        0 3px 15px rgba(0, 0, 0, 0.07);
+        0 2px 10px rgba(0, 0, 0, 0.06);
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
 
 }
 
 
-.invited-avatar {
+.user-card:active {
 
-    width: 48px;
+    transform: scale(0.99);
 
-    height: 48px;
+}
+
+
+.user-avatar {
+
+    width: 50px;
+
+    height: 50px;
+
+    flex-shrink: 0;
 
     border-radius: 50%;
 
+    object-fit: cover;
+
     background: #e3f2fd;
 
-    color: #2196f3;
+    border: 2px solid #e3f2fd;
+
+}
+
+
+/* ==================================================
+   USER INFO
+================================================== */
+
+.user-info {
+
+    flex: 1;
+
+    min-width: 0;
+
+}
+
+
+.user-info strong {
+
+    display: block;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+}
+
+
+.user-info small {
+
+    display: block;
+
+    margin-top: 4px;
+
+    color: #777;
+
+    font-size: 12px;
+
+}
+
+
+/* ==================================================
+   INVITE BUTTON
+================================================== */
+
+.invite-btn {
+
+    border: none;
+
+    border-radius: 9px;
+
+    padding: 10px 14px;
+
+    background: #2196f3;
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    white-space: nowrap;
 
     display: flex;
 
@@ -435,45 +483,79 @@ body {
 
     justify-content: center;
 
-    font-size: 20px;
+    gap: 6px;
+
+    transition: 0.2s;
 
 }
 
 
-.invited-info {
+.invite-btn:hover {
 
-    flex: 1;
-
-}
-
-
-.invited-info strong {
-
-    display: block;
-
-    font-size: 16px;
+    background: #1976d2;
 
 }
 
 
-.invited-info span {
+.invite-btn:active {
 
-    display: block;
+    transform: scale(0.96);
+
+}
+
+
+.invite-btn:disabled {
+
+    opacity: 0.7;
+
+    cursor: not-allowed;
+
+}
+
+
+.invite-btn.invited {
+
+    background: #43a047;
+
+}
+
+
+/* ==================================================
+   EMPTY USERS
+================================================== */
+
+.empty-users {
+
+    background: white;
+
+    border-radius: 14px;
+
+    padding: 40px 20px;
+
+    text-align: center;
+
+    box-shadow:
+        0 2px 10px rgba(0, 0, 0, 0.06);
+
+}
+
+
+.empty-users i {
+
+    color: #9e9e9e;
+
+    font-size: 40px;
+
+    margin-bottom: 12px;
+
+}
+
+
+.empty-users p {
 
     color: #777;
 
-    font-size: 13px;
-
-    margin-top: 4px;
-
-}
-
-
-.invited-check {
-
-    color: #43a047;
-
-    font-size: 24px;
+    font-size: 15px;
 
 }
 
@@ -556,16 +638,41 @@ body {
     }
 
 
-    .search-box {
+    .user-card {
 
-        flex-direction: column;
+        padding: 12px;
 
     }
 
 
-    #inviteButton {
+    .user-avatar {
 
-        width: 100%;
+        width: 46px;
+
+        height: 46px;
+
+    }
+
+
+    .user-info strong {
+
+        font-size: 15px;
+
+    }
+
+
+    .invite-btn {
+
+        padding: 9px 11px;
+
+        font-size: 13px;
+
+    }
+
+
+    .invite-btn i {
+
+        font-size: 12px;
 
     }
 
