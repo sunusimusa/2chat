@@ -104,6 +104,25 @@ const inviteMembersBtn =
 
 let currentGroup = null;
 
+// ==================================================
+// INVITE MEMBERS BUTTON
+// ==================================================
+
+if (inviteMembersBtn) {
+
+    inviteMembersBtn.addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                "/group-invite-members.html?id=" +
+                encodeURIComponent(groupId);
+
+        }
+    );
+
+}
+
 
 // ==================================================
 // MESSAGE
