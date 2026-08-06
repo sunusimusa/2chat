@@ -392,6 +392,12 @@ function renderUser(
 
     }
 
+    console.log(
+    "USER:",
+    targetUser.username,
+    "AVATAR:",
+    targetUser.avatar
+);
 
     // ------------------------------------------
     // DON'T SHOW YOURSELF
