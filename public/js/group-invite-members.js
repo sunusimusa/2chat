@@ -95,37 +95,29 @@ function showMessage(
 // LOAD USERS
 // ==================================================
 
+// ==================================================
+// LOAD USERS
+// ==================================================
+
 async function loadUsers(search = "") {
 
     try {
 
         if (loading) {
-
-            loading.style.display =
-                "block";
-
+            loading.style.display = "block";
         }
 
         if (usersList) {
-
             usersList.innerHTML = "";
-
         }
 
-        const url =
-            "/api/users/search?query=" +
-            encodeURIComponent(search);
-
         const res =
-            await fetch(url);
+            await fetch("/api/users/all");
 
         const data =
             await res.json();
 
-        if (
-            !res.ok ||
-            !data.success
-        ) {
+        if (!res.ok || !data.success) {
 
             throw new Error(
                 data.message ||
@@ -134,9 +126,42 @@ async function loadUsers(search = "") {
 
         }
 
-        const users =
+        let users =
             data.users || [];
 
+
+        // ==========================================
+        // REMOVE CURRENT USER
+        // ==========================================
+
+        users = users.filter(
+            targetUser =>
+                targetUser.username !== user.username
+        );
+
+
+        // ==========================================
+        // SEARCH USERS
+        // ==========================================
+
+        const searchText =
+            search.trim().toLowerCase();
+
+        if (searchText) {
+
+            users = users.filter(
+                targetUser =>
+                    targetUser.username
+                        .toLowerCase()
+                        .includes(searchText)
+            );
+
+        }
+
+
+        // ==========================================
+        // NO USERS
+        // ==========================================
 
         if (!users.length) {
 
@@ -149,7 +174,11 @@ async function loadUsers(search = "") {
                         <i class="fa-solid fa-user-slash"></i>
 
                         <p>
-                            No users found.
+                            ${
+                                searchText
+                                ? "No users found."
+                                : "No users available."
+                            }
                         </p>
 
                     </div>
@@ -163,6 +192,10 @@ async function loadUsers(search = "") {
         }
 
 
+        // ==========================================
+        // DISPLAY USERS
+        // ==========================================
+
         users.forEach(
             renderUser
         );
@@ -175,6 +208,27 @@ async function loadUsers(search = "") {
             error
         );
 
+        if (usersList) {
+
+            usersList.innerHTML = `
+
+                <div class="empty-users">
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                    <p>
+                        ${escapeHtml(
+                            error.message ||
+                            "Failed to load users."
+                        )}
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
         showMessage(
             error.message ||
             "Failed to load users.",
@@ -184,10 +238,7 @@ async function loadUsers(search = "") {
     } finally {
 
         if (loading) {
-
-            loading.style.display =
-                "none";
-
+            loading.style.display = "none";
         }
 
     }
