@@ -454,16 +454,13 @@ if (
     card.innerHTML = `
 
         <img
-            class="user-avatar"
-            src="${escapeHtml(avatar)}"
-            alt="${escapeHtml(
-                targetUser.username
-            )}"
-            onerror="
-                this.onerror=null;
-                this.src='/images/default-avatar.png';
-            "
-        >
+    class="user-avatar"
+    src="${escapeHtml(avatar)}"
+    alt="${escapeHtml(
+        targetUser.username
+    )}"
+    onerror="this.onerror=null; this.src='/images/default-avatar.png';"
+>
 
 
         <div class="user-info">
