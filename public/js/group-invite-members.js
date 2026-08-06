@@ -2,19 +2,41 @@
 // 2CHAT GROUP INVITE MEMBERS
 // ==================================================
 
-const user = JSON.parse(
-    localStorage.getItem("user")
-);
+
+// ==================================================
+// GET LOGGED-IN USER
+// ==================================================
+
+let user = null;
+
+try {
+
+    user = JSON.parse(
+        localStorage.getItem("user")
+    );
+
+} catch (error) {
+
+    console.error(
+        "USER DATA ERROR:",
+        error
+    );
+
+}
+
 
 // ==================================================
 // GET GROUP ID
 // ==================================================
 
-const params = new URLSearchParams(
-    window.location.search
-);
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
 
-const groupId = params.get("id");
+const groupId =
+    params.get("id");
+
 
 // ==================================================
 // CHECK LOGIN
@@ -24,11 +46,15 @@ if (!user || !user.username) {
 
     alert("Please login first.");
 
-    window.location.href = "/login.html";
+    window.location.href =
+        "/login.html";
 
-    throw new Error("User is not logged in.");
+    throw new Error(
+        "User is not logged in."
+    );
 
 }
+
 
 // ==================================================
 // CHECK GROUP ID
@@ -40,28 +66,52 @@ if (!groupId) {
 
     history.back();
 
-    throw new Error("Group ID is missing.");
+    throw new Error(
+        "Group ID is missing."
+    );
 
 }
+
 
 // ==================================================
 // ELEMENTS
 // ==================================================
 
 const backButton =
-    document.getElementById("backButton");
+    document.getElementById(
+        "backButton"
+    );
 
 const searchInput =
-    document.getElementById("searchInput");
+    document.getElementById(
+        "searchInput"
+    );
 
 const usersList =
-    document.getElementById("usersList");
+    document.getElementById(
+        "usersList"
+    );
 
 const loading =
-    document.getElementById("loading");
+    document.getElementById(
+        "loading"
+    );
 
 const message =
-    document.getElementById("inviteMessage");
+    document.getElementById(
+        "inviteMessage"
+    );
+
+
+// ==================================================
+// INVITED USERS
+// ==================================================
+
+// Wannan yana taimaka mana kada button ya koma
+// "Invite" bayan search ko reload na list.
+
+const invitedUsers =
+    new Set();
 
 
 // ==================================================
@@ -75,49 +125,101 @@ function showMessage(
 
     if (!message) return;
 
-    message.textContent = text;
+
+    message.textContent =
+        text;
+
 
     message.className =
         error
-        ? "invite-message error show"
-        : "invite-message success show";
+            ? "invite-message error show"
+            : "invite-message success show";
 
-    setTimeout(() => {
 
-        message.classList.remove("show");
+    clearTimeout(
+        showMessage.timer
+    );
 
-    }, 3000);
+
+    showMessage.timer =
+        setTimeout(() => {
+
+            message.classList.remove(
+                "show"
+            );
+
+        }, 3000);
 
 }
 
 
 // ==================================================
-// LOAD USERS
+// LOAD ALL USERS
 // ==================================================
 
-// ==================================================
-// LOAD USERS
-// ==================================================
+async function loadUsers(
+    search = ""
+) {
 
-async function loadUsers(search = "") {
+    if (!usersList) {
+
+        console.error(
+            "usersList element not found."
+        );
+
+        return;
+
+    }
+
 
     try {
 
+        // ------------------------------------------
+        // LOADING
+        // ------------------------------------------
+
         if (loading) {
-            loading.style.display = "block";
+
+            loading.style.display =
+                "block";
+
         }
 
-        if (usersList) {
-            usersList.innerHTML = "";
-        }
+
+        usersList.innerHTML =
+            "";
+
+
+        // ------------------------------------------
+        // GET USERS
+        // ------------------------------------------
 
         const res =
-            await fetch("/api/users/all");
+            await fetch(
+                "/api/users/all",
+                {
+                    method: "GET",
+
+                    headers: {
+                        "Accept":
+                            "application/json"
+                    }
+                }
+            );
+
 
         const data =
             await res.json();
 
-        if (!res.ok || !data.success) {
+
+        // ------------------------------------------
+        // CHECK RESPONSE
+        // ------------------------------------------
+
+        if (
+            !res.ok ||
+            !data.success
+        ) {
 
             throw new Error(
                 data.message ||
@@ -126,75 +228,98 @@ async function loadUsers(search = "") {
 
         }
 
+
         let users =
-            data.users || [];
+            Array.isArray(data.users)
+                ? data.users
+                : [];
 
 
-        // ==========================================
+        // ------------------------------------------
         // REMOVE CURRENT USER
-        // ==========================================
+        // ------------------------------------------
 
-        users = users.filter(
-            targetUser =>
-                targetUser.username !== user.username
-        );
+        users =
+            users.filter(
+                targetUser => {
+
+                    return (
+                        targetUser &&
+                        targetUser.username &&
+                        targetUser.username !==
+                            user.username
+                    );
+
+                }
+            );
 
 
-        // ==========================================
-        // SEARCH USERS
-        // ==========================================
+        // ------------------------------------------
+        // SEARCH
+        // ------------------------------------------
 
         const searchText =
-            search.trim().toLowerCase();
+            String(search || "")
+                .trim()
+                .toLowerCase();
+
 
         if (searchText) {
 
-            users = users.filter(
-                targetUser =>
-                    targetUser.username
-                        .toLowerCase()
-                        .includes(searchText)
-            );
+            users =
+                users.filter(
+                    targetUser => {
+
+                        const username =
+                            String(
+                                targetUser.username ||
+                                ""
+                            ).toLowerCase();
+
+                        return username.includes(
+                            searchText
+                        );
+
+                    }
+                );
 
         }
 
 
-        // ==========================================
+        // ------------------------------------------
         // NO USERS
-        // ==========================================
+        // ------------------------------------------
 
         if (!users.length) {
 
-            if (usersList) {
+            usersList.innerHTML = `
 
-                usersList.innerHTML = `
+                <div class="empty-users">
 
-                    <div class="empty-users">
+                    <i
+                        class="fa-solid fa-user-slash"
+                    ></i>
 
-                        <i class="fa-solid fa-user-slash"></i>
-
-                        <p>
-                            ${
-                                searchText
+                    <p>
+                        ${
+                            searchText
                                 ? "No users found."
                                 : "No users available."
-                            }
-                        </p>
+                        }
+                    </p>
 
-                    </div>
+                </div>
 
-                `;
-
-            }
+            `;
 
             return;
 
         }
 
 
-        // ==========================================
+        // ------------------------------------------
         // DISPLAY USERS
-        // ==========================================
+        // ------------------------------------------
 
         users.forEach(
             renderUser
@@ -208,26 +333,26 @@ async function loadUsers(search = "") {
             error
         );
 
-        if (usersList) {
 
-            usersList.innerHTML = `
+        usersList.innerHTML = `
 
-                <div class="empty-users">
+            <div class="empty-users">
 
-                    <i class="fa-solid fa-circle-exclamation"></i>
+                <i
+                    class="fa-solid fa-circle-exclamation"
+                ></i>
 
-                    <p>
-                        ${escapeHtml(
-                            error.message ||
-                            "Failed to load users."
-                        )}
-                    </p>
+                <p>
+                    ${escapeHtml(
+                        error.message ||
+                        "Failed to load users."
+                    )}
+                </p>
 
-                </div>
+            </div>
 
-            `;
+        `;
 
-        }
 
         showMessage(
             error.message ||
@@ -235,10 +360,14 @@ async function loadUsers(search = "") {
             true
         );
 
+
     } finally {
 
         if (loading) {
-            loading.style.display = "none";
+
+            loading.style.display =
+                "none";
+
         }
 
     }
@@ -250,7 +379,9 @@ async function loadUsers(search = "") {
 // RENDER USER
 // ==================================================
 
-function renderUser(targetUser) {
+function renderUser(
+    targetUser
+) {
 
     if (
         !targetUser ||
@@ -262,7 +393,9 @@ function renderUser(targetUser) {
     }
 
 
-    // Don't show yourself
+    // ------------------------------------------
+    // DON'T SHOW YOURSELF
+    // ------------------------------------------
 
     if (
         targetUser.username ===
@@ -274,16 +407,43 @@ function renderUser(targetUser) {
     }
 
 
+    // ------------------------------------------
+    // CREATE CARD
+    // ------------------------------------------
+
     const card =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     card.className =
         "user-card";
 
 
+    // ------------------------------------------
+    // AVATAR
+    // ------------------------------------------
+
     const avatar =
-        targetUser.avatar ||
-        "/images/default-avatar.png";
+        targetUser.avatar &&
+        String(
+            targetUser.avatar
+        ).trim() !== ""
+
+            ? targetUser.avatar
+
+            : "/images/default-avatar.png";
+
+
+    // ------------------------------------------
+    // ONLINE STATUS
+    // ------------------------------------------
+
+    const onlineText =
+        targetUser.online
+            ? "Online"
+            : "Offline";
 
 
     card.innerHTML = `
@@ -291,8 +451,15 @@ function renderUser(targetUser) {
         <img
             class="user-avatar"
             src="${escapeHtml(avatar)}"
-            alt="Avatar"
+            alt="${escapeHtml(
+                targetUser.username
+            )}"
+            onerror="
+                this.onerror=null;
+                this.src='/images/default-avatar.png';
+            "
         >
+
 
         <div class="user-info">
 
@@ -302,14 +469,21 @@ function renderUser(targetUser) {
                 )}
             </strong>
 
+            <small>
+                ${onlineText}
+            </small>
+
         </div>
+
 
         <button
             type="button"
             class="invite-btn"
         >
 
-            <i class="fa-solid fa-user-plus"></i>
+            <i
+                class="fa-solid fa-user-plus"
+            ></i>
 
             Invite
 
@@ -318,11 +492,43 @@ function renderUser(targetUser) {
     `;
 
 
+    // ------------------------------------------
+    // INVITE BUTTON
+    // ------------------------------------------
+
     const inviteButton =
         card.querySelector(
             ".invite-btn"
         );
 
+
+    if (!inviteButton) {
+
+        return;
+
+    }
+
+
+    // ------------------------------------------
+    // ALREADY INVITED IN THIS SESSION
+    // ------------------------------------------
+
+    if (
+        invitedUsers.has(
+            targetUser.username
+        )
+    ) {
+
+        setInvitedButton(
+            inviteButton
+        );
+
+    }
+
+
+    // ------------------------------------------
+    // CLICK
+    // ------------------------------------------
 
     inviteButton.addEventListener(
         "click",
@@ -337,13 +543,15 @@ function renderUser(targetUser) {
     );
 
 
-    usersList.appendChild(card);
+    usersList.appendChild(
+        card
+    );
 
 }
 
 
 // ==================================================
-// SEND INVITATION
+// SEND GROUP INVITATION
 // ==================================================
 
 async function sendInvitation(
@@ -351,16 +559,42 @@ async function sendInvitation(
     button
 ) {
 
-    if (!invitee) return;
+    if (!invitee) {
 
+        return;
+
+    }
+
+
+    // ------------------------------------------
+    // PREVENT DOUBLE CLICK
+    // ------------------------------------------
+
+    if (
+        button &&
+        button.disabled
+    ) {
+
+        return;
+
+    }
+
+
+    // ------------------------------------------
+    // BUTTON LOADING
+    // ------------------------------------------
 
     if (button) {
 
-        button.disabled = true;
+        button.disabled =
+            true;
+
 
         button.innerHTML = `
 
-            <i class="fa-solid fa-spinner fa-spin"></i>
+            <i
+                class="fa-solid fa-spinner fa-spin"
+            ></i>
 
             Sending...
 
@@ -370,6 +604,10 @@ async function sendInvitation(
 
 
     try {
+
+        // ------------------------------------------
+        // SEND REQUEST
+        // ------------------------------------------
 
         const res =
             await fetch(
@@ -381,18 +619,26 @@ async function sendInvitation(
                     headers: {
 
                         "Content-Type":
+                            "application/json",
+
+                        "Accept":
                             "application/json"
 
                     },
 
                     body: JSON.stringify({
 
-                        groupId,
+                        groupId:
+
+                            groupId,
 
                         username:
+
                             user.username,
 
-                        invitee
+                        invitee:
+
+                            invitee
 
                     })
 
@@ -400,9 +646,17 @@ async function sendInvitation(
             );
 
 
+        // ------------------------------------------
+        // READ RESPONSE
+        // ------------------------------------------
+
         const data =
             await res.json();
 
+
+        // ------------------------------------------
+        // CHECK RESPONSE
+        // ------------------------------------------
 
         if (
             !res.ok ||
@@ -417,28 +671,35 @@ async function sendInvitation(
         }
 
 
-        showMessage(
-            "✅ Invitation sent successfully."
+        // ------------------------------------------
+        // SAVE INVITED USER
+        // ------------------------------------------
+
+        invitedUsers.add(
+            invitee
         );
 
 
+        // ------------------------------------------
+        // BUTTON SUCCESS
+        // ------------------------------------------
+
         if (button) {
 
-            button.disabled = true;
-
-            button.innerHTML = `
-
-                <i class="fa-solid fa-check"></i>
-
-                Invited
-
-            `;
-
-            button.classList.add(
-                "invited"
+            setInvitedButton(
+                button
             );
 
         }
+
+
+        // ------------------------------------------
+        // MESSAGE
+        // ------------------------------------------
+
+        showMessage(
+            "✅ Invitation sent successfully."
+        );
 
 
     } catch (error) {
@@ -449,6 +710,10 @@ async function sendInvitation(
         );
 
 
+        // ------------------------------------------
+        // ERROR MESSAGE
+        // ------------------------------------------
+
         showMessage(
             error.message ||
             "Failed to send invitation.",
@@ -456,13 +721,21 @@ async function sendInvitation(
         );
 
 
+        // ------------------------------------------
+        // RESTORE BUTTON
+        // ------------------------------------------
+
         if (button) {
 
-            button.disabled = false;
+            button.disabled =
+                false;
+
 
             button.innerHTML = `
 
-                <i class="fa-solid fa-user-plus"></i>
+                <i
+                    class="fa-solid fa-user-plus"
+                ></i>
 
                 Invite
 
@@ -476,10 +749,45 @@ async function sendInvitation(
 
 
 // ==================================================
+// SET INVITED BUTTON
+// ==================================================
+
+function setInvitedButton(
+    button
+) {
+
+    if (!button) return;
+
+
+    button.disabled =
+        true;
+
+
+    button.innerHTML = `
+
+        <i
+            class="fa-solid fa-check"
+        ></i>
+
+        Invited
+
+    `;
+
+
+    button.classList.add(
+        "invited"
+    );
+
+}
+
+
+// ==================================================
 // SEARCH
 // ==================================================
 
-let searchTimer;
+let searchTimer =
+    null;
+
 
 if (searchInput) {
 
@@ -491,16 +799,17 @@ if (searchInput) {
                 searchTimer
             );
 
+
             searchTimer =
                 setTimeout(
                     () => {
 
                         loadUsers(
-                            searchInput.value.trim()
+                            searchInput.value
                         );
 
                     },
-                    400
+                    300
                 );
 
         }
@@ -513,15 +822,21 @@ if (searchInput) {
 // ESCAPE HTML
 // ==================================================
 
-function escapeHtml(value) {
+function escapeHtml(
+    value
+) {
 
     const div =
         document.createElement(
             "div"
         );
 
+
     div.textContent =
-        value || "";
+        value == null
+            ? ""
+            : String(value);
+
 
     return div.innerHTML;
 
@@ -529,7 +844,7 @@ function escapeHtml(value) {
 
 
 // ==================================================
-// BACK
+// BACK BUTTON
 // ==================================================
 
 if (backButton) {
