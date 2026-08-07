@@ -1,73 +1,310 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  <title>2Chat Register</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>2Chat Register</title>
+
+    <!-- REGISTER CSS -->
+    <link
+        rel="stylesheet"
+        href="/css/register.css"
+    >
+
+    <!-- FONT AWESOME -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    >
+
 </head>
+
+
 <body>
 
-<h2>Create 2Chat Account</h2>
 
-<input id="username" placeholder="Username"><br><br>
+<div class="register-container">
 
-<input id="email" placeholder="Email"><br><br>
 
-<input id="password" type="password" placeholder="Password"><br><br>
+    <!-- ==========================
+         LOGO
+    =========================== -->
 
-<button onclick="register()">Register</button>
+    <div class="register-logo">
 
-<p id="msg"></p>
+        <i class="fa-solid fa-user-plus"></i>
+
+    </div>
+
+
+    <!-- ==========================
+         TITLE
+    =========================== -->
+
+    <h2>
+        Create 2Chat Account
+    </h2>
+
+
+    <p class="register-subtitle">
+        Join 2Chat and connect with your community.
+    </p>
+
+
+    <!-- ==========================
+         USERNAME
+    =========================== -->
+
+    <div class="input-group">
+
+        <i class="fa-solid fa-user"></i>
+
+        <input
+            id="username"
+            type="text"
+            placeholder="Username"
+            autocomplete="username"
+        >
+
+    </div>
+
+
+    <!-- ==========================
+         EMAIL
+    =========================== -->
+
+    <div class="input-group">
+
+        <i class="fa-solid fa-envelope"></i>
+
+        <input
+            id="email"
+            type="email"
+            placeholder="Email"
+            autocomplete="email"
+        >
+
+    </div>
+
+
+    <!-- ==========================
+         PASSWORD
+    =========================== -->
+
+    <div class="input-group">
+
+        <i class="fa-solid fa-lock"></i>
+
+        <input
+            id="password"
+            type="password"
+            placeholder="Password"
+            autocomplete="new-password"
+        >
+
+    </div>
+
+
+    <!-- ==========================
+         REGISTER
+    =========================== -->
+
+    <button
+        id="registerButton"
+        class="register-btn"
+        type="button"
+        onclick="register()"
+    >
+
+        <i class="fa-solid fa-user-plus"></i>
+
+        Register
+
+    </button>
+
+
+    <!-- ==========================
+         MESSAGE
+    =========================== -->
+
+    <p id="msg"></p>
+
+
+    <!-- ==========================
+         LOGIN
+    =========================== -->
+
+    <p class="login-text">
+
+        Already have an account?
+
+        <a href="/login.html">
+            Login Here
+        </a>
+
+    </p>
+
+
+</div>
+
+
 
 <script>
+
 async function register() {
 
-  const username =
-    document.getElementById("username").value;
+    const username =
+        document.getElementById("username").value.trim();
 
-  const email =
-    document.getElementById("email").value;
+    const email =
+        document.getElementById("email").value.trim();
 
-  const password =
-    document.getElementById("password").value;
+    const password =
+        document.getElementById("password").value;
 
-  const res = await fetch("/api/auth/register", {
-    method: "POST",
-    headers: {
-      "Content-Type":"application/json"
-    },
-    body: JSON.stringify({
-      username,
-      email,
-      password
-    })
-  });
+    const msg =
+        document.getElementById("msg");
 
-  const data = await res.json();
+    const button =
+        document.getElementById("registerButton");
 
-  if(data.success){
 
-    localStorage.setItem(
-      "token",
-      data.token
-    );
+    // ==========================
+    // VALIDATION
+    // ==========================
 
-    location.href = "/home.html";
+    if (!username || !email || !password) {
 
-  } else {
+        msg.innerText =
+            "Please fill in all fields.";
 
-    document.getElementById("msg")
-      .innerText = data.message;
-  }
+        return;
+
+    }
+
+
+    if (password.length < 6) {
+
+        msg.innerText =
+            "Password must be at least 6 characters.";
+
+        return;
+
+    }
+
+
+    // ==========================
+    // LOADING
+    // ==========================
+
+    button.disabled = true;
+
+    button.innerHTML = `
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Creating Account...
+    `;
+
+    msg.innerText = "";
+
+
+    try {
+
+        const res =
+            await fetch(
+                "/api/auth/register",
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body: JSON.stringify({
+
+                        username,
+                        email,
+                        password
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await res.json();
+
+
+        // ==========================
+        // SUCCESS
+        // ==========================
+
+        if (data.success) {
+
+            localStorage.setItem(
+                "token",
+                data.token
+            );
+
+
+            location.href =
+                "/home.html";
+
+
+            return;
+
+        }
+
+
+        // ==========================
+        // ERROR
+        // ==========================
+
+        msg.innerText =
+            data.message ||
+            "Registration failed.";
+
+
+    } catch (error) {
+
+        console.error(
+            "REGISTER ERROR:",
+            error
+        );
+
+        msg.innerText =
+            "Network error. Please try again.";
+
+    }
+
+
+    // ==========================
+    // RESTORE BUTTON
+    // ==========================
+
+    button.disabled = false;
+
+    button.innerHTML = `
+        <i class="fa-solid fa-user-plus"></i>
+        Register
+    `;
+
 }
 
 </script>
-  <p>
-Already have an account?
 
-<a href="/login.html">
-Login Here
-</a>
-</p>
 
 </body>
+
 </html>
