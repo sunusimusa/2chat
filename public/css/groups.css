@@ -392,3 +392,182 @@ ADMIN MANAGEMENT
     font-size:12px;
 
 }
+
+/* ==========================
+GROUP INVITATIONS
+========================== */
+
+.group-invitations-section{
+
+    padding-bottom:10px;
+
+}
+
+
+.group-invitations-card{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin:0 12px 15px;
+
+    padding:14px;
+
+    background:#fff;
+
+    border-radius:18px;
+
+    box-shadow:0 3px 12px rgba(0,0,0,.08);
+
+}
+
+
+.group-invitations-icon{
+
+    width:48px;
+
+    height:48px;
+
+    flex-shrink:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:#e8f1ff;
+
+    color:#1877f2;
+
+    font-size:20px;
+
+}
+
+
+.group-invitations-info{
+
+    flex:1;
+
+    min-width:0;
+
+}
+
+
+.group-invitations-info h3{
+
+    font-size:15px;
+
+    color:#222;
+
+    margin-bottom:4px;
+
+}
+
+
+.group-invitations-info p{
+
+    font-size:12px;
+
+    line-height:1.4;
+
+    color:#777;
+
+}
+
+
+.group-invitations-btn{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    padding:9px 13px;
+
+    border:none;
+
+    border-radius:20px;
+
+    background:#1877f2;
+
+    color:#fff;
+
+    font-size:12px;
+
+    cursor:pointer;
+
+    white-space:nowrap;
+
+}
+
+
+.group-invitations-btn:hover{
+
+    background:#1664c4;
+
+}
+
+
+.group-invitations-btn i{
+
+    font-size:12px;
+
+}
+
+
+/* ==========================
+MOBILE
+========================== */
+
+@media (max-width:420px){
+
+    .group-invitations-card{
+
+        gap:10px;
+
+        padding:13px;
+
+    }
+
+
+    .group-invitations-icon{
+
+        width:45px;
+
+        height:45px;
+
+        font-size:18px;
+
+    }
+
+
+    .group-invitations-info h3{
+
+        font-size:14px;
+
+    }
+
+
+    .group-invitations-info p{
+
+        font-size:11px;
+
+    }
+
+
+    .group-invitations-btn{
+
+        padding:9px 11px;
+
+        font-size:12px;
+
+    }
+
+}
