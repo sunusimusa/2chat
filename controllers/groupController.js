@@ -1056,7 +1056,18 @@ exports.sendGroupInvitation = async (req, res) => {
 
         if (!groupId || !username || !invitee) {
 
-            if (username === invitee) {
+    return res.status(400).json({
+
+        success: false,
+
+        message:
+            "Group ID, username and invitee are required."
+
+    });
+
+}
+
+if (username === invitee) {
 
     return res.status(400).json({
 
@@ -1068,18 +1079,7 @@ exports.sendGroupInvitation = async (req, res) => {
     });
 
 }
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Group ID, username and invitee are required."
-
-            });
-
-        }
-
+          
 
         // ==========================
         // FIND GROUP
@@ -1243,6 +1243,7 @@ exports.sendGroupInvitation = async (req, res) => {
 
 };
 
+
 // ==================================================
 // GET SENT GROUP INVITATIONS
 // ==================================================
@@ -1251,28 +1252,38 @@ exports.getSentGroupInvitations = async (req, res) => {
 
     try {
 
-        const {
-            groupId,
-            username
-        } = req.params;
+        const username =
+            String(req.params.username || "").trim();
+
+        const groupId =
+            String(req.query.groupId || "").trim();
 
 
         // ==========================
         // CHECK DATA
         // ==========================
 
-        if (!groupId || !username) {
+        if (!username || !groupId) {
 
             return res.status(400).json({
 
                 success: false,
 
                 message:
-                    "Group ID and username are required."
+                    "Username and group ID are required."
 
             });
 
         }
+
+
+        console.log(
+            "🔥 GET SENT INVITATIONS:",
+            {
+                username,
+                groupId
+            }
+        );
 
 
         // ==========================
@@ -1289,28 +1300,40 @@ exports.getSentGroupInvitations = async (req, res) => {
                 status: "pending"
 
             })
-            .select("invitee")
+            .sort({
+                createdAt: -1
+            })
             .lean();
 
 
         // ==========================
-        // GET USERNAMES ONLY
+        // GET USERNAMES
         // ==========================
 
         const invitedUsers =
             invitations.map(
                 invitation =>
-                    invitation.invitee
+                    String(
+                        invitation.invitee
+                    ).trim()
             );
+
+
+        console.log(
+            "🔥 SENT PENDING INVITATIONS:",
+            invitations.length
+        );
 
 
         // ==========================
         // RESPONSE
         // ==========================
 
-        return res.json({
+        return res.status(200).json({
 
             success: true,
+
+            invitations,
 
             invitedUsers
 
@@ -1337,6 +1360,7 @@ exports.getSentGroupInvitations = async (req, res) => {
     }
 
 };
+
 
 // ==================================================
 // GET MY GROUP INVITATIONS
@@ -1508,11 +1532,11 @@ exports.acceptGroupInvitation = async (req, res) => {
 
         if (!group) {
 
-            invitation.status =
-                "rejected";
+            invitation.status = "accepted";
+invitation.respondedAt = new Date();
 
-            await invitation.save();
-
+await invitation.save();
+            
             return res.status(404).json({
 
                 success: false,
@@ -1678,11 +1702,10 @@ exports.rejectGroupInvitation = async (req, res) => {
         // REJECT
         // ==========================
 
-        invitation.status =
-            "rejected";
+        invitation.status = "rejected";
+invitation.respondedAt = new Date();
 
-        await invitation.save();
-
+await invitation.save();
 
         return res.json({
 
