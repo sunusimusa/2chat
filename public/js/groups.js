@@ -445,17 +445,115 @@ function renderInvitationNotification(){
 
 }
 
-// ==========================
-// START
-// ==========================
+/* ==========================
+GROUP INVITATION NOTIFICATION
+========================== */
 
-loadGroups();
+async function loadInvitationNotification(){
 
-// ==========================
-// GROUP INVITATION NOTIFICATION
-// ==========================
+    try{
+
+        if(!user || !user.username){
+
+            return;
+
+        }
+
+        const res =
+            await fetch(
+                "/api/groups/invitations/" +
+                encodeURIComponent(user.username)
+            );
+
+        const data =
+            await res.json();
+
+        if(
+            !res.ok ||
+            !data.success
+        ){
+
+            return;
+
+        }
+
+        const invitations =
+            Array.isArray(data.invitations)
+                ? data.invitations
+                : [];
+
+        /*
+         * Nuna notification ne kawai
+         * idan akwai PENDING invitations.
+         */
+
+        const pendingInvitations =
+            invitations.filter(
+                invitation =>
+                    invitation &&
+                    invitation.status === "pending"
+            );
+
+        const badge =
+            document.getElementById(
+                "invitationBadge"
+            );
+
+        if(!badge){
+
+            return;
+
+        }
+
+        if(pendingInvitations.length > 0){
+
+            badge.textContent =
+                pendingInvitations.length > 99
+                    ? "99+"
+                    : pendingInvitations.length;
+
+            badge.style.display =
+                "flex";
+
+        }else{
+
+            badge.style.display =
+                "none";
+
+        }
+
+    }catch(error){
+
+        console.error(
+            "INVITATION NOTIFICATION ERROR:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ==========================
+START INVITATION CHECK
+========================== */
+
+loadInvitationNotification();
+
+
+/*
+ * Check every 15 seconds
+ * for new invitations.
+ */
 
 setInterval(
     loadInvitationNotification,
     15000
 );
+
+
+/* ==========================
+LOAD GROUPS
+========================== */
+
+loadGroups();
