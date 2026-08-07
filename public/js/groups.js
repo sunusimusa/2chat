@@ -12,6 +12,7 @@ document.getElementById("searchGroup");
 
 let allGroups = [];
 let ownedGroup = null;
+let invitationCount = 0;
 
 /* ==========================
 LOAD GROUPS
@@ -269,4 +270,192 @@ async function joinGroup(groupId){
 
 }
 
+/* ==========================
+GROUP INVITATION NOTIFICATION
+========================== */
+
+async function loadInvitationNotification(){
+
+    try{
+
+        if(!user || !user.username){
+            return;
+        }
+
+        const res =
+        await fetch(
+            "/api/groups/invitations/" +
+            encodeURIComponent(user.username)
+        );
+
+        const data =
+        await res.json();
+
+        if(
+            !res.ok ||
+            !data.success
+        ){
+            return;
+        }
+
+        const invitations =
+            Array.isArray(data.invitations)
+            ? data.invitations
+            : [];
+
+        invitationCount =
+            invitations.length;
+
+        renderInvitationNotification();
+
+    }catch(err){
+
+        console.error(
+            "INVITATION NOTIFICATION ERROR:",
+            err
+        );
+
+    }
+
+}
+
+/* ==========================
+RENDER INVITATION NOTIFICATION
+========================== */
+
+function renderInvitationNotification(){
+
+    let section =
+        document.getElementById(
+            "groupInvitationNotification"
+        );
+
+    if(!section){
+
+        section =
+        document.createElement("div");
+
+        section.id =
+            "groupInvitationNotification";
+
+        const myGroupsSection =
+            document.getElementById("myGroups");
+
+        if(
+            myGroupsSection &&
+            myGroupsSection.parentNode
+        ){
+
+            myGroupsSection.parentNode.insertBefore(
+                section,
+                myGroupsSection.nextSibling
+            );
+
+        }
+
+    }
+
+    section.innerHTML = `
+
+        <div class="section-title">
+            Group Invitations
+        </div>
+
+        <div
+            class="admin-management-card"
+            style="
+                position:relative;
+                cursor:pointer;
+            "
+            onclick="
+                location.href='/group-invitations.html'
+            "
+        >
+
+            <div class="admin-management-icon">
+
+                <i class="fa-solid fa-envelope"></i>
+
+            </div>
+
+            <div class="admin-management-info">
+
+                <h3>
+                    Group Invitations
+                </h3>
+
+                <p>
+                    View and respond to invitations you've received.
+                </p>
+
+            </div>
+
+            ${
+                invitationCount > 0
+                ?
+
+                `
+                <span
+                    style="
+                        position:absolute;
+                        top:-6px;
+                        left:48px;
+                        min-width:24px;
+                        height:24px;
+                        padding:0 7px;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        background:#ff1744;
+                        color:#fff;
+                        border-radius:50%;
+                        font-size:12px;
+                        font-weight:bold;
+                        border:3px solid #fff;
+                        box-shadow:0 2px 6px rgba(0,0,0,.2);
+                    "
+                >
+                    ${invitationCount}
+                </span>
+                `
+
+                :
+
+                ""
+            }
+
+            <button
+                class="admin-management-btn"
+                type="button"
+                onclick="
+                    event.stopPropagation();
+                    location.href='/group-invitations.html';
+                "
+            >
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+                View
+
+            </button>
+
+        </div>
+
+    `;
+
+}
+
+// ==========================
+// START
+// ==========================
+
 loadGroups();
+
+// ==========================
+// GROUP INVITATION NOTIFICATION
+// ==========================
+
+setInterval(
+    loadInvitationNotification,
+    15000
+);
