@@ -1532,21 +1532,21 @@ exports.acceptGroupInvitation = async (req, res) => {
 
         if (!group) {
 
-            invitation.status = "accepted";
-invitation.respondedAt = new Date();
+    invitation.status = "accepted";
+    invitation.respondedAt = new Date();
 
-await invitation.save();
-            
-            return res.status(404).json({
+    await invitation.save();
 
-                success: false,
+    return res.status(404).json({
 
-                message:
-                    "Group no longer exists."
+        success: false,
 
-            });
+        message:
+            "Group no longer exists."
 
-        }
+    });
+
+}
 
 
         // ==========================
@@ -1569,11 +1569,10 @@ await invitation.save();
         // UPDATE INVITATION
         // ==========================
 
-        invitation.status =
-            "accepted";
+        invitation.status = "accepted";
+invitation.respondedAt = new Date();
 
-        await invitation.save();
-
+await invitation.save();
 
         return res.json({
 
