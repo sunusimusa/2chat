@@ -4,19 +4,29 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
 <title>2Chat Groups</title>
 
-<link rel="stylesheet" href="/css/groups.css">
+<link
+    rel="stylesheet"
+    href="/css/groups.css"
+>
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+>
 
 </head>
 
+
 <body>
+
 
 <!-- ==========================
 HEADER
@@ -24,21 +34,33 @@ HEADER
 
 <header class="groups-header">
 
-<button onclick="history.back()">
+    <button
+        type="button"
+        onclick="history.back()"
+    >
 
-<i class="fa-solid fa-arrow-left"></i>
+        <i class="fa-solid fa-arrow-left"></i>
 
-</button>
+    </button>
 
-<h2>Groups</h2>
 
-<button onclick="location.href='/create-group.html'">
+    <h2>
+        Groups
+    </h2>
 
-<i class="fa-solid fa-plus"></i>
 
-</button>
+    <button
+        type="button"
+        onclick="location.href='/create-group.html'"
+    >
+
+        <i class="fa-solid fa-plus"></i>
+
+    </button>
 
 </header>
+
+
 
 <!-- ==========================
 SEARCH
@@ -46,14 +68,17 @@ SEARCH
 
 <div class="search-box">
 
-<i class="fa-solid fa-magnifying-glass"></i>
+    <i class="fa-solid fa-magnifying-glass"></i>
 
-<input
-type="text"
-id="searchGroup"
-placeholder="Search groups...">
+    <input
+        type="text"
+        id="searchGroup"
+        placeholder="Search groups..."
+    >
 
 </div>
+
+
 
 <!-- ==========================
 MY GROUPS
@@ -61,69 +86,31 @@ MY GROUPS
 
 <div class="section-title">
 
-My Groups
+    My Groups
 
 </div>
+
 
 <div id="myGroups">
 
 </div>
 
-  <!-- ==========================
-GROUP INVITATIONS
-========================== -->
 
-<div class="group-invitations-section">
 
-    <div class="section-title">
-        Group Invitations
-    </div>
+<!-- ==================================================
+GROUP INVITATION NOTIFICATION
 
-    <div class="group-invitations-card">
+IMPORTANT:
+groups.js zai ƙirƙiri notification
+card ɗin nan da kansa idan akwai
+pending invitation.
 
-        <div class="group-invitations-icon">
+KADA A SAKE SAKA CARD ƊIN NAN A HTML.
+================================================== -->
 
-    <i class="fa-solid fa-envelope"></i>
 
-    <!-- NEW INVITATION BADGE -->
-    <span
-        id="groupInvitationBadge"
-        class="group-invitation-badge"
-        style="display:none;"
-    >
-        0
-    </span>
 
-</div>
-
-        <div class="group-invitations-info">
-
-            <h3>Group Invitations</h3>
-
-            <p>
-                View and respond to invitations
-                you've received.
-            </p>
-
-        </div>
-
-        <button
-            type="button"
-            class="group-invitations-btn"
-            onclick="location.href='/group-invitations.html'"
-        >
-
-            <i class="fa-solid fa-arrow-right"></i>
-
-            View
-
-        </button>
-
-    </div>
-
-</div>
-
-  <!-- ==========================
+<!-- ==========================
 ADMIN MANAGEMENT
 ========================== -->
 
@@ -134,18 +121,27 @@ ADMIN MANAGEMENT
 >
 
     <div class="section-title">
+
         Admin Management
+
     </div>
+
 
     <div class="admin-management-card">
 
         <div class="admin-management-icon">
+
             <i class="fa-solid fa-user-shield"></i>
+
         </div>
+
 
         <div class="admin-management-info">
 
-            <h3>Manage Group Admins</h3>
+            <h3>
+                Manage Group Admins
+            </h3>
+
 
             <p>
                 Add or remove admins from your group.
@@ -153,9 +149,11 @@ ADMIN MANAGEMENT
 
         </div>
 
+
         <button
             id="openAdminManagement"
             class="admin-management-btn"
+            type="button"
         >
 
             <i class="fa-solid fa-gear"></i>
@@ -168,21 +166,33 @@ ADMIN MANAGEMENT
 
 </div>
 
+
+
 <!-- ==========================
 DISCOVER GROUPS
 ========================== -->
 
 <div class="section-title">
 
-Discover Groups
+    Discover Groups
 
 </div>
+
 
 <div id="groupsList">
 
 </div>
 
-<script src="/js/groups.js"></script>
+
+
+<!-- ==========================
+JAVASCRIPT
+========================== -->
+
+<script
+    src="/js/groups.js"
+></script>
+
 
 </body>
 
