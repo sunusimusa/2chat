@@ -304,8 +304,12 @@ async function loadInvitationNotification(){
             : [];
 
         invitationCount =
-            invitations.length;
-
+    invitations.filter(
+        invitation =>
+            invitation &&
+            invitation.status === "pending"
+    ).length;
+        
         renderInvitationNotification();
 
     }catch(err){
@@ -442,94 +446,6 @@ function renderInvitationNotification(){
         </div>
 
     `;
-
-}
-
-/* ==========================
-GROUP INVITATION NOTIFICATION
-========================== */
-
-async function loadInvitationNotification(){
-
-    try{
-
-        if(!user || !user.username){
-
-            return;
-
-        }
-
-        const res =
-            await fetch(
-                "/api/groups/invitations/" +
-                encodeURIComponent(user.username)
-            );
-
-        const data =
-            await res.json();
-
-        if(
-            !res.ok ||
-            !data.success
-        ){
-
-            return;
-
-        }
-
-        const invitations =
-            Array.isArray(data.invitations)
-                ? data.invitations
-                : [];
-
-        /*
-         * Nuna notification ne kawai
-         * idan akwai PENDING invitations.
-         */
-
-        const pendingInvitations =
-            invitations.filter(
-                invitation =>
-                    invitation &&
-                    invitation.status === "pending"
-            );
-
-        const badge =
-            document.getElementById(
-                "invitationBadge"
-            );
-
-        if(!badge){
-
-            return;
-
-        }
-
-        if(pendingInvitations.length > 0){
-
-            badge.textContent =
-                pendingInvitations.length > 99
-                    ? "99+"
-                    : pendingInvitations.length;
-
-            badge.style.display =
-                "flex";
-
-        }else{
-
-            badge.style.display =
-                "none";
-
-        }
-
-    }catch(error){
-
-        console.error(
-            "INVITATION NOTIFICATION ERROR:",
-            error
-        );
-
-    }
 
 }
 
