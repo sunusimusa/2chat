@@ -195,25 +195,24 @@ async function loadSentInvitations() {
 
         }
 
-        const invitations =
-            Array.isArray(data.invitations)
-                ? data.invitations
+        // ==========================================
+        // IMPORTANT:
+        // Controller yana dawo da invitedUsers
+        // ==========================================
+
+        const invited =
+            Array.isArray(data.invitedUsers)
+                ? data.invitedUsers
                 : [];
 
-        // Clear old values
         invitedUsers.clear();
 
-        // Save only pending invitations
-        invitations.forEach(invitation => {
+        invited.forEach(username => {
 
-            if (
-                invitation &&
-                invitation.status === "pending" &&
-                invitation.invitee
-            ) {
+            if (username) {
 
                 invitedUsers.add(
-                    String(invitation.invitee).trim()
+                    String(username).trim()
                 );
 
             }
@@ -232,13 +231,85 @@ async function loadSentInvitations() {
             error
         );
 
-        // Ba za mu hana users list ɗin loading ba.
-        // Idan endpoint bai samu ba, users za su ci gaba
-        // da fitowa.
     }
 
 }
 
+
+// ==================================================
+// LOAD GROUP MEMBERS
+// ==================================================
+
+async function loadGroupMembers() {
+
+    try {
+
+        const res =
+            await fetch(
+                "/api/groups/" +
+                encodeURIComponent(groupId),
+                {
+                    method: "GET",
+
+                    headers: {
+                        "Accept":
+                            "application/json"
+                    }
+                }
+            );
+
+        const data =
+            await res.json();
+
+        if (
+            !res.ok ||
+            !data.success ||
+            !data.group
+        ) {
+
+            throw new Error(
+                data.message ||
+                "Failed to load group."
+            );
+
+        }
+
+        groupMembers.clear();
+
+        const members =
+            Array.isArray(data.group.members)
+                ? data.group.members
+                : [];
+
+        members.forEach(member => {
+
+            if (member) {
+
+                // KADA mu canza case.
+                // Sunusi da sunusi accounts biyu ne.
+                groupMembers.add(
+                    String(member).trim()
+                );
+
+            }
+
+        });
+
+        console.log(
+            "GROUP MEMBERS:",
+            [...groupMembers]
+        );
+
+    } catch (error) {
+
+        console.error(
+            "LOAD GROUP MEMBERS ERROR:",
+            error
+        );
+
+    }
+
+}
 
 // ==================================================
 // LOAD ALL USERS
@@ -277,7 +348,10 @@ async function loadUsers(
             "";
 
 
-        await loadSentInvitations();
+        await Promise.all([
+    loadSentInvitations(),
+    loadGroupMembers()
+]);
         // ------------------------------------------
         // GET USERS
         // ------------------------------------------
@@ -595,6 +669,22 @@ if (
             ".invite-btn"
         );
 
+    // ==================================================
+// CHECK GROUP MEMBERS FIRST
+// ==================================================
+
+if (
+    groupMembers.has(
+        String(targetUser.username).trim()
+    )
+) {
+
+    setMemberButton(
+        inviteButton
+    );
+
+}
+
 
     if (!inviteButton) {
 
@@ -607,17 +697,20 @@ if (
     // ALREADY INVITED IN THIS SESSION
     // ------------------------------------------
 
-    if (
-        invitedUsers.has(
-            targetUser.username
-        )
-    ) {
+   if (
+    !groupMembers.has(
+        String(targetUser.username).trim()
+    ) &&
+    invitedUsers.has(
+        String(targetUser.username).trim()
+    )
+) {
 
-        setInvitedButton(
-            inviteButton
-        );
+    setInvitedButton(
+        inviteButton
+    );
 
-    }
+}
 
 
     // ------------------------------------------
@@ -841,6 +934,34 @@ async function sendInvitation(
 
 }
 
+// ==================================================
+// SET MEMBER BUTTON
+// ==================================================
+
+function setMemberButton(
+    button
+) {
+
+    if (!button) return;
+
+    button.disabled =
+        true;
+
+    button.innerHTML = `
+
+        <i
+            class="fa-solid fa-user-check"
+        ></i>
+
+        Member
+
+    `;
+
+    button.classList.add(
+        "member"
+    );
+
+}
 
 // ==================================================
 // SET INVITED BUTTON
