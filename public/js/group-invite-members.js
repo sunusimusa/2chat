@@ -154,6 +154,93 @@ function showMessage(
 
 
 // ==================================================
+// LOAD SENT/PENDING GROUP INVITATIONS
+// ==================================================
+
+async function loadSentInvitations() {
+
+    try {
+
+        const url =
+            "/api/groups/invitations/sent/" +
+            encodeURIComponent(user.username) +
+            "?groupId=" +
+            encodeURIComponent(groupId);
+
+        console.log(
+            "LOADING SENT INVITATIONS:",
+            url
+        );
+
+        const res =
+            await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json"
+                }
+            });
+
+        const data =
+            await res.json();
+
+        if (
+            !res.ok ||
+            !data.success
+        ) {
+
+            throw new Error(
+                data.message ||
+                "Failed to load sent invitations."
+            );
+
+        }
+
+        const invitations =
+            Array.isArray(data.invitations)
+                ? data.invitations
+                : [];
+
+        // Clear old values
+        invitedUsers.clear();
+
+        // Save only pending invitations
+        invitations.forEach(invitation => {
+
+            if (
+                invitation &&
+                invitation.status === "pending" &&
+                invitation.invitee
+            ) {
+
+                invitedUsers.add(
+                    String(invitation.invitee).trim()
+                );
+
+            }
+
+        });
+
+        console.log(
+            "PENDING INVITED USERS:",
+            [...invitedUsers]
+        );
+
+    } catch (error) {
+
+        console.error(
+            "LOAD SENT INVITATIONS ERROR:",
+            error
+        );
+
+        // Ba za mu hana users list ɗin loading ba.
+        // Idan endpoint bai samu ba, users za su ci gaba
+        // da fitowa.
+    }
+
+}
+
+
+// ==================================================
 // LOAD ALL USERS
 // ==================================================
 
@@ -867,92 +954,6 @@ if (backButton) {
 
 }
 
-
-// ==================================================
-// LOAD SENT/PENDING GROUP INVITATIONS
-// ==================================================
-
-async function loadSentInvitations() {
-
-    try {
-
-        const url =
-            "/api/groups/invitations/sent/" +
-            encodeURIComponent(user.username) +
-            "?groupId=" +
-            encodeURIComponent(groupId);
-
-        console.log(
-            "LOADING SENT INVITATIONS:",
-            url
-        );
-
-        const res =
-            await fetch(url, {
-                method: "GET",
-                headers: {
-                    "Accept": "application/json"
-                }
-            });
-
-        const data =
-            await res.json();
-
-        if (
-            !res.ok ||
-            !data.success
-        ) {
-
-            throw new Error(
-                data.message ||
-                "Failed to load sent invitations."
-            );
-
-        }
-
-        const invitations =
-            Array.isArray(data.invitations)
-                ? data.invitations
-                : [];
-
-        // Clear old values
-        invitedUsers.clear();
-
-        // Save only pending invitations
-        invitations.forEach(invitation => {
-
-            if (
-                invitation &&
-                invitation.status === "pending" &&
-                invitation.invitee
-            ) {
-
-                invitedUsers.add(
-                    String(invitation.invitee).trim()
-                );
-
-            }
-
-        });
-
-        console.log(
-            "PENDING INVITED USERS:",
-            [...invitedUsers]
-        );
-
-    } catch (error) {
-
-        console.error(
-            "LOAD SENT INVITATIONS ERROR:",
-            error
-        );
-
-        // Ba za mu hana users list ɗin loading ba.
-        // Idan endpoint bai samu ba, users za su ci gaba
-        // da fitowa.
-    }
-
-}
 
 // ==================================================
 // START
