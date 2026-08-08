@@ -71,6 +71,8 @@ document.getElementById("groupCover").src =
 
     renderMembers();
 
+    renderGroupLink();
+
     if(user.username === currentGroup.owner){
 
         deleteBtn.style.display = "block";
@@ -80,6 +82,31 @@ document.getElementById("groupCover").src =
         deleteBtn.style.display = "none";
 
     }
+
+}
+
+/* ==========================
+GROUP LINK
+========================== */
+
+function renderGroupLink(){
+
+    const linkText =
+        document.getElementById("groupLinkText");
+
+    if(!linkText || !currentGroup){
+
+        return;
+
+    }
+
+    const groupLink =
+        window.location.origin +
+        "/group.html?id=" +
+        encodeURIComponent(currentGroup._id);
+
+    linkText.innerText =
+        groupLink;
 
 }
 
@@ -369,6 +396,140 @@ if(groupSettingsBtn){
             location.href =
                 "/group-settings.html?id=" +
                 encodeURIComponent(groupId);
+
+        }
+    );
+
+}
+
+/* ==========================
+COPY GROUP LINK
+========================== */
+
+const copyGroupLinkBtn =
+    document.getElementById("copyGroupLinkBtn");
+
+if(copyGroupLinkBtn){
+
+    copyGroupLinkBtn.addEventListener(
+        "click",
+        async () => {
+
+            if(!currentGroup){
+
+                return;
+
+            }
+
+            const groupLink =
+                window.location.origin +
+                "/group.html?id=" +
+                encodeURIComponent(
+                    currentGroup._id
+                );
+
+            try{
+
+                await navigator.clipboard.writeText(
+                    groupLink
+                );
+
+                alert("✅ Group link copied!");
+
+            }catch(error){
+
+                console.error(error);
+
+                alert(
+                    "Unable to copy group link."
+                );
+
+            }
+
+        }
+    );
+
+}
+
+/* ==========================
+SHARE GROUP LINK
+========================== */
+
+const shareGroupLinkBtn =
+    document.getElementById("shareGroupLinkBtn");
+
+if(shareGroupLinkBtn){
+
+    shareGroupLinkBtn.addEventListener(
+        "click",
+        async () => {
+
+            if(!currentGroup){
+
+                return;
+
+            }
+
+            const groupLink =
+                window.location.origin +
+                "/group.html?id=" +
+                encodeURIComponent(
+                    currentGroup._id
+                );
+
+            const shareData = {
+
+                title:
+                    currentGroup.name +
+                    " - 2Chat Group",
+
+                text:
+                    "Join " +
+                    currentGroup.name +
+                    " on 2Chat.",
+
+                url:
+                    groupLink
+
+            };
+
+            try{
+
+                if(
+                    navigator.share
+                ){
+
+                    await navigator.share(
+                        shareData
+                    );
+
+                }else{
+
+                    await navigator.clipboard.writeText(
+                        groupLink
+                    );
+
+                    alert(
+                        "✅ Group link copied!"
+                    );
+
+                }
+
+            }catch(error){
+
+                if(
+                    error.name !==
+                    "AbortError"
+                ){
+
+                    console.error(
+                        "SHARE GROUP ERROR:",
+                        error
+                    );
+
+                }
+
+            }
 
         }
     );
