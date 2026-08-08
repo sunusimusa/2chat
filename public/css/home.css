@@ -1,12 +1,20 @@
 /* =========================
 HEADER
 ========================== */
+html,
+body{
+    margin:0;
+    padding:0;
+    width:100%;
+}
 
 .app-header{
     position:sticky;
     top:0;
     left:0;
     z-index:1000;
+
+    width:100%;
 
     display:flex;
     align-items:center;
@@ -203,17 +211,6 @@ font-weight:bold;
 
 }
 
-
-/* ==========================
-Body Padding
-========================== */
-
-body{
-
-padding-top:75px;
-
-}
-
    /* ==========================
 BOTTOM NAVIGATION
 ========================== */
@@ -281,9 +278,8 @@ color:#2196f3;
 /* Domin bottom nav kada ya rufe posts */
 
 body{
-
-padding-bottom:90px;
-
+    margin:0;
+    padding:0 0 90px 0;
 }
 
 .post{
