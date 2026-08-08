@@ -1,1 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>2Chat Group</title>
+
+<link
+    rel="stylesheet"
+    href="/css/group.css"
+>
+
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+>
+
+</head>
+
+<body>
+
+
+<!-- ==========================
+HEADER
+========================== -->
+
+<header class="group-header">
+
+    <button
+        type="button"
+        onclick="history.back()"
+        title="Back"
+    >
+
+        <i class="fa-solid fa-arrow-left"></i>
+
+    </button>
+
+
+    <h2>
+        Group
+    </h2>
+
+
+    <button
+        type="button"
+        id="shareTopBtn"
+        title="Share Group"
+    >
+
+        <i class="fa-solid fa-share-nodes"></i>
+
+    </button>
+
+</header>
+
+
+
+<!-- ==========================
+LOADING
+========================== -->
+
+<div
+    id="loading"
+    class="loading"
+>
+
+    <i class="fa-solid fa-spinner fa-spin"></i>
+
+    <p>
+        Loading group...
+    </p>
+
+</div>
+
+
+
+<!-- ==========================
+ERROR
+========================== -->
+
+<div
+    id="errorBox"
+    class="error-box"
+    style="display:none;"
+>
+
+    <i class="fa-solid fa-circle-exclamation"></i>
+
+    <h3>
+        Group Not Found
+    </h3>
+
+    <p id="errorMessage">
+        This group does not exist or is no longer available.
+    </p>
+
+
+    <button
+        type="button"
+        onclick="location.href='/groups.html'"
+    >
+
+        <i class="fa-solid fa-users"></i>
+
+        Go to Groups
+
+    </button>
+
+</div>
+
+
+
+<!-- ==========================
+GROUP CONTENT
+========================== -->
+
+<main
+    id="groupContent"
+    style="display:none;"
+>
+
+
+    <!-- ==========================
+    COVER
+    ========================== -->
+
+    <div class="group-cover">
+
+        <img
+            id="groupCover"
+            src="/images/default-group-cover.jpg"
+            alt="Group Cover"
+        >
+
+    </div>
+
+
+
+    <!-- ==========================
+    GROUP AVATAR
+    ========================== -->
+
+    <div class="group-avatar-wrapper">
+
+        <img
+            id="groupAvatar"
+            src="/images/default-group.png"
+            alt="Group Avatar"
+        >
+
+    </div>
+
+
+
+    <!-- ==========================
+    GROUP DETAILS
+    ========================== -->
+
+    <section class="group-details">
+
+        <h1 id="groupName">
+            Loading...
+        </h1>
+
+
+        <p id="groupDescription">
+            No description
+        </p>
+
+
+        <!-- ==========================
+        GROUP PRIVACY
+        ========================== -->
+
+        <div class="group-privacy">
+
+            <span id="groupPrivacyIcon">
+
+                <i class="fa-solid fa-earth-americas"></i>
+
+            </span>
+
+
+            <span id="groupPrivacyText">
+                Public Group
+            </span>
+
+        </div>
+
+
+        <!-- ==========================
+        GROUP MEMBERS
+        ========================== -->
+
+        <div class="group-members-count">
+
+            <i class="fa-solid fa-users"></i>
+
+            <span id="memberCount">
+                0
+            </span>
+
+            <span>
+                Members
+            </span>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==========================
+    GROUP LINK
+    ========================== -->
+
+    <section class="group-link-card">
+
+        <div class="link-icon">
+
+            <i class="fa-solid fa-link"></i>
+
+        </div>
+
+
+        <div class="link-info">
+
+            <h3>
+                Group Link
+            </h3>
+
+            <p id="groupLinkText">
+                Loading...
+            </p>
+
+        </div>
+
+
+        <button
+            type="button"
+            id="copyLinkBtn"
+            title="Copy Group Link"
+        >
+
+            <i class="fa-solid fa-copy"></i>
+
+        </button>
+
+
+        <button
+            type="button"
+            id="shareLinkBtn"
+            title="Share Group Link"
+        >
+
+            <i class="fa-solid fa-share-nodes"></i>
+
+        </button>
+
+    </section>
+
+
+
+    <!-- ==========================
+    JOIN SECTION
+    ========================== -->
+
+    <section class="join-section">
+
+        <button
+            type="button"
+            id="joinGroupBtn"
+            class="join-group-btn"
+        >
+
+            <i class="fa-solid fa-user-plus"></i>
+
+            <span id="joinButtonText">
+                Join Group
+            </span>
+
+        </button>
+
+
+        <p
+            id="joinMessage"
+            class="join-message"
+        ></p>
+
+    </section>
+
+
+
+    <!-- ==========================
+    GROUP INFO
+    ========================== -->
+
+    <section class="info-card">
+
+        <div class="info-row">
+
+            <div class="info-icon">
+
+                <i class="fa-solid fa-user-crown"></i>
+
+            </div>
+
+
+            <div>
+
+                <span class="info-label">
+                    Group Owner
+                </span>
+
+                <strong id="groupOwner">
+                    Loading...
+                </strong>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="info-row">
+
+            <div class="info-icon">
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+            </div>
+
+
+            <div>
+
+                <span class="info-label">
+                    Admins
+                </span>
+
+                <strong id="adminCount">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="info-row">
+
+            <div class="info-icon">
+
+                <i class="fa-solid fa-calendar-days"></i>
+
+            </div>
+
+
+            <div>
+
+                <span class="info-label">
+                    Created
+                </span>
+
+                <strong id="createdDate">
+                    Loading...
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==========================
+    MEMBERS PREVIEW
+    ========================== -->
+
+    <section class="members-section">
+
+        <div class="members-title">
+
+            <h3>
+                Members
+            </h3>
+
+
+            <span id="membersPreviewCount">
+                0
+            </span>
+
+        </div>
+
+
+        <div id="membersPreview">
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+
+<!-- ==========================
+LOGIN / REGISTER NOTICE
+========================== -->
+
+<div
+    id="authNotice"
+    class="auth-notice"
+    style="display:none;"
+>
+
+    <div class="auth-notice-icon">
+
+        <i class="fa-solid fa-user-lock"></i>
+
+    </div>
+
+
+    <h3>
+        Join this group
+    </h3>
+
+
+    <p>
+        You need a 2Chat account before you can join this group.
+    </p>
+
+
+    <button
+        type="button"
+        id="registerBtn"
+    >
+
+        <i class="fa-solid fa-user-plus"></i>
+
+        Register
+
+    </button>
+
+
+    <button
+        type="button"
+        id="loginBtn"
+        class="login-btn"
+    >
+
+        Already have an account? Login
+
+    </button>
+
+</div>
+
+
+
+<!-- ==========================
+TOAST
+========================== -->
+
+<div
+    id="toast"
+    class="toast"
+>
+
+    <i
+        id="toastIcon"
+        class="fa-solid fa-check"
+    ></i>
+
+    <span id="toastMessage">
+        Done
+    </span>
+
+</div>
+
+
+
+<script src="/js/group.js"></script>
+
+</body>
+
+</html>
