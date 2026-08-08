@@ -1,35 +1,23 @@
-/* =========================================================
-   2CHAT GROUP PAGE
-   ========================================================= */
+/* ==================================================
+2CHAT GROUP PAGE
+GROUP LINK
+JOIN
+REGISTER REDIRECT
+================================================== */
 
 
 /* ==========================
-USER
+GET USER
 ========================== */
 
-let user = null;
-
-try {
-
-    user =
-        JSON.parse(
-            localStorage.getItem("user")
-        );
-
-} catch (error) {
-
-    console.error(
-        "USER PARSE ERROR:",
-        error
+const user =
+    JSON.parse(
+        localStorage.getItem("user")
     );
-
-    user = null;
-
-}
 
 
 /* ==========================
-GROUP ID
+GET GROUP ID
 ========================== */
 
 const params =
@@ -48,111 +36,47 @@ ELEMENTS
 const loading =
     document.getElementById("loading");
 
-const errorBox =
-    document.getElementById("errorBox");
-
-const errorMessage =
-    document.getElementById("errorMessage");
-
-const groupContent =
-    document.getElementById("groupContent");
-
-const authNotice =
-    document.getElementById("authNotice");
-
-const groupCover =
-    document.getElementById("groupCover");
-
-const groupAvatar =
-    document.getElementById("groupAvatar");
-
 const groupName =
     document.getElementById("groupName");
 
 const groupDescription =
     document.getElementById("groupDescription");
 
-const groupPrivacyIcon =
-    document.getElementById("groupPrivacyIcon");
+const groupAvatar =
+    document.getElementById("groupAvatar");
 
-const groupPrivacyText =
-    document.getElementById("groupPrivacyText");
+const groupCover =
+    document.getElementById("groupCover");
 
 const memberCount =
     document.getElementById("memberCount");
 
-const groupLinkText =
-    document.getElementById("groupLinkText");
+const privacyText =
+    document.getElementById("privacyText");
 
-const groupOwner =
-    document.getElementById("groupOwner");
-
-const adminCount =
-    document.getElementById("adminCount");
-
-const createdDate =
-    document.getElementById("createdDate");
-
-const membersPreview =
-    document.getElementById("membersPreview");
-
-const membersPreviewCount =
-    document.getElementById(
-        "membersPreviewCount"
-    );
+const groupLink =
+    document.getElementById("groupLink");
 
 const joinGroupBtn =
-    document.getElementById(
-        "joinGroupBtn"
-    );
+    document.getElementById("joinGroupBtn");
 
-const joinButtonText =
-    document.getElementById(
-        "joinButtonText"
-    );
+const joinSection =
+    document.getElementById("joinSection");
 
-const joinMessage =
-    document.getElementById(
-        "joinMessage"
-    );
+const openGroupSection =
+    document.getElementById("openGroupSection");
+
+const openGroupBtn =
+    document.getElementById("openGroupBtn");
 
 const copyLinkBtn =
-    document.getElementById(
-        "copyLinkBtn"
-    );
+    document.getElementById("copyLinkBtn");
 
-const shareLinkBtn =
-    document.getElementById(
-        "shareLinkBtn"
-    );
+const shareBtn =
+    document.getElementById("shareBtn");
 
-const shareTopBtn =
-    document.getElementById(
-        "shareTopBtn"
-    );
-
-const registerBtn =
-    document.getElementById(
-        "registerBtn"
-    );
-
-const loginBtn =
-    document.getElementById(
-        "loginBtn"
-    );
-
-const toast =
-    document.getElementById("toast");
-
-const toastMessage =
-    document.getElementById(
-        "toastMessage"
-    );
-
-const toastIcon =
-    document.getElementById(
-        "toastIcon"
-    );
+const groupMessage =
+    document.getElementById("groupMessage");
 
 
 /* ==========================
@@ -162,15 +86,18 @@ CURRENT GROUP
 let currentGroup = null;
 
 
-/* ==========================
+/* ==================================================
 CHECK GROUP ID
-========================== */
+================================================== */
 
 if (!groupId) {
 
-    showError(
-        "No group link was provided."
+    showMessage(
+        "Invalid group link.",
+        "error"
     );
+
+    loading.style.display = "none";
 
 } else {
 
@@ -179,15 +106,16 @@ if (!groupId) {
 }
 
 
-/* =========================================================
+/* ==================================================
 LOAD GROUP
-========================================================= */
+================================================== */
 
 async function loadGroup() {
 
-    showLoading();
-
     try {
+
+        loading.style.display = "flex";
+
 
         const res =
             await fetch(
@@ -200,12 +128,17 @@ async function loadGroup() {
             await res.json();
 
 
-        if (!res.ok || !data.success) {
+        if (!data.success) {
 
-            showError(
+            loading.style.display = "none";
+
+            showMessage(
                 data.message ||
-                "Group not found."
+                "Group not found.",
+                "error"
             );
+
+            joinSection.style.display = "none";
 
             return;
 
@@ -226,83 +159,27 @@ async function loadGroup() {
             error
         );
 
-
-        showError(
-            "Unable to load this group. Please check your internet connection."
+        showMessage(
+            "Unable to load group.",
+            "error"
         );
+
+    } finally {
+
+        loading.style.display = "none";
 
     }
 
 }
 
 
-/* =========================================================
+/* ==================================================
 RENDER GROUP
-========================================================= */
+================================================== */
 
 function renderGroup() {
 
-    if (!currentGroup) {
-
-        showError(
-            "Group not found."
-        );
-
-        return;
-
-    }
-
-
-    /* ==========================
-    COVER
-    ========================== */
-
-    groupCover.src =
-        currentGroup.cover &&
-        String(
-            currentGroup.cover
-        ).trim() !== ""
-
-            ? currentGroup.cover
-
-            : "/images/default-group-cover.jpg";
-
-
-    groupCover.onerror =
-        function () {
-
-            this.onerror = null;
-
-            this.src =
-                "/images/default-group-cover.jpg";
-
-        };
-
-
-    /* ==========================
-    AVATAR
-    ========================== */
-
-    groupAvatar.src =
-        currentGroup.avatar &&
-        String(
-            currentGroup.avatar
-        ).trim() !== ""
-
-            ? currentGroup.avatar
-
-            : "/images/default-group.png";
-
-
-    groupAvatar.onerror =
-        function () {
-
-            this.onerror = null;
-
-            this.src =
-                "/images/default-group.png";
-
-        };
+    if (!currentGroup) return;
 
 
     /* ==========================
@@ -311,7 +188,7 @@ function renderGroup() {
 
     groupName.innerText =
         currentGroup.name ||
-        "Unnamed Group";
+        "2Chat Group";
 
 
     /* ==========================
@@ -320,307 +197,468 @@ function renderGroup() {
 
     groupDescription.innerText =
         currentGroup.description ||
-        "No description";
+        "No group description.";
+
+
+    /* ==========================
+    AVATAR
+    ========================== */
+
+    groupAvatar.src =
+        currentGroup.avatar &&
+        currentGroup.avatar.trim() !== ""
+
+            ? currentGroup.avatar
+
+            : "/images/default-group.png";
+
+
+    /* ==========================
+    COVER
+    ========================== */
+
+    groupCover.src =
+        currentGroup.cover &&
+        currentGroup.cover.trim() !== ""
+
+            ? currentGroup.cover
+
+            : "/images/default-group-cover.jpg";
 
 
     /* ==========================
     MEMBERS
     ========================== */
 
-    const members =
-        Array.isArray(
-            currentGroup.members
-        )
-
-            ? currentGroup.members
-
-            : [];
-
-
     memberCount.innerText =
-        members.length;
-
-
-    membersPreviewCount.innerText =
-        members.length;
-
-
-    /* ==========================
-    OWNER
-    ========================== */
-
-    groupOwner.innerText =
-        currentGroup.owner ||
-        "Unknown";
-
-
-    /* ==========================
-    ADMINS
-    ========================== */
-
-    const admins =
-        Array.isArray(
-            currentGroup.admins
-        )
-
-            ? currentGroup.admins
-
-            : [];
-
-
-    adminCount.innerText =
-        admins.length;
-
-
-    /* ==========================
-    CREATED DATE
-    ========================== */
-
-    if (currentGroup.createdAt) {
-
-        const date =
-            new Date(
-                currentGroup.createdAt
-            );
-
-
-        if (!isNaN(date.getTime())) {
-
-            createdDate.innerText =
-                date.toLocaleDateString(
-                    "en-US",
-                    {
-                        year:"numeric",
-                        month:"short",
-                        day:"numeric"
-                    }
-                );
-
-        } else {
-
-            createdDate.innerText =
-                "Unknown";
-
-        }
-
-    } else {
-
-        createdDate.innerText =
-            "Unknown";
-
-    }
+        currentGroup.members
+            ? currentGroup.members.length
+            : 0;
 
 
     /* ==========================
     PRIVACY
     ========================== */
 
-    renderPrivacy();
+    if (
+        currentGroup.privacy ===
+        "private"
+    ) {
+
+        privacyText.innerText =
+            "Private";
+
+    } else {
+
+        privacyText.innerText =
+            "Public";
+
+    }
 
 
     /* ==========================
     GROUP LINK
     ========================== */
 
-    renderGroupLink();
+    const link =
+        createGroupLink();
+
+
+    groupLink.innerText =
+        link;
 
 
     /* ==========================
-    MEMBERS PREVIEW
+    CHECK USER
     ========================== */
 
-    renderMembersPreview();
-
-
-    /* ==========================
-    AUTH / JOIN
-    ========================== */
-
-    updateJoinState();
-
-
-    /* ==========================
-    SHOW PAGE
-    ========================== */
-
-    loading.style.display =
-        "none";
-
-    errorBox.style.display =
-        "none";
-
-    groupContent.style.display =
-        "block";
+    updateUserState();
 
 }
 
 
-/* =========================================================
-PRIVACY
-========================================================= */
+/* ==================================================
+CREATE SHAREABLE GROUP LINK
+================================================== */
 
-function renderPrivacy() {
+function createGroupLink() {
 
-    if (
-        currentGroup.privacy ===
-        "private"
-    ) {
+    return (
+        window.location.origin +
+        "/group.html?id=" +
+        encodeURIComponent(groupId)
+    );
 
-        groupPrivacyText.innerText =
-            "Private Group";
+}
 
 
-        groupPrivacyIcon.innerHTML =
-            `
-            <i class="fa-solid fa-lock"></i>
-            `;
+/* ==================================================
+UPDATE USER STATE
+================================================== */
+
+function updateUserState() {
+
+    /* ==========================
+    USER NOT LOGGED IN
+    ========================== */
+
+    if (!user || !user.username) {
+
+        joinSection.style.display =
+            "block";
+
+        openGroupSection.style.display =
+            "none";
+
+        joinGroupBtn.innerHTML = `
+
+            <i class="fa-solid fa-user-plus"></i>
+
+            Join Group
+
+        `;
+
+        return;
+
+    }
+
+
+    /* ==========================
+    CHECK MEMBERSHIP
+    ========================== */
+
+    const isMember =
+        currentGroup.members &&
+        currentGroup.members.includes(
+            user.username
+        );
+
+
+    if (isMember) {
+
+        joinSection.style.display =
+            "none";
+
+        openGroupSection.style.display =
+            "block";
 
     } else {
 
-        groupPrivacyText.innerText =
-            "Public Group";
+        joinSection.style.display =
+            "block";
 
+        openGroupSection.style.display =
+            "none";
 
-        groupPrivacyIcon.innerHTML =
-            `
-            <i class="fa-solid fa-earth-americas"></i>
-            `;
+        joinGroupBtn.innerHTML = `
+
+            <i class="fa-solid fa-user-plus"></i>
+
+            Join Group
+
+        `;
 
     }
 
 }
 
 
-/* =========================================================
-GROUP LINK
-========================================================= */
+/* ==================================================
+JOIN GROUP
+================================================== */
 
-function getGroupLink() {
-
-    return (
-        window.location.origin +
-        "/group.html?id=" +
-        encodeURIComponent(
-            currentGroup._id
-        )
-    );
-
-}
-
-
-function renderGroupLink() {
-
-    const link =
-        getGroupLink();
-
-
-    groupLinkText.innerText =
-        link;
-
-}
-
-
-/* =========================================================
-COPY GROUP LINK
-========================================================= */
-
-copyLinkBtn.addEventListener(
+joinGroupBtn.addEventListener(
     "click",
-    async function () {
+    joinGroup
+);
 
-        if (!currentGroup) {
+
+async function joinGroup() {
+
+    /* ==================================================
+    USER NOT REGISTERED / NOT LOGGED IN
+
+    SAVE GROUP LINK
+    THEN SEND USER TO REGISTER
+    ================================================== */
+
+    if (!user || !user.username) {
+
+        const returnUrl =
+            window.location.href;
+
+
+        localStorage.setItem(
+            "pendingGroupJoin",
+            returnUrl
+        );
+
+
+        window.location.href =
+            "/register.html";
+
+
+        return;
+
+    }
+
+
+    /* ==========================
+    ALREADY MEMBER
+    ========================== */
+
+    if (
+        currentGroup.members &&
+        currentGroup.members.includes(
+            user.username
+        )
+    ) {
+
+        openGroup();
+
+        return;
+
+    }
+
+
+    /* ==========================
+    JOIN
+    ========================== */
+
+    joinGroupBtn.disabled = true;
+
+    joinGroupBtn.innerHTML = `
+
+        <i class="fa-solid fa-spinner fa-spin"></i>
+
+        Joining...
+
+    `;
+
+
+    try {
+
+        const res =
+            await fetch(
+                "/api/groups/join",
+                {
+
+                    method: "PUT",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            groupId:
+                                groupId,
+
+                            username:
+                                user.username
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await res.json();
+
+
+        /* ==========================
+        SUCCESS
+        ========================== */
+
+        if (data.success) {
+
+            currentGroup =
+                data.group;
+
+
+            showMessage(
+                "✅ You joined the group successfully.",
+                "success"
+            );
+
+
+            updateUserState();
+
+
+            /*
+            Ƙaramin delay domin
+            user ya ga success message
+            */
+
+            setTimeout(
+                () => {
+
+                    openGroup();
+
+                },
+                700
+            );
+
 
             return;
 
         }
 
 
-        const link =
-            getGroupLink();
+        /* ==========================
+        PRIVATE GROUP
+        ========================== */
 
+        if (data.private) {
 
-        try {
-
-            await navigator.clipboard.writeText(
-                link
+            showMessage(
+                "🔒 This is a private group. You need an invitation to join.",
+                "error"
             );
 
 
-            showToast(
-                "Group link copied!",
-                "success"
-            );
+            resetJoinButton();
 
-
-        } catch (error) {
-
-            console.error(
-                "COPY ERROR:",
-                error
-            );
-
-
-            /* FALLBACK */
-
-            const textarea =
-                document.createElement(
-                    "textarea"
-                );
-
-            textarea.value =
-                link;
-
-            textarea.style.position =
-                "fixed";
-
-            textarea.style.left =
-                "-9999px";
-
-            document.body.appendChild(
-                textarea
-            );
-
-            textarea.select();
-
-            try {
-
-                document.execCommand(
-                    "copy"
-                );
-
-                showToast(
-                    "Group link copied!",
-                    "success"
-                );
-
-            } catch (err) {
-
-                showToast(
-                    "Could not copy the link.",
-                    "error"
-                );
-
-            }
-
-            textarea.remove();
+            return;
 
         }
 
+
+        /* ==========================
+        ERROR
+        ========================== */
+
+        showMessage(
+            data.message ||
+            "Unable to join group.",
+            "error"
+        );
+
+
+        resetJoinButton();
+
+
+    } catch (error) {
+
+        console.error(
+            "JOIN GROUP ERROR:",
+            error
+        );
+
+
+        showMessage(
+            "Network error. Please try again.",
+            "error"
+        );
+
+
+        resetJoinButton();
+
     }
-);
+
+}
 
 
-/* =========================================================
-SHARE GROUP
-========================================================= */
+/* ==================================================
+OPEN GROUP
+================================================== */
 
-shareLinkBtn.addEventListener(
+openGroupBtn.addEventListener(
     "click",
-    shareGroup
+    openGroup
 );
 
 
-shareTopBtn.addEventListener(
+function openGroup() {
+
+    /*
+    Wannan route ɗin ne za mu yi amfani da shi
+    idan group chat ɗinka yana da:
+    
+    /group-chat.html?id=GROUP_ID
+    */
+
+    window.location.href =
+        "/group-chat.html?id=" +
+        encodeURIComponent(groupId);
+
+}
+
+
+/* ==================================================
+COPY GROUP LINK
+================================================== */
+
+copyLinkBtn.addEventListener(
+    "click",
+    copyGroupLink
+);
+
+
+async function copyGroupLink() {
+
+    const link =
+        createGroupLink();
+
+
+    try {
+
+        await navigator.clipboard.writeText(
+            link
+        );
+
+
+        showMessage(
+            "🔗 Group link copied.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        /*
+        FALLBACK
+        */
+
+        const textarea =
+            document.createElement("textarea");
+
+        textarea.value =
+            link;
+
+        document.body.appendChild(
+            textarea
+        );
+
+        textarea.select();
+
+        document.execCommand(
+            "copy"
+        );
+
+        textarea.remove();
+
+
+        showMessage(
+            "🔗 Group link copied.",
+            "success"
+        );
+
+    }
+
+}
+
+
+/* ==================================================
+SHARE GROUP
+================================================== */
+
+shareBtn.addEventListener(
     "click",
     shareGroup
 );
@@ -628,30 +666,13 @@ shareTopBtn.addEventListener(
 
 async function shareGroup() {
 
-    if (!currentGroup) {
-
-        return;
-
-    }
-
-
     const link =
-        getGroupLink();
+        createGroupLink();
 
 
-    const shareData = {
-
-        title:
-            currentGroup.name ||
-            "2Chat Group",
-
-        text:
-            "Join this group on 2Chat",
-
-        url:
-            link
-
-    };
+    const text =
+        "Join my group on 2Chat: " +
+        currentGroup.name;
 
 
     /* ==========================
@@ -664,22 +685,30 @@ async function shareGroup() {
 
         try {
 
-            await navigator.share(
-                shareData
-            );
+            await navigator.share({
+
+                title:
+                    currentGroup.name,
+
+                text:
+                    text,
+
+                url:
+                    link
+
+            });
 
             return;
 
         } catch (error) {
 
-            if (
-                error.name ===
-                "AbortError"
-            ) {
+            /*
+            User cancelled share.
+            */
 
-                return;
-
-            }
+            console.log(
+                "Share cancelled."
+            );
 
         }
 
@@ -690,814 +719,83 @@ async function shareGroup() {
     FALLBACK COPY
     ========================== */
 
-    try {
-
-        await navigator.clipboard.writeText(
-            link
-        );
-
-
-        showToast(
-            "Group link copied. You can now share it.",
-            "success"
-        );
-
-
-    } catch (error) {
-
-        showToast(
-            "Unable to share group link.",
-            "error"
-        );
-
-    }
+    await copyGroupLink();
 
 }
 
 
-/* =========================================================
-AUTH CHECK
-========================================================= */
+/* ==================================================
+SHOW MESSAGE
+================================================== */
 
-function isLoggedIn() {
+function showMessage(
+    message,
+    type
+) {
 
-    return (
-        user &&
-        user.username
+    groupMessage.innerText =
+        message;
+
+
+    groupMessage.className =
+        "group-message " +
+        type;
+
+
+    groupMessage.style.display =
+        "block";
+
+
+    setTimeout(
+        () => {
+
+            groupMessage.style.display =
+                "none";
+
+        },
+        3500
     );
 
 }
 
 
-/* =========================================================
-UPDATE JOIN STATE
-========================================================= */
+/* ==================================================
+RESET JOIN BUTTON
+================================================== */
 
-function updateJoinState() {
-
-    if (!currentGroup) {
-
-        return;
-
-    }
-
-
-    /* ==========================
-    NOT LOGGED IN
-    ========================== */
-
-    if (!isLoggedIn()) {
-
-        joinGroupBtn.style.display =
-            "none";
-
-        authNotice.style.display =
-            "block";
-
-        return;
-
-    }
-
-
-    /* ==========================
-    LOGGED IN
-    ========================== */
-
-    authNotice.style.display =
-        "none";
-
-    joinGroupBtn.style.display =
-        "block";
-
-
-    const username =
-        String(
-            user.username
-        ).trim();
-
-
-    const members =
-        Array.isArray(
-            currentGroup.members
-        )
-
-            ? currentGroup.members
-
-            : [];
-
-
-    /* ==========================
-    ALREADY MEMBER
-    ========================== */
-
-    if (
-        members.includes(
-            username
-        )
-    ) {
-
-        joinGroupBtn.disabled =
-            false;
-
-        joinGroupBtn.classList.add(
-            "joined"
-        );
-
-        joinGroupBtn.classList.remove(
-            "private"
-        );
-
-        joinButtonText.innerText =
-            "Open Group";
-
-
-        joinMessage.innerText =
-            "You are already a member of this group.";
-
-        return;
-
-    }
-
-
-    /* ==========================
-    PRIVATE GROUP
-    ========================== */
-
-    if (
-        currentGroup.privacy ===
-        "private"
-    ) {
-
-        joinGroupBtn.disabled =
-            true;
-
-        joinGroupBtn.classList.remove(
-            "joined"
-        );
-
-        joinGroupBtn.classList.add(
-            "private"
-        );
-
-        joinButtonText.innerText =
-            "Private Group";
-
-
-        joinMessage.innerText =
-            "This is a private group. You need an invitation to join.";
-
-        return;
-
-    }
-
-
-    /* ==========================
-    PUBLIC GROUP
-    ========================== */
+function resetJoinButton() {
 
     joinGroupBtn.disabled =
         false;
 
-    joinGroupBtn.classList.remove(
-        "joined",
-        "private"
-    );
 
-    joinButtonText.innerText =
-        "Join Group";
+    joinGroupBtn.innerHTML = `
 
+        <i class="fa-solid fa-user-plus"></i>
 
-    joinMessage.innerText =
-        "Anyone can join this public group.";
+        Join Group
+
+    `;
 
 }
 
 
-/* =========================================================
-JOIN GROUP
-========================================================= */
+/* ==================================================
+REGISTER RETURN SYSTEM
+================================================== */
 
-joinGroupBtn.addEventListener(
-    "click",
-    handleJoinGroup
-);
+/*
+    Bayan register ya gama,
+    register.js zai duba wannan:
 
+    localStorage.pendingGroupJoin
 
-async function handleJoinGroup() {
+    sannan ya mayar da user
+    zuwa group link ɗin da ya fara.
+*/
 
-    if (!currentGroup) {
 
-        return;
-
-    }
-
-
-    if (!isLoggedIn()) {
-
-        showAuthNotice();
-
-        return;
-
-    }
-
-
-    const username =
-        String(
-            user.username
-        ).trim();
-
-
-    const members =
-        Array.isArray(
-            currentGroup.members
-        )
-
-            ? currentGroup.members
-
-            : [];
-
-
-    /* ==========================
-    ALREADY MEMBER
-    ========================== */
-
-    if (
-        members.includes(
-            username
-        )
-    ) {
-
-        openGroup();
-
-        return;
-
-    }
-
-
-    /* ==========================
-    PRIVATE GROUP
-    ========================== */
-
-    if (
-        currentGroup.privacy ===
-        "private"
-    ) {
-
-        showToast(
-            "This is a private group. You need an invitation.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    /* ==========================
-    DISABLE BUTTON
-    ========================== */
-
-    joinGroupBtn.disabled =
-        true;
-
-    joinButtonText.innerText =
-        "Joining...";
-
-
-    try {
-
-        const res =
-            await fetch(
-                "/api/groups/join",
-                {
-
-                    method:"PUT",
-
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify({
-
-                            groupId:
-                                currentGroup._id,
-
-                            username:
-                                username
-
-                        })
-
-                }
-            );
-
-
-        const data =
-            await res.json();
-
-
-        if (!res.ok || !data.success) {
-
-            showToast(
-                data.message ||
-                "Unable to join group.",
-                "error"
-            );
-
-
-            updateJoinState();
-
-            return;
-
-        }
-
-
-        /* ==========================
-        UPDATE LOCAL GROUP
-        ========================== */
-
-        if (data.group) {
-
-            currentGroup =
-                data.group;
-
-        } else {
-
-            currentGroup.members.push(
-                username
-            );
-
-        }
-
-
-        memberCount.innerText =
-            currentGroup.members.length;
-
-
-        membersPreviewCount.innerText =
-            currentGroup.members.length;
-
-
-        renderMembersPreview();
-
-
-        joinGroupBtn.classList.remove(
-            "private"
-        );
-
-        joinGroupBtn.classList.add(
-            "joined"
-        );
-
-        joinButtonText.innerText =
-            "Open Group";
-
-
-        joinMessage.innerText =
-            "You joined this group successfully.";
-
-
-        showToast(
-            "You joined the group!",
-            "success"
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "JOIN GROUP ERROR:",
-            error
-        );
-
-
-        showToast(
-            "Network error. Please try again.",
-            "error"
-        );
-
-
-        updateJoinState();
-
-    }
-
-}
-
-
-/* =========================================================
-OPEN GROUP
-========================================================= */
-
-function openGroup() {
-
-    /*
-       Wannan shi ne inda daga baya
-       za mu kai user group chat page.
-    */
-
-    window.location.href =
-        "/group-chat.html?id=" +
-        encodeURIComponent(
-            currentGroup._id
-        );
-
-}
-
-
-/* =========================================================
-MEMBERS PREVIEW
-========================================================= */
-
-function renderMembersPreview() {
-
-    if (!membersPreview) {
-
-        return;
-
-    }
-
-
-    membersPreview.innerHTML =
-        "";
-
-
-    const members =
-        Array.isArray(
-            currentGroup.members
-        )
-
-            ? currentGroup.members
-
-            : [];
-
-
-    const preview =
-        members.slice(
-            0,
-            8
-        );
-
-
-    preview.forEach(
-        function(member) {
-
-            const div =
-                document.createElement(
-                    "div"
-                );
-
-            div.className =
-                "member-preview";
-
-
-            const img =
-                document.createElement(
-                    "img"
-                );
-
-            img.src =
-                "/images/default-group.png";
-
-            img.alt =
-                member;
-
-
-            img.onerror =
-                function() {
-
-                    this.onerror =
-                        null;
-
-                    this.src =
-                        "/images/default-group.png";
-
-                };
-
-
-            const span =
-                document.createElement(
-                    "span"
-                );
-
-            span.innerText =
-                member;
-
-
-            div.appendChild(
-                img
-            );
-
-            div.appendChild(
-                span
-            );
-
-
-            membersPreview.appendChild(
-                div
-            );
-
-        }
-    );
-
-
-    /* ==========================
-    MORE MEMBERS
-    ========================== */
-
-    if (
-        members.length > 8
-    ) {
-
-        const more =
-            document.createElement(
-                "div"
-            );
-
-        more.className =
-            "more-members";
-
-
-        more.innerText =
-            "+" +
-            (
-                members.length -
-                8
-            ) +
-            " more";
-
-
-        membersPreview.appendChild(
-            more
-        );
-
-    }
-
-
-    /* ==========================
-    NO MEMBERS
-    ========================== */
-
-    if (
-        members.length === 0
-    ) {
-
-        const empty =
-            document.createElement(
-                "div"
-            );
-
-        empty.className =
-            "more-members";
-
-        empty.innerText =
-            "No members yet";
-
-        membersPreview.appendChild(
-            empty
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-AUTH NOTICE
-========================================================= */
-
-function showAuthNotice() {
-
-    if (!authNotice) {
-
-        return;
-
-    }
-
-
-    authNotice.style.display =
-        "block";
-
-
-    authNotice.scrollIntoView({
-
-        behavior:"smooth",
-
-        block:"center"
-
-    });
-
-}
-
-
-/* =========================================================
-REGISTER
-========================================================= */
-
-registerBtn.addEventListener(
-    "click",
-    function() {
-
-        const returnUrl =
-            window.location.href;
-
-
-        localStorage.setItem(
-            "groupReturnUrl",
-            returnUrl
-        );
-
-
-        window.location.href =
-            "/register.html";
-
-    }
-);
-
-
-/* =========================================================
-LOGIN
-========================================================= */
-
-loginBtn.addEventListener(
-    "click",
-    function() {
-
-        const returnUrl =
-            window.location.href;
-
-
-        localStorage.setItem(
-            "groupReturnUrl",
-            returnUrl
-        );
-
-
-        window.location.href =
-            "/login.html";
-
-    }
-);
-
-
-/* =========================================================
-LOADING
-========================================================= */
-
-function showLoading() {
-
-    loading.style.display =
-        "flex";
-
-    errorBox.style.display =
-        "none";
-
-    groupContent.style.display =
-        "none";
-
-    authNotice.style.display =
-        "none";
-
-}
-
-
-/* =========================================================
-ERROR
-========================================================= */
-
-function showError(message) {
-
-    loading.style.display =
-        "none";
-
-    groupContent.style.display =
-        "none";
-
-    authNotice.style.display =
-        "none";
-
-    errorBox.style.display =
-        "block";
-
-
-    errorMessage.innerText =
-        message ||
-        "Group not found.";
-
-}
-
-
-/* =========================================================
-TOAST
-========================================================= */
-
-let toastTimer = null;
-
-
-function showToast(
-    message,
-    type = "success"
-) {
-
-    if (!toast) {
-
-        return;
-
-    }
-
-
-    clearTimeout(
-        toastTimer
-    );
-
-
-    toastMessage.innerText =
-        message;
-
-
-    if (
-        type === "error"
-    ) {
-
-        toastIcon.className =
-            "fa-solid fa-circle-exclamation";
-
-        toastIcon.style.color =
-            "#f44336";
-
-    } else {
-
-        toastIcon.className =
-            "fa-solid fa-check";
-
-        toastIcon.style.color =
-            "#4caf50";
-
-    }
-
-
-    toast.classList.add(
-        "show"
-    );
-
-
-    toastTimer =
-        setTimeout(
-            function() {
-
-                toast.classList.remove(
-                    "show"
-                );
-
-            },
-            3000
-        );
-
-}
-
-
-/* =========================================================
-PAGE VISIBILITY
-========================================================= */
-
-document.addEventListener(
-    "visibilitychange",
-    function() {
-
-        if (
-            document.visibilityState ===
-            "visible"
-        ) {
-
-            /*
-               Idan user ya dawo daga
-               register/login, mu sake
-               duba user.
-            */
-
-            try {
-
-                user =
-                    JSON.parse(
-                        localStorage.getItem(
-                            "user"
-                        )
-                    );
-
-            } catch (error) {
-
-                user = null;
-
-            }
-
-
-            if (currentGroup) {
-
-                updateJoinState();
-
-            }
-
-        }
-
-    }
+console.log(
+    "2Chat Group ID:",
+    groupId
 );
