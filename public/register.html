@@ -250,22 +250,66 @@ async function register() {
         // SUCCESS
         // ==========================
 
-        if (data.success) {
+        
+if(data.success){
 
-            localStorage.setItem(
-                "token",
-                data.token
-            );
+    localStorage.setItem(
+        "token",
+        data.token
+    );
+
+    /*
+    SAVE USER
+    */
+
+    if(data.user){
+
+        localStorage.setItem(
+            "user",
+            JSON.stringify(data.user)
+        );
+
+    }
 
 
-            location.href =
-                "/home.html";
+    /*
+    CHECK WHETHER USER CAME
+    FROM GROUP LINK
+    */
+
+    const pendingGroupJoin =
+        localStorage.getItem(
+            "pendingGroupJoin"
+        );
 
 
-            return;
+    if(pendingGroupJoin){
 
-        }
+        localStorage.removeItem(
+            "pendingGroupJoin"
+        );
 
+
+        /*
+        RETURN USER TO GROUP
+        */
+
+        location.href =
+            pendingGroupJoin;
+
+        return;
+
+    }
+
+
+    /*
+    NORMAL REGISTER
+    */
+
+    location.href =
+        "/home.html";
+
+}
 
         // ==========================
         // ERROR
