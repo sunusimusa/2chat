@@ -28,6 +28,13 @@ const groupSchema = new mongoose.Schema({
         required:true
     },
 
+    inviteCode:{
+    type:String,
+    unique:true,
+    index:true,
+    required:true
+},
+
     admins:{
         type:[String],
         default:[]
