@@ -1,8 +1,12 @@
+/* ==================================================
+   2CHAT GROUP INFO
+================================================== */
+
 const user =
     JSON.parse(localStorage.getItem("user"));
 
 const params =
-    new URLSearchParams(location.search);
+    new URLSearchParams(window.location.search);
 
 const groupId =
     params.get("id");
@@ -10,25 +14,48 @@ const groupId =
 let currentGroup = null;
 
 
-/* ==========================
-CHECK GROUP ID
-========================== */
+/* ==================================================
+   ELEMENTS
+================================================== */
 
-if(!groupId){
+const groupName =
+    document.getElementById("groupName");
 
-    alert("Group ID is missing.");
+const groupDescription =
+    document.getElementById("groupDescription");
 
-    history.back();
+const groupAvatar =
+    document.getElementById("groupAvatar");
 
-}
+const groupCover =
+    document.getElementById("groupCover");
 
+const memberCount =
+    document.getElementById("memberCount");
 
-/* ==========================
-ELEMENTS
-========================== */
+const adminCount =
+    document.getElementById("adminCount");
+
+const membersList =
+    document.getElementById("membersList");
 
 const deleteBtn =
     document.getElementById("deleteGroupBtn");
+
+const addMemberBtn =
+    document.getElementById("addMemberBtn");
+
+const adminManagementBtn =
+    document.getElementById("adminManagementBtn");
+
+const groupSettingsBtn =
+    document.getElementById("groupSettingsBtn");
+
+const leaveGroupBtn =
+    document.getElementById("leaveGroupBtn");
+
+const groupLinkText =
+    document.getElementById("groupLinkText");
 
 const copyGroupLinkBtn =
     document.getElementById("copyGroupLinkBtn");
@@ -36,20 +63,31 @@ const copyGroupLinkBtn =
 const shareGroupLinkBtn =
     document.getElementById("shareGroupLinkBtn");
 
-const groupLinkText =
-    document.getElementById("groupLinkText");
+
+/* ==================================================
+   CHECK GROUP ID
+================================================== */
+
+if (!groupId) {
+
+    alert("Group ID is missing.");
+
+    window.location.href =
+        "/groups.html";
+
+}
 
 
-/* ==========================
-LOAD GROUP
-========================== */
+/* ==================================================
+   LOAD GROUP
+================================================== */
 
 loadGroup();
 
 
-async function loadGroup(){
+async function loadGroup() {
 
-    try{
+    try {
 
         const res =
             await fetch(
@@ -61,7 +99,7 @@ async function loadGroup(){
             await res.json();
 
 
-        if(!data.success){
+        if (!data.success) {
 
             alert(
                 data.message ||
@@ -81,18 +119,16 @@ async function loadGroup(){
 
         renderGroup();
 
-        generateGroupLink();
 
-
-    }catch(err){
+    } catch (error) {
 
         console.error(
             "LOAD GROUP ERROR:",
-            err
+            error
         );
 
         alert(
-            "Failed to load group."
+            "Unable to load group."
         );
 
     }
@@ -100,138 +136,238 @@ async function loadGroup(){
 }
 
 
-/* ==========================
-RENDER GROUP
-========================== */
+/* ==================================================
+   RENDER GROUP
+================================================== */
 
-function renderGroup(){
+function renderGroup() {
 
-    document.getElementById(
-        "groupName"
-    ).innerText =
-        currentGroup.name;
+    if (!currentGroup) return;
 
 
-    document.getElementById(
-        "groupDescription"
-    ).innerText =
+    /* ==========================
+       NAME
+    ========================== */
+
+    groupName.innerText =
+        currentGroup.name || "Group";
+
+
+    /* ==========================
+       DESCRIPTION
+    ========================== */
+
+    groupDescription.innerText =
         currentGroup.description ||
         "No description";
 
 
-    /* AVATAR */
+    /* ==========================
+       AVATAR
+    ========================== */
 
-    document.getElementById(
-        "groupAvatar"
-    ).src =
-
+    groupAvatar.src =
         currentGroup.avatar &&
         currentGroup.avatar.trim() !== ""
 
-            ? currentGroup.avatar
+        ? currentGroup.avatar
 
-            : "/images/default-group.png";
+        : "/images/default-group.png";
 
 
-    /* COVER */
+    /* ==========================
+       COVER
+    ========================== */
 
-    document.getElementById(
-        "groupCover"
-    ).src =
-
+    groupCover.src =
         currentGroup.cover &&
         currentGroup.cover.trim() !== ""
 
-            ? currentGroup.cover
+        ? currentGroup.cover
 
-            : "/images/default-group-cover.jpg";
+        : "/images/default-group-cover.jpg";
 
 
-    /* MEMBERS */
+    /* ==========================
+       STATS
+    ========================== */
 
-    document.getElementById(
-        "memberCount"
-    ).innerText =
-
+    const members =
         Array.isArray(currentGroup.members)
+            ? currentGroup.members
+            : [];
 
-            ? currentGroup.members.length
-
-            : 0;
-
-
-    /* ADMINS */
-
-    document.getElementById(
-        "adminCount"
-    ).innerText =
-
+    const admins =
         Array.isArray(currentGroup.admins)
+            ? currentGroup.admins
+            : [];
 
-            ? currentGroup.admins.length
 
-            : 0;
+    memberCount.innerText =
+        members.length;
 
+
+    adminCount.innerText =
+        admins.length;
+
+
+    /* ==========================
+       MEMBERS
+    ========================== */
 
     renderMembers();
 
 
-    /* DELETE BUTTON */
+    /* ==========================
+       GROUP LINK
+    ========================== */
 
-    if(
-        user &&
-        user.username === currentGroup.owner
-    ){
+    renderGroupLink();
 
-        deleteBtn.style.display =
-            "block";
 
-    }else{
+    /* ==========================
+       PERMISSIONS
+    ========================== */
 
-        deleteBtn.style.display =
-            "none";
-
-    }
+    updatePermissions();
 
 }
 
 
-/* ==========================
-GENERATE GROUP LINK
-========================== */
+/* ==================================================
+   RENDER MEMBERS
+================================================== */
 
-function generateGroupLink(){
+function renderMembers() {
 
-    if(!groupLinkText){
+    membersList.innerHTML = "";
+
+
+    const members =
+        Array.isArray(currentGroup.members)
+            ? currentGroup.members
+            : [];
+
+
+    if (members.length === 0) {
+
+        membersList.innerHTML = `
+
+            <p style="
+                text-align:center;
+                color:#777;
+                padding:20px;
+            ">
+                No members found.
+            </p>
+
+        `;
 
         return;
 
     }
 
 
-    const groupLink =
-        window.location.origin +
-        "/group.html?id=" +
-        encodeURIComponent(
-            currentGroup._id
-        );
+    members.forEach(member => {
+
+        const isOwner =
+            member === currentGroup.owner;
 
 
-    groupLinkText.innerText =
-        groupLink;
+        const isAdmin =
+            Array.isArray(currentGroup.admins) &&
+            currentGroup.admins.includes(member);
 
 
-    groupLinkText.dataset.link =
-        groupLink;
+        let role =
+            "Member";
+
+
+        if (isOwner) {
+
+            role =
+                "Owner 👑";
+
+        } else if (isAdmin) {
+
+            role =
+                "Admin ⭐";
+
+        }
+
+
+        const card =
+            document.createElement("div");
+
+
+        card.className =
+            "member-card";
+
+
+        card.innerHTML = `
+
+            <img
+                src="/images/default-group.png"
+                alt="Member"
+            >
+
+            <div class="member-info">
+
+                <div class="member-name">
+                    ${escapeHTML(member)}
+                </div>
+
+                <div class="member-role">
+                    ${role}
+                </div>
+
+            </div>
+
+        `;
+
+
+        membersList.appendChild(card);
+
+    });
 
 }
 
 
-/* ==========================
-COPY GROUP LINK
-========================== */
+/* ==================================================
+   GROUP LINK
+================================================== */
 
-if(copyGroupLinkBtn){
+function getGroupLink() {
+
+    return (
+        window.location.origin +
+        "/group.html?id=" +
+        encodeURIComponent(groupId)
+    );
+
+}
+
+
+function renderGroupLink() {
+
+    if (!groupLinkText) return;
+
+
+    const link =
+        getGroupLink();
+
+
+    groupLinkText.innerText =
+        link;
+
+}
+
+
+/* ==================================================
+   COPY GROUP LINK
+================================================== */
+
+if (copyGroupLinkBtn) {
 
     copyGroupLinkBtn.addEventListener(
         "click",
@@ -241,126 +377,67 @@ if(copyGroupLinkBtn){
 }
 
 
-async function copyGroupLink(){
-
-    if(!currentGroup){
-
-        return;
-
-    }
-
+async function copyGroupLink() {
 
     const link =
-        window.location.origin +
-        "/group.html?id=" +
-        encodeURIComponent(
-            currentGroup._id
-        );
+        getGroupLink();
 
 
-    try{
+    try {
 
         await navigator.clipboard.writeText(
             link
         );
 
 
-        showCopySuccess();
-
-
-    }catch(error){
-
-        /* FALLBACK */
-
-        const textarea =
-            document.createElement("textarea");
-
-        textarea.value =
-            link;
-
-        textarea.style.position =
-            "fixed";
-
-        textarea.style.left =
-            "-9999px";
-
-        document.body.appendChild(
-            textarea
+        alert(
+            "✅ Group link copied."
         );
 
-        textarea.select();
 
-        try{
+    } catch (error) {
 
-            document.execCommand(
-                "copy"
-            );
+        console.error(
+            "COPY LINK ERROR:",
+            error
+        );
 
-            showCopySuccess();
 
-        }catch(err){
+        /* fallback */
 
-            alert(
-                "Could not copy group link."
-            );
+        const input =
+            document.createElement("input");
 
-        }
+        input.value =
+            link;
 
-        textarea.remove();
+        document.body.appendChild(
+            input
+        );
+
+        input.select();
+
+        document.execCommand(
+            "copy"
+        );
+
+        input.remove();
+
+
+        alert(
+            "✅ Group link copied."
+        );
 
     }
 
 }
 
 
-/* ==========================
-COPY SUCCESS
-========================== */
+/* ==================================================
+   SHARE GROUP LINK
+================================================== */
 
-function showCopySuccess(){
-
-    if(!copyGroupLinkBtn){
-
-        return;
-
-    }
-
-
-    const oldHTML =
-        copyGroupLinkBtn.innerHTML;
-
-
-    copyGroupLinkBtn.innerHTML =
-        '<i class="fa-solid fa-check"></i>';
-
-    copyGroupLinkBtn.style.background =
-        "#1877f2";
-
-    copyGroupLinkBtn.style.color =
-        "#fff";
-
-
-    setTimeout(()=>{
-
-        copyGroupLinkBtn.innerHTML =
-            oldHTML;
-
-        copyGroupLinkBtn.style.background =
-            "";
-
-        copyGroupLinkBtn.style.color =
-            "";
-
-    },1500);
-
-}
-
-
-/* ==========================
-SHARE GROUP LINK
-========================== */
-
-if(shareGroupLinkBtn){
+if (shareGroupLinkBtn) {
 
     shareGroupLinkBtn.addEventListener(
         "click",
@@ -370,33 +447,20 @@ if(shareGroupLinkBtn){
 }
 
 
-async function shareGroupLink(){
-
-    if(!currentGroup){
-
-        return;
-
-    }
-
+async function shareGroupLink() {
 
     const link =
-        window.location.origin +
-        "/group.html?id=" +
-        encodeURIComponent(
-            currentGroup._id
-        );
+        getGroupLink();
 
 
     const shareData = {
 
         title:
-            currentGroup.name +
-            " - 2Chat Group",
+            currentGroup.name ||
+            "2Chat Group",
 
         text:
-            "Join " +
-            currentGroup.name +
-            " on 2Chat.",
+            "Join my group on 2Chat.",
 
         url:
             link
@@ -404,13 +468,11 @@ async function shareGroupLink(){
     };
 
 
-    /* NATIVE SHARE */
+    try {
 
-    if(
-        navigator.share
-    ){
-
-        try{
+        if (
+            navigator.share
+        ) {
 
             await navigator.share(
                 shareData
@@ -418,293 +480,33 @@ async function shareGroupLink(){
 
             return;
 
-        }catch(error){
-
-            /*
-            User cancelled share.
-            Do nothing.
-            */
-
-            if(
-                error.name ===
-                "AbortError"
-            ){
-
-                return;
-
-            }
-
         }
 
-    }
-
-
-    /* FALLBACK */
-
-    try{
 
         await navigator.clipboard.writeText(
             link
         );
 
-        alert(
-            "Group link copied. You can now share it."
-        );
-
-    }catch(error){
 
         alert(
-            link
-        );
-
-    }
-
-}
-
-
-/* ==========================
-CLICK LINK
-========================== */
-
-if(groupLinkText){
-
-    groupLinkText.addEventListener(
-        "click",
-        ()=>{
-
-            if(
-                groupLinkText.dataset.link
-            ){
-
-                window.open(
-                    groupLinkText.dataset.link,
-                    "_blank"
-                );
-
-            }
-
-        }
-    );
-
-}
-
-
-/* ==========================
-RENDER MEMBERS
-========================== */
-
-function renderMembers(){
-
-    const list =
-        document.getElementById(
-            "membersList"
+            "✅ Group link copied. You can now share it."
         );
 
 
-    list.innerHTML = "";
+    } catch (error) {
 
+        if (
+            error.name ===
+            "AbortError"
+        ) {
 
-    if(
-        !Array.isArray(
-            currentGroup.members
-        ) ||
-        currentGroup.members.length === 0
-    ){
-
-        list.innerHTML = `
-            <p style="
-                text-align:center;
-                color:#888;
-                padding:20px;
-            ">
-                No members yet.
-            </p>
-        `;
-
-        return;
-
-    }
-
-
-    currentGroup.members.forEach(
-        member => {
-
-            const isOwner =
-                member ===
-                currentGroup.owner;
-
-
-            const isAdmin =
-                Array.isArray(
-                    currentGroup.admins
-                ) &&
-                currentGroup.admins.includes(
-                    member
-                );
-
-
-            let role =
-                "Member";
-
-
-            if(isOwner){
-
-                role =
-                    "Owner 👑";
-
-            }else if(isAdmin){
-
-                role =
-                    "Admin ⭐";
-
-            }
-
-
-            list.innerHTML += `
-
-                <div class="member-card">
-
-                    <img
-                        src="/images/default-group.png"
-                        alt="Member"
-                    >
-
-                    <div class="member-info">
-
-                        <div class="member-name">
-
-                            ${escapeHTML(member)}
-
-                        </div>
-
-                        <div class="member-role">
-
-                            ${role}
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            `;
-
-        }
-    );
-
-}
-
-
-/* ==========================
-HTML ESCAPE
-========================== */
-
-function escapeHTML(value){
-
-    return String(value)
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
-
-}
-
-
-/* ==========================
-LEAVE GROUP
-========================== */
-
-document
-    .getElementById("leaveGroupBtn")
-    .addEventListener(
-        "click",
-        leaveGroup
-    );
-
-
-async function leaveGroup(){
-
-    if(
-        !currentGroup ||
-        !user
-    ){
-
-        return;
-
-    }
-
-
-    if(
-        !confirm(
-            "Leave this group?"
-        )
-    ){
-
-        return;
-
-    }
-
-
-    try{
-
-        const res =
-            await fetch(
-                "/api/groups/leave",
-                {
-
-                    method:"PUT",
-
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:JSON.stringify({
-
-                        groupId:
-
-                            groupId,
-
-                        username:
-
-                            user.username
-
-                    })
-
-                }
-            );
-
-
-        const data =
-            await res.json();
-
-
-        if(data.success){
-
-            alert(
-                "✅ You left the group."
-            );
-
-
-            location.href =
-                "/groups.html";
-
-        }else{
-
-            alert(
-                data.message
-            );
+            return;
 
         }
 
-
-    }catch(err){
-
-        console.error(err);
-
-        alert(
-            "Network Error"
+        console.error(
+            "SHARE GROUP ERROR:",
+            error
         );
 
     }
@@ -712,150 +514,138 @@ async function leaveGroup(){
 }
 
 
-/* ==========================
-DELETE GROUP
-========================== */
+/* ==================================================
+   PERMISSIONS
+================================================== */
 
-if(deleteBtn){
+function updatePermissions() {
 
-    deleteBtn.addEventListener(
-        "click",
-        deleteGroup
-    );
-
-}
+    if (!currentGroup) return;
 
 
-async function deleteGroup(){
-
-    if(
-        !user ||
-        !currentGroup
-    ){
-
-        return;
-
-    }
+    const username =
+        user &&
+        user.username
+            ? user.username
+            : "";
 
 
-    if(
-        user.username !==
-        currentGroup.owner
-    ){
-
-        return;
-
-    }
+    const isOwner =
+        username ===
+        currentGroup.owner;
 
 
-    if(
-        !confirm(
-            "Delete this group permanently?"
-        )
-    ){
-
-        return;
-
-    }
-
-
-    try{
-
-        const res =
-            await fetch(
-                "/api/groups/delete",
-                {
-
-                    method:"DELETE",
-
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:JSON.stringify({
-
-                        groupId,
-
-                        username:
-                            user.username
-
-                    })
-
-                }
-            );
-
-
-        const data =
-            await res.json();
-
-
-        if(data.success){
-
-            alert(
-                "🗑️ Group deleted."
-            );
-
-
-            location.href =
-                "/groups.html";
-
-        }else{
-
-            alert(
-                data.message
-            );
-
-        }
-
-
-    }catch(err){
-
-        console.error(err);
-
-        alert(
-            "Network Error"
+    const isAdmin =
+        Array.isArray(currentGroup.admins) &&
+        currentGroup.admins.includes(
+            username
         );
 
+
+    /* ==========================
+       DELETE
+    ========================== */
+
+    if (deleteBtn) {
+
+        deleteBtn.style.display =
+            isOwner
+                ? "block"
+                : "none";
+
+    }
+
+
+    /* ==========================
+       ADD MEMBER
+    ========================== */
+
+    if (addMemberBtn) {
+
+        addMemberBtn.style.display =
+            (isOwner || isAdmin)
+                ? "block"
+                : "none";
+
+    }
+
+
+    /* ==========================
+       ADMIN MANAGEMENT
+    ========================== */
+
+    if (adminManagementBtn) {
+
+        adminManagementBtn.style.display =
+            isOwner
+                ? "block"
+                : "none";
+
+    }
+
+
+    /* ==========================
+       GROUP SETTINGS
+    ========================== */
+
+    if (groupSettingsBtn) {
+
+        groupSettingsBtn.style.display =
+            isOwner
+                ? "block"
+                : "none";
+
     }
 
 }
 
 
-/* ==========================
-ADD MEMBER
-========================== */
+/* ==================================================
+   ADD MEMBER
+================================================== */
 
-document
-    .getElementById("addMemberBtn")
-    .addEventListener(
+if (addMemberBtn) {
+
+    addMemberBtn.addEventListener(
         "click",
         addMember
     );
 
+}
 
-async function addMember(){
 
-    if(
-        !currentGroup ||
-        !user
-    ){
+async function addMember() {
+
+    if (!currentGroup) return;
+
+
+    if (!user) {
+
+        alert(
+            "Please login first."
+        );
+
+        window.location.href =
+            "/login.html";
 
         return;
 
     }
 
 
-    if(
+    const isOwner =
+        user.username ===
+        currentGroup.owner;
 
-        user.username !==
-        currentGroup.owner &&
 
-        !currentGroup.admins.includes(
+    const isAdmin =
+        currentGroup.admins &&
+        currentGroup.admins.includes(
             user.username
-        )
+        );
 
-    ){
+
+    if (!isOwner && !isAdmin) {
 
         alert(
             "Only Owner or Admin can add members."
@@ -872,28 +662,31 @@ async function addMember(){
         );
 
 
-    if(!member){
-
-        return;
-
-    }
+    if (!member) return;
 
 
-    try{
+    const username =
+        member.trim();
+
+
+    if (!username) return;
+
+
+    try {
 
         const res =
             await fetch(
                 "/api/groups/add-member",
                 {
 
-                    method:"PUT",
+                    method: "PUT",
 
-                    headers:{
+                    headers: {
                         "Content-Type":
                             "application/json"
                     },
 
-                    body:JSON.stringify({
+                    body: JSON.stringify({
 
                         groupId,
 
@@ -901,7 +694,7 @@ async function addMember(){
                             user.username,
 
                         member:
-                            member.trim()
+                            username
 
                     })
 
@@ -913,30 +706,39 @@ async function addMember(){
             await res.json();
 
 
-        if(data.success){
+        if (data.success) {
 
             alert(
                 "✅ Member added successfully."
             );
 
 
-            loadGroup();
+            currentGroup =
+                data.group;
 
-        }else{
+
+            renderGroup();
+
+
+        } else {
 
             alert(
-                data.message
+                data.message ||
+                "Failed to add member."
             );
 
         }
 
 
-    }catch(err){
+    } catch (error) {
 
-        console.error(err);
+        console.error(
+            "ADD MEMBER ERROR:",
+            error
+        );
 
         alert(
-            "Network Error"
+            "Network error."
         );
 
     }
@@ -944,27 +746,19 @@ async function addMember(){
 }
 
 
-/* ==========================
-ADMIN MANAGEMENT
-========================== */
+/* ==================================================
+   ADMIN MANAGEMENT
+================================================== */
 
-const adminManagementBtn =
-    document.getElementById(
-        "adminManagementBtn"
-    );
-
-
-if(adminManagementBtn){
+if (adminManagementBtn) {
 
     adminManagementBtn.addEventListener(
         "click",
-        ()=>{
+        () => {
 
-            location.href =
+            window.location.href =
                 "/group-admins.html?id=" +
-                encodeURIComponent(
-                    groupId
-                );
+                encodeURIComponent(groupId);
 
         }
     );
@@ -972,29 +766,288 @@ if(adminManagementBtn){
 }
 
 
-/* ==========================
-GROUP SETTINGS
-========================== */
+/* ==================================================
+   GROUP SETTINGS
+================================================== */
 
-const groupSettingsBtn =
-    document.getElementById(
-        "groupSettingsBtn"
-    );
-
-
-if(groupSettingsBtn){
+if (groupSettingsBtn) {
 
     groupSettingsBtn.addEventListener(
         "click",
-        ()=>{
+        () => {
 
-            location.href =
+            window.location.href =
                 "/group-settings.html?id=" +
-                encodeURIComponent(
-                    groupId
-                );
+                encodeURIComponent(groupId);
 
         }
     );
+
+}
+
+
+/* ==================================================
+   LEAVE GROUP
+================================================== */
+
+if (leaveGroupBtn) {
+
+    leaveGroupBtn.addEventListener(
+        "click",
+        leaveGroup
+    );
+
+}
+
+
+async function leaveGroup() {
+
+    if (!user) {
+
+        alert(
+            "Please login first."
+        );
+
+        window.location.href =
+            "/login.html";
+
+        return;
+
+    }
+
+
+    if (
+        user.username ===
+        currentGroup.owner
+    ) {
+
+        alert(
+            "The group owner cannot leave the group. Transfer ownership or delete the group."
+        );
+
+        return;
+
+    }
+
+
+    const confirmLeave =
+        confirm(
+            "Are you sure you want to leave this group?"
+        );
+
+
+    if (!confirmLeave) return;
+
+
+    try {
+
+        const res =
+            await fetch(
+                "/api/groups/leave",
+                {
+
+                    method: "PUT",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        groupId,
+
+                        username:
+                            user.username
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await res.json();
+
+
+        if (data.success) {
+
+            alert(
+                "✅ You left the group."
+            );
+
+
+            window.location.href =
+                "/groups.html";
+
+
+        } else {
+
+            alert(
+                data.message ||
+                "Unable to leave group."
+            );
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "LEAVE GROUP ERROR:",
+            error
+        );
+
+        alert(
+            "Network error."
+        );
+
+    }
+
+}
+
+
+/* ==================================================
+   DELETE GROUP
+================================================== */
+
+if (deleteBtn) {
+
+    deleteBtn.addEventListener(
+        "click",
+        deleteGroup
+    );
+
+}
+
+
+async function deleteGroup() {
+
+    if (!user || !currentGroup) return;
+
+
+    if (
+        user.username !==
+        currentGroup.owner
+    ) {
+
+        alert(
+            "Only the group owner can delete this group."
+        );
+
+        return;
+
+    }
+
+
+    const confirmed =
+        confirm(
+            "⚠️ Delete this group permanently?"
+        );
+
+
+    if (!confirmed) return;
+
+
+    try {
+
+        const res =
+            await fetch(
+                "/api/groups/delete",
+                {
+
+                    method: "DELETE",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        groupId,
+
+                        username:
+                            user.username
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await res.json();
+
+
+        if (data.success) {
+
+            alert(
+                "🗑️ Group deleted successfully."
+            );
+
+
+            window.location.href =
+                "/groups.html";
+
+
+        } else {
+
+            alert(
+                data.message ||
+                "Failed to delete group."
+            );
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "DELETE GROUP ERROR:",
+            error
+        );
+
+        alert(
+            "Network error."
+        );
+
+    }
+
+}
+
+
+/* ==================================================
+   ESCAPE HTML
+================================================== */
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
