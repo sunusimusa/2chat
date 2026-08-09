@@ -271,36 +271,17 @@ if(data.success){
 
     }
 
+    const afterAuthRedirect =
+    localStorage.getItem("afterAuthRedirect");
 
-    /*
-    CHECK WHETHER USER CAME
-    FROM GROUP LINK
-    */
+if (afterAuthRedirect) {
 
-    const pendingGroupJoin =
-        localStorage.getItem(
-            "pendingGroupJoin"
-        );
+    localStorage.removeItem("afterAuthRedirect");
 
+    location.href = afterAuthRedirect;
 
-    if(pendingGroupJoin){
-
-        localStorage.removeItem(
-            "pendingGroupJoin"
-        );
-
-
-        /*
-        RETURN USER TO GROUP
-        */
-
-        location.href =
-            pendingGroupJoin;
-
-        return;
-
-    }
-
+    return;
+}
 
     /*
     NORMAL REGISTER
