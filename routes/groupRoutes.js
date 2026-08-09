@@ -10,6 +10,7 @@ const {
     createGroup,
     getGroups,
     getGroup,
+    getGroupByInviteCode,
     joinGroup,
     leaveGroup,
     deleteGroup,
@@ -147,6 +148,16 @@ router.put(
     updateGroupSettings
 );
 
+
+// ==================================================
+// GET GROUP BY INVITE CODE
+// IMPORTANT: MUST COME BEFORE /:id
+// ==================================================
+
+router.get(
+    "/invite/:inviteCode",
+    getGroupByInviteCode
+);
 
 // ==================================================
 // GET SINGLE GROUP
