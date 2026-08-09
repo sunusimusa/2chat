@@ -1,64 +1,73 @@
 /* ==================================================
-2CHAT GROUP PAGE
-GROUP LINK
-JOIN
-REGISTER REDIRECT
+   2CHAT GROUP SYSTEM
+   group.html
 ================================================== */
 
 
-/* ==========================
-GET USER
-========================== */
-
-const user =
-    JSON.parse(
-        localStorage.getItem("user")
-    );
-
-
-/* ==========================
-GET GROUP ID
-========================== */
-
 const params =
-    new URLSearchParams(
-        window.location.search
-    );
+    new URLSearchParams(window.location.search);
+
+
+/* ==================================================
+   GET INVITE CODE
+================================================== */
+
+const inviteCode =
+    params.get("invite");
+
+
+/* ==================================================
+   GET GROUP ID
+   Wannan yana taimakawa idan an bude group
+   kai tsaye daga groupId.
+================================================== */
 
 const groupId =
     params.get("id");
 
 
-/* ==========================
-ELEMENTS
-========================== */
+/* ==================================================
+   USER
+================================================== */
+
+let user = null;
+
+try {
+
+    user =
+        JSON.parse(
+            localStorage.getItem("user")
+        );
+
+} catch (error) {
+
+    user = null;
+
+}
+
+
+/* ==================================================
+   CURRENT GROUP
+================================================== */
+
+let currentGroup = null;
+
+
+/* ==================================================
+   ELEMENTS
+================================================== */
 
 const loading =
-    document.getElementById("loading");
+    document.getElementById("groupLoading");
 
-const groupName =
-    document.getElementById("groupName");
+const content =
+    document.getElementById("groupContent");
 
-const groupDescription =
-    document.getElementById("groupDescription");
+const errorBox =
+    document.getElementById("groupError");
 
-const groupAvatar =
-    document.getElementById("groupAvatar");
-
-const groupCover =
-    document.getElementById("groupCover");
-
-const memberCount =
-    document.getElementById("memberCount");
-
-const privacyText =
-    document.getElementById("privacyText");
-
-const groupLink =
-    document.getElementById("groupLink");
-
-const joinGroupBtn =
-    document.getElementById("joinGroupBtn");
+const errorMessage =
+    document.getElementById("groupErrorMessage");
 
 const joinSection =
     document.getElementById("joinSection");
@@ -66,79 +75,88 @@ const joinSection =
 const openGroupSection =
     document.getElementById("openGroupSection");
 
+const joinBtn =
+    document.getElementById("joinGroupBtn");
+
 const openGroupBtn =
     document.getElementById("openGroupBtn");
 
-const copyLinkBtn =
-    document.getElementById("copyLinkBtn");
-
 const shareBtn =
-    document.getElementById("shareBtn");
+    document.getElementById("shareGroupBtn");
 
-const groupMessage =
-    document.getElementById("groupMessage");
-
-
-/* ==========================
-CURRENT GROUP
-========================== */
-
-let currentGroup = null;
+const copyBtn =
+    document.getElementById("copyGroupLinkBtn");
 
 
 /* ==================================================
-CHECK GROUP ID
+   START
 ================================================== */
 
-if (!groupId) {
-
-    showMessage(
-        "Invalid group link.",
-        "error"
-    );
-
-    loading.style.display = "none";
-
-} else {
-
-    loadGroup();
-
-}
+loadGroup();
 
 
 /* ==================================================
-LOAD GROUP
+   LOAD GROUP
 ================================================== */
 
 async function loadGroup() {
 
     try {
 
-        loading.style.display = "flex";
+        let url = "";
+
+
+        /* ==========================================
+           PRIORITY:
+           invite code
+        ========================================== */
+
+        if (inviteCode) {
+
+            url =
+                "/api/groups/invite/" +
+                encodeURIComponent(inviteCode);
+
+        }
+
+        /* ==========================================
+           FALLBACK:
+           group ID
+        ========================================== */
+
+        else if (groupId) {
+
+            url =
+                "/api/groups/" +
+                encodeURIComponent(groupId);
+
+        }
+
+        else {
+
+            showError(
+                "No group link or group ID was provided."
+            );
+
+            return;
+
+        }
 
 
         const res =
-            await fetch(
-                "/api/groups/" +
-                encodeURIComponent(groupId)
-            );
+            await fetch(url);
 
 
         const data =
             await res.json();
 
 
-        if (!data.success) {
+        if (!res.ok || !data.success) {
 
-            loading.style.display = "none";
-
-            showMessage(
+            showError(
                 data.message ||
-                "Group not found.",
-                "error"
+                "Group not found."
             );
-
-            joinSection.style.display = "none";
 
             return;
 
@@ -159,14 +177,10 @@ async function loadGroup() {
             error
         );
 
-        showMessage(
-            "Unable to load group.",
-            "error"
+
+        showError(
+            "Unable to load this group. Please try again."
         );
-
-    } finally {
-
-        loading.style.display = "none";
 
     }
 
@@ -174,37 +188,50 @@ async function loadGroup() {
 
 
 /* ==================================================
-RENDER GROUP
+   RENDER GROUP
 ================================================== */
 
 function renderGroup() {
 
-    if (!currentGroup) return;
+    loading.style.display =
+        "none";
+
+    errorBox.style.display =
+        "none";
+
+    content.style.display =
+        "block";
 
 
-    /* ==========================
-    NAME
-    ========================== */
+    /* ==========================================
+       NAME
+    ========================================== */
 
-    groupName.innerText =
-        currentGroup.name ||
-        "2Chat Group";
+    document.getElementById(
+        "groupName"
+    ).innerText =
+        currentGroup.name || "2Chat Group";
 
 
-    /* ==========================
-    DESCRIPTION
-    ========================== */
+    /* ==========================================
+       DESCRIPTION
+    ========================================== */
 
-    groupDescription.innerText =
+    document.getElementById(
+        "groupDescription"
+    ).innerText =
         currentGroup.description ||
-        "No group description.";
+        "No description";
 
 
-    /* ==========================
-    AVATAR
-    ========================== */
+    /* ==========================================
+       AVATAR
+    ========================================== */
 
-    groupAvatar.src =
+    document.getElementById(
+        "groupAvatar"
+    ).src =
+
         currentGroup.avatar &&
         currentGroup.avatar.trim() !== ""
 
@@ -213,11 +240,14 @@ function renderGroup() {
             : "/images/default-group.png";
 
 
-    /* ==========================
-    COVER
-    ========================== */
+    /* ==========================================
+       COVER
+    ========================================== */
 
-    groupCover.src =
+    document.getElementById(
+        "groupCover"
+    ).src =
+
         currentGroup.cover &&
         currentGroup.cover.trim() !== ""
 
@@ -226,83 +256,120 @@ function renderGroup() {
             : "/images/default-group-cover.jpg";
 
 
-    /* ==========================
-    MEMBERS
-    ========================== */
+    /* ==========================================
+       MEMBERS
+    ========================================== */
 
-    memberCount.innerText =
-        currentGroup.members
-            ? currentGroup.members.length
-            : 0;
+    document.getElementById(
+        "memberCount"
+    ).innerText =
 
-
-    /* ==========================
-    PRIVACY
-    ========================== */
-
-    if (
-        currentGroup.privacy ===
-        "private"
-    ) {
-
-        privacyText.innerText =
-            "Private";
-
-    } else {
-
-        privacyText.innerText =
-            "Public";
-
-    }
+        currentGroup.memberCount ??
+        currentGroup.members?.length ??
+        0;
 
 
-    /* ==========================
-    GROUP LINK
-    ========================== */
+    /* ==========================================
+       PRIVACY
+    ========================================== */
 
-    const link =
-        createGroupLink();
+    document.getElementById(
+        "groupPrivacy"
+    ).innerText =
+
+        currentGroup.privacy === "private"
+            ? "Private"
+            : "Public";
 
 
-    groupLink.innerText =
-        link;
+    /* ==========================================
+       GROUP LINK
+    ========================================== */
+
+    updateGroupLink();
 
 
-    /* ==========================
-    CHECK USER
-    ========================== */
+    /* ==========================================
+       CHECK MEMBERSHIP
+    ========================================== */
 
-    updateUserState();
+    updateMembershipUI();
 
 }
 
 
 /* ==================================================
-CREATE SHAREABLE GROUP LINK
+   GROUP SHARE LINK
 ================================================== */
 
-function createGroupLink() {
+function getGroupLink() {
+
+    if (!currentGroup) {
+
+        return "";
+
+    }
+
+
+    /*
+       Sabon link format:
+
+       /group.html?invite=INVITECODE
+    */
+
+    if (currentGroup.inviteCode) {
+
+        return (
+            window.location.origin +
+            "/group.html?invite=" +
+            encodeURIComponent(
+                currentGroup.inviteCode
+            )
+        );
+
+    }
+
+
+    /* ==========================================
+       FALLBACK
+    ========================================== */
 
     return (
         window.location.origin +
         "/group.html?id=" +
-        encodeURIComponent(groupId)
+        encodeURIComponent(
+            currentGroup._id
+        )
     );
 
 }
 
 
 /* ==================================================
-UPDATE USER STATE
+   DISPLAY GROUP LINK
 ================================================== */
 
-function updateUserState() {
+function updateGroupLink() {
 
-    /* ==========================
-    USER NOT LOGGED IN
-    ========================== */
+    const link =
+        getGroupLink();
 
-    if (!user || !user.username) {
+
+    document.getElementById(
+        "groupLinkText"
+    ).innerText =
+        link;
+
+}
+
+
+/* ==================================================
+   CHECK MEMBERSHIP
+================================================== */
+
+function updateMembershipUI() {
+
+    if (!user) {
 
         joinSection.style.display =
             "block";
@@ -310,7 +377,7 @@ function updateUserState() {
         openGroupSection.style.display =
             "none";
 
-        joinGroupBtn.innerHTML = `
+        joinBtn.innerHTML = `
 
             <i class="fa-solid fa-user-plus"></i>
 
@@ -323,18 +390,23 @@ function updateUserState() {
     }
 
 
-    /* ==========================
-    CHECK MEMBERSHIP
-    ========================== */
-
-    const isMember =
-        currentGroup.members &&
-        currentGroup.members.includes(
-            user.username
-        );
+    const username =
+        String(
+            user.username || ""
+        ).trim();
 
 
-    if (isMember) {
+    const members =
+        currentGroup.members || [];
+
+
+    if (
+        members.includes(username)
+    ) {
+
+        /*
+           Already member
+        */
 
         joinSection.style.display =
             "none";
@@ -342,32 +414,29 @@ function updateUserState() {
         openGroupSection.style.display =
             "block";
 
-    } else {
-
-        joinSection.style.display =
-            "block";
-
-        openGroupSection.style.display =
-            "none";
-
-        joinGroupBtn.innerHTML = `
-
-            <i class="fa-solid fa-user-plus"></i>
-
-            Join Group
-
-        `;
+        return;
 
     }
+
+
+    /*
+       Logged in but not member
+    */
+
+    joinSection.style.display =
+        "block";
+
+    openGroupSection.style.display =
+        "none";
 
 }
 
 
 /* ==================================================
-JOIN GROUP
+   JOIN GROUP
 ================================================== */
 
-joinGroupBtn.addEventListener(
+joinBtn.addEventListener(
     "click",
     joinGroup
 );
@@ -375,93 +444,93 @@ joinGroupBtn.addEventListener(
 
 async function joinGroup() {
 
-    /* ==================================================
-    USER NOT REGISTERED / NOT LOGGED IN
 
-    SAVE GROUP LINK
-    THEN SEND USER TO REGISTER
-    ================================================== */
+    /* ==========================================
+       NOT LOGGED IN
+    ========================================== */
 
-    if (!user || !user.username) {
+    if (!user) {
 
-        const returnUrl =
-            window.location.href;
+        /*
+           Save the exact group destination.
+
+           Bayan register/login za mu dawo nan.
+        */
+
+        const redirectUrl =
+            window.location.pathname +
+            window.location.search;
 
 
         localStorage.setItem(
-            "pendingGroupJoin",
-            returnUrl
+            "afterAuthRedirect",
+            redirectUrl
         );
 
+
+        /*
+           Aika user Register
+        */
 
         window.location.href =
             "/register.html";
 
-
         return;
 
     }
 
 
-    /* ==========================
-    ALREADY MEMBER
-    ========================== */
+    /* ==========================================
+       CHECK GROUP
+    ========================================== */
 
-    if (
-        currentGroup.members &&
-        currentGroup.members.includes(
-            user.username
-        )
-    ) {
+    if (!currentGroup) {
 
-        openGroup();
+        alert(
+            "Group information is not available."
+        );
 
         return;
 
     }
-
-
-    /* ==========================
-    JOIN
-    ========================== */
-
-    joinGroupBtn.disabled = true;
-
-    joinGroupBtn.innerHTML = `
-
-        <i class="fa-solid fa-spinner fa-spin"></i>
-
-        Joining...
-
-    `;
 
 
     try {
+
+        joinBtn.disabled =
+            true;
+
+
+        joinBtn.innerHTML = `
+
+            <i class="fa-solid fa-spinner fa-spin"></i>
+
+            Joining...
+
+        `;
+
 
         const res =
             await fetch(
                 "/api/groups/join",
                 {
 
-                    method: "PUT",
+                    method:"PUT",
 
-                    headers: {
-
+                    headers:{
                         "Content-Type":
                             "application/json"
-
                     },
 
-                    body:
-                        JSON.stringify({
+                    body:JSON.stringify({
 
-                            groupId:
-                                groupId,
+                        groupId:
+                            currentGroup._id,
 
-                            username:
-                                user.username
+                        username:
+                            user.username
 
-                        })
+                    })
 
                 }
             );
@@ -471,76 +540,72 @@ async function joinGroup() {
             await res.json();
 
 
-        /* ==========================
-        SUCCESS
-        ========================== */
-
-        if (data.success) {
-
-            currentGroup =
-                data.group;
-
-
-            showMessage(
-                "✅ You joined the group successfully.",
-                "success"
-            );
-
-
-            updateUserState();
-
+        if (!data.success) {
 
             /*
-            Ƙaramin delay domin
-            user ya ga success message
+               Private group
             */
 
-            setTimeout(
-                () => {
+            if (data.private) {
 
-                    openGroup();
+                alert(
+                    data.message ||
+                    "This is a private group."
+                );
 
-                },
-                700
-            );
+            } else {
 
+                alert(
+                    data.message ||
+                    "Unable to join group."
+                );
+
+            }
+
+
+            joinBtn.disabled =
+                false;
+
+
+            joinBtn.innerHTML = `
+
+                <i class="fa-solid fa-user-plus"></i>
+
+                Join Group
+
+            `;
 
             return;
 
         }
 
 
-        /* ==========================
-        PRIVATE GROUP
-        ========================== */
+        /* ======================================
+           SUCCESS
+        ====================================== */
 
-        if (data.private) {
-
-            showMessage(
-                "🔒 This is a private group. You need an invitation to join.",
-                "error"
-            );
+        currentGroup =
+            data.group;
 
 
-            resetJoinButton();
-
-            return;
-
-        }
-
-
-        /* ==========================
-        ERROR
-        ========================== */
-
-        showMessage(
-            data.message ||
-            "Unable to join group.",
-            "error"
+        alert(
+            "✅ You joined the group successfully."
         );
 
 
-        resetJoinButton();
+        /*
+           Redirect zuwa group chat.
+
+           Idan group chat page ɗinka yana da
+           wani route daban, za mu canza wannan
+           daga baya.
+        */
+
+        window.location.href =
+            "/group-chat.html?id=" +
+            encodeURIComponent(
+                currentGroup._id
+            );
 
 
     } catch (error) {
@@ -551,13 +616,22 @@ async function joinGroup() {
         );
 
 
-        showMessage(
-            "Network error. Please try again.",
-            "error"
+        alert(
+            "Network error. Please try again."
         );
 
 
-        resetJoinButton();
+        joinBtn.disabled =
+            false;
+
+
+        joinBtn.innerHTML = `
+
+            <i class="fa-solid fa-user-plus"></i>
+
+            Join Group
+
+        `;
 
     }
 
@@ -565,7 +639,7 @@ async function joinGroup() {
 
 
 /* ==================================================
-OPEN GROUP
+   OPEN GROUP
 ================================================== */
 
 openGroupBtn.addEventListener(
@@ -576,25 +650,27 @@ openGroupBtn.addEventListener(
 
 function openGroup() {
 
-    /*
-    Wannan route ɗin ne za mu yi amfani da shi
-    idan group chat ɗinka yana da:
-    
-    /group-chat.html?id=GROUP_ID
-    */
+    if (!currentGroup) {
+
+        return;
+
+    }
+
 
     window.location.href =
         "/group-chat.html?id=" +
-        encodeURIComponent(groupId);
+        encodeURIComponent(
+            currentGroup._id
+        );
 
 }
 
 
 /* ==================================================
-COPY GROUP LINK
+   COPY GROUP LINK
 ================================================== */
 
-copyLinkBtn.addEventListener(
+copyBtn.addEventListener(
     "click",
     copyGroupLink
 );
@@ -603,7 +679,14 @@ copyLinkBtn.addEventListener(
 async function copyGroupLink() {
 
     const link =
-        createGroupLink();
+        getGroupLink();
+
+
+    if (!link) {
+
+        return;
+
+    }
 
 
     try {
@@ -613,40 +696,43 @@ async function copyGroupLink() {
         );
 
 
-        showMessage(
-            "🔗 Group link copied.",
-            "success"
+        const oldHTML =
+            copyBtn.innerHTML;
+
+
+        copyBtn.innerHTML = `
+
+            <i class="fa-solid fa-check"></i>
+
+        `;
+
+
+        setTimeout(
+            () => {
+
+                copyBtn.innerHTML =
+                    oldHTML;
+
+            },
+            1500
         );
 
 
     } catch (error) {
 
+        console.error(
+            "COPY LINK ERROR:",
+            error
+        );
+
+
         /*
-        FALLBACK
+           Fallback
         */
 
-        const textarea =
-            document.createElement("textarea");
-
-        textarea.value =
-            link;
-
-        document.body.appendChild(
-            textarea
-        );
-
-        textarea.select();
-
-        document.execCommand(
-            "copy"
-        );
-
-        textarea.remove();
-
-
-        showMessage(
-            "🔗 Group link copied.",
-            "success"
+        window.prompt(
+            "Copy Group Link:",
+            link
         );
 
     }
@@ -655,7 +741,7 @@ async function copyGroupLink() {
 
 
 /* ==================================================
-SHARE GROUP
+   SHARE GROUP
 ================================================== */
 
 shareBtn.addEventListener(
@@ -667,135 +753,97 @@ shareBtn.addEventListener(
 async function shareGroup() {
 
     const link =
-        createGroupLink();
+        getGroupLink();
 
 
-    const text =
-        "Join my group on 2Chat: " +
-        currentGroup.name;
+    if (!link) {
+
+        return;
+
+    }
 
 
-    /* ==========================
-    NATIVE SHARE
-    ========================== */
+    const shareData = {
 
-    if (
-        navigator.share
-    ) {
+        title:
+            currentGroup.name +
+            " - 2Chat",
 
-        try {
+        text:
+            "Join " +
+            currentGroup.name +
+            " on 2Chat.",
 
-            await navigator.share({
+        url:
+            link
 
-                title:
-                    currentGroup.name,
+    };
 
-                text:
-                    text,
 
-                url:
-                    link
+    try {
 
-            });
+        if (
+            navigator.share
+        ) {
 
-            return;
+            await navigator.share(
+                shareData
+            );
 
-        } catch (error) {
+        } else {
 
-            /*
-            User cancelled share.
-            */
+            await navigator.clipboard.writeText(
+                link
+            );
 
-            console.log(
-                "Share cancelled."
+
+            alert(
+                "✅ Group link copied. You can now share it."
+            );
+
+        }
+
+    } catch (error) {
+
+        /*
+           User cancelled share.
+           Kada mu nuna error idan kawai
+           ya rufe share sheet.
+        */
+
+        if (
+            error.name !==
+            "AbortError"
+        ) {
+
+            console.error(
+                "SHARE ERROR:",
+                error
             );
 
         }
 
     }
 
-
-    /* ==========================
-    FALLBACK COPY
-    ========================== */
-
-    await copyGroupLink();
-
 }
 
 
 /* ==================================================
-SHOW MESSAGE
+   ERROR
 ================================================== */
 
-function showMessage(
-    message,
-    type
-) {
+function showError(message) {
 
-    groupMessage.innerText =
-        message;
+    loading.style.display =
+        "none";
 
+    content.style.display =
+        "none";
 
-    groupMessage.className =
-        "group-message " +
-        type;
-
-
-    groupMessage.style.display =
+    errorBox.style.display =
         "block";
 
-
-    setTimeout(
-        () => {
-
-            groupMessage.style.display =
-                "none";
-
-        },
-        3500
-    );
+    errorMessage.innerText =
+        message;
 
 }
-
-
-/* ==================================================
-RESET JOIN BUTTON
-================================================== */
-
-function resetJoinButton() {
-
-    joinGroupBtn.disabled =
-        false;
-
-
-    joinGroupBtn.innerHTML = `
-
-        <i class="fa-solid fa-user-plus"></i>
-
-        Join Group
-
-    `;
-
-}
-
-
-/* ==================================================
-REGISTER RETURN SYSTEM
-================================================== */
-
-/*
-    Bayan register ya gama,
-    register.js zai duba wannan:
-
-    localStorage.pendingGroupJoin
-
-    sannan ya mayar da user
-    zuwa group link ɗin da ya fara.
-*/
-
-
-console.log(
-    "2Chat Group ID:",
-    groupId
-);
