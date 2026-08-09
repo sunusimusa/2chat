@@ -475,6 +475,8 @@ exports.joinGroup = async (req, res) => {
 };
 
 // ================= LEAVE GROUP =================
+ // ================= LEAVE GROUP =================
+
 exports.leaveGroup = async (req, res) => {
 
     try {
@@ -485,24 +487,49 @@ exports.leaveGroup = async (req, res) => {
         } = req.body;
 
 
-        const group =
-            await Group.findById(groupId);
+        // ==========================
+        // CHECK REQUIRED DATA
+        // ==========================
 
+        if (!groupId || !username) {
 
-        if (!group) {
-
-            return res.json({
+            return res.status(400).json({
 
                 success: false,
 
-                message: "Group not found."
+                message:
+                    "Group ID and username are required."
 
             });
 
         }
 
 
+        // ==========================
+        // FIND GROUP
+        // ==========================
+
+        const group =
+            await Group.findById(groupId);
+
+        if (!group) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Group not found."
+
+            });
+
+        }
+
+
+        // ==========================
         // OWNER CANNOT LEAVE
+        // ==========================
+
         if (group.owner === username) {
 
             return res.status(400).json({
@@ -517,36 +544,111 @@ exports.leaveGroup = async (req, res) => {
         }
 
 
+        // ==========================
+        // CHECK MEMBERSHIP
+        // ==========================
+
+        if (!group.members.includes(username)) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "You are not a member of this group."
+
+            });
+
+        }
+
+
+        // ==========================
+        // REMOVE MEMBER
+        // ==========================
+
         group.members =
             group.members.filter(
-                m => m !== username
+                member => member !== username
             );
 
+
+        // ==========================
+        // REMOVE FROM ADMINS TOO
+        // ==========================
+
+        group.admins =
+            group.admins.filter(
+                admin => admin !== username
+            );
+
+
+        // ==========================
+        // UPDATE MEMBER COUNT
+        // ==========================
 
         group.memberCount =
             group.members.length;
 
 
-        await group.save();
+        // ==================================================
+        // IMPORTANT
+        // Don't use group.save()
+        // because old groups may not have inviteCode.
+        // ==================================================
+
+        await Group.updateOne(
+
+            {
+                _id: group._id
+            },
+
+            {
+                $set: {
+
+                    members:
+                        group.members,
+
+                    admins:
+                        group.admins,
+
+                    memberCount:
+                        group.memberCount
+
+                }
+
+            }
+
+        );
 
 
-        res.json({
+        // ==========================
+        // SUCCESS
+        // ==========================
 
-            success: true
+        return res.json({
+
+            success: true,
+
+            message:
+                "You left the group successfully."
 
         });
 
 
-    } catch (err) {
+    } catch (error) {
 
-        console.error(err);
+        console.error(
+            "LEAVE GROUP ERROR:",
+            error
+        );
 
 
-        res.status(500).json({
+        return res.status(500).json({
 
             success: false,
 
-            message: err.message
+            message:
+                "Failed to leave group."
 
         });
 
