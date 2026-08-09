@@ -195,6 +195,108 @@ exports.getGroups = async (req, res) => {
 
 };
 
+// ==================================================
+// GET GROUP BY INVITE CODE
+// ==================================================
+
+exports.getGroupByInviteCode = async (req, res) => {
+
+    try {
+
+        const inviteCode =
+            String(req.params.inviteCode || "").trim();
+
+
+        // ==========================
+        // CHECK INVITE CODE
+        // ==========================
+
+        if (!inviteCode) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Invite code is required."
+
+            });
+
+        }
+
+
+        // ==========================
+        // FIND GROUP
+        // ==========================
+
+        const group =
+            await Group.findOne({
+                inviteCode: inviteCode
+            }).lean();
+
+
+        // ==========================
+        // GROUP NOT FOUND
+        // ==========================
+
+        if (!group) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Invalid or expired group link."
+
+            });
+
+        }
+
+
+        // ==========================
+        // MEMBER COUNT
+        // ==========================
+
+        group.memberCount =
+            Array.isArray(group.members)
+                ? group.members.length
+                : 0;
+
+
+        // ==========================
+        // SUCCESS
+        // ==========================
+
+        return res.status(200).json({
+
+            success: true,
+
+            group
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "GET GROUP BY INVITE CODE ERROR:",
+            error
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Failed to load group."
+
+        });
+
+    }
+
+};
+
 // ================= GET SINGLE GROUP =================
 exports.getGroup = async (req, res) => {
 
