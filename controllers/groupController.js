@@ -477,43 +477,77 @@ exports.joinGroup = async (req, res) => {
 // ================= LEAVE GROUP =================
 exports.leaveGroup = async (req, res) => {
 
-    try{
+    try {
 
         const {
             groupId,
             username
         } = req.body;
 
-        const group = await Group.findById(groupId);
 
-        if(!group){
+        const group =
+            await Group.findById(groupId);
+
+
+        if (!group) {
 
             return res.json({
-                success:false,
-                message:"Group not found."
+
+                success: false,
+
+                message: "Group not found."
+
             });
 
         }
 
-        group.members = group.members.filter(
-    m => m !== username
-);
 
-group.memberCount = group.members.length;
+        // OWNER CANNOT LEAVE
+        if (group.owner === username) {
 
-await group.save();
-        
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Group owner cannot leave. Transfer ownership or delete the group."
+
+            });
+
+        }
+
+
+        group.members =
+            group.members.filter(
+                m => m !== username
+            );
+
+
+        group.memberCount =
+            group.members.length;
+
+
+        await group.save();
+
+
         res.json({
-            success:true
+
+            success: true
+
         });
 
-    }catch(err){
+
+    } catch (err) {
 
         console.error(err);
 
+
         res.status(500).json({
-            success:false,
-            message:err.message
+
+            success: false,
+
+            message: err.message
+
         });
 
     }
@@ -1175,13 +1209,7 @@ if (
 
 await group.save();
 
-        // ==========================
-        // SAVE GROUP
-        // ==========================
-
-        await group.save();
-
-
+        
         // ==========================
         // SUCCESS
         // ==========================
