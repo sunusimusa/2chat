@@ -430,8 +430,35 @@ exports.joinGroup = async (req, res) => {
 
         group.memberCount =
             group.members.length;
+        
+        // ==========================
+// FIX OLD GROUP
+// ==========================
 
+if (!group.inviteCode) {
 
+    let inviteCode;
+    let existingGroup;
+
+    do {
+
+        inviteCode =
+            "2chat_" +
+            crypto
+                .randomBytes(8)
+                .toString("hex");
+
+        existingGroup =
+            await Group.findOne({
+                inviteCode
+            });
+
+    } while (existingGroup);
+
+    group.inviteCode =
+        inviteCode;
+}
+        
         await group.save();
 
 
