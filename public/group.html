@@ -45,7 +45,7 @@ HEADER
 
     <button
         type="button"
-        id="shareBtn"
+        id="shareGroupBtn"
         title="Share Group"
     >
 
@@ -57,185 +57,225 @@ HEADER
 
 
 <!-- ==========================
-GROUP COVER
+GROUP LOADING
 ========================== -->
 
-<section class="group-cover">
+<div
+    id="groupLoading"
+    class="group-loading"
+>
 
-    <img
-        id="groupCover"
-        src="/images/default-group-cover.jpg"
-        alt="Group Cover"
-    >
+    <i class="fa-solid fa-spinner fa-spin"></i>
 
-</section>
-
-
-<!-- ==========================
-GROUP AVATAR
-========================== -->
-
-<div class="group-avatar-wrapper">
-
-    <img
-        id="groupAvatar"
-        src="/images/default-group.png"
-        alt="Group Avatar"
-    >
+    <p>Loading group...</p>
 
 </div>
 
 
 <!-- ==========================
-GROUP INFORMATION
+GROUP CONTENT
 ========================== -->
 
-<section class="group-information">
-
-    <h1 id="groupName">
-        Loading...
-    </h1>
-
-    <p id="groupDescription">
-        Loading group...
-    </p>
-
-
-    <div class="group-meta">
-
-        <span>
-
-            <i class="fa-solid fa-users"></i>
-
-            <b id="memberCount">0</b>
-            Members
-
-        </span>
-
-
-        <span>
-
-            <i class="fa-solid fa-lock"></i>
-
-            <span id="privacyText">
-                Public
-            </span>
-
-        </span>
-
-    </div>
-
-</section>
-
-
-<!-- ==========================
-GROUP LINK
-========================== -->
-
-<section class="group-link-card">
-
-    <div class="link-icon">
-
-        <i class="fa-solid fa-link"></i>
-
-    </div>
-
-
-    <div class="link-content">
-
-        <h3>
-            Group Link
-        </h3>
-
-        <p id="groupLink">
-            Loading...
-        </p>
-
-    </div>
-
-
-    <button
-        id="copyLinkBtn"
-        type="button"
-        title="Copy Link"
-    >
-
-        <i class="fa-solid fa-copy"></i>
-
-    </button>
-
-</section>
-
-
-<!-- ==========================
-JOIN AREA
-========================== -->
-
-<section
-    id="joinSection"
-    class="join-section"
->
-
-    <button
-        id="joinGroupBtn"
-        type="button"
-    >
-
-        <i class="fa-solid fa-user-plus"></i>
-
-        Join Group
-
-    </button>
-
-</section>
-
-
-<!-- ==========================
-OPEN GROUP
-========================== -->
-
-<section
-    id="openGroupSection"
-    class="open-group-section"
+<main
+    id="groupContent"
+    class="group-content"
     style="display:none;"
 >
 
-    <button
-        id="openGroupBtn"
-        type="button"
+
+    <!-- ==========================
+    COVER
+    ========================== -->
+
+    <div class="group-cover">
+
+        <img
+            id="groupCover"
+            src="/images/default-group-cover.jpg"
+            alt="Group cover"
+        >
+
+    </div>
+
+
+    <!-- ==========================
+    GROUP AVATAR
+    ========================== -->
+
+    <div class="group-avatar-wrapper">
+
+        <img
+            id="groupAvatar"
+            src="/images/default-group.png"
+            alt="Group avatar"
+        >
+
+    </div>
+
+
+    <!-- ==========================
+    GROUP DETAILS
+    ========================== -->
+
+    <section class="group-details">
+
+        <h1 id="groupName">
+            Loading...
+        </h1>
+
+        <p id="groupDescription">
+            No description
+        </p>
+
+
+        <div class="group-meta">
+
+            <span>
+
+                <i class="fa-solid fa-users"></i>
+
+                <b id="memberCount">
+                    0
+                </b>
+
+                Members
+
+            </span>
+
+
+            <span>
+
+                <i class="fa-solid fa-lock-open"></i>
+
+                <span id="groupPrivacy">
+                    Public
+                </span>
+
+            </span>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==========================
+    GROUP LINK
+    ========================== -->
+
+    <section class="group-link-card">
+
+        <div class="group-link-icon">
+
+            <i class="fa-solid fa-link"></i>
+
+        </div>
+
+
+        <div class="group-link-info">
+
+            <h3>
+                Group Link
+            </h3>
+
+            <p id="groupLinkText">
+                Loading...
+            </p>
+
+        </div>
+
+
+        <button
+            id="copyGroupLinkBtn"
+            type="button"
+            title="Copy Link"
+        >
+
+            <i class="fa-solid fa-copy"></i>
+
+        </button>
+
+    </section>
+
+
+    <!-- ==========================
+    JOIN
+    ========================== -->
+
+    <section
+        id="joinSection"
+        class="join-section"
     >
 
-        <i class="fa-solid fa-comments"></i>
+        <button
+            id="joinGroupBtn"
+            class="join-group-btn"
+            type="button"
+        >
 
-        Open Group
+            <i class="fa-solid fa-user-plus"></i>
 
-    </button>
+            Join Group
 
-</section>
+        </button>
+
+    </section>
+
+
+    <!-- ==========================
+    OPEN GROUP
+    ========================== -->
+
+    <section
+        id="openGroupSection"
+        class="open-group-section"
+        style="display:none;"
+    >
+
+        <button
+            id="openGroupBtn"
+            type="button"
+        >
+
+            <i class="fa-solid fa-comments"></i>
+
+            Open Group
+
+        </button>
+
+    </section>
+
+
+</main>
 
 
 <!-- ==========================
-MESSAGE
-========================== -->
-
-<p
-    id="groupMessage"
-    class="group-message"
-></p>
-
-
-<!-- ==========================
-LOADING
+ERROR
 ========================== -->
 
 <div
-    id="loading"
-    class="loading"
+    id="groupError"
+    class="group-error"
+    style="display:none;"
 >
 
-    <i class="fa-solid fa-spinner fa-spin"></i>
+    <i class="fa-solid fa-circle-exclamation"></i>
 
-    Loading group...
+    <h3>
+        Group not found
+    </h3>
+
+    <p id="groupErrorMessage">
+        This group may have been deleted.
+    </p>
+
+    <button
+        type="button"
+        onclick="location.href='/groups.html'"
+    >
+
+        Back to Groups
+
+    </button>
 
 </div>
 
