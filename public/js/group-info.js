@@ -873,13 +873,28 @@ async function leaveGroup() {
         if (data.success) {
 
             alert(
-                "✅ You left the group."
-            );
+    "✅ You left the group."
+);
 
+/* Update local group immediately */
+currentGroup.members =
+    currentGroup.members.filter(
+        member =>
+            member !== user.username
+    );
 
-            window.location.href =
-                "/groups.html";
+currentGroup.memberCount =
+    currentGroup.members.length;
 
+/* Remove user from admins too, if necessary */
+currentGroup.admins =
+    (currentGroup.admins || []).filter(
+        admin =>
+            admin !== user.username
+    );
+
+/* Refresh UI immediately */
+renderGroup();
 
         } else {
 
