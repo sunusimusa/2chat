@@ -5,9 +5,11 @@ const GroupInvitation =
     require("../models/GroupInvitation");
 
 // ================= CREATE GROUP =================
+const crypto = require("crypto");
+
 exports.createGroup = async (req, res) => {
 
-    try{
+    try {
 
         const {
             name,
@@ -16,55 +18,134 @@ exports.createGroup = async (req, res) => {
             avatar
         } = req.body;
 
-        if(!name || !owner){
 
-            return res.json({
-                success:false,
-                message:"Group name and owner are required."
+        // ==========================
+        // CHECK REQUIRED DATA
+        // ==========================
+
+        if (!name || !owner) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Group name and owner are required."
+
             });
 
         }
 
-        const group = await Group.create({
 
-    name,
+        // ==========================
+        // GENERATE UNIQUE INVITE CODE
+        // ==========================
 
-    description: description || "",
+        let inviteCode;
 
-    avatar: avatar || "/images/default-group.png",
+        let existingGroup;
 
-    cover: "/images/default-group-cover.jpg",
+        do {
 
-    owner,
+            inviteCode =
+                "2chat_" +
+                crypto
+                    .randomBytes(8)
+                    .toString("hex");
 
-    admins:[owner],
+            existingGroup =
+                await Group.findOne({
+                    inviteCode
+                });
 
-    members:[owner],
+        } while (existingGroup);
 
-    memberCount:1,
 
-    privacy:"public",
+        // ==========================
+        // CREATE GROUP
+        // ==========================
 
-    lastMessage:"",
+        const group =
+            await Group.create({
 
-    lastMessageSender:"",
+                name: name.trim(),
 
-    lastMessageTime:null
+                description:
+                    description
+                        ? description.trim()
+                        : "",
 
-});
+                avatar:
+                    avatar ||
+                    "/images/default-group.png",
 
-        res.json({
-            success:true,
-            group
+                cover:
+                    "/images/default-group-cover.jpg",
+
+                owner,
+
+                // ⭐ UNIQUE GROUP LINK CODE
+                inviteCode,
+
+                admins: [
+                    owner
+                ],
+
+                members: [
+                    owner
+                ],
+
+                memberCount: 1,
+
+                privacy: "public",
+
+                lastMessage: "",
+
+                lastMessageSender: "",
+
+                lastMessageTime: null
+
+            });
+
+
+        // ==========================
+        // SUCCESS
+        // ==========================
+
+        return res.status(201).json({
+
+            success: true,
+
+            message:
+                "Group created successfully.",
+
+            group,
+
+            // Za mu yi amfani da wannan daga baya
+            inviteCode,
+
+            // Wannan shi ne link ɗin group
+            groupLink:
+                `/group.html?invite=${encodeURIComponent(inviteCode)}`
+
         });
 
-    }catch(err){
 
-        console.error(err);
+    } catch (error) {
 
-        res.status(500).json({
-            success:false,
-            message:err.message
+        console.error(
+            "CREATE GROUP ERROR:",
+            error
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Failed to create group."
+
         });
 
     }
