@@ -112,9 +112,38 @@ async function login(){
       JSON.stringify(data.user)
     );
 
-    location.href="/home.html";
 
-  }else{
+    // ==========================
+    // CHECK GROUP REDIRECT
+    // ==========================
+
+    const afterAuthRedirect =
+        localStorage.getItem("afterAuthRedirect");
+
+
+    if (afterAuthRedirect) {
+
+        localStorage.removeItem(
+            "afterAuthRedirect"
+        );
+
+        location.href =
+            afterAuthRedirect;
+
+        return;
+
+    }
+
+
+    // ==========================
+    // NORMAL LOGIN
+    // ==========================
+
+    location.href =
+        "/home.html";
+
+
+}else{
 
     document.getElementById("msg")
       .innerText =
