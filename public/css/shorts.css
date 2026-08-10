@@ -923,4 +923,307 @@ body{
     width:22px;
     text-align:center;
 }
-    
+
+    /* ==================================================
+   YOUTUBE STYLE TOP CONTROLS
+================================================== */
+
+.youtube-top{
+
+    position:fixed;
+
+    top:18px;
+
+    right:14px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    z-index:5000;
+
+}
+
+
+/* SEARCH + MENU */
+
+.top-icon{
+
+    width:56px;
+
+    height:56px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:rgba(0,0,0,.48);
+
+    color:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-decoration:none;
+
+    font-size:27px;
+
+    cursor:pointer;
+
+    backdrop-filter:blur(8px);
+
+    -webkit-backdrop-filter:blur(8px);
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,.25);
+
+    transition:.2s;
+
+}
+
+
+.top-icon:active{
+
+    transform:scale(.90);
+
+}
+
+
+/* ==================================================
+   SHORTS MENU
+================================================== */
+
+.shorts-menu{
+
+    position:fixed;
+
+    top:82px;
+
+    right:14px;
+
+    width:210px;
+
+    background:rgba(25,25,25,.96);
+
+    border-radius:15px;
+
+    padding:7px;
+
+    z-index:6000;
+
+    box-shadow:
+        0 8px 30px rgba(0,0,0,.55);
+
+    opacity:0;
+
+    visibility:hidden;
+
+    transform:
+        translateY(-8px)
+        scale(.96);
+
+    transform-origin:
+        top right;
+
+    transition:
+        opacity .18s ease,
+        transform .18s ease,
+        visibility .18s ease;
+
+}
+
+
+/* OPEN */
+
+.shorts-menu.show{
+
+    opacity:1;
+
+    visibility:visible;
+
+    transform:
+        translateY(0)
+        scale(1);
+
+}
+
+
+/* MENU BUTTON */
+
+.shorts-menu button{
+
+    width:100%;
+
+    min-height:48px;
+
+    border:none;
+
+    background:transparent;
+
+    color:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    padding:12px;
+
+    border-radius:10px;
+
+    font-size:15px;
+
+    text-align:left;
+
+    cursor:pointer;
+
+}
+
+
+.shorts-menu button:hover{
+
+    background:rgba(255,255,255,.12);
+
+}
+
+
+.shorts-menu button:active{
+
+    background:rgba(255,255,255,.20);
+
+}
+
+
+.shorts-menu button i{
+
+    width:22px;
+
+    text-align:center;
+
+    font-size:18px;
+
+}
+
+
+/* ==================================================
+   MOVE USER INFO UP
+================================================== */
+
+.overlay{
+
+    bottom:105px !important;
+
+}
+
+
+/* ==================================================
+   USER INFO
+================================================== */
+
+.user-info{
+
+    margin-bottom:8px;
+
+}
+
+
+/* ==================================================
+   FOLLOW BUTTON
+================================================== */
+
+.follow-btn{
+
+    padding:8px 16px;
+
+}
+
+
+/* ==================================================
+   UPLOAD BUTTON
+================================================== */
+
+.uploadBtn{
+
+    width:44px;
+
+    height:44px;
+
+}
+
+
+/* ==================================================
+   KEEP RIGHT ACTIONS
+================================================== */
+
+.actions{
+
+    bottom:125px !important;
+
+}
+
+
+/* ==================================================
+   MOBILE
+================================================== */
+
+@media(max-width:600px){
+
+    .youtube-top{
+
+        top:14px;
+
+        right:10px;
+
+        gap:8px;
+
+    }
+
+
+    .top-icon{
+
+        width:54px;
+
+        height:54px;
+
+        font-size:25px;
+
+    }
+
+
+    .shorts-menu{
+
+        top:76px;
+
+        right:10px;
+
+        width:205px;
+
+    }
+
+
+    .overlay{
+
+        left:15px;
+
+        right:95px;
+
+        bottom:110px !important;
+
+    }
+
+
+    .actions{
+
+        right:10px;
+
+        bottom:125px !important;
+
+    }
+
+}
