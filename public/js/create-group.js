@@ -274,10 +274,42 @@ async function createGroup() {
             );
 
 
-        const data =
-            await res.json();
+        const responseText =
+    await res.text();
 
+console.log(
+    "CREATE GROUP STATUS:",
+    res.status
+);
 
+console.log(
+    "CREATE GROUP RESPONSE:",
+    responseText
+);
+
+let data = {};
+
+try {
+
+    data =
+        JSON.parse(responseText);
+
+} catch (error) {
+
+    console.error(
+        "SERVER RESPONSE IS NOT JSON:",
+        responseText
+    );
+
+    alert(
+        "Server error: " +
+        responseText
+    );
+
+    return;
+
+}
+       
         /* ==========================================
            SUCCESS
         ========================================== */
