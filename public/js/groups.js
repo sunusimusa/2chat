@@ -23,8 +23,10 @@ async function loadGroups(){
     try{
 
         const res =
-        await fetch("/api/groups/all");
-
+await fetch("/api/groups/all", {
+    cache: "no-store"
+});
+        
         const data =
         await res.json();
 
@@ -473,3 +475,14 @@ LOAD GROUPS
 ========================== */
 
 loadGroups();
+
+
+/* ==================================================
+   REFRESH GROUPS WHEN COMING BACK TO THIS PAGE
+   ================================================== */
+
+window.addEventListener("pageshow", function (event) {
+
+    loadGroups();
+
+});
