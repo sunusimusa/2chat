@@ -294,3 +294,20 @@ margin-right:6px;
 margin-right:8px;
 color:#2196f3;
 }
+
+.following-stat{
+    cursor:pointer;
+    transition:transform .2s ease;
+}
+
+.following-stat:active{
+    transform:scale(.92);
+}
+
+.following-stat:hover{
+    opacity:.8;
+}
+
+.following-stat b{
+    color:#2196f3;
+}
