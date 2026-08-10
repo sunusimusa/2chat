@@ -1,1 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>2Chat Following</title>
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+html,
+body{
+    width:100%;
+    min-height:100%;
+    background:#f5f6f8;
+    color:#111;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.header{
+
+    height:65px;
+
+    background:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    padding:0 15px;
+
+    position:sticky;
+
+    top:0;
+
+    z-index:100;
+
+    box-shadow:
+        0 2px 10px rgba(0,0,0,.10);
+}
+
+
+.back-btn{
+
+    width:42px;
+    height:42px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#f0f1f3;
+
+    color:#111;
+
+    font-size:20px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    cursor:pointer;
+}
+
+
+.header h2{
+
+    flex:1;
+
+    text-align:center;
+
+    font-size:20px;
+
+    margin-right:42px;
+}
+
+
+/* =========================
+   PAGE
+========================= */
+
+.page{
+
+    width:100%;
+
+    max-width:650px;
+
+    margin:auto;
+
+    padding:20px 15px 90px;
+}
+
+
+/* =========================
+   TITLE
+========================= */
+
+.page-title{
+
+    font-size:22px;
+
+    font-weight:bold;
+
+    margin-bottom:5px;
+}
+
+
+.page-subtitle{
+
+    color:#777;
+
+    font-size:14px;
+
+    margin-bottom:18px;
+}
+
+
+/* =========================
+   COUNT
+========================= */
+
+.following-count{
+
+    background:#fff;
+
+    padding:15px;
+
+    border-radius:14px;
+
+    margin-bottom:15px;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.07);
+
+    font-size:15px;
+}
+
+
+.following-count b{
+
+    color:#1877f2;
+
+    font-size:18px;
+}
+
+
+/* =========================
+   LIST
+========================= */
+
+.following-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+}
+
+
+/* =========================
+   USER CARD
+========================= */
+
+.user-card{
+
+    background:#fff;
+
+    border-radius:15px;
+
+    padding:13px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.07);
+}
+
+
+/* Avatar */
+
+.user-avatar{
+
+    width:55px;
+
+    height:55px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    background:#ddd;
+
+    flex-shrink:0;
+}
+
+
+/* User information */
+
+.user-info{
+
+    flex:1;
+
+    min-width:0;
+}
+
+
+.user-info h3{
+
+    font-size:16px;
+
+    margin-bottom:4px;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+}
+
+
+.user-info p{
+
+    font-size:13px;
+
+    color:#777;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+}
+
+
+/* View profile */
+
+.view-btn{
+
+    border:none;
+
+    background:#1877f2;
+
+    color:#fff;
+
+    padding:9px 13px;
+
+    border-radius:20px;
+
+    font-size:13px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    white-space:nowrap;
+}
+
+
+.view-btn:active{
+
+    transform:scale(.94);
+}
+
+
+/* =========================
+   EMPTY
+========================= */
+
+.empty{
+
+    background:#fff;
+
+    border-radius:16px;
+
+    padding:45px 20px;
+
+    text-align:center;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.07);
+}
+
+
+.empty i{
+
+    font-size:55px;
+
+    color:#bbb;
+
+    margin-bottom:15px;
+}
+
+
+.empty h3{
+
+    font-size:18px;
+
+    margin-bottom:8px;
+}
+
+
+.empty p{
+
+    color:#777;
+
+    font-size:14px;
+
+    line-height:20px;
+
+    margin-bottom:18px;
+}
+
+
+.find-btn{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:11px 18px;
+
+    border-radius:25px;
+
+    background:#1877f2;
+
+    color:#fff;
+
+    text-decoration:none;
+
+    font-weight:bold;
+
+    font-size:14px;
+}
+
+
+/* =========================
+   LOADING
+========================= */
+
+.loading{
+
+    text-align:center;
+
+    padding:40px;
+
+    color:#777;
+}
+
+
+.loading i{
+
+    font-size:30px;
+
+    margin-bottom:10px;
+}
+
+
+/* =========================
+   BOTTOM NAV
+========================= */
+
+.bottom-nav{
+
+    position:fixed;
+
+    left:0;
+
+    right:0;
+
+    bottom:0;
+
+    height:68px;
+
+    background:#111;
+
+    display:flex;
+
+    justify-content:space-around;
+
+    align-items:center;
+
+    z-index:500;
+
+    box-shadow:
+        0 -2px 10px rgba(0,0,0,.20);
+}
+
+
+.bottom-nav a{
+
+    flex:1;
+
+    height:100%;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:4px;
+
+    text-decoration:none;
+
+    color:#aaa;
+
+    font-size:11px;
+
+    font-weight:bold;
+}
+
+
+.bottom-nav a i{
+
+    font-size:21px;
+}
+
+
+.bottom-nav a.active{
+
+    color:#2196f3;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:600px){
+
+    .page{
+
+        padding:
+        18px 12px 90px;
+    }
+
+
+    .user-card{
+
+        padding:11px;
+    }
+
+
+    .user-avatar{
+
+        width:52px;
+        height:52px;
+    }
+
+
+    .view-btn{
+
+        padding:8px 11px;
+
+        font-size:12px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<header class="header">
+
+    <button
+        class="back-btn"
+        onclick="history.back()">
+
+        <i class="fa-solid fa-arrow-left"></i>
+
+    </button>
+
+    <h2>Following</h2>
+
+</header>
+
+
+<!-- =========================
+     PAGE
+========================= -->
+
+<main class="page">
+
+    <div class="page-title">
+        People You Follow
+    </div>
+
+    <div class="page-subtitle">
+        Accounts you are following on 2Chat.
+    </div>
+
+
+    <div class="following-count">
+
+        <b id="followingCount">0</b>
+
+        Following
+
+    </div>
+
+
+    <div
+        id="followingList"
+        class="following-list">
+
+        <div class="loading">
+
+            <i class="fa-solid fa-spinner fa-spin"></i>
+
+            <p>Loading...</p>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- =========================
+     BOTTOM NAVIGATION
+========================= -->
+
+<nav class="bottom-nav">
+
+    <a href="/home.html">
+
+        <i class="fa-solid fa-house"></i>
+
+        <span>Home</span>
+
+    </a>
+
+
+    <a href="/shorts.html">
+
+        <i class="fa-solid fa-clapperboard"></i>
+
+        <span>Shorts</span>
+
+    </a>
+
+
+    <a href="/trending.html">
+
+        <i class="fa-solid fa-fire"></i>
+
+        <span>Trending</span>
+
+    </a>
+
+
+    <a href="/saved.html">
+
+        <i class="fa-solid fa-bookmark"></i>
+
+        <span>Saved</span>
+
+    </a>
+
+
+    <a href="/profile.html">
+
+        <i class="fa-solid fa-user"></i>
+
+        <span>Profile</span>
+
+    </a>
+
+</nav>
+
+
+<script>
+
+/* =========================
+   USER
+========================= */
+
+const user =
+    JSON.parse(localStorage.getItem("user"));
+
+
+/* =========================
+   ELEMENTS
+========================= */
+
+const list =
+    document.getElementById("followingList");
+
+const count =
+    document.getElementById("followingCount");
+
+
+/* =========================
+   LOAD FOLLOWING
+========================= */
+
+function loadFollowing(){
+
+    if(!user){
+
+        list.innerHTML = `
+
+            <div class="empty">
+
+                <i class="fa-solid fa-user-lock"></i>
+
+                <h3>Login Required</h3>
+
+                <p>
+                    Please login to see the people
+                    you are following.
+                </p>
+
+                <a
+                    href="/login.html"
+                    class="find-btn">
+
+                    Login
+
+                </a>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    /*
+       Get following array from user
+       stored in localStorage.
+    */
+
+    const following =
+        Array.isArray(user.following)
+        ? user.following
+        : [];
+
+
+    count.innerText =
+        following.length;
+
+
+    /* =========================
+       EMPTY FOLLOWING
+    ========================= */
+
+    if(following.length === 0){
+
+        list.innerHTML = `
+
+            <div class="empty">
+
+                <i class="fa-solid fa-user-group"></i>
+
+                <h3>
+                    You are not following anyone yet
+                </h3>
+
+                <p>
+                    Find people and creators you like
+                    and follow them to see their content.
+                </p>
+
+                <a
+                    href="/search.html"
+                    class="find-btn">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    Find People
+
+                </a>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    /* =========================
+       DISPLAY USERS
+    ========================= */
+
+    list.innerHTML = "";
+
+
+    following.forEach(username => {
+
+        const safeUsername =
+            String(username)
+            .replace(/</g,"&lt;")
+            .replace(/>/g,"&gt;");
+
+
+        list.innerHTML += `
+
+            <div class="user-card">
+
+                <img
+                    class="user-avatar"
+                    src="/images/default-avatar.png"
+                    onerror="
+                        this.src='/images/default-profile.png';
+                    ">
+
+                <div class="user-info">
+
+                    <h3>
+                        @${safeUsername}
+                    </h3>
+
+                    <p>
+                        You are following this user
+                    </p>
+
+                </div>
+
+
+                <button
+                    class="view-btn"
+                    onclick="
+                        openProfile('${encodeURIComponent(username)}')
+                    ">
+
+                    View
+
+                </button>
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+
+/* =========================
+   OPEN PROFILE
+========================= */
+
+function openProfile(username){
+
+    location.href =
+        "/profile.html?username=" + username;
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+loadFollowing();
+
+</script>
+
+</body>
+
+</html>
