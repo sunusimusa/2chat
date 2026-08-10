@@ -3,241 +3,108 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    >
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-    <title>2Chat Shorts</title>
+<title>2Chat Shorts</title>
 
-    <!-- SHORTS CSS -->
-    <link
-        rel="stylesheet"
-        href="/css/shorts.css"
-    >
+<link rel="stylesheet"
+href="/css/shorts.css">
 
-    <!-- FONT AWESOME -->
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-    >
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
 </head>
 
-
 <body>
 
+<!-- =========================
+     TOP RIGHT CONTROLS
+========================= -->
 
-<!-- ==================================================
-     SHORTS APP
-================================================== -->
+<div class="youtube-top">
 
-<main class="shorts-app">
+    <a href="/search.html"
+       class="top-icon"
+       title="Search">
 
+        <i class="fa-solid fa-magnifying-glass"></i>
 
-    <!-- ==================================================
-         TOP NAVIGATION
-    ================================================== -->
+    </a>
 
-    <header class="shorts-topbar">
+    <button
+        class="top-icon"
+        type="button"
+        title="More">
 
-        <div class="shorts-brand">
+        <i class="fa-solid fa-ellipsis-vertical"></i>
 
-            <strong>2Chat</strong>
-
-            <span>Shorts</span>
-
-        </div>
-
-
-        <nav class="top-tabs">
-
-
-            <a
-                href="/following.html"
-                title="Following"
-            >
-
-                <i class="fa-solid fa-user-group"></i>
-
-                <span>Following</span>
-
-            </a>
-
-
-            <a
-                href="/shorts.html"
-                class="active"
-                title="For You"
-            >
-
-                <i class="fa-solid fa-house"></i>
-
-                <span>For You</span>
-
-            </a>
-
-
-            <a
-                href="/search.html"
-                title="Search"
-            >
-
-                <i class="fa-solid fa-magnifying-glass"></i>
-
-                <span>Search</span>
-
-            </a>
-
-
-            <a
-                href="/trending.html"
-                title="Trending"
-            >
-
-                <i class="fa-solid fa-fire"></i>
-
-                <span>Trending</span>
-
-            </a>
-
-
-        </nav>
-
-
-        <!-- MORE -->
-
-        <button
-            class="shorts-more-btn"
-            type="button"
-            title="More"
-        >
-
-            <i class="fa-solid fa-ellipsis-vertical"></i>
-
-        </button>
-
-
-    </header>
-
-
-
-    <!-- ==================================================
-         SHORTS CONTAINER
-         shorts.js zai cika wannan
-    ================================================== -->
-
-    <section
-        id="shortsContainer"
-        class="shorts-container"
-    >
-
-        <!-- Videos will be inserted by shorts.js -->
-
-    </section>
-
-
-
-</main>
-
-
-
-<!-- ==================================================
-     COMMENT MODAL
-================================================== -->
-
-<div
-    id="commentModal"
-    class="comment-modal"
->
-
-
-    <div class="comment-box">
-
-
-        <!-- COMMENT HEADER -->
-
-        <div class="comment-header">
-
-
-            <h3>
-
-                <i class="fa-regular fa-comment"></i>
-
-                Comments
-
-            </h3>
-
-
-            <button
-                type="button"
-                onclick="closeComments()"
-                aria-label="Close comments"
-            >
-
-                <i class="fa-solid fa-xmark"></i>
-
-            </button>
-
-
-        </div>
-
-
-
-        <!-- COMMENT LIST -->
-
-        <div
-            id="commentList"
-            class="comment-list"
-        >
-
-        </div>
-
-
-
-        <!-- COMMENT INPUT -->
-
-        <div class="comment-input">
-
-
-            <input
-                type="text"
-                id="commentText"
-                placeholder="Add a comment..."
-                autocomplete="off"
-            >
-
-
-            <button
-                type="button"
-                onclick="sendComment()"
-            >
-
-                <i class="fa-solid fa-paper-plane"></i>
-
-                <span>Send</span>
-
-            </button>
-
-
-        </div>
-
-
-    </div>
-
+    </button>
 
 </div>
 
 
+<!-- =========================
+     SHORTS CONTAINER
+========================= -->
 
-<!-- ==================================================
-     SHORTS JS
-================================================== -->
+<div id="shortsContainer"></div>
+
+
+<!-- =========================
+     COMMENT POPUP
+========================= -->
+
+<div
+id="commentModal"
+class="comment-modal">
+
+    <div class="comment-box">
+
+        <div class="comment-header">
+
+            <h3>💬 Comments</h3>
+
+            <button
+            onclick="closeComments()">
+
+                ✖
+
+            </button>
+
+        </div>
+
+
+        <div
+        id="commentList"
+        class="comment-list">
+        </div>
+
+
+        <div class="comment-input">
+
+            <input
+            type="text"
+            id="commentText"
+            placeholder="Write a comment...">
+
+            <button
+            onclick="sendComment()">
+
+                Send
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
 
 <script src="/js/shorts.js"></script>
-
 
 </body>
 
