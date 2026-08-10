@@ -1,62 +1,157 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 
-<title>
-2Chat Search
-</title>
+<meta charset="UTF-8">
 
 <meta name="viewport"
-content="width=device-width,initial-scale=1">
+content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="/css/hashtag.css">
+<title>2Chat Search</title>
+
+<link rel="stylesheet"
+href="/css/search.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
 </head>
-
 
 <body>
 
 
-<header>
+<!-- =========================
+     HEADER
+========================= -->
 
-<button onclick="history.back()">
-⬅
-</button>
+<header class="search-header">
 
-<h2>
-🔥 Search Shorts
-</h2>
+    <button
+    type="button"
+    onclick="history.back()"
+    class="back-btn">
+
+        <i class="fa-solid fa-arrow-left"></i>
+
+    </button>
+
+    <h2>
+        <i class="fa-solid fa-magnifying-glass"></i>
+        Search
+    </h2>
 
 </header>
 
 
-<div class="search-box">
+<!-- =========================
+     SEARCH BOX
+========================= -->
 
-<input
-id="searchInput"
-placeholder="Search #hashtag or user">
+<div class="search-wrapper">
 
-<button onclick="searchShorts()">
-🔎 Search
-</button>
+    <div class="search-box">
+
+        <i class="fa-solid fa-magnifying-glass"></i>
+
+        <input
+        type="search"
+        id="searchInput"
+        placeholder="Search users or Shorts..."
+        autocomplete="off">
+
+        <button
+        type="button"
+        id="clearSearch"
+        class="clear-btn">
+
+            <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
+    </div>
+
+    <button
+    type="button"
+    onclick="performSearch()"
+    class="search-btn">
+
+        Search
+
+    </button>
 
 </div>
 
 
+<!-- =========================
+     SEARCH TABS
+========================= -->
 
-<h2 id="title">
-Trending Search
+<div class="search-tabs">
+
+    <button
+    id="shortsTab"
+    class="search-tab active"
+    onclick="switchSearchType('shorts')">
+
+        <i class="fa-solid fa-clapperboard"></i>
+        Shorts
+
+    </button>
+
+
+    <button
+    id="usersTab"
+    class="search-tab"
+    onclick="switchSearchType('users')">
+
+        <i class="fa-solid fa-users"></i>
+        Users
+
+    </button>
+
+</div>
+
+
+<!-- =========================
+     TITLE
+========================= -->
+
+<h2
+id="searchTitle"
+class="search-title">
+
+    Search Shorts
+
 </h2>
 
 
-<div id="results">
+<!-- =========================
+     RESULTS
+========================= -->
+
+<div
+id="results"
+class="results">
+
+    <div class="empty-state">
+
+        <i class="fa-solid fa-magnifying-glass"></i>
+
+        <h3>
+            Search 2Chat
+        </h3>
+
+        <p>
+            Find Shorts, hashtags and users.
+        </p>
+
+    </div>
 
 </div>
 
 
-
-<script src="/js/hashtag.js"></script>
+<script src="/js/search.js"></script>
 
 </body>
 
