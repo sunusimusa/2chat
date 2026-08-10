@@ -151,3 +151,71 @@ message: err.message
 
 }
 };
+
+// ==========================
+// SEARCH USERS
+// ==========================
+
+exports.searchUsers = async (req, res) => {
+
+    try {
+
+        const keyword =
+            req.params.keyword
+                .trim();
+
+        if (!keyword) {
+
+            return res.json({
+                success: true,
+                users: []
+            });
+
+        }
+
+
+        const users =
+            await User.find(
+                {
+                    username: {
+                        $regex: keyword,
+                        $options: "i"
+                    }
+                },
+                "username avatar online lastSeen bio"
+            )
+            .sort({
+                username: 1
+            })
+            .limit(30);
+
+
+        return res.json({
+
+            success: true,
+
+            users
+
+        });
+
+
+    } catch (err) {
+
+        console.error(
+            "SEARCH USERS ERROR:",
+            err
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Failed to search users."
+
+        });
+
+    }
+
+};
