@@ -3,7 +3,8 @@ const router = require("express").Router();
 const {
     followUser,
     getUserProfile,
-    getAllUsers
+    getAllUsers,
+    searchUsers
 } = require("../controllers/userController");
 
 
@@ -26,6 +27,14 @@ router.get(
     getUserProfile
 );
 
+// ==========================
+// SEARCH USERS
+// ==========================
+
+router.get(
+    "/search/:keyword",
+    searchUsers
+);
 
 // ==========================
 // GET ALL USERS
