@@ -4,103 +4,230 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
 <title>Create Group</title>
 
-<link rel="stylesheet" href="/css/create-group.css">
+<link
+    rel="stylesheet"
+    href="/css/create-group.css"
+>
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+>
 
 </head>
 
 <body>
 
-<!-- Header -->
+
+<!-- ==========================
+     HEADER
+========================== -->
 
 <header class="header">
 
-<button class="back-btn" onclick="history.back()">
+    <button
+        class="back-btn"
+        type="button"
+        onclick="history.back()"
+    >
 
-<i class="fa-solid fa-arrow-left"></i>
+        <i class="fa-solid fa-arrow-left"></i>
 
-</button>
+    </button>
 
-<h2>Create New Group</h2>
+    <h2>
+        Create New Group
+    </h2>
 
 </header>
 
-<!-- Container -->
+
+<!-- ==========================
+     CONTAINER
+========================== -->
 
 <div class="container">
 
-<!-- Avatar -->
 
-<div class="avatar-box">
+    <!-- ==========================
+         AVATAR
+    =========================== -->
 
-<label for="groupImage">
+    <div class="avatar-box">
 
-<img
-id="previewImage"
-src="/images/default-group.png"
-class="group-avatar">
+        <label for="groupImage">
 
-<div class="camera-icon">
+            <img
+                id="previewImage"
+                src="/images/default-group.png"
+                class="group-avatar"
+                alt="Group avatar"
+            >
 
-<i class="fa-solid fa-camera"></i>
+            <div class="camera-icon">
+
+                <i class="fa-solid fa-camera"></i>
+
+            </div>
+
+        </label>
+
+        <input
+            type="file"
+            id="groupImage"
+            accept="image/*"
+            hidden
+        >
+
+    </div>
+
+
+    <!-- ==========================
+         GROUP NAME
+    =========================== -->
+
+    <div class="input-box">
+
+        <i class="fa-solid fa-users"></i>
+
+        <input
+            type="text"
+            id="groupName"
+            placeholder="Enter group name"
+            maxlength="100"
+        >
+
+    </div>
+
+
+    <!-- ==========================
+         DESCRIPTION
+    =========================== -->
+
+    <div class="input-box textarea-box">
+
+        <i class="fa-solid fa-align-left"></i>
+
+        <textarea
+            id="groupDescription"
+            placeholder="Group description (optional)"
+            maxlength="500"
+        ></textarea>
+
+    </div>
+
+
+    <!-- ==========================
+         PRIVACY
+    =========================== -->
+
+    <div class="privacy-box">
+
+        <div class="privacy-title">
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+            <span>
+                Group Privacy
+            </span>
+
+        </div>
+
+
+        <!-- PUBLIC -->
+
+        <label class="privacy-option">
+
+            <input
+                type="radio"
+                name="groupPrivacy"
+                value="public"
+                checked
+            >
+
+            <div class="privacy-icon public-icon">
+
+                <i class="fa-solid fa-earth-africa"></i>
+
+            </div>
+
+            <div class="privacy-info">
+
+                <strong>
+                    Public
+                </strong>
+
+                <small>
+                    Anyone can find and join this group.
+                </small>
+
+            </div>
+
+        </label>
+
+
+        <!-- PRIVATE -->
+
+        <label class="privacy-option">
+
+            <input
+                type="radio"
+                name="groupPrivacy"
+                value="private"
+            >
+
+            <div class="privacy-icon private-icon">
+
+                <i class="fa-solid fa-lock"></i>
+
+            </div>
+
+            <div class="privacy-info">
+
+                <strong>
+                    Private
+                </strong>
+
+                <small>
+                    Only invited users can join this group.
+                </small>
+
+            </div>
+
+        </label>
+
+    </div>
+
+
+    <!-- ==========================
+         CREATE
+    =========================== -->
+
+    <button
+        id="createBtn"
+        class="create-btn"
+        type="button"
+    >
+
+        <i class="fa-solid fa-users"></i>
+
+        <span>
+            Create Group
+        </span>
+
+    </button>
+
 
 </div>
 
-</label>
-
-<input
-type="file"
-id="groupImage"
-accept="image/*"
-hidden>
-
-</div>
-
-<!-- Group Name -->
-
-<div class="input-box">
-
-<i class="fa-solid fa-users"></i>
-
-<input
-type="text"
-id="groupName"
-placeholder="Enter group name">
-
-</div>
-
-<!-- Description -->
-
-<div class="input-box textarea-box">
-
-<i class="fa-solid fa-align-left"></i>
-
-<textarea
-id="groupDescription"
-placeholder="Group description (optional)"></textarea>
-
-</div>
-
-<!-- Create -->
-
-<button
-id="createBtn"
-class="create-btn"
-onclick="createGroup()">
-
-<i class="fa-solid fa-users"></i>
-
-<span>Create Group</span>
-
-</button>
-
-</div>
 
 <script src="/js/create-group.js"></script>
 
