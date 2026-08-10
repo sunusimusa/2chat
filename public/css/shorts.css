@@ -1,3 +1,7 @@
+/* =========================================================
+   2CHAT SHORTS — CLEAN YOUTUBE SHORTS STYLE
+========================================================= */
+
 *{
     margin:0;
     padding:0;
@@ -15,16 +19,21 @@ body{
 }
 
 
-/* ==================================================
+/* =========================================================
    SHORTS CONTAINER
-================================================== */
+========================================================= */
 
 #shortsContainer{
     width:100%;
     height:100vh;
+
     overflow-y:auto;
+    overflow-x:hidden;
+
     scroll-snap-type:y mandatory;
     scroll-behavior:smooth;
+
+    background:#000;
 }
 
 #shortsContainer::-webkit-scrollbar{
@@ -32,28 +41,40 @@ body{
 }
 
 
-/* ==================================================
+/* =========================================================
    EACH SHORT
-================================================== */
+========================================================= */
 
 .short{
     position:relative;
+
     width:100%;
     height:100vh;
+    min-height:100vh;
+
     background:#000;
-    scroll-snap-align:start;
+
     overflow:hidden;
+
+    scroll-snap-align:start;
+    scroll-snap-stop:always;
 }
 
 
-/* VIDEO */
+/* =========================================================
+   VIDEO
+========================================================= */
 
 .short video{
     position:absolute;
-    inset:0;
+
+    top:0;
+    left:0;
 
     width:100%;
     height:100%;
+
+    display:block;
 
     object-fit:cover;
 
@@ -61,53 +82,68 @@ body{
 }
 
 
-/* ==================================================
-   TOP RIGHT — YOUTUBE STYLE
-================================================== */
+/* =========================================================
+   TOP RIGHT — SEARCH + MENU
+========================================================= */
 
 .youtube-top{
+
     position:fixed;
 
     top:14px;
     right:12px;
 
     display:flex;
+
     align-items:center;
 
-    gap:14px;
+    gap:10px;
 
-    z-index:500;
+    z-index:5000;
+
+    pointer-events:auto;
 }
 
 
-/* Search + More */
+/* Search / Menu button */
 
 .top-icon{
-    width:46px;
-    height:46px;
+
+    width:52px;
+    height:52px;
+
+    border:none;
+
+    border-radius:50%;
 
     display:flex;
     align-items:center;
     justify-content:center;
 
-    border:none;
-    border-radius:50%;
-
-    background:rgba(0,0,0,.38);
+    background:rgba(0,0,0,.48);
 
     color:#fff;
 
-    font-size:23px;
+    font-size:25px;
 
     text-decoration:none;
 
     cursor:pointer;
 
     backdrop-filter:blur(8px);
-
     -webkit-backdrop-filter:blur(8px);
 
-    transition:.2s;
+    box-shadow:
+        0 3px 12px rgba(0,0,0,.35);
+
+    transition:
+        transform .18s ease,
+        background .18s ease;
+}
+
+
+.top-icon:hover{
+    background:rgba(0,0,0,.65);
 }
 
 
@@ -116,198 +152,434 @@ body{
 }
 
 
-.top-icon:hover{
-    background:rgba(0,0,0,.6);
+/* =========================================================
+   SHORTS MENU
+========================================================= */
+
+.shorts-menu{
+
+    position:fixed;
+
+    top:76px;
+    right:12px;
+
+    width:220px;
+
+    padding:8px;
+
+    background:rgba(25,25,25,.97);
+
+    border-radius:16px;
+
+    z-index:6000;
+
+    opacity:0;
+
+    visibility:hidden;
+
+    pointer-events:none;
+
+    transform:
+        translateY(-8px)
+        scale(.96);
+
+    transform-origin:top right;
+
+    box-shadow:
+        0 8px 30px rgba(0,0,0,.6);
+
+    transition:
+        opacity .18s ease,
+        transform .18s ease,
+        visibility .18s ease;
 }
 
 
-/* ==================================================
-   RIGHT ACTIONS
-================================================== */
+/* OPEN MENU */
 
-.actions{
-    position:absolute;
+.shorts-menu.show{
 
-    right:12px;
-    bottom:105px;
+    opacity:1;
+
+    visibility:visible;
+
+    pointer-events:auto;
+
+    transform:
+        translateY(0)
+        scale(1);
+}
+
+
+/* Menu item */
+
+.shorts-menu button{
+
+    width:100%;
+
+    min-height:50px;
+
+    padding:12px 14px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:transparent;
+
+    color:#fff;
 
     display:flex;
-    flex-direction:column;
 
     align-items:center;
 
     gap:13px;
 
-    z-index:100;
+    font-size:15px;
+
+    text-align:left;
+
+    cursor:pointer;
+
+    transition:.18s;
 }
 
 
-/* Action button */
+.shorts-menu button:hover{
+
+    background:rgba(255,255,255,.12);
+}
+
+
+.shorts-menu button:active{
+
+    background:rgba(255,255,255,.2);
+
+    transform:scale(.98);
+}
+
+
+.shorts-menu button i{
+
+    width:22px;
+
+    text-align:center;
+
+    font-size:18px;
+}
+
+
+/* =========================================================
+   RIGHT ACTIONS
+========================================================= */
+
+.actions{
+
+    position:absolute;
+
+    right:12px;
+
+    /*
+       An ɗaga actions sama kadan
+       domin kada su yi kusa da Android navigation.
+    */
+
+    bottom:120px;
+
+    z-index:3000;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    gap:4px;
+
+    pointer-events:auto;
+}
+
+
+/* =========================================================
+   ACTION BUTTON
+========================================================= */
 
 .actions button{
-    width:56px;
-    height:56px;
+
+    width:54px;
+    height:54px;
 
     border:none;
+
     border-radius:50%;
 
-    background:rgba(0,0,0,.45);
+    background:rgba(30,30,30,.72);
 
     color:#fff;
 
     font-size:27px;
 
     display:flex;
+
     align-items:center;
     justify-content:center;
 
     cursor:pointer;
 
-    backdrop-filter:blur(5px);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
 
-    -webkit-backdrop-filter:blur(5px);
+    box-shadow:
+        0 3px 12px rgba(0,0,0,.25);
 
-    transition:.2s;
+    transition:
+        transform .18s ease,
+        background .18s ease;
 }
 
 
 .actions button:active{
+
     transform:scale(.88);
 }
 
 
+/* =========================================================
+   LIKED
+========================================================= */
+
 .actions button.liked{
+
     background:#ff0050;
 
     box-shadow:
-        0 0 15px
-        rgba(255,0,80,.65);
+        0 0 15px rgba(255,0,80,.6);
+
+    transform:scale(1.05);
 }
 
 
-/* Number under button */
+/* =========================================================
+   ACTION NUMBERS / LABELS
+========================================================= */
 
 .actions span{
+
+    min-height:18px;
+
+    margin-bottom:6px;
+
     color:#fff;
 
     font-size:13px;
 
+    line-height:16px;
+
     font-weight:bold;
 
-    margin-top:-8px;
+    text-align:center;
 
     text-shadow:
-        0 2px 5px
-        rgba(0,0,0,.9);
+        0 2px 5px rgba(0,0,0,.9);
 }
 
 
-/* ==================================================
-   BOTTOM LEFT USER INFORMATION
-================================================== */
+/* =========================================================
+   SAVE LABEL
+========================================================= */
+
+.actions button + span{
+
+    margin-top:-1px;
+}
+
+
+/* =========================================================
+   BOTTOM LEFT OVERLAY
+========================================================= */
 
 .overlay{
+
     position:absolute;
 
-    left:16px;
+    left:15px;
 
-    right:90px;
+    /*
+       An bar username/caption su yi karo
+       da right-side buttons.
+    */
 
-    bottom:32px;
+    right:105px;
+
+    /*
+       Wannan shine gyaran da kake nema:
+       an ɗaga username + follow sama.
+    */
+
+    bottom:105px;
+
+    z-index:2000;
 
     color:#fff;
 
-    z-index:90;
-
     text-shadow:
-        0 2px 8px
-        rgba(0,0,0,.9);
+        0 2px 7px rgba(0,0,0,.95);
+
+    pointer-events:none;
 }
 
 
-/* User row */
+/* =========================================================
+   USER INFO ROW
+========================================================= */
 
 .user-info{
+
     display:flex;
 
     align-items:center;
 
-    gap:10px;
-
-    margin-bottom:9px;
-}
-
-
-.user-buttons{
-    display:flex;
-
-    align-items:center;
+    justify-content:flex-start;
 
     gap:9px;
+
+    margin-bottom:8px;
+
+    pointer-events:auto;
 }
 
 
-/* Username */
-
-.user-info h3,
-.overlay h3{
-    font-size:17px;
-
-    font-weight:bold;
+.user-info h3{
 
     margin:0;
+
+    font-size:17px;
+
+    line-height:22px;
+
+    font-weight:700;
+
+    color:#fff;
 }
 
 
-/* ==================================================
+/* =========================================================
+   USER BUTTONS
+========================================================= */
+
+.user-buttons{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+}
+
+
+/* =========================================================
+   UPLOAD + BUTTON
+========================================================= */
+
+.uploadBtn{
+
+    width:44px;
+    height:44px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#ff0050;
+
+    color:#fff;
+
+    font-size:24px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,.35);
+
+    transition:.18s;
+}
+
+
+.uploadBtn:active{
+
+    transform:scale(.9);
+}
+
+
+/* =========================================================
    FOLLOW BUTTON
-================================================== */
+========================================================= */
 
 .follow-btn{
-    background:#fff;
-
-    color:#111;
 
     border:none;
 
     padding:8px 16px;
 
-    border-radius:22px;
+    border-radius:24px;
+
+    background:#ff0050;
+
+    color:#fff;
 
     font-size:14px;
 
+    line-height:18px;
+
     font-weight:bold;
+
+    white-space:nowrap;
 
     cursor:pointer;
 
-    transition:.2s;
+    box-shadow:
+        0 3px 10px rgba(0,0,0,.25);
+
+    transition:.18s;
 }
 
 
 .follow-btn:active{
+
     transform:scale(.92);
 }
 
 
+/* FOLLOWING */
+
 .follow-btn.following{
-    background:#555;
+
+    background:rgba(80,80,80,.9);
 
     color:#fff;
 }
 
 
-/* ==================================================
+/* =========================================================
    CAPTION
-================================================== */
+========================================================= */
 
 .overlay p{
+
+    margin:6px 0 0;
+
+    max-width:100%;
+
+    color:#fff;
+
     font-size:15px;
 
     line-height:21px;
-
-    margin-top:7px;
-
-    max-width:100%;
 
     word-break:break-word;
 
@@ -321,11 +593,12 @@ body{
 }
 
 
-/* ==================================================
+/* =========================================================
    DOUBLE TAP HEART
-================================================== */
+========================================================= */
 
 .heart-animation{
+
     position:absolute;
 
     top:50%;
@@ -341,13 +614,16 @@ body{
 
     pointer-events:none;
 
-    z-index:200;
+    z-index:4000;
 
-    transition:.3s ease;
+    transition:
+        transform .3s ease,
+        opacity .3s ease;
 }
 
 
 .heart-animation.show{
+
     transform:
         translate(-50%,-50%)
         scale(1.25);
@@ -356,11 +632,12 @@ body{
 }
 
 
-/* ==================================================
+/* =========================================================
    COMMENT MODAL
-================================================== */
+========================================================= */
 
 .comment-modal{
+
     position:fixed;
 
     left:0;
@@ -372,20 +649,28 @@ body{
     background:rgba(0,0,0,.55);
 
     display:flex;
+
     align-items:flex-end;
 
-    z-index:999;
+    z-index:10000;
 
-    transition:.35s ease;
+    transition:
+        bottom .35s ease;
 }
 
 
 .comment-modal.show{
+
     bottom:0;
 }
 
 
+/* =========================================================
+   COMMENT BOX
+========================================================= */
+
 .comment-box{
+
     width:100%;
 
     height:70%;
@@ -403,45 +688,59 @@ body{
 }
 
 
-.comment-header{
-    display:flex;
+/* =========================================================
+   COMMENT HEADER
+========================================================= */
 
-    justify-content:space-between;
+.comment-header{
+
+    display:flex;
 
     align-items:center;
 
+    justify-content:space-between;
+
     padding:15px;
+
+    background:#fff;
 
     border-bottom:
         1px solid #e5e5e5;
-
-    background:#fff;
 }
 
 
 .comment-header h3{
-    font-size:18px;
+
+    margin:0;
 
     color:#111;
+
+    font-size:18px;
 
     font-weight:bold;
 }
 
 
 .comment-header button{
+
     border:none;
 
     background:none;
 
+    color:#444;
+
     font-size:22px;
 
     cursor:pointer;
-
-    color:#444;
 }
 
 
+/* =========================================================
+   COMMENT LIST
+========================================================= */
+
 .comment-list{
+
     flex:1;
 
     overflow-y:auto;
@@ -452,7 +751,14 @@ body{
 }
 
 
+.comment-list::-webkit-scrollbar{
+
+    display:none;
+}
+
+
 .comment-item{
+
     margin-bottom:15px;
 
     padding-bottom:10px;
@@ -463,6 +769,7 @@ body{
 
 
 .comment-item b{
+
     display:block;
 
     margin-bottom:4px;
@@ -474,15 +781,21 @@ body{
 
 
 .comment-item p{
-    font-size:14px;
 
     color:#333;
+
+    font-size:14px;
 
     line-height:20px;
 }
 
 
+/* =========================================================
+   COMMENT INPUT
+========================================================= */
+
 .comment-input{
+
     display:flex;
 
     align-items:center;
@@ -491,15 +804,18 @@ body{
 
     padding:12px;
 
+    background:#fff;
+
     border-top:
         1px solid #ddd;
-
-    background:#fff;
 }
 
 
 .comment-input input{
+
     flex:1;
+
+    min-width:0;
 
     padding:12px 15px;
 
@@ -510,20 +826,25 @@ body{
 
     outline:none;
 
+    color:#111;
+
+    background:#fff;
+
     font-size:14px;
 }
 
 
 .comment-input button{
+
     padding:12px 20px;
 
     border:none;
 
+    border-radius:30px;
+
     background:#1877f2;
 
     color:#fff;
-
-    border-radius:30px;
 
     font-size:14px;
 
@@ -533,697 +854,260 @@ body{
 }
 
 
-/* ==================================================
+.comment-input button:active{
+
+    transform:scale(.94);
+}
+
+
+/* =========================================================
    MOBILE
-================================================== */
+========================================================= */
 
 @media(max-width:600px){
 
     .youtube-top{
-        top:10px;
-        right:8px;
 
-        gap:7px;
+        top:12px;
+
+        right:9px;
+
+        gap:8px;
     }
 
 
     .top-icon{
-        width:43px;
-        height:43px;
 
-        font-size:21px;
+        width:52px;
+        height:52px;
 
-        background:rgba(0,0,0,.32);
+        font-size:24px;
     }
 
 
     .actions{
-        right:8px;
 
-        bottom:95px;
+        right:9px;
 
-        gap:11px;
+        bottom:115px;
+
+        gap:3px;
     }
 
 
     .actions button{
-        width:53px;
-        height:53px;
 
-        font-size:25px;
+        width:52px;
+        height:52px;
+
+        font-size:26px;
+    }
+
+
+    .actions span{
+
+        font-size:13px;
+
+        margin-bottom:5px;
     }
 
 
     .overlay{
+
         left:14px;
 
-        right:82px;
+        right:95px;
 
-        bottom:27px;
+        bottom:105px;
     }
 
 
-    .follow-btn{
-        padding:7px 14px;
-    }
+    .user-info{
 
-}
+        gap:8px;
 
-
-/* ==================================================
-   SMALL PHONE
-================================================== */
-
-@media(max-height:650px){
-
-    .actions{
-        bottom:80px;
-
-        gap:7px;
+        margin-bottom:7px;
     }
 
 
-    .actions button{
-        width:48px;
-        height:48px;
+    .user-info h3{
+
+        font-size:16px;
+    }
+
+
+    .uploadBtn{
+
+        width:43px;
+        height:43px;
 
         font-size:23px;
     }
 
 
-    .overlay {
-    bottom: 75px;
-}
+    .follow-btn{
 
-}
+        padding:8px 14px;
 
-
-/* =========================================
-   FINAL YOUTUBE-SHORTS STYLE POSITIONING
-========================================= */
-
-.short {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
-    background: #000;
-}
-
-/* VIDEO */
-
-.short video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-
-/* =========================================
-   USERNAME + CAPTION
-========================================= */
-
-.overlay {
-    position: absolute;
-
-    left: 16px;
-    right: 105px;
-    bottom: 28px;
-
-    z-index: 20;
-
-    color: #fff;
-
-    text-shadow:
-        0 2px 5px rgba(0,0,0,.9);
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-
-    gap: 10px;
-
-    margin-bottom: 8px;
-}
-
-.user-info h3 {
-    margin: 0;
-
-    font-size: 17px;
-    font-weight: 700;
-}
-
-.user-buttons {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-}
-
-/* + button */
-
-.uploadBtn {
-    width: 48px;
-    height: 48px;
-
-    border-radius: 50%;
-    border: none;
-
-    background: #ff0050;
-    color: #fff;
-
-    font-size: 25px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* FOLLOW */
-
-.follow-btn {
-    border: none;
-
-    padding: 8px 14px;
-
-    border-radius: 22px;
-
-    background: #ff0050;
-    color: #fff;
-
-    font-size: 14px;
-    font-weight: bold;
-
-    white-space: nowrap;
-}
-
-.follow-btn.following {
-    background: rgba(80,80,80,.85);
-}
-
-
-/* CAPTION */
-
-.overlay p {
-    margin: 6px 0 0;
-
-    font-size: 15px;
-    line-height: 21px;
-
-    max-width: 90%;
-
-    color: #fff;
-}
-
-
-/* =========================================
-   RIGHT SIDE ACTIONS
-========================================= */
-
-.actions {
-    position: absolute;
-
-    right: 12px;
-    bottom: 72px;
-
-    z-index: 30;
-
-    display: flex;
-    flex-direction: column;
-
-    align-items: center;
-
-    gap: 5px;
-}
-
-
-/* ICON */
-
-.actions button {
-    width: 52px;
-    height: 52px;
-
-    border: none;
-    border-radius: 50%;
-
-    background: rgba(35,35,35,.72);
-
-    color: #fff;
-
-    font-size: 27px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    cursor: pointer;
-
-    transition: transform .2s ease;
-}
-
-.actions button:active {
-    transform: scale(.90);
-}
-
-
-/* LIKE */
-
-.actions button.liked {
-    background: #ff0050;
-
-    box-shadow:
-        0 0 14px rgba(255,0,80,.55);
-}
-
-
-/* NUMBER */
-
-.actions span {
-    margin-bottom: 7px;
-
-    color: #fff;
-
-    font-size: 13px;
-    font-weight: bold;
-
-    text-shadow:
-        0 2px 5px rgba(0,0,0,.9);
-}
-
-
-/* SAVE LABEL */
-
-#shortsContainer .actions span {
-    min-height:
-
-
-    /* ================================
-   TOP SEARCH + MENU
-================================ */
-
-.top-tabs{
-    position:absolute;
-    top:18px;
-    right:10px;
-    left:auto;
-
-    display:flex;
-    gap:10px;
-
-    z-index:1000;
-}
-
-.top-action{
-    width:52px;
-    height:52px;
-
-    border:0;
-    border-radius:50%;
-
-    background:rgba(35,35,35,.78);
-
-    color:#fff;
-
-    font-size:25px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    cursor:pointer;
-}
-
-.top-action:active{
-    transform:scale(.92);
-}
-
-
-/* ================================
-   SHORTS MENU
-================================ */
-
-.shorts-menu{
-    position:fixed;
-
-    top:80px;
-    right:12px;
-
-    width:210px;
-
-    padding:8px;
-
-    background:rgba(25,25,25,.96);
-
-    border-radius:16px;
-
-    z-index:2000;
-
-    display:none;
-
-    box-shadow:0 5px 25px rgba(0,0,0,.5);
-}
-
-.shorts-menu.show{
-    display:block;
-}
-
-.shorts-menu button{
-    width:100%;
-
-    padding:14px 12px;
-
-    border:0;
-
-    background:transparent;
-
-    color:#fff;
-
-    text-align:left;
-
-    font-size:15px;
-
-    border-radius:10px;
-
-    display:flex;
-
-    align-items:center;
-
-    gap:12px;
-
-    cursor:pointer;
-}
-
-.shorts-menu button:hover{
-    background:rgba(255,255,255,.12);
-}
-
-.shorts-menu button i{
-    width:22px;
-    text-align:center;
-}
-
-    /* ==================================================
-   YOUTUBE STYLE TOP CONTROLS
-================================================== */
-
-.youtube-top{
-
-    position:fixed;
-
-    top:18px;
-
-    right:14px;
-
-    display:flex;
-
-    align-items:center;
-
-    gap:10px;
-
-    z-index:5000;
-
-}
-
-
-/* SEARCH + MENU */
-
-.top-icon{
-
-    width:56px;
-
-    height:56px;
-
-    border:none;
-
-    border-radius:50%;
-
-    background:rgba(0,0,0,.48);
-
-    color:#fff;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    text-decoration:none;
-
-    font-size:27px;
-
-    cursor:pointer;
-
-    backdrop-filter:blur(8px);
-
-    -webkit-backdrop-filter:blur(8px);
-
-    box-shadow:
-        0 3px 12px rgba(0,0,0,.25);
-
-    transition:.2s;
-
-}
-
-
-.top-icon:active{
-
-    transform:scale(.90);
-
-}
-
-
-/* ==================================================
-   SHORTS MENU
-================================================== */
-
-.shorts-menu{
-
-    position:fixed;
-
-    top:82px;
-
-    right:14px;
-
-    width:210px;
-
-    background:rgba(25,25,25,.96);
-
-    border-radius:15px;
-
-    padding:7px;
-
-    z-index:6000;
-
-    box-shadow:
-        0 8px 30px rgba(0,0,0,.55);
-
-    opacity:0;
-
-    visibility:hidden;
-
-    transform:
-        translateY(-8px)
-        scale(.96);
-
-    transform-origin:
-        top right;
-
-    transition:
-        opacity .18s ease,
-        transform .18s ease,
-        visibility .18s ease;
-
-}
-
-
-/* OPEN */
-
-.shorts-menu.show{
-
-    opacity:1;
-
-    visibility:visible;
-
-    transform:
-        translateY(0)
-        scale(1);
-
-}
-
-
-/* MENU BUTTON */
-
-.shorts-menu button{
-
-    width:100%;
-
-    min-height:48px;
-
-    border:none;
-
-    background:transparent;
-
-    color:#fff;
-
-    display:flex;
-
-    align-items:center;
-
-    gap:14px;
-
-    padding:12px;
-
-    border-radius:10px;
-
-    font-size:15px;
-
-    text-align:left;
-
-    cursor:pointer;
-
-}
-
-
-.shorts-menu button:hover{
-
-    background:rgba(255,255,255,.12);
-
-}
-
-
-.shorts-menu button:active{
-
-    background:rgba(255,255,255,.20);
-
-}
-
-
-.shorts-menu button i{
-
-    width:22px;
-
-    text-align:center;
-
-    font-size:18px;
-
-}
-
-
-/* ==================================================
-   MOVE USER INFO UP
-================================================== */
-
-.overlay{
-
-    bottom:105px !important;
-
-}
-
-
-/* ==================================================
-   USER INFO
-================================================== */
-
-.user-info{
-
-    margin-bottom:8px;
-
-}
-
-
-/* ==================================================
-   FOLLOW BUTTON
-================================================== */
-
-.follow-btn{
-
-    padding:8px 16px;
-
-}
-
-
-/* ==================================================
-   UPLOAD BUTTON
-================================================== */
-
-.uploadBtn{
-
-    width:44px;
-
-    height:44px;
-
-}
-
-
-/* ==================================================
-   KEEP RIGHT ACTIONS
-================================================== */
-
-.actions{
-
-    bottom:125px !important;
-
-}
-
-
-/* ==================================================
-   MOBILE
-================================================== */
-
-@media(max-width:600px){
-
-    .youtube-top{
-
-        top:14px;
-
-        right:10px;
-
-        gap:8px;
-
+        font-size:13px;
     }
 
 
-    .top-icon{
+    .overlay p{
 
-        width:54px;
+        font-size:14px;
 
-        height:54px;
+        line-height:20px;
 
-        font-size:25px;
-
+        -webkit-line-clamp:2;
     }
 
 
     .shorts-menu{
 
-        top:76px;
+        top:72px;
 
-        right:10px;
+        right:9px;
 
-        width:205px;
+        width:210px;
+    }
 
+}
+
+
+/* =========================================================
+   SMALL PHONE
+========================================================= */
+
+@media(max-height:700px){
+
+    .actions{
+
+        bottom:105px;
+    }
+
+
+    .actions button{
+
+        width:49px;
+        height:49px;
+
+        font-size:24px;
+    }
+
+
+    .actions span{
+
+        font-size:12px;
+
+        margin-bottom:3px;
     }
 
 
     .overlay{
 
-        left:15px;
-
-        right:95px;
-
-        bottom:110px !important;
-
+        bottom:95px;
     }
 
 
+    .uploadBtn{
+
+        width:40px;
+        height:40px;
+
+        font-size:22px;
+    }
+
+
+    .follow-btn{
+
+        padding:7px 13px;
+
+        font-size:13px;
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL PHONE
+========================================================= */
+
+@media(max-height:600px){
+
     .actions{
 
-        right:10px;
+        bottom:88px;
 
-        bottom:125px !important;
+        gap:1px;
+    }
 
+
+    .actions button{
+
+        width:45px;
+        height:45px;
+
+        font-size:22px;
+    }
+
+
+    .overlay{
+
+        bottom:85px;
+    }
+
+}
+
+
+/* =========================================================
+   PREVENT TEXT SELECTION
+========================================================= */
+
+.actions button,
+.top-icon,
+.follow-btn,
+.uploadBtn{
+
+    -webkit-tap-highlight-color:transparent;
+
+    user-select:none;
+}
+
+
+/* =========================================================
+   VIDEO TAP AREA
+========================================================= */
+
+.short video{
+
+    -webkit-tap-highlight-color:transparent;
+}
+
+
+/* =========================================================
+   SAFE AREA — ANDROID / MODERN PHONES
+========================================================= */
+
+@supports(padding:env(safe-area-inset-bottom)){
+
+    .actions{
+
+        bottom:
+            calc(
+                115px +
+                env(safe-area-inset-bottom)
+            );
+    }
+
+
+    .overlay{
+
+        bottom:
+            calc(
+                105px +
+                env(safe-area-inset-bottom)
+            );
     }
 
 }
