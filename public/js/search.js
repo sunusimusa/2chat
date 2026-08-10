@@ -377,9 +377,9 @@ function renderUsers(users){
 
 
         const avatar =
-            user.avatar ||
-            "/images/default-avatar.png";
-
+    user.avatar && user.avatar.trim() !== ""
+    ? user.avatar
+    : "/images/default.png";
 
         html += `
 
