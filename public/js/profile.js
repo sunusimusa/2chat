@@ -46,14 +46,13 @@ followBtn.style.display = "none";
 const avatar =
 document.getElementById("avatar");
 
-if(profile.avatar && profile.avatar !== ""){
+if(profile.avatar && profile.avatar.trim() !== ""){
 
     avatar.src = profile.avatar;
 
 }else{
 
-    avatar.src =
-    "/images/default-avatar.png";
+    avatar.src = "/images/default.png";
 
 }
  
