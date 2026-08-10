@@ -817,3 +817,110 @@ body{
 
 #shortsContainer .actions span {
     min-height:
+
+
+    /* ================================
+   TOP SEARCH + MENU
+================================ */
+
+.top-tabs{
+    position:absolute;
+    top:18px;
+    right:10px;
+    left:auto;
+
+    display:flex;
+    gap:10px;
+
+    z-index:1000;
+}
+
+.top-action{
+    width:52px;
+    height:52px;
+
+    border:0;
+    border-radius:50%;
+
+    background:rgba(35,35,35,.78);
+
+    color:#fff;
+
+    font-size:25px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+}
+
+.top-action:active{
+    transform:scale(.92);
+}
+
+
+/* ================================
+   SHORTS MENU
+================================ */
+
+.shorts-menu{
+    position:fixed;
+
+    top:80px;
+    right:12px;
+
+    width:210px;
+
+    padding:8px;
+
+    background:rgba(25,25,25,.96);
+
+    border-radius:16px;
+
+    z-index:2000;
+
+    display:none;
+
+    box-shadow:0 5px 25px rgba(0,0,0,.5);
+}
+
+.shorts-menu.show{
+    display:block;
+}
+
+.shorts-menu button{
+    width:100%;
+
+    padding:14px 12px;
+
+    border:0;
+
+    background:transparent;
+
+    color:#fff;
+
+    text-align:left;
+
+    font-size:15px;
+
+    border-radius:10px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    cursor:pointer;
+}
+
+.shorts-menu button:hover{
+    background:rgba(255,255,255,.12);
+}
+
+.shorts-menu button i{
+    width:22px;
+    text-align:center;
+}
+    
