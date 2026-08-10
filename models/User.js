@@ -25,9 +25,9 @@ default:[]
     },
 
     avatar: {
-      type: String,
-      default: ""
-    },
+  type: String,
+  default: "/images/default.png"
+},
 
     cover: {
   type: String,
