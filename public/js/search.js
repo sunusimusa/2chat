@@ -391,8 +391,7 @@ function renderUsers(users){
             <img
             src="${avatar}"
             class="user-avatar"
-            onerror="this.src='/images/default-avatar.png'">
-
+            onerror="this.src='/images/default.png'">
 
             <div class="user-details">
 
