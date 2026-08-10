@@ -15,7 +15,8 @@ exports.createGroup = async (req, res) => {
             name,
             description,
             owner,
-            avatar
+            avatar,
+            privacy
         } = req.body;
 
 
@@ -38,12 +39,23 @@ exports.createGroup = async (req, res) => {
 
 
         // ==========================
+        // CHECK PRIVACY
+        // ==========================
+
+        const groupPrivacy =
+            privacy === "private"
+                ? "private"
+                : "public";
+
+
+        // ==========================
         // GENERATE UNIQUE INVITE CODE
         // ==========================
 
         let inviteCode;
 
         let existingGroup;
+
 
         do {
 
@@ -53,10 +65,12 @@ exports.createGroup = async (req, res) => {
                     .randomBytes(8)
                     .toString("hex");
 
+
             existingGroup =
                 await Group.findOne({
                     inviteCode
                 });
+
 
         } while (existingGroup);
 
@@ -68,42 +82,80 @@ exports.createGroup = async (req, res) => {
         const group =
             await Group.create({
 
-                name: name.trim(),
+                name:
+                    name.trim(),
+
 
                 description:
                     description
                         ? description.trim()
                         : "",
 
+
                 avatar:
                     avatar ||
                     "/images/default-group.png",
 
+
                 cover:
                     "/images/default-group-cover.jpg",
 
-                owner,
 
-                // ⭐ UNIQUE GROUP LINK CODE
+                owner:
+                    owner.trim(),
+
+
+                // ==========================
+                // UNIQUE GROUP LINK
+                // ==========================
+
                 inviteCode,
 
+
+                // ==========================
+                // ADMIN
+                // ==========================
+
                 admins: [
-                    owner
+                    owner.trim()
                 ],
+
+
+                // ==========================
+                // OWNER IS FIRST MEMBER
+                // ==========================
 
                 members: [
-                    owner
+                    owner.trim()
                 ],
 
-                memberCount: 1,
 
-                privacy: "public",
+                memberCount:
+                    1,
 
-                lastMessage: "",
 
-                lastMessageSender: "",
+                // ==========================
+                // PUBLIC / PRIVATE
+                // ==========================
 
-                lastMessageTime: null
+                privacy:
+                    groupPrivacy,
+
+
+                // ==========================
+                // LAST MESSAGE
+                // ==========================
+
+                lastMessage:
+                    "",
+
+
+                lastMessageSender:
+                    "",
+
+
+                lastMessageTime:
+                    null
 
             });
 
@@ -121,12 +173,12 @@ exports.createGroup = async (req, res) => {
 
             group,
 
-            // Za mu yi amfani da wannan daga baya
             inviteCode,
 
-            // Wannan shi ne link ɗin group
             groupLink:
-                `/group.html?invite=${encodeURIComponent(inviteCode)}`
+                `/group.html?invite=${encodeURIComponent(
+                    inviteCode
+                )}`
 
         });
 
@@ -151,6 +203,7 @@ exports.createGroup = async (req, res) => {
     }
 
 };
+
 
 // ================= GET ALL GROUPS =================
 exports.getGroups = async (req, res) => {
