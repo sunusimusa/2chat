@@ -20,11 +20,14 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 
 <body>
 
-<!-- =========================
+
+<!-- ==================================================
      TOP RIGHT CONTROLS
-========================= -->
+================================================== -->
 
 <div class="youtube-top">
+
+    <!-- SEARCH -->
 
     <a href="/search.html"
        class="top-icon"
@@ -34,7 +37,11 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 
     </a>
 
+
+    <!-- MENU -->
+
     <button
+        id="shortsMenuBtn"
         class="top-icon"
         type="button"
         title="More">
@@ -46,29 +53,82 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 </div>
 
 
-<!-- =========================
+
+<!-- ==================================================
+     MENU POPUP
+================================================== -->
+
+<div
+    id="shortsMenu"
+    class="shorts-menu">
+
+    <button
+        type="button"
+        onclick="location.href='/upload-short.html'">
+
+        <i class="fa-solid fa-upload"></i>
+
+        <span>Upload Short</span>
+
+    </button>
+
+
+    <button
+        type="button"
+        onclick="location.href='/saved-shorts.html'">
+
+        <i class="fa-solid fa-bookmark"></i>
+
+        <span>Saved Shorts</span>
+
+    </button>
+
+
+    <button
+        type="button"
+        onclick="location.href='/following.html'">
+
+        <i class="fa-solid fa-user-group"></i>
+
+        <span>Following</span>
+
+    </button>
+
+</div>
+
+
+
+<!-- ==================================================
      SHORTS CONTAINER
-========================= -->
+================================================== -->
 
 <div id="shortsContainer"></div>
 
 
-<!-- =========================
+
+<!-- ==================================================
      COMMENT POPUP
-========================= -->
+================================================== -->
 
 <div
-id="commentModal"
-class="comment-modal">
+    id="commentModal"
+    class="comment-modal">
 
     <div class="comment-box">
 
+
+        <!-- COMMENT HEADER -->
+
         <div class="comment-header">
 
-            <h3>💬 Comments</h3>
+            <h3>
+                💬 Comments
+            </h3>
+
 
             <button
-            onclick="closeComments()">
+                type="button"
+                onclick="closeComments()">
 
                 ✖
 
@@ -77,21 +137,29 @@ class="comment-modal">
         </div>
 
 
+
+        <!-- COMMENT LIST -->
+
         <div
-        id="commentList"
-        class="comment-list">
+            id="commentList"
+            class="comment-list">
         </div>
 
+
+
+        <!-- COMMENT INPUT -->
 
         <div class="comment-input">
 
             <input
-            type="text"
-            id="commentText"
-            placeholder="Write a comment...">
+                type="text"
+                id="commentText"
+                placeholder="Write a comment...">
+
 
             <button
-            onclick="sendComment()">
+                type="button"
+                onclick="sendComment()">
 
                 Send
 
@@ -104,7 +172,91 @@ class="comment-modal">
 </div>
 
 
+
+<!-- ==================================================
+     MENU SCRIPT
+================================================== -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function(){
+
+        const menuBtn =
+            document.getElementById(
+                "shortsMenuBtn"
+            );
+
+        const menu =
+            document.getElementById(
+                "shortsMenu"
+            );
+
+
+        /* ==========================
+           OPEN / CLOSE MENU
+        ========================== */
+
+        menuBtn.addEventListener(
+            "click",
+            function(event){
+
+                event.stopPropagation();
+
+                menu.classList.toggle("show");
+
+            }
+        );
+
+
+        /* ==========================
+           CLICK OUTSIDE
+        ========================== */
+
+        document.addEventListener(
+            "click",
+            function(event){
+
+                if(
+                    !menu.contains(event.target) &&
+                    !menuBtn.contains(event.target)
+                ){
+
+                    menu.classList.remove("show");
+
+                }
+
+            }
+        );
+
+
+        /* ==========================
+           PREVENT MENU CLICK CLOSING
+        ========================== */
+
+        menu.addEventListener(
+            "click",
+            function(event){
+
+                event.stopPropagation();
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+
+
+<!-- ==================================================
+     SHORTS JS
+================================================== -->
+
 <script src="/js/shorts.js"></script>
+
 
 </body>
 
