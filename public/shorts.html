@@ -1,96 +1,244 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width,initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    >
 
-<title>2Chat Shorts</title>
+    <title>2Chat Shorts</title>
 
-<link rel="stylesheet"
-href="/css/shorts.css">
+    <!-- SHORTS CSS -->
+    <link
+        rel="stylesheet"
+        href="/css/shorts.css"
+    >
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <!-- FONT AWESOME -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    >
 
 </head>
 
+
 <body>
-  
-<div class="top-tabs">
 
-<a href="/following.html" title="Following">
-<i class="fa-solid fa-user-group"></i>
-</a>
 
-<a href="/shorts.html" class="active" title="For You">
-<i class="fa-solid fa-house"></i>
-</a>
+<!-- ==================================================
+     SHORTS APP
+================================================== -->
 
-<a href="/search.html" title="Search">
-<i class="fa-solid fa-magnifying-glass"></i>
-</a>
+<main class="shorts-app">
 
-<a href="/trending.html" title="Trending">
-<i class="fa-solid fa-fire"></i>
-</a>
 
-</div>
+    <!-- ==================================================
+         TOP NAVIGATION
+    ================================================== -->
 
-<div id="shortsContainer"></div>
+    <header class="shorts-topbar">
 
-<!-- Upload Button -->
+        <div class="shorts-brand">
 
-<!-- Comment Popup -->
+            <strong>2Chat</strong>
+
+            <span>Shorts</span>
+
+        </div>
+
+
+        <nav class="top-tabs">
+
+
+            <a
+                href="/following.html"
+                title="Following"
+            >
+
+                <i class="fa-solid fa-user-group"></i>
+
+                <span>Following</span>
+
+            </a>
+
+
+            <a
+                href="/shorts.html"
+                class="active"
+                title="For You"
+            >
+
+                <i class="fa-solid fa-house"></i>
+
+                <span>For You</span>
+
+            </a>
+
+
+            <a
+                href="/search.html"
+                title="Search"
+            >
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <span>Search</span>
+
+            </a>
+
+
+            <a
+                href="/trending.html"
+                title="Trending"
+            >
+
+                <i class="fa-solid fa-fire"></i>
+
+                <span>Trending</span>
+
+            </a>
+
+
+        </nav>
+
+
+        <!-- MORE -->
+
+        <button
+            class="shorts-more-btn"
+            type="button"
+            title="More"
+        >
+
+            <i class="fa-solid fa-ellipsis-vertical"></i>
+
+        </button>
+
+
+    </header>
+
+
+
+    <!-- ==================================================
+         SHORTS CONTAINER
+         shorts.js zai cika wannan
+    ================================================== -->
+
+    <section
+        id="shortsContainer"
+        class="shorts-container"
+    >
+
+        <!-- Videos will be inserted by shorts.js -->
+
+    </section>
+
+
+
+</main>
+
+
+
+<!-- ==================================================
+     COMMENT MODAL
+================================================== -->
 
 <div
-id="commentModal"
-class="comment-modal">
+    id="commentModal"
+    class="comment-modal"
+>
 
-<div class="comment-box">
 
-<div class="comment-header">
+    <div class="comment-box">
 
-<h3>💬 Comments</h3>
 
-<button
-onclick="closeComments()">
+        <!-- COMMENT HEADER -->
 
-✖
+        <div class="comment-header">
 
-</button>
+
+            <h3>
+
+                <i class="fa-regular fa-comment"></i>
+
+                Comments
+
+            </h3>
+
+
+            <button
+                type="button"
+                onclick="closeComments()"
+                aria-label="Close comments"
+            >
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+
+        </div>
+
+
+
+        <!-- COMMENT LIST -->
+
+        <div
+            id="commentList"
+            class="comment-list"
+        >
+
+        </div>
+
+
+
+        <!-- COMMENT INPUT -->
+
+        <div class="comment-input">
+
+
+            <input
+                type="text"
+                id="commentText"
+                placeholder="Add a comment..."
+                autocomplete="off"
+            >
+
+
+            <button
+                type="button"
+                onclick="sendComment()"
+            >
+
+                <i class="fa-solid fa-paper-plane"></i>
+
+                <span>Send</span>
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
 
 </div>
 
-<div
-id="commentList"
-class="comment-list">
 
-</div>
 
-<div class="comment-input">
-
-<input
-type="text"
-id="commentText"
-placeholder="Write a comment...">
-
-<button
-onclick="sendComment()">
-
-Send
-
-</button>
-
-</div>
-
-</div>
-
-</div>
+<!-- ==================================================
+     SHORTS JS
+================================================== -->
 
 <script src="/js/shorts.js"></script>
 
+
 </body>
+
 </html>
