@@ -31,20 +31,127 @@ const profile = data.user;
 
 const followBtn = document.getElementById("followBtn");
 
-if(profile.username !== user.username){
+const isOwner =
+    profile.username === user.username;
 
-followBtn.style.display = "block";
 
-followBtn.onclick = () => {
-    followUser(profile.username);
-};
+// ===============================
+// OWNER / OTHER USER CONTROLS
+// ===============================
 
-}else{
+const coverBtn =
+    document.querySelector(".cover-btn");
 
-followBtn.style.display = "none";
+const avatarBtn =
+    document.querySelector(".avatar-btn");
+
+const coverFile =
+    document.getElementById("coverFile");
+
+const avatarFile =
+    document.getElementById("avatarFile");
+
+const newUsername =
+    document.getElementById("newUsername");
+
+const newBio =
+    document.getElementById("newBio");
+
+const saveBtn =
+    document.querySelector(
+        'button[onclick="saveProfile()"]'
+    );
+
+const uploadAvatarBtn =
+    document.querySelector(
+        'button[onclick="uploadAvatar()"]'
+);
+
+
+// ===============================
+// MY PROFILE
+// ===============================
+
+if(isOwner){
+
+    // Show editing controls
+
+    if(coverBtn)
+        coverBtn.style.display = "flex";
+
+    if(avatarBtn)
+        avatarBtn.style.display = "flex";
+
+    if(newUsername)
+        newUsername.style.display = "block";
+
+    if(newBio)
+        newBio.style.display = "block";
+
+    if(saveBtn)
+        saveBtn.style.display = "flex";
+
+    if(uploadAvatarBtn)
+        uploadAvatarBtn.style.display = "flex";
+
+
+    // Hide Follow
+
+    if(followBtn)
+        followBtn.style.display = "none";
 
 }
 
+
+// ===============================
+// OTHER USER PROFILE
+// ===============================
+
+else{
+
+    // Hide editing controls
+
+    if(coverBtn)
+        coverBtn.style.display = "none";
+
+    if(avatarBtn)
+        avatarBtn.style.display = "none";
+
+    if(coverFile)
+        coverFile.style.display = "none";
+
+    if(avatarFile)
+        avatarFile.style.display = "none";
+
+    if(newUsername)
+        newUsername.style.display = "none";
+
+    if(newBio)
+        newBio.style.display = "none";
+
+    if(saveBtn)
+        saveBtn.style.display = "none";
+
+    if(uploadAvatarBtn)
+        uploadAvatarBtn.style.display = "none";
+
+
+    // Show Follow
+
+    if(followBtn){
+
+        followBtn.style.display = "block";
+
+        followBtn.onclick = () => {
+
+            followUser(profile.username);
+
+        };
+
+    }
+
+}
+    
 const avatar =
 document.getElementById("avatar");
 
