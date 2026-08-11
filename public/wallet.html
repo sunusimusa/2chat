@@ -1,1 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>2Chat Wallet</title>
+
+    <link
+        rel="stylesheet"
+        href="/css/wallet.css">
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+
+</head>
+
+<body>
+
+    <div class="wallet-page">
+
+        <!-- HEADER -->
+
+        <header class="wallet-header">
+
+            <button
+                class="back-btn"
+                onclick="history.back()">
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+            </button>
+
+            <h1>
+                <i class="fa-solid fa-wallet"></i>
+                My Wallet
+            </h1>
+
+        </header>
+
+
+        <!-- WALLET CARD -->
+
+        <section class="wallet-card">
+
+            <div class="wallet-icon">
+
+                <i class="fa-solid fa-wallet"></i>
+
+            </div>
+
+            <h2>
+                Wallet Balance
+            </h2>
+
+            <div
+                id="balance"
+                class="balance">
+
+                ₦0.00
+
+            </div>
+
+        </section>
+
+
+        <!-- COINS -->
+
+        <section class="coins-card">
+
+            <div class="coins-icon">
+
+                <i class="fa-solid fa-coins"></i>
+
+            </div>
+
+            <div class="coins-info">
+
+                <h3>
+                    My Coins
+                </h3>
+
+                <p>
+                    Coins you can use to send gifts.
+                </p>
+
+            </div>
+
+            <strong id="coins">
+                0
+            </strong>
+
+        </section>
+
+
+        <!-- STATUS -->
+
+        <div
+            id="walletMessage"
+            class="wallet-message">
+
+            Loading wallet...
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="wallet-actions">
+
+            <button
+                onclick="buyCoins()">
+
+                <i class="fa-solid fa-cart-shopping"></i>
+
+                Buy Coins
+
+            </button>
+
+            <button
+                onclick="sendGift()">
+
+                <i class="fa-solid fa-gift"></i>
+
+                Send Gift
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script src="/js/wallet.js"></script>
+
+</body>
+
+</html>
