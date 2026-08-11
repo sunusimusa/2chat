@@ -1,1 +1,340 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
 
+body{
+
+    min-height:100vh;
+
+    background:#f5f5f5;
+
+    color:#111;
+
+}
+
+
+.wallet-page{
+
+    width:100%;
+
+    max-width:600px;
+
+    margin:auto;
+
+    min-height:100vh;
+
+    background:#f5f5f5;
+
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.wallet-header{
+
+    height:65px;
+
+    background:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    padding:0 15px;
+
+    border-bottom:1px solid #ddd;
+
+}
+
+
+.wallet-header h1{
+
+    font-size:20px;
+
+}
+
+
+.wallet-header h1 i{
+
+    color:#ff0050;
+
+}
+
+
+.back-btn{
+
+    width:42px;
+
+    height:42px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#f0f0f0;
+
+    cursor:pointer;
+
+    font-size:18px;
+
+}
+
+
+/* =========================
+   WALLET CARD
+========================= */
+
+.wallet-card{
+
+    margin:20px 15px;
+
+    padding:30px 20px;
+
+    border-radius:20px;
+
+    text-align:center;
+
+    background:linear-gradient(
+        135deg,
+        #ff0050,
+        #ff4f81
+    );
+
+    color:#fff;
+
+    box-shadow:
+        0 8px 25px
+        rgba(255,0,80,.25);
+
+}
+
+
+.wallet-icon{
+
+    width:65px;
+
+    height:65px;
+
+    margin:auto;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:rgba(255,255,255,.2);
+
+    font-size:28px;
+
+}
+
+
+.wallet-card h2{
+
+    margin-top:15px;
+
+    font-size:17px;
+
+    font-weight:normal;
+
+}
+
+
+.balance{
+
+    margin-top:8px;
+
+    font-size:34px;
+
+    font-weight:bold;
+
+}
+
+
+/* =========================
+   COINS
+========================= */
+
+.coins-card{
+
+    margin:15px;
+
+    padding:18px;
+
+    background:#fff;
+
+    border-radius:16px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    box-shadow:
+        0 3px 12px
+        rgba(0,0,0,.07);
+
+}
+
+
+.coins-icon{
+
+    width:50px;
+
+    height:50px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:#fff3c4;
+
+    color:#d99b00;
+
+    font-size:22px;
+
+}
+
+
+.coins-info{
+
+    flex:1;
+
+}
+
+
+.coins-info h3{
+
+    font-size:17px;
+
+    margin-bottom:5px;
+
+}
+
+
+.coins-info p{
+
+    color:#777;
+
+    font-size:12px;
+
+}
+
+
+#coins{
+
+    font-size:20px;
+
+    color:#d99b00;
+
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+.wallet-message{
+
+    text-align:center;
+
+    padding:10px;
+
+    font-size:13px;
+
+    color:#777;
+
+}
+
+
+/* =========================
+   ACTIONS
+========================= */
+
+.wallet-actions{
+
+    display:flex;
+
+    gap:10px;
+
+    padding:0 15px;
+
+}
+
+
+.wallet-actions button{
+
+    flex:1;
+
+    height:48px;
+
+    border:none;
+
+    border-radius:25px;
+
+    background:#ff0050;
+
+    color:#fff;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+}
+
+
+.wallet-actions button:last-child{
+
+    background:#111;
+
+}
+
+
+.wallet-actions button i{
+
+    margin-right:6px;
+
+}
+
+
+.wallet-actions button:active{
+
+    transform:scale(.96);
+
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:400px){
+
+    .balance{
+
+        font-size:29px;
+
+    }
+
+    .wallet-actions{
+
+        flex-direction:column;
+
+    }
+
+}
