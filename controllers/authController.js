@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const generateToken = require("../utils/generateToken");
 const cloudinary = require("../config/cloudinary");
+const streamifier = require("streamifier");
 
 // REGISTER
 exports.register = async (req, res) => {
@@ -127,49 +128,75 @@ exports.updateProfile = async (req, res) => {
 
 exports.uploadAvatar = async (req, res) => {
 
-  try {
+    try {
 
-    const user = await User.findById(req.user._id);
+        const user = await User.findById(req.user._id);
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found"
-      });
-    }
-
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "No image selected"
-      });
-    }
-
-    const result =
-      await cloudinary.uploader.upload(
-        req.file.path,
-        {
-          folder: "2chat-avatar"
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
         }
-      );
 
-    user.avatar = result.secure_url;
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: "No image selected"
+            });
+        }
 
-    await user.save();
+        const result =
+            await new Promise((resolve, reject) => {
 
-    res.json({
-      success: true,
-      avatar: user.avatar
-    });
+                const stream =
+                    cloudinary.uploader.upload_stream(
+                        {
+                            folder: "2chat-avatar",
+                            resource_type: "image"
+                        },
+                        (error, result) => {
 
-  } catch (err) {
+                            if (error) {
+                                reject(error);
+                            } else {
+                                resolve(result);
+                            }
 
-    res.status(500).json({
-      success: false,
-      message: err.message
-    });
+                        }
+                    );
 
-  }
+                streamifier
+                    .createReadStream(req.file.buffer)
+                    .pipe(stream);
+
+            });
+
+
+        user.avatar = result.secure_url;
+
+        await user.save();
+
+
+        res.json({
+            success: true,
+            avatar: user.avatar
+        });
+
+
+    } catch (err) {
+
+        console.error(
+            "UPLOAD AVATAR ERROR:",
+            err
+        );
+
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+
+    }
 
 };
 
@@ -227,49 +254,76 @@ message:err.message
 
 exports.uploadCover = async (req, res) => {
 
-  try {
+    try {
 
-    const user =
-      await User.findById(req.user._id);
+        const user = await User.findById(req.user._id);
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found"
-      });
-    }
-
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "No image selected"
-      });
-    }
-
-    const result =
-      await cloudinary.uploader.upload(
-        req.file.path,
-        {
-          folder: "2chat/covers"
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
         }
-      );
 
-    user.cover = result.secure_url;
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: "No image selected"
+            });
+        }
 
-    await user.save();
 
-    res.json({
-      success: true,
-      cover: user.cover
-    });
+        const result =
+            await new Promise((resolve, reject) => {
 
-  } catch (err) {
+                const stream =
+                    cloudinary.uploader.upload_stream(
+                        {
+                            folder: "2chat/covers",
+                            resource_type: "image"
+                        },
+                        (error, result) => {
 
-    res.status(500).json({
-      success: false,
-      message: err.message
-    });
+                            if (error) {
+                                reject(error);
+                            } else {
+                                resolve(result);
+                            }
 
-  }
+                        }
+                    );
+
+
+                streamifier
+                    .createReadStream(req.file.buffer)
+                    .pipe(stream);
+
+            });
+
+
+        user.cover = result.secure_url;
+
+        await user.save();
+
+
+        res.json({
+            success: true,
+            cover: user.cover
+        });
+
+
+    } catch (err) {
+
+        console.error(
+            "UPLOAD COVER ERROR:",
+            err
+        );
+
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+
+    }
 
 };
