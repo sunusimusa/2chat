@@ -89,87 +89,87 @@ exports.login = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
 
-    const { email, username, bio } = req.body;
+    const { username, bio } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await User.findById(req.user._id);
 
     if (!user) {
       return res.status(404).json({
-        success:false,
-        message:"User not found"
+        success: false,
+        message: "User not found"
       });
     }
 
-    user.username = username || user.username;
-    user.bio = bio || user.bio;
+    if (username) {
+      user.username = username;
+    }
+
+    if (bio !== undefined) {
+      user.bio = bio;
+    }
 
     await user.save();
 
     res.json({
-      success:true,
+      success: true,
       user
     });
 
-  } catch(err) {
+  } catch (err) {
 
     res.status(500).json({
-      success:false,
-      message:err.message
+      success: false,
+      message: err.message
     });
 
   }
 };
 
-exports.uploadAvatar =
-async (req,res)=>{
+exports.uploadAvatar = async (req, res) => {
 
-try{
+  try {
 
-const User =
-require("../models/User");
+    const user = await User.findById(req.user._id);
 
-const {
-email
-} = req.body;
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
 
-const user =
-await User.findOne({ email });
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No image selected"
+      });
+    }
 
-if(!user){
+    const result =
+      await cloudinary.uploader.upload(
+        req.file.path,
+        {
+          folder: "2chat-avatar"
+        }
+      );
 
-return res.status(404).json({
-success:false,
-message:"User not found"
-});
+    user.avatar = result.secure_url;
 
-}
+    await user.save();
 
-const result =
-await cloudinary.uploader.upload(
-req.file.path,
-{
-folder:"2chat-avatar"
-}
-);
+    res.json({
+      success: true,
+      avatar: user.avatar
+    });
 
-user.avatar =
-result.secure_url;
+  } catch (err) {
 
-await user.save();
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
 
-res.json({
-success:true,
-avatar:user.avatar
-});
-
-}catch(err){
-
-res.status(500).json({
-success:false,
-message:err.message
-});
-
-}
+  }
 
 };
 
@@ -227,42 +227,49 @@ message:err.message
 
 exports.uploadCover = async (req, res) => {
 
-try {
+  try {
 
-const User = require("../models/User");
-const cloudinary = require("../config/cloudinary");
+    const user =
+      await User.findById(req.user._id);
 
-const file = req.file;
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
 
-if (!file) {
-return res.json({
-success:false,
-message:"No image selected"
-});
-}
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No image selected"
+      });
+    }
 
-const result = await cloudinary.uploader.upload(file.path,{
-folder:"2chat/covers"
-});
+    const result =
+      await cloudinary.uploader.upload(
+        req.file.path,
+        {
+          folder: "2chat/covers"
+        }
+      );
 
-const user = await User.findOneAndUpdate(
-{ email:req.body.email },
-{ cover:result.secure_url },
-{ new:true }
-);
+    user.cover = result.secure_url;
 
-res.json({
-success:true,
-cover:user.cover
-});
+    await user.save();
 
-} catch(err){
+    res.json({
+      success: true,
+      cover: user.cover
+    });
 
-res.status(500).json({
-success:false,
-message:err.message
-});
+  } catch (err) {
 
-}
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
+
+  }
 
 };
