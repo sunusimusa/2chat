@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const generateToken = require("../utils/generateToken");
 const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
+const Wallet = require("../models/Wallet");
 
 // REGISTER
 exports.register = async (req, res) => {
@@ -23,10 +24,14 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
-      username,
-      email,
-      password: hashedPassword
-    });
+  username,
+  email,
+  password: hashedPassword
+});
+
+await Wallet.create({
+  user: user._id
+});
 
     res.status(201).json({
       success: true,
