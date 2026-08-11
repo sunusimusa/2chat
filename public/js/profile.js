@@ -193,45 +193,54 @@ profile.following ? profile.following.length : 0;
 
 async function saveProfile(){
 
-  const username =
-  document.getElementById("newUsername").value;
+    const username =
+        document.getElementById("newUsername").value.trim();
 
-  const bio =
-  document.getElementById("newBio").value;
+    const bio =
+        document.getElementById("newBio").value.trim();
 
-  const res = await fetch(
-    "/api/auth/profile",
-    {
-      method:"PUT",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        email:user.email,
-        username,
-        bio
-      })
+    const token =
+        localStorage.getItem("token");
+
+    if(!token){
+        return alert("❌ Login session expired. Please login again.");
     }
-  );
 
-  const data = await res.json();
+    const res = await fetch(
+        "/api/auth/profile",
+        {
+            method:"PUT",
 
-  if(data.success){
+            headers:{
+                "Content-Type":"application/json",
+                "Authorization":"Bearer " + token
+            },
 
-    localStorage.setItem(
-      "user",
-      JSON.stringify(data.user)
+            body:JSON.stringify({
+                username,
+                bio
+            })
+        }
     );
 
-    alert("✅ Profile Updated");
+    const data = await res.json();
 
-    location.reload();
+    if(data.success){
 
-  }else{
+        localStorage.setItem(
+            "user",
+            JSON.stringify(data.user)
+        );
 
-    alert(data.message);
+        alert("✅ Profile Updated");
 
-  }
+        location.reload();
+
+    }else{
+
+        alert("❌ " + (data.message || "Update failed"));
+
+    }
 
 }
 
@@ -251,65 +260,63 @@ function logout(){
 
 async function uploadAvatar(){
 
-const file =
-document.getElementById(
-"avatarFile"
-).files[0];
+    const file =
+        document.getElementById("avatarFile").files[0];
 
-if(!file){
-return alert(
-"Select image"
-);
+    if(!file){
+        return alert("Select image");
+    }
+
+    const token =
+        localStorage.getItem("token");
+
+    if(!token){
+        return alert("❌ Login session expired. Please login again.");
+    }
+
+    const formData =
+        new FormData();
+
+    formData.append("avatar", file);
+
+    const res =
+        await fetch(
+            "/api/auth/avatar",
+            {
+                method:"POST",
+
+                headers:{
+                    "Authorization":"Bearer " + token
+                },
+
+                body:formData
+            }
+        );
+
+    const data =
+        await res.json();
+
+    if(data.success){
+
+        user.avatar =
+            data.avatar;
+
+        localStorage.setItem(
+            "user",
+            JSON.stringify(user)
+        );
+
+        alert("✅ Avatar Updated");
+
+        location.reload();
+
+    }else{
+
+        alert("❌ " + (data.message || "Upload failed"));
+
+    }
+
 }
-
-const formData =
-new FormData();
-
-formData.append(
-"avatar",
-file
-);
-
-formData.append(
-"email",
-user.email
-);
-
-const res =
-await fetch(
-"/api/auth/avatar",
-{
-method:"POST",
-body:formData
-}
-);
-
-const data =
-await res.json();
-
-if(data.success){
-
-user.avatar =
-data.avatar;
-
-localStorage.setItem(
-"user",
-JSON.stringify(user)
-);
-
-alert(
-"✅ Avatar Updated"
-);
-
-location.reload();
-
-}else{
-
-alert(data.message);
-
-}
-
-} 
 
 async function loadMyPosts(){
 
@@ -388,46 +395,61 @@ alert(data.message);
 
 async function uploadCover(){
 
-const file =
-document.getElementById("coverFile").files[0];
+    const file =
+        document.getElementById("coverFile").files[0];
 
-if(!file){
-return;
-}
+    if(!file){
+        return;
+    }
 
-const formData = new FormData();
+    const token =
+        localStorage.getItem("token");
 
-formData.append("cover",file);
-formData.append("email",user.email);
+    if(!token){
+        return alert("❌ Login session expired. Please login again.");
+    }
 
-const res = await fetch(
-"/api/auth/cover",
-{
-method:"POST",
-body:formData
-}
-);
+    const formData =
+        new FormData();
 
-const data = await res.json();
+    formData.append("cover", file);
 
-if(data.success){
+    const res =
+        await fetch(
+            "/api/auth/cover",
+            {
+                method:"POST",
 
-user.cover = data.cover;
+                headers:{
+                    "Authorization":"Bearer " + token
+                },
 
-localStorage.setItem(
-"user",
-JSON.stringify(user)
-);
+                body:formData
+            }
+        );
 
-alert("✅ Cover Updated");
+    const data =
+        await res.json();
 
-location.reload();
+    if(data.success){
 
-}else{
+        user.cover =
+            data.cover;
 
-alert(data.message);
+        localStorage.setItem(
+            "user",
+            JSON.stringify(user)
+        );
 
-}
+        alert("✅ Cover Updated");
+
+        location.reload();
+
+    }else{
+
+        alert("❌ " + (data.message || "Upload failed"));
+
+    }
 
 }
 
