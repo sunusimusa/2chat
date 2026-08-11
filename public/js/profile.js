@@ -258,6 +258,98 @@ function logout(){
 
 }
 
+// ===============================
+// COMPRESS IMAGE BEFORE UPLOAD
+// ===============================
+
+function compressImage(file, maxWidth = 1200, quality = 0.75){
+
+    return new Promise((resolve, reject) => {
+
+        const img = new Image();
+
+        const reader = new FileReader();
+
+        reader.onload = function(e){
+
+            img.onload = function(){
+
+                let width = img.width;
+                let height = img.height;
+
+                if(width > maxWidth){
+
+                    height =
+                        height * (maxWidth / width);
+
+                    width = maxWidth;
+
+                }
+
+                const canvas =
+                    document.createElement("canvas");
+
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx =
+                    canvas.getContext("2d");
+
+                ctx.drawImage(
+                    img,
+                    0,
+                    0,
+                    width,
+                    height
+                );
+
+                canvas.toBlob(
+                    blob => {
+
+                        if(!blob){
+                            reject(
+                                new Error(
+                                    "Image compression failed"
+                                )
+                            );
+                            return;
+                        }
+
+                        const compressedFile =
+                            new File(
+                                [blob],
+                                file.name.replace(
+                                    /\.[^/.]+$/,
+                                    ".jpg"
+                                ),
+                                {
+                                    type:"image/jpeg"
+                                }
+                            );
+
+                        resolve(compressedFile);
+
+                    },
+                    "image/jpeg",
+                    quality
+                );
+
+            };
+
+            img.onerror = reject;
+
+            img.src = e.target.result;
+
+        };
+
+        reader.onerror = reject;
+
+        reader.readAsDataURL(file);
+
+    });
+
+}
+
 async function uploadAvatar(){
 
     const file =
@@ -271,48 +363,76 @@ async function uploadAvatar(){
         localStorage.getItem("token");
 
     if(!token){
-        return alert("❌ Login session expired. Please login again.");
+        return alert(
+            "❌ Login session expired. Please login again."
+        );
     }
 
-    const formData =
-        new FormData();
+    try{
 
-    formData.append("avatar", file);
+        const compressedFile =
+            await compressImage(
+                file,
+                700,
+                0.75
+            );
 
-    const res =
-        await fetch(
-            "/api/auth/avatar",
-            {
-                method:"POST",
+        const formData =
+            new FormData();
 
-                headers:{
-                    "Authorization":"Bearer " + token
-                },
-
-                body:formData
-            }
+        formData.append(
+            "avatar",
+            compressedFile
         );
 
-    const data =
-        await res.json();
+        const res =
+            await fetch(
+                "/api/auth/avatar",
+                {
+                    method:"POST",
 
-    if(data.success){
+                    headers:{
+                        "Authorization":
+                            "Bearer " + token
+                    },
 
-        user.avatar =
-            data.avatar;
+                    body:formData
+                }
+            );
 
-        localStorage.setItem(
-            "user",
-            JSON.stringify(user)
+        const data =
+            await res.json();
+
+        if(data.success){
+
+            user.avatar =
+                data.avatar;
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify(user)
+            );
+
+            alert("✅ Avatar Updated");
+
+            location.reload();
+
+        }else{
+
+            alert(
+                "❌ " +
+                (data.message || "Upload failed")
+            );
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+        alert(
+            "❌ Failed to upload avatar"
         );
-
-        alert("✅ Avatar Updated");
-
-        location.reload();
-
-    }else{
-
-        alert("❌ " + (data.message || "Upload failed"));
 
     }
 
@@ -393,6 +513,7 @@ alert(data.message);
 
 }
 
+
 async function uploadCover(){
 
     const file =
@@ -406,53 +527,80 @@ async function uploadCover(){
         localStorage.getItem("token");
 
     if(!token){
-        return alert("❌ Login session expired. Please login again.");
+        return alert(
+            "❌ Login session expired. Please login again."
+        );
     }
 
-    const formData =
-        new FormData();
+    try{
 
-    formData.append("cover", file);
+        const compressedFile =
+            await compressImage(
+                file,
+                1400,
+                0.75
+            );
 
-    const res =
-        await fetch(
-            "/api/auth/cover",
-            {
-                method:"POST",
+        const formData =
+            new FormData();
 
-                headers:{
-                    "Authorization":"Bearer " + token
-                },
-
-                body:formData
-            }
+        formData.append(
+            "cover",
+            compressedFile
         );
 
-    const data =
-        await res.json();
+        const res =
+            await fetch(
+                "/api/auth/cover",
+                {
+                    method:"POST",
 
-    if(data.success){
+                    headers:{
+                        "Authorization":
+                            "Bearer " + token
+                    },
 
-        user.cover =
-            data.cover;
+                    body:formData
+                }
+            );
 
-        localStorage.setItem(
-            "user",
-            JSON.stringify(user)
+        const data =
+            await res.json();
+
+        if(data.success){
+
+            user.cover =
+                data.cover;
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify(user)
+            );
+
+            alert("✅ Cover Updated");
+
+            location.reload();
+
+        }else{
+
+            alert(
+                "❌ " +
+                (data.message || "Upload failed")
+            );
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+        alert(
+            "❌ Failed to upload cover"
         );
-
-        alert("✅ Cover Updated");
-
-        location.reload();
-
-    }else{
-
-        alert("❌ " + (data.message || "Upload failed"));
 
     }
 
 }
-
 
 document
 .getElementById("coverFile")
