@@ -1,5 +1,7 @@
 const router = require("express").Router();
 
+const protect = require("../middleware/auth");
+
 const upload =
 require("../middleware/upload");
 
@@ -25,19 +27,22 @@ router.post("/register", register);
 router.post("/login", login);
 
 // Update Profile
-router.put("/profile", updateProfile);
+router.put("/profile", protect, updateProfile);
 
 // Upload Avatar
 router.post(
   "/avatar",
+  protect,
   upload.single("avatar"),
   uploadAvatar
 );
 
+// Upload Cover
 router.post(
-"/cover",
-upload.single("cover"),
-uploadCover
+  "/cover",
+  protect,
+  upload.single("cover"),
+  uploadCover
 );
 
 router.get(
