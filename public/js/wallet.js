@@ -274,7 +274,21 @@ async function testAddCoins(){
 
     }
 
-}                       
+}
+
+function openGiftPage() {
+
+    const receiverId =
+        prompt("Saka Creator User ID:");
+
+    if (!receiverId) {
+        return;
+    }
+
+    location.href =
+        "/gifts.html?receiverId=" +
+        encodeURIComponent(receiverId);
+}
 
 /* =========================
    START
