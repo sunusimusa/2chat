@@ -4,7 +4,8 @@ const protect = require("../middleware/auth");
 
 const {
   getWallet,
-  testAddCoins
+  testAddCoins,
+  getEarnings
 } = require("../controllers/walletController");
 
 router.get(
@@ -17,6 +18,12 @@ router.post(
   "/test-add-coins",
   protect,
   testAddCoins
+);
+
+router.get(
+  "/earnings",
+  protect,
+  getEarnings
 );
 
 module.exports = router;
