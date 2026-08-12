@@ -214,7 +214,7 @@ const giftIcon =
 
                     <div class="gift-name">
 
-                        🎁
+                     
                         ${giftIcon}
 ${escapeHTML(
     formatGiftName(
