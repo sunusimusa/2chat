@@ -48,6 +48,43 @@ exports.getWallet = async (req, res) => {
   }
 };
 
+exports.getEarnings = async (req, res) => {
+  try {
+
+    const wallet = await Wallet.findOne({
+      userId: req.user._id
+    });
+
+    if (!wallet) {
+      return res.status(404).json({
+        success: false,
+        message: "Wallet not found"
+      });
+    }
+
+    res.json({
+      success: true,
+      earnings: {
+        totalEarned: wallet.totalEarned || 0,
+        giftsReceived: wallet.giftsReceived || 0
+      }
+    });
+
+  } catch (err) {
+
+    console.error(
+      "GET EARNINGS ERROR:",
+      err
+    );
+
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
+
+  }
+};
+
 exports.testAddCoins = async (req, res) => {
   try {
 
