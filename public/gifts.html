@@ -1,1 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>2Chat Gifts</title>
+
+<link
+rel="stylesheet"
+href="/css/gifts.css">
+
+</head>
+
+<body>
+
+<div class="gift-page">
+
+    <div class="gift-header">
+
+        <button
+        class="back-btn"
+        onclick="history.back()">
+
+            ←
+
+        </button>
+
+        <div>
+
+            <h2>Send a Gift</h2>
+
+            <p>Choose a gift to support this creator</p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Receiver -->
+
+    <div class="receiver-box">
+
+        <img
+        id="receiverAvatar"
+        src="/images/default.png">
+
+        <div>
+
+            <strong id="receiverName">
+                Creator
+            </strong>
+
+            <small>
+                Send a gift
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <!-- Coins -->
+
+    <div class="coin-box">
+
+        <span>🪙 My Coins</span>
+
+        <strong id="myCoins">
+            0
+        </strong>
+
+    </div>
+
+
+    <!-- Gifts -->
+
+    <h3 class="section-title">
+        Choose Gift
+    </h3>
+
+    <div
+    id="giftGrid"
+    class="gift-grid">
+    </div>
+
+
+    <!-- Selected Gift -->
+
+    <div
+    id="selectedBox"
+    class="selected-box"
+    style="display:none;">
+
+        <div>
+
+            <span id="selectedIcon">
+                🌹
+            </span>
+
+            <div>
+
+                <strong id="selectedName">
+                    Rose
+                </strong>
+
+                <small>
+                    <span id="selectedCoins">
+                        10
+                    </span>
+                    coins
+                </small>
+
+            </div>
+
+        </div>
+
+        <button
+        id="sendBtn"
+        onclick="sendSelectedGift()">
+
+            🎁 Send Gift
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script src="/js/gifts.js"></script>
+
+</body>
+
+</html>
