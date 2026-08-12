@@ -114,17 +114,20 @@ exports.sendGift = async (req, res) => {
     // CREATE GIFT RECORD
     // =========================
 
-    const gift = await Gift.create(
-      [{
-        senderId: req.user._id,
-        receiverId,
-        giftType,
-        coins: amount
-      }],
-      {
-        session
-      }
-    );
+    const creatorEarning = amount;
+
+const gift = await Gift.create(
+  [{
+    senderId: req.user._id,
+    receiverId,
+    giftType,
+    coins: amount,
+    creatorEarning
+  }],
+  {
+    session
+  }
+);
 
     await session.commitTransaction();
 
