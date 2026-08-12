@@ -200,6 +200,82 @@ async function testAddCoins(){
 
 }
 
+     async function testSendGift(){
+
+    const token =
+        localStorage.getItem("token");
+
+    if(!token){
+        return alert("❌ Login session expired");
+    }
+
+    // Wannan username/ID za mu canza zuwa creator na gwaji
+    const receiverId =
+        prompt("Saka User ID na wanda za a aika masa gift:");
+
+    if(!receiverId){
+        return;
+    }
+
+    try{
+
+        const res = await fetch(
+            "/api/gifts/send",
+            {
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json",
+                    "Authorization":
+                        "Bearer " + token
+                },
+
+                body:JSON.stringify({
+                    receiverId: receiverId,
+                    giftType: "rose",
+                    coins: 10
+                })
+            }
+        );
+
+        const data =
+            await res.json();
+
+        console.log(data);
+
+        if(data.success){
+
+            alert(
+                "🎁 Gift sent!\n\n" +
+                "Sender coins: " +
+                data.senderCoins +
+                "\nCreator earnings: " +
+                data.creatorEarnings
+            );
+
+            loadWallet();
+
+        }else{
+
+            alert(
+                "❌ " +
+                (data.message || "Gift failed")
+            );
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+        alert(
+            "❌ Server connection error"
+        );
+
+    }
+
+}                       
+
 /* =========================
    START
 ========================= */
