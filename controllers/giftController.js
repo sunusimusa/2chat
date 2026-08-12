@@ -1,17 +1,9 @@
 const mongoose = require("mongoose");
-
 const Wallet = require("../models/Wallet");
 const Gift = require("../models/Gift");
-const User = require("../models/User");
-
-// =========================================
-// SEND GIFT
-// =========================================
 
 exports.sendGift = async (req, res) => {
-
-  const session =
-    await mongoose.startSession();
+  const session = await mongoose.startSession();
 
   try {
 
@@ -21,244 +13,132 @@ exports.sendGift = async (req, res) => {
       coins
     } = req.body;
 
-    // =====================================
-    // VALIDATION
-    // =====================================
-
-    if (
-      !receiverId ||
-      !giftType ||
-      !coins
-    ) {
-
+    if (!receiverId || !giftType || !coins) {
       return res.status(400).json({
         success: false,
         message: "receiverId, giftType and coins are required"
       });
-
     }
 
-    if (coins <= 0) {
+    const amount = Number(coins);
 
+    if (!Number.isInteger(amount) || amount <= 0) {
       return res.status(400).json({
         success: false,
-        message: "Gift coins must be greater than 0"
+        message: "Invalid coin amount"
       });
-
     }
 
     if (
-      !mongoose.Types.ObjectId.isValid(
-        receiverId
-      )
+      String(req.user._id) === String(receiverId)
     ) {
-
-      return res.status(400).json({
-        success: false,
-        message: "Invalid receiver ID"
-      });
-
-    }
-
-    // =====================================
-    // FIND USERS
-    // =====================================
-
-    const sender =
-      await User.findById(req.user._id);
-
-    const receiver =
-      await User.findById(receiverId);
-
-    if (!sender) {
-
-      return res.status(404).json({
-        success: false,
-        message: "Sender not found"
-      });
-
-    }
-
-    if (!receiver) {
-
-      return res.status(404).json({
-        success: false,
-        message: "Receiver not found"
-      });
-
-    }
-
-    if (
-      sender._id.toString() ===
-      receiver._id.toString()
-    ) {
-
       return res.status(400).json({
         success: false,
         message: "You cannot send a gift to yourself"
       });
-
     }
-
-    // =====================================
-    // START TRANSACTION
-    // =====================================
 
     session.startTransaction();
 
-    // =====================================
-    // GET / CREATE SENDER WALLET
-    // =====================================
+    // =========================
+    // SENDER WALLET
+    // =========================
 
-    let senderWallet =
+    const senderWallet =
       await Wallet.findOne({
-        userId: sender._id
+        userId: req.user._id
       }).session(session);
 
     if (!senderWallet) {
-
-      senderWallet =
-        await Wallet.create(
-          [{
-            userId: sender._id,
-            coins: 0
-          }],
-          { session }
-        );
-
-      senderWallet =
-        senderWallet[0];
-
+      throw new Error("Sender wallet not found");
     }
 
-    // =====================================
-    // GET / CREATE RECEIVER WALLET
-    // =====================================
-
-    let receiverWallet =
-      await Wallet.findOne({
-        userId: receiver._id
-      }).session(session);
-
-    if (!receiverWallet) {
-
-      receiverWallet =
-        await Wallet.create(
-          [{
-            userId: receiver._id,
-            coins: 0
-          }],
-          { session }
-        );
-
-      receiverWallet =
-        receiverWallet[0];
-
-    }
-
-    // =====================================
-    // CHECK COINS
-    // =====================================
-
-    if (
-      senderWallet.coins < coins
-    ) {
+    if (senderWallet.coins < amount) {
 
       await session.abortTransaction();
 
       return res.status(400).json({
         success: false,
-        message: "Not enough coins"
+        message: "Insufficient coins"
       });
 
     }
 
-    // =====================================
-    // CREATOR EARNING
-    // =====================================
+    // =========================
+    // CREATOR WALLET
+    // =========================
 
-    const creatorEarning =
-      coins;
+    let receiverWallet =
+      await Wallet.findOne({
+        userId: receiverId
+      }).session(session);
 
-    // =====================================
-    // UPDATE SENDER
-    // =====================================
+    if (!receiverWallet) {
 
-    senderWallet.coins -= coins;
+      receiverWallet = new Wallet({
+        userId: receiverId,
+        coins: 0,
+        totalEarned: 0,
+        giftsReceived: 0
+      });
 
-    senderWallet.totalSpent += coins;
+      await receiverWallet.save({
+        session
+      });
+    }
 
+    // =========================
+    // REMOVE SENDER COINS
+    // =========================
+
+    senderWallet.coins -= amount;
+    senderWallet.totalSpent += amount;
     senderWallet.giftsSent += 1;
+
+    // =========================
+    // CREATOR EARNINGS
+    // =========================
+
+    receiverWallet.totalEarned += amount;
+    receiverWallet.giftsReceived += 1;
 
     await senderWallet.save({
       session
     });
 
-    // =====================================
-    // UPDATE RECEIVER
-    // =====================================
-
-    receiverWallet.totalEarned +=
-      creatorEarning;
-
-    receiverWallet.giftsReceived += 1;
-
     await receiverWallet.save({
       session
     });
 
-    // =====================================
+    // =========================
     // CREATE GIFT RECORD
-    // =====================================
+    // =========================
 
-    const gift =
-      await Gift.create(
-        [{
-          senderId: sender._id,
-
-          receiverId: receiver._id,
-
-          giftType,
-
-          coins,
-
-          creatorEarning,
-
-          status: "completed"
-        }],
-        {
-          session
-        }
-      );
-
-    // =====================================
-    // COMMIT
-    // =====================================
+    const gift = await Gift.create(
+      [{
+        senderId: req.user._id,
+        receiverId,
+        giftType,
+        coins: amount
+      }],
+      {
+        session
+      }
+    );
 
     await session.commitTransaction();
 
     res.json({
-
       success: true,
-
       message: "Gift sent successfully",
 
       gift: gift[0],
 
-      senderWallet: {
-        coins: senderWallet.coins,
-        totalSpent: senderWallet.totalSpent,
-        giftsSent: senderWallet.giftsSent
-      },
+      senderCoins:
+        senderWallet.coins,
 
-      receiverWallet: {
-        totalEarned:
-          receiverWallet.totalEarned,
-
-        giftsReceived:
-          receiverWallet.giftsReceived
-      }
-
+      creatorEarnings:
+        receiverWallet.totalEarned
     });
 
   } catch (err) {
@@ -280,5 +160,4 @@ exports.sendGift = async (req, res) => {
     session.endSession();
 
   }
-
 };
