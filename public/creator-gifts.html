@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Creator Gifts</title>
+
+    <link
+        rel="stylesheet"
+        href="/css/creator-gifts.css">
+
+</head>
+
+
+<body>
+
+
+    <header class="gifts-header">
+
+        <button
+            class="back-btn"
+            onclick="history.back()">
+
+            ←
+
+        </button>
+
+        <h1>
+            🎁 Gifts Received
+        </h1>
+
+    </header>
+
+
+    <main class="gifts-container">
+
+
+        <!-- SUMMARY -->
+
+        <section class="earnings-card">
+
+            <div>
+
+                <span>
+                    Total Earned
+                </span>
+
+                <strong id="totalEarned">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Gifts Received
+                </span>
+
+                <strong id="giftsReceived">
+                    0
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- STATUS -->
+
+        <div
+            id="giftMessage"
+            class="gift-message">
+
+            Loading gifts...
+
+        </div>
+
+
+        <!-- GIFTS -->
+
+        <section
+            id="giftList"
+            class="gift-list">
+
+        </section>
+
+
+    </main>
+
+
+    <script src="/js/creator-gifts.js"></script>
+
+</body>
+
+</html>
