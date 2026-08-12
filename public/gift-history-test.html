@@ -1,1 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>2Chat Gift History Test</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+
+            margin: 0;
+
+            padding: 20px;
+
+            font-family: Arial, sans-serif;
+
+            background: #f5f5f5;
+
+        }
+
+        .container {
+
+            max-width: 600px;
+
+            margin: auto;
+
+        }
+
+        h1 {
+
+            text-align: center;
+
+            margin-bottom: 20px;
+
+        }
+
+        button {
+
+            width: 100%;
+
+            padding: 14px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: #ff0874;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+        }
+
+        button:disabled {
+
+            opacity: .6;
+
+        }
+
+        #message {
+
+            text-align: center;
+
+            margin: 15px 0;
+
+        }
+
+        .gift {
+
+            background: white;
+
+            padding: 16px;
+
+            margin-bottom: 12px;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 3px 12px
+                rgba(0,0,0,.08);
+
+        }
+
+        .gift-top {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+        }
+
+        .gift-type {
+
+            font-size: 20px;
+
+            font-weight: bold;
+
+        }
+
+        .coins {
+
+            color: #ff0874;
+
+            font-weight: bold;
+
+        }
+
+        .info {
+
+            margin-top: 10px;
+
+            color: #555;
+
+            line-height: 1.6;
+
+        }
+
+        .empty {
+
+            text-align: center;
+
+            padding: 30px;
+
+            color: #777;
+
+            background: white;
+
+            border-radius: 14px;
+
+        }
+
+        pre {
+
+            background: #111;
+
+            color: #00ff88;
+
+            padding: 15px;
+
+            border-radius: 10px;
+
+            overflow-x: auto;
+
+            font-size: 12px;
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+    <h1>
+        🎁 Gift History
+    </h1>
+
+
+    <button
+        id="loadBtn"
+        onclick="loadGiftHistory()">
+
+        🔄 Load Gift History
+
+    </button>
+
+
+    <div id="message">
+        Loading...
+    </div>
+
+
+    <div id="giftList"></div>
+
+
+    <h3>
+        API Response
+    </h3>
+
+    <pre id="apiResponse">
+Waiting...
+    </pre>
+
+
+</div>
+
+
+<script>
+
+
+async function loadGiftHistory() {
+
+
+    const token =
+        localStorage.getItem("token");
+
+
+    if (!token) {
+
+        document.getElementById(
+            "message"
+        ).innerText =
+            "❌ Login required";
+
+        return;
+
+    }
+
+
+    const button =
+        document.getElementById(
+            "loadBtn"
+        );
+
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+
+    const giftList =
+        document.getElementById(
+            "giftList"
+        );
+
+
+    const apiResponse =
+        document.getElementById(
+            "apiResponse"
+        );
+
+
+    button.disabled = true;
+
+    button.innerText =
+        "Loading...";
+
+
+    message.innerText =
+        "Connecting to Gift API...";
+
+
+    giftList.innerHTML = "";
+
+
+    try {
+
+
+        const res =
+            await fetch(
+                "/api/gifts/received",
+                {
+
+                    method: "GET",
+
+                    headers: {
+
+                        "Authorization":
+                            "Bearer " + token
+
+                    }
+
+                }
+            );
+
+
+        const data =
+            await res.json();
+
+
+        console.log(
+            "RECEIVED GIFTS:",
+            data
+        );
+
+
+        apiResponse.innerText =
+            JSON.stringify(
+                data,
+                null,
+                2
+            );
+
+
+        if (!data.success) {
+
+            message.innerText =
+                "❌ " +
+                (
+                    data.message ||
+                    "Failed to load gifts"
+                );
+
+            return;
+
+        }
+
+
+        const gifts =
+            data.gifts || [];
+
+
+        if (gifts.length === 0) {
+
+            message.innerText =
+                "No gifts received yet.";
+
+            giftList.innerHTML = `
+                <div class="empty">
+                    🎁 No gifts found
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        message.innerText =
+            "✅ Gift history loaded successfully";
+
+
+        gifts.forEach(gift => {
+
+
+            const sender =
+                gift.senderId || {};
+
+
+            const senderName =
+                sender.username ||
+                sender.name ||
+                "Unknown User";
+
+
+            const date =
+                gift.createdAt
+                    ? new Date(
+                        gift.createdAt
+                    ).toLocaleString(
+                        "en-NG"
+                    )
+                    : "Unknown date";
+
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "gift";
+
+
+            item.innerHTML = `
+
+                <div class="gift-top">
+
+                    <div class="gift-type">
+
+                        🎁 ${escapeHTML(
+                            gift.giftType ||
+                            "Gift"
+                        )}
+
+                    </div>
+
+                    <div class="coins">
+
+                        ${Number(
+                            gift.coins || 0
+                        )} coins
+
+                    </div>
+
+                </div>
+
+
+                <div class="info">
+
+                    👤 From:
+                    <strong>
+                        ${escapeHTML(
+                            senderName
+                        )}
+                    </strong>
+
+                    <br>
+
+
+                    💰 Creator earning:
+                    <strong>
+                        ${Number(
+                            gift.creatorEarning || 0
+                        )} coins
+                    </strong>
+
+                    <br>
+
+
+                    📅 ${escapeHTML(date)}
+
+                </div>
+
+            `;
+
+
+            giftList.appendChild(
+                item
+            );
+
+        });
+
+
+    } catch (err) {
+
+
+        console.error(
+            "GIFT HISTORY ERROR:",
+            err
+        );
+
+
+        message.innerText =
+            "❌ Server connection error";
+
+
+        apiResponse.innerText =
+            err.message;
+
+
+    } finally {
+
+
+        button.disabled = false;
+
+        button.innerText =
+            "🔄 Load Gift History";
+
+    }
+
+}
+
+
+/* ============================
+   SAFE HTML
+============================ */
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replaceAll("&", "&amp;")
+
+        .replaceAll("<", "&lt;")
+
+        .replaceAll(">", "&gt;")
+
+        .replaceAll('"', "&quot;")
+
+        .replaceAll("'", "&#039;");
+
+}
+
+
+/* ============================
+   AUTO LOAD
+============================ */
+
+loadGiftHistory();
+
+
+</script>
+
+
+</body>
+
+</html>
