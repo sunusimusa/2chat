@@ -215,10 +215,12 @@ const giftIcon =
                     <div class="gift-name">
 
                         🎁
-                        ${escapeHTML(
-                            gift.giftType ||
-                            "Gift"
-                        )}
+                        ${giftIcon}
+${escapeHTML(
+    formatGiftName(
+        gift.giftType
+    )
+)}
 
                     </div>
 
@@ -314,6 +316,20 @@ function escapeHTML(value) {
 
 }
 
+
+function formatGiftName(value) {
+
+    if (!value) {
+        return "Gift";
+    }
+
+    return String(value)
+        .replaceAll("-", " ")
+        .replace(/\b\w/g, char =>
+            char.toUpperCase()
+        );
+
+}
 
 /* =========================
    START
