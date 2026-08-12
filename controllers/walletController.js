@@ -4,7 +4,7 @@ exports.getWallet = async (req, res) => {
   try {
 
     let wallet = await Wallet.findOne({
-      user: req.user._id
+      userId: req.user._id
     });
 
     // =====================================
@@ -14,7 +14,7 @@ exports.getWallet = async (req, res) => {
     if (!wallet) {
 
       wallet = await Wallet.create({
-        user: req.user._id,
+        userId: req.user._id,
         coins: 0,
         balance: 0
       });
@@ -27,7 +27,6 @@ exports.getWallet = async (req, res) => {
 
     res.json({
       success: true,
-
       wallet: {
         coins: wallet.coins || 0,
         balance: wallet.balance || 0
