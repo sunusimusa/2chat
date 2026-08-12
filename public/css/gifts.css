@@ -19,18 +19,21 @@ body {
     align-items: center;
     gap: 15px;
 
-    padding: 18px 20px;
+    padding: 16px 20px;
 
-    background: white;
+    background: #fff;
 
     box-shadow:
         0 2px 10px rgba(0, 0, 0, .08);
+
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .gifts-header h1 {
     margin: 0;
-
-    font-size: 23px;
+    font-size: 22px;
 }
 
 .back-btn {
@@ -41,9 +44,9 @@ body {
     border-radius: 50%;
 
     background: #ff0874;
-    color: white;
+    color: #fff;
 
-    font-size: 24px;
+    font-size: 22px;
 
     cursor: pointer;
 }
@@ -54,11 +57,12 @@ body {
 ========================= */
 
 .gifts-container {
+    width: 100%;
     max-width: 650px;
 
     margin: auto;
 
-    padding: 20px;
+    padding: 20px 16px 40px;
 }
 
 
@@ -68,14 +72,13 @@ body {
 
 .creator-card {
     display: flex;
-
     align-items: center;
 
     gap: 14px;
 
-    padding: 18px;
+    padding: 16px;
 
-    background: white;
+    background: #fff;
 
     border-radius: 18px;
 
@@ -85,32 +88,32 @@ body {
         0 4px 14px rgba(0, 0, 0, .07);
 }
 
-.creator-icon {
-    width: 50px;
-    height: 50px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.receiver-avatar {
+    width: 58px;
+    height: 58px;
 
     border-radius: 50%;
 
+    object-fit: cover;
+
     background: #fff0f6;
 
-    font-size: 25px;
+    border: 2px solid #ff0874;
 }
 
-.creator-card span {
-    display: block;
+.creator-info {
+    display: flex;
+    flex-direction: column;
 
+    gap: 5px;
+}
+
+.creator-info span {
     color: #777;
-
     font-size: 14px;
-
-    margin-bottom: 5px;
 }
 
-.creator-card strong {
+.creator-info strong {
     font-size: 18px;
 }
 
@@ -122,9 +125,8 @@ body {
 .coin-card {
     display: flex;
 
-    justify-content: space-between;
-
     align-items: center;
+    justify-content: space-between;
 
     padding: 18px;
 
@@ -135,33 +137,53 @@ body {
     margin-bottom: 25px;
 }
 
+.coin-card div {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
 .coin-card span {
     font-weight: bold;
+    font-size: 16px;
+}
+
+.coin-card small {
+    color: #777;
 }
 
 .coin-card strong {
     color: #ff0874;
 
-    font-size: 25px;
+    font-size: 26px;
 }
 
 
 /* =========================
-   TITLE
+   GIFT TITLE
 ========================= */
 
-.gifts-container h2 {
-    font-size: 20px;
+.gift-title h2 {
+    margin: 0 0 5px;
 
-    margin-bottom: 15px;
+    font-size: 21px;
+}
+
+.gift-title p {
+    margin: 0 0 16px;
+
+    color: #777;
+
+    font-size: 14px;
 }
 
 
 /* =========================
-   GIFT OPTIONS
+   GIFT GRID
 ========================= */
 
-.gift-options {
+.gift-grid {
     display: grid;
 
     grid-template-columns:
@@ -170,26 +192,30 @@ body {
     gap: 14px;
 }
 
-.gift-option {
+
+/* =========================
+   GIFT CARD
+========================= */
+
+.gift-card {
     display: flex;
 
     flex-direction: column;
 
     align-items: center;
-
     justify-content: center;
 
-    gap: 6px;
+    gap: 7px;
 
     min-height: 145px;
 
-    padding: 15px;
+    padding: 16px;
+
+    background: #fff;
 
     border: 2px solid transparent;
 
     border-radius: 18px;
-
-    background: white;
 
     cursor: pointer;
 
@@ -197,70 +223,165 @@ body {
         0 4px 14px rgba(0, 0, 0, .07);
 
     transition:
-        transform .15s,
-        border-color .15s,
-        background .15s;
+        transform .15s ease,
+        border-color .15s ease,
+        background .15s ease;
 }
 
-.gift-option:hover {
-    transform: translateY(-2px);
+.gift-card:hover {
+    transform: translateY(-3px);
 }
 
-.gift-option.selected {
+.gift-card:active {
+    transform: scale(.97);
+}
+
+
+/* SELECTED */
+
+.gift-card.selected {
     border-color: #ff0874;
 
     background: #fff0f6;
-}
 
-.gift-emoji {
-    font-size: 42px;
-}
-
-.gift-option strong {
-    font-size: 17px;
-}
-
-.gift-option small {
-    color: #777;
-
-    font-size: 14px;
+    box-shadow:
+        0 5px 18px rgba(255, 8, 116, .18);
 }
 
 
 /* =========================
-   SELECTED GIFT
+   GIFT ICON
 ========================= */
 
-.selected-gift {
-    margin-top: 20px;
+.gift-icon {
+    font-size: 43px;
 
-    padding: 16px;
+    line-height: 1;
+}
+
+
+/* =========================
+   GIFT NAME
+========================= */
+
+.gift-name {
+    font-size: 17px;
+
+    font-weight: bold;
 
     text-align: center;
+}
 
-    background: white;
+
+/* =========================
+   GIFT PRICE
+========================= */
+
+.gift-price {
+    color: #ff0874;
+
+    font-size: 14px;
+
+    font-weight: bold;
+}
+
+
+/* =========================
+   SELECTED BOX
+========================= */
+
+.selected-box {
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    margin-top: 20px;
+
+    padding: 15px;
+
+    background: #fff;
+
+    border: 2px solid #ff0874;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 4px 14px rgba(0, 0, 0, .07);
+}
+
+
+/* =========================
+   SELECTED ICON
+========================= */
+
+.selected-icon {
+    width: 55px;
+    height: 55px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
 
     border-radius: 14px;
 
-    color: #555;
+    background: #fff0f6;
 
-    box-shadow:
-        0 3px 10px rgba(0, 0, 0, .06);
+    font-size: 32px;
 }
 
 
 /* =========================
-   MESSAGE
+   SELECTED INFO
 ========================= */
 
-.gift-message {
-    min-height: 25px;
+.selected-info {
+    display: flex;
 
-    margin: 15px 0;
+    flex-direction: column;
 
-    text-align: center;
+    gap: 4px;
 
-    font-size: 15px;
+    flex: 1;
+}
+
+.selected-info span {
+    color: #777;
+
+    font-size: 13px;
+}
+
+.selected-info strong {
+    font-size: 17px;
+}
+
+
+/* =========================
+   SELECTED PRICE
+========================= */
+
+.selected-price {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-end;
+
+    gap: 2px;
+}
+
+.selected-price strong {
+    color: #ff0874;
+
+    font-size: 20px;
+}
+
+.selected-price span {
+    color: #777;
+
+    font-size: 12px;
 }
 
 
@@ -271,15 +392,17 @@ body {
 .send-gift-btn {
     width: 100%;
 
+    margin-top: 18px;
+
     padding: 16px;
 
     border: none;
 
-    border-radius: 14px;
+    border-radius: 15px;
 
     background: #ff0874;
 
-    color: white;
+    color: #fff;
 
     font-size: 17px;
 
@@ -287,13 +410,45 @@ body {
 
     cursor: pointer;
 
-    transition: opacity .2s;
+    box-shadow:
+        0 5px 15px rgba(255, 8, 116, .2);
+
+    transition:
+        transform .15s ease,
+        opacity .2s ease;
+}
+
+.send-gift-btn:hover {
+    transform: translateY(-1px);
+}
+
+.send-gift-btn:active {
+    transform: scale(.98);
 }
 
 .send-gift-btn:disabled {
-    opacity: .45;
+    opacity: .55;
 
     cursor: not-allowed;
+
+    transform: none;
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+.gift-message {
+    min-height: 25px;
+
+    margin-top: 15px;
+
+    text-align: center;
+
+    font-size: 15px;
+
+    color: #555;
 }
 
 
@@ -304,20 +459,66 @@ body {
 @media (max-width: 500px) {
 
     .gifts-container {
-        padding: 15px;
+        padding:
+            15px 12px 35px;
     }
 
-    .gift-options {
+    .gifts-header {
+        padding: 14px;
+    }
+
+    .gifts-header h1 {
+        font-size: 20px;
+    }
+
+    .gift-grid {
         grid-template-columns:
             repeat(2, 1fr);
+
+        gap: 10px;
     }
 
-    .gift-option {
+    .gift-card {
         min-height: 135px;
+
+        padding: 12px;
     }
 
-    .gift-emoji {
-        font-size: 36px;
+    .gift-icon {
+        font-size: 37px;
+    }
+
+    .gift-name {
+        font-size: 15px;
+    }
+
+    .gift-price {
+        font-size: 13px;
+    }
+
+}
+
+
+/* =========================
+   VERY SMALL SCREENS
+========================= */
+
+@media (max-width: 350px) {
+
+    .gift-grid {
+        gap: 8px;
+    }
+
+    .gift-card {
+        min-height: 125px;
+    }
+
+    .gift-icon {
+        font-size: 33px;
+    }
+
+    .gift-name {
+        font-size: 14px;
     }
 
 }
