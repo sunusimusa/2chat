@@ -47,3 +47,40 @@ exports.getWallet = async (req, res) => {
 
   }
 };
+
+exports.testAddCoins = async (req, res) => {
+  try {
+
+    let wallet = await Wallet.findOne({
+      userId: req.user._id
+    });
+
+    if (!wallet) {
+      wallet = await Wallet.create({
+        userId: req.user._id,
+        coins: 0
+      });
+    }
+
+    wallet.coins += 100;
+    wallet.totalPurchased += 100;
+
+    await wallet.save();
+
+    res.json({
+      success: true,
+      message: "100 test coins added",
+      coins: wallet.coins
+    });
+
+  } catch (err) {
+
+    console.error("TEST ADD COINS ERROR:", err);
+
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
+
+  }
+};
