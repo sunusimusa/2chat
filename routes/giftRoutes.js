@@ -3,7 +3,8 @@ const router = require("express").Router();
 const protect = require("../middleware/auth");
 
 const {
-  sendGift
+  sendGift,
+  getReceivedGifts
 } = require("../controllers/giftController");
 
 
@@ -15,6 +16,17 @@ router.post(
   "/send",
   protect,
   sendGift
+);
+
+
+// =========================================
+// RECEIVED GIFTS
+// =========================================
+
+router.get(
+  "/received",
+  protect,
+  getReceivedGifts
 );
 
 
