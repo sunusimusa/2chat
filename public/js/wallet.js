@@ -139,9 +139,16 @@ function buyCoins(){
 
 function sendGift(){
 
-    alert(
-        "Gift system coming soon."
-    );
+    const receiverId =
+        prompt("Saka Creator User ID:");
+
+    if(!receiverId){
+        return;
+    }
+
+    location.href =
+        "/gifts.html?receiverId=" +
+        encodeURIComponent(receiverId);
 
 }
 
@@ -274,20 +281,6 @@ async function testAddCoins(){
 
     }
 
-}
-
-function openGiftPage() {
-
-    const receiverId =
-        prompt("Saka Creator User ID:");
-
-    if (!receiverId) {
-        return;
-    }
-
-    location.href =
-        "/gifts.html?receiverId=" +
-        encodeURIComponent(receiverId);
 }
 
 /* =========================
