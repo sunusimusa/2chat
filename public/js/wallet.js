@@ -146,6 +146,60 @@ function sendGift(){
 }
 
 
+async function testAddCoins(){
+
+    const token =
+        localStorage.getItem("token");
+
+    if(!token){
+        return alert("❌ Login session expired");
+    }
+
+    try{
+
+        const res = await fetch(
+            "/api/wallet/test-add-coins",
+            {
+                method: "POST",
+                headers:{
+                    "Authorization":
+                        "Bearer " + token
+                }
+            }
+        );
+
+        const data = await res.json();
+
+        if(data.success){
+
+            alert(
+                "✅ An ƙara 100 coins!\nCoins: " +
+                data.coins
+            );
+
+            loadWallet();
+
+        }else{
+
+            alert(
+                "❌ " +
+                (data.message || "Failed")
+            );
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+        alert(
+            "❌ Server connection error"
+        );
+
+    }
+
+}
+
 /* =========================
    START
 ========================= */
