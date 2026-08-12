@@ -1,0 +1,228 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    color: #222;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.gifts-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    padding: 20px;
+
+    background: white;
+
+    box-shadow:
+        0 2px 10px rgba(0,0,0,.08);
+}
+
+.gifts-header h1 {
+    margin: 0;
+    font-size: 25px;
+}
+
+.back-btn {
+    width: 45px;
+    height: 45px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #ff0874;
+    color: white;
+
+    font-size: 25px;
+    cursor: pointer;
+}
+
+
+/* =========================
+   CONTAINER
+========================= */
+
+.gifts-container {
+    max-width: 650px;
+
+    margin: auto;
+
+    padding: 20px;
+}
+
+
+/* =========================
+   EARNINGS CARD
+========================= */
+
+.earnings-card {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 15px;
+
+    margin-bottom: 20px;
+}
+
+.earnings-card > div {
+    background: #fff0f6;
+
+    border-radius: 18px;
+
+    padding: 22px;
+
+    text-align: center;
+}
+
+.earnings-card span {
+    display: block;
+
+    color: #666;
+
+    font-size: 15px;
+
+    margin-bottom: 8px;
+}
+
+.earnings-card strong {
+    display: block;
+
+    color: #ff0874;
+
+    font-size: 30px;
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+.gift-message {
+    text-align: center;
+
+    margin: 15px 0;
+
+    font-size: 16px;
+
+    color: #555;
+}
+
+
+/* =========================
+   GIFT LIST
+========================= */
+
+.gift-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 14px;
+}
+
+
+/* =========================
+   GIFT CARD
+========================= */
+
+.gift-card {
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 18px;
+
+    box-shadow:
+        0 4px 14px rgba(0,0,0,.08);
+}
+
+.gift-top {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+}
+
+.gift-name {
+    font-size: 20px;
+
+    font-weight: bold;
+}
+
+.gift-coins {
+    color: #ff0874;
+
+    font-weight: bold;
+
+    font-size: 17px;
+}
+
+.gift-info {
+    margin-top: 12px;
+
+    color: #555;
+
+    line-height: 1.7;
+}
+
+.gift-earning {
+    color: #222;
+
+    font-weight: bold;
+}
+
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.empty-gifts {
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 35px 20px;
+
+    text-align: center;
+
+    color: #777;
+
+    box-shadow:
+        0 4px 14px rgba(0,0,0,.06);
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 500px) {
+
+    .gifts-header h1 {
+        font-size: 21px;
+    }
+
+    .gifts-container {
+        padding: 15px;
+    }
+
+    .earnings-card strong {
+        font-size: 25px;
+    }
+
+    .gift-name {
+        font-size: 18px;
+    }
+
+}
