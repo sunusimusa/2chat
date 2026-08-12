@@ -22,6 +22,8 @@ const shortVideoRoutes =
 require("./routes/shortVideoRoutes");
 const walletRoutes =
 require("./routes/walletRoutes");
+const giftRoutes =
+require("./routes/giftRoutes");
 
 
 const app = express();
@@ -60,6 +62,7 @@ app.use("/api/friends", friendRoutes);
 app.use("/api/status", statusRoutes);
 app.use("/api/shorts", shortVideoRoutes);
 app.use("/api/wallet",walletRoutes);
+app.use("/api/gifts", giftRoutes);
 
 app.get("/",(req,res)=>{
   res.send("🚀 2Chat Server Running Successfully");
