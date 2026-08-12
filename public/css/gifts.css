@@ -3,393 +3,321 @@
 }
 
 body {
-
     margin: 0;
-
-    font-family:
-    Arial,
-    sans-serif;
-
+    font-family: Arial, sans-serif;
     background: #f5f5f5;
-
     color: #222;
 }
 
 
-.gift-page {
+/* =========================
+   HEADER
+========================= */
 
-    max-width: 600px;
+.gifts-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    padding: 18px 20px;
+
+    background: white;
+
+    box-shadow:
+        0 2px 10px rgba(0, 0, 0, .08);
+}
+
+.gifts-header h1 {
+    margin: 0;
+
+    font-size: 23px;
+}
+
+.back-btn {
+    width: 44px;
+    height: 44px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #ff0874;
+    color: white;
+
+    font-size: 24px;
+
+    cursor: pointer;
+}
+
+
+/* =========================
+   CONTAINER
+========================= */
+
+.gifts-container {
+    max-width: 650px;
 
     margin: auto;
 
-    min-height: 100vh;
-
     padding: 20px;
-
-    padding-bottom: 120px;
 }
 
 
-/* HEADER */
+/* =========================
+   CREATOR CARD
+========================= */
 
-.gift-header {
-
+.creator-card {
     display: flex;
 
     align-items: center;
 
-    gap: 15px;
+    gap: 14px;
 
-    margin-bottom: 20px;
-}
-
-
-.gift-header h2 {
-
-    margin: 0;
-
-    font-size: 24px;
-}
-
-
-.gift-header p {
-
-    margin: 5px 0 0;
-
-    color: #777;
-
-    font-size: 14px;
-}
-
-
-.back-btn {
-
-    width: 45px;
-
-    height: 45px;
-
-    border: none;
-
-    border-radius: 50%;
-
-    background: white;
-
-    font-size: 25px;
-
-    cursor: pointer;
-
-    box-shadow:
-    0 2px 8px
-    rgba(0,0,0,.1);
-}
-
-
-/* RECEIVER */
-
-.receiver-box {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 12px;
-
-    background: white;
-
-    padding: 15px;
-
-    border-radius: 15px;
-
-    margin-bottom: 15px;
-
-    box-shadow:
-    0 2px 10px
-    rgba(0,0,0,.06);
-}
-
-
-.receiver-box img {
-
-    width: 55px;
-
-    height: 55px;
-
-    border-radius: 50%;
-
-    object-fit: cover;
-}
-
-
-.receiver-box strong {
-
-    display: block;
-
-    font-size: 17px;
-}
-
-
-.receiver-box small {
-
-    color: #888;
-}
-
-
-/* COINS */
-
-.coin-box {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    background: #fff7d6;
-
-    padding: 16px;
-
-    border-radius: 15px;
-
-    margin-bottom: 25px;
-
-    font-size: 17px;
-}
-
-
-.coin-box strong {
-
-    color: #d99b00;
-
-    font-size: 20px;
-}
-
-
-/* TITLE */
-
-.section-title {
-
-    margin-bottom: 15px;
-}
-
-
-/* GIFT GRID */
-
-.gift-grid {
-
-    display: grid;
-
-    grid-template-columns:
-    repeat(3, 1fr);
-
-    gap: 12px;
-}
-
-
-.gift-card {
-
-    background: white;
-
-    border: 2px solid transparent;
-
-    border-radius: 16px;
-
-    padding: 15px 8px;
-
-    text-align: center;
-
-    cursor: pointer;
-
-    transition: .2s;
-
-    box-shadow:
-    0 2px 8px
-    rgba(0,0,0,.06);
-}
-
-
-.gift-card:hover {
-
-    transform: translateY(-3px);
-}
-
-
-.gift-card.selected {
-
-    border-color: #ff0874;
-
-    background: #fff0f6;
-}
-
-
-.gift-icon {
-
-    font-size: 42px;
-
-    margin-bottom: 8px;
-}
-
-
-.gift-name {
-
-    font-weight: bold;
-
-    font-size: 14px;
-
-    display: block;
-
-    margin-bottom: 5px;
-}
-
-
-.gift-price {
-
-    color: #d99b00;
-
-    font-size: 13px;
-
-    font-weight: bold;
-}
-
-
-/* SELECTED */
-
-.selected-box {
-
-    position: fixed;
-
-    left: 50%;
-
-    bottom: 15px;
-
-    transform:
-    translateX(-50%);
-
-    width: min(
-        560px,
-        calc(100% - 30px)
-    );
+    padding: 18px;
 
     background: white;
 
     border-radius: 18px;
 
-    padding: 12px;
+    margin-bottom: 15px;
 
+    box-shadow:
+        0 4px 14px rgba(0, 0, 0, .07);
+}
+
+.creator-icon {
+    width: 50px;
+    height: 50px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #fff0f6;
+
+    font-size: 25px;
+}
+
+.creator-card span {
+    display: block;
+
+    color: #777;
+
+    font-size: 14px;
+
+    margin-bottom: 5px;
+}
+
+.creator-card strong {
+    font-size: 18px;
+}
+
+
+/* =========================
+   COINS
+========================= */
+
+.coin-card {
     display: flex;
 
     justify-content: space-between;
 
     align-items: center;
 
-    gap: 10px;
+    padding: 18px;
 
-    box-shadow:
-    0 4px 25px
-    rgba(0,0,0,.2);
+    background: #fff0f6;
 
-    z-index: 100;
+    border-radius: 18px;
+
+    margin-bottom: 25px;
+}
+
+.coin-card span {
+    font-weight: bold;
+}
+
+.coin-card strong {
+    color: #ff0874;
+
+    font-size: 25px;
 }
 
 
-.selected-box > div {
+/* =========================
+   TITLE
+========================= */
 
+.gifts-container h2 {
+    font-size: 20px;
+
+    margin-bottom: 15px;
+}
+
+
+/* =========================
+   GIFT OPTIONS
+========================= */
+
+.gift-options {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 14px;
+}
+
+.gift-option {
     display: flex;
+
+    flex-direction: column;
 
     align-items: center;
 
-    gap: 10px;
+    justify-content: center;
+
+    gap: 6px;
+
+    min-height: 145px;
+
+    padding: 15px;
+
+    border: 2px solid transparent;
+
+    border-radius: 18px;
+
+    background: white;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 4px 14px rgba(0, 0, 0, .07);
+
+    transition:
+        transform .15s,
+        border-color .15s,
+        background .15s;
 }
 
-
-#selectedIcon {
-
-    font-size: 35px;
+.gift-option:hover {
+    transform: translateY(-2px);
 }
 
+.gift-option.selected {
+    border-color: #ff0874;
 
-.selected-box strong,
-.selected-box small {
-
-    display: block;
+    background: #fff0f6;
 }
 
+.gift-emoji {
+    font-size: 42px;
+}
 
-.selected-box small {
+.gift-option strong {
+    font-size: 17px;
+}
 
+.gift-option small {
     color: #777;
 
-    margin-top: 3px;
+    font-size: 14px;
 }
 
 
-#sendBtn {
+/* =========================
+   SELECTED GIFT
+========================= */
+
+.selected-gift {
+    margin-top: 20px;
+
+    padding: 16px;
+
+    text-align: center;
+
+    background: white;
+
+    border-radius: 14px;
+
+    color: #555;
+
+    box-shadow:
+        0 3px 10px rgba(0, 0, 0, .06);
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+.gift-message {
+    min-height: 25px;
+
+    margin: 15px 0;
+
+    text-align: center;
+
+    font-size: 15px;
+}
+
+
+/* =========================
+   SEND BUTTON
+========================= */
+
+.send-gift-btn {
+    width: 100%;
+
+    padding: 16px;
 
     border: none;
+
+    border-radius: 14px;
 
     background: #ff0874;
 
     color: white;
 
-    padding: 12px 18px;
-
-    border-radius: 12px;
+    font-size: 17px;
 
     font-weight: bold;
 
     cursor: pointer;
+
+    transition: opacity .2s;
 }
 
-
-#sendBtn:disabled {
-
-    opacity: .6;
+.send-gift-btn:disabled {
+    opacity: .45;
 
     cursor: not-allowed;
 }
 
 
-/* MOBILE */
+/* =========================
+   MOBILE
+========================= */
 
-@media(max-width: 400px) {
+@media (max-width: 500px) {
 
-    .gift-page {
-
+    .gifts-container {
         padding: 15px;
     }
 
-    .gift-grid {
-
+    .gift-options {
         grid-template-columns:
-        repeat(3, 1fr);
-
-        gap: 8px;
+            repeat(2, 1fr);
     }
 
-    .gift-card {
-
-        padding: 10px 5px;
+    .gift-option {
+        min-height: 135px;
     }
 
-    .gift-icon {
-
-        font-size: 34px;
-    }
-
-    .gift-name {
-
-        font-size: 12px;
-    }
-
-    .gift-price {
-
-        font-size: 11px;
-    }
-
-    #sendBtn {
-
-        padding: 10px 12px;
-
-        font-size: 12px;
+    .gift-emoji {
+        font-size: 36px;
     }
 
 }
