@@ -108,6 +108,80 @@ async function loadCreatorGifts() {
         ).innerText =
             gifts.length;
 
+       /* =========================
+   TOP GIFT
+========================= */
+
+const topGift =
+    gifts.reduce(
+        (top, gift) => {
+
+            const currentCoins =
+                Number(
+                    gift.coins || 0
+                );
+
+            const topCoins =
+                Number(
+                    top?.coins || 0
+                );
+
+            return currentCoins > topCoins
+                ? gift
+                : top;
+
+        },
+        null
+    );
+
+
+const topGiftElement =
+    document.getElementById(
+        "topGift"
+    );
+
+
+if (topGiftElement) {
+
+    topGiftElement.innerText =
+        topGift
+            ? `${formatGiftName(
+                topGift.giftType
+              )} (${Number(
+                topGift.coins || 0
+              )} coins)`
+            : "—";
+
+}
+
+
+/* =========================
+   LATEST GIFT
+========================= */
+
+const latestGift =
+    gifts.length > 0
+        ? gifts[0]
+        : null;
+
+
+const latestGiftElement =
+    document.getElementById(
+        "latestGift"
+    );
+
+
+if (latestGiftElement) {
+
+    latestGiftElement.innerText =
+        latestGift
+            ? formatGiftName(
+                latestGift.giftType
+              )
+            : "—";
+
+}
+
 
         /* =========================
            EMPTY
