@@ -172,6 +172,31 @@ async function loadCreatorGifts() {
                     )
                     : "Unknown date";
 
+           const giftIcons = {
+    rose: "🌹",
+    gift: "🎁",
+    "gift-box": "🎁",
+    heart: "💖",
+    diamond: "💎",
+    crown: "👑",
+    rocket: "🚀",
+    fire: "🔥",
+    lion: "🦁",
+    trophy: "🏆",
+    star: "⭐",
+    kiss: "💋",
+    cake: "🎂",
+    flower: "🌸",
+    rainbow: "🌈",
+    love: "❤️"
+};
+
+const giftIcon =
+    giftIcons[
+        String(gift.giftType || "")
+            .toLowerCase()
+    ] || "🎁";
+
 
             const item =
                 document.createElement(
