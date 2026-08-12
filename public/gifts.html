@@ -3,137 +3,249 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-<title>2Chat Gifts</title>
+    <title>Send Gift</title>
 
-<link
-rel="stylesheet"
-href="/css/gifts.css">
+    <link
+        rel="stylesheet"
+        href="/css/gifts.css">
 
 </head>
 
+
 <body>
 
-<div class="gift-page">
-
-    <div class="gift-header">
+    <header class="gifts-header">
 
         <button
-        class="back-btn"
-        onclick="history.back()">
+            class="back-btn"
+            onclick="history.back()">
 
             ←
 
         </button>
 
-        <div>
+        <h1>
+            🎁 Send a Gift
+        </h1>
 
-            <h2>Send a Gift</h2>
-
-            <p>Choose a gift to support this creator</p>
-
-        </div>
-
-    </div>
+    </header>
 
 
-    <!-- Receiver -->
-
-    <div class="receiver-box">
-
-        <img
-        id="receiverAvatar"
-        src="/images/default.png">
-
-        <div>
-
-            <strong id="receiverName">
-                Creator
-            </strong>
-
-            <small>
-                Send a gift
-            </small>
-
-        </div>
-
-    </div>
+    <main class="gifts-container">
 
 
-    <!-- Coins -->
+        <!-- CREATOR -->
 
-    <div class="coin-box">
+        <section class="creator-card">
 
-        <span>🪙 My Coins</span>
-
-        <strong id="myCoins">
-            0
-        </strong>
-
-    </div>
-
-
-    <!-- Gifts -->
-
-    <h3 class="section-title">
-        Choose Gift
-    </h3>
-
-    <div
-    id="giftGrid"
-    class="gift-grid">
-    </div>
-
-
-    <!-- Selected Gift -->
-
-    <div
-    id="selectedBox"
-    class="selected-box"
-    style="display:none;">
-
-        <div>
-
-            <span id="selectedIcon">
-                🌹
-            </span>
+            <div class="creator-icon">
+                👤
+            </div>
 
             <div>
 
-                <strong id="selectedName">
+                <span>
+                    Sending gift to
+                </span>
+
+                <strong id="creatorName">
+                    Creator
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- COINS -->
+
+        <section class="coin-card">
+
+            <span>
+                🪙 Your Coins
+            </span>
+
+            <strong id="coinBalance">
+                0
+            </strong>
+
+        </section>
+
+
+        <!-- GIFT OPTIONS -->
+
+        <h2>
+            Choose a Gift
+        </h2>
+
+        <section
+            id="giftOptions"
+            class="gift-options">
+
+
+            <button
+                class="gift-option"
+                data-gift="rose"
+                data-coins="10">
+
+                <span class="gift-emoji">
+                    🌹
+                </span>
+
+                <strong>
                     Rose
                 </strong>
 
                 <small>
-                    <span id="selectedCoins">
-                        10
-                    </span>
-                    coins
+                    10 coins
                 </small>
 
-            </div>
+            </button>
+
+
+            <button
+                class="gift-option"
+                data-gift="gift-box"
+                data-coins="50">
+
+                <span class="gift-emoji">
+                    🎁
+                </span>
+
+                <strong>
+                    Gift Box
+                </strong>
+
+                <small>
+                    50 coins
+                </small>
+
+            </button>
+
+
+            <button
+                class="gift-option"
+                data-gift="diamond"
+                data-coins="100">
+
+                <span class="gift-emoji">
+                    💎
+                </span>
+
+                <strong>
+                    Diamond
+                </strong>
+
+                <small>
+                    100 coins
+                </small>
+
+            </button>
+
+
+            <button
+                class="gift-option"
+                data-gift="heart"
+                data-coins="150">
+
+                <span class="gift-emoji">
+                    💖
+                </span>
+
+                <strong>
+                    Heart
+                </strong>
+
+                <small>
+                    150 coins
+                </small>
+
+            </button>
+
+
+            <button
+                class="gift-option"
+                data-gift="crown"
+                data-coins="500">
+
+                <span class="gift-emoji">
+                    👑
+                </span>
+
+                <strong>
+                    Crown
+                </strong>
+
+                <small>
+                    500 coins
+                </small>
+
+            </button>
+
+
+            <button
+                class="gift-option"
+                data-gift="rocket"
+                data-coins="1000">
+
+                <span class="gift-emoji">
+                    🚀
+                </span>
+
+                <strong>
+                    Rocket
+                </strong>
+
+                <small>
+                    1,000 coins
+                </small>
+
+            </button>
+
+        </section>
+
+
+        <!-- SELECTED -->
+
+        <div
+            id="selectedGift"
+            class="selected-gift">
+
+            Choose a gift first.
 
         </div>
 
+
+        <!-- MESSAGE -->
+
+        <div
+            id="giftMessage"
+            class="gift-message">
+        </div>
+
+
+        <!-- SEND -->
+
         <button
-        id="sendBtn"
-        onclick="sendSelectedGift()">
+            id="sendGiftBtn"
+            class="send-gift-btn"
+            disabled>
 
             🎁 Send Gift
 
         </button>
 
-    </div>
 
-</div>
+    </main>
 
 
-<script src="/js/gifts.js"></script>
+    <script src="/js/gifts.js"></script>
 
 </body>
 
