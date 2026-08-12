@@ -164,3 +164,33 @@ const gift = await Gift.create(
 
   }
 };
+
+exports.getReceivedGifts = async (req, res) => {
+  try {
+
+    const gifts = await Gift.find({
+      receiverId: req.user._id,
+      status: "completed"
+    })
+      .populate("senderId", "username name")
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      gifts
+    });
+
+  } catch (err) {
+
+    console.error(
+      "GET RECEIVED GIFTS ERROR:",
+      err
+    );
+
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
+
+  }
+};
