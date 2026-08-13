@@ -1111,3 +1111,23 @@ body{
     }
 
 }
+
+     .creator-info{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.short-avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid #fff;
+    cursor:pointer;
+    flex-shrink:0;
+}
+
+.short-username{
+    cursor:pointer;
+}          
