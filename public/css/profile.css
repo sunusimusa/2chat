@@ -311,3 +311,49 @@ color:#2196f3;
 .following-stat b{
     color:#2196f3;
 }
+
+/* =========================
+   SEND GIFT PROFILE BUTTON
+========================= */
+
+.send-gift-profile-btn {
+    width: 100%;
+    padding: 14px 18px;
+    margin-top: 10px;
+
+    background: #ff0874;
+    color: #fff;
+
+    border: none;
+    border-radius: 10px;
+
+    font-size: 17px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 4px 12px rgba(255, 8, 116, 0.25);
+
+    transition:
+        transform 0.15s ease,
+        background 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.send-gift-profile-btn:hover {
+    background: #e90068;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 6px 16px rgba(255, 8, 116, 0.30);
+}
+
+.send-gift-profile-btn:active {
+    transform: scale(0.98);
+}
+
+.send-gift-profile-btn i {
+    margin-right: 8px;
+}
