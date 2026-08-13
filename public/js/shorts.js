@@ -583,13 +583,13 @@ async function sendComment() {
 
             }
 
+            closeComments();
+
         } else {
 
             alert(data.message);
 
         }
-
-        closeComments();
 
     } catch (err) {
 
