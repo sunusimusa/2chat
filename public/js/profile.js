@@ -87,17 +87,6 @@ const newUsername =
 const newBio =
     document.getElementById("newBio");
 
-const saveBtn =
-    document.querySelector(
-        'button[onclick="saveProfile()"]'
-    );
-
-const uploadAvatarBtn =
-    document.querySelector(
-        'button[onclick="uploadAvatar()"]'
-);
-
-
 // ===============================
 // MY PROFILE
 // ===============================
