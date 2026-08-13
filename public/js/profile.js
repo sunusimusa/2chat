@@ -145,9 +145,18 @@ else{
     if(uploadAvatarBtn)
         uploadAvatarBtn.style.display = "none";
 
-    if(sendGiftBtn)
+    if(sendGiftBtn){
+
     sendGiftBtn.style.display = "block";
 
+    console.log(
+        "SEND GIFT BUTTON SHOWN",
+        profileUserId,
+        profile.username,
+        user.username
+    );
+
+}
 
     // Show Follow
 
