@@ -11,9 +11,13 @@ new URLSearchParams(window.location.search);
 let profileUserId = null;
 
 const profileUsername =
-params.get("username") ||
-params.get("user") ||
-user.username;
+    params.get("username") ||
+    params.get("user");
+
+if (!profileUsername) {
+    location.href = "/profile.html?username=" +
+        encodeURIComponent(user.username);
+}
 
 async function loadProfile(){
 
@@ -37,8 +41,9 @@ const profile = data.user;
 const followBtn = document.getElementById("followBtn");
 
 const isOwner =
-    profile.username === user.username;
-
+    String(profile.username).toLowerCase() ===
+    String(user.username).toLowerCase();
+    
     const sendGiftBtn =
     document.getElementById("sendGiftBtn");
 
