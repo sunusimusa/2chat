@@ -208,7 +208,10 @@ onclick="likeVideo('${video._id}')">
 <span id="likes-${video._id}">${video.likes.length}</span>
 
 <button onclick="commentVideo('${video._id}')">💬</button>
-<span>${video.comments.length}</span>
+
+<span id="comments-${video._id}">
+    ${video.comments.length}
+</span>
 
 <button onclick="shareVideo('${video._id}')">📤</button>
 <span id="shares-${video._id}">
