@@ -47,6 +47,24 @@ const isOwner =
     const sendGiftBtn =
     document.getElementById("sendGiftBtn");
 
+    const savedVideosBtn =
+    document.getElementById("savedVideosBtn");
+
+const walletBtn =
+    document.getElementById("walletBtn");
+
+const giftsReceivedBtn =
+    document.getElementById("giftsReceivedBtn");
+
+const creatorStudioBtn =
+    document.getElementById("creatorStudioBtn");
+
+const saveProfileBtn =
+    document.getElementById("saveProfileBtn");
+
+const uploadAvatarBtn =
+    document.getElementById("uploadAvatarBtn");
+
 // ===============================
 // OWNER / OTHER USER CONTROLS
 // ===============================
@@ -86,8 +104,7 @@ const uploadAvatarBtn =
 
 if(isOwner){
 
-    // Show editing controls
-
+    // My profile controls
     if(coverBtn)
         coverBtn.style.display = "flex";
 
@@ -100,21 +117,31 @@ if(isOwner){
     if(newBio)
         newBio.style.display = "block";
 
-    if(saveBtn)
-        saveBtn.style.display = "flex";
+    if(savedVideosBtn)
+        savedVideosBtn.style.display = "flex";
+
+    if(walletBtn)
+        walletBtn.style.display = "flex";
+
+    if(giftsReceivedBtn)
+        giftsReceivedBtn.style.display = "flex";
+
+    if(creatorStudioBtn)
+        creatorStudioBtn.style.display = "flex";
+
+    if(saveProfileBtn)
+        saveProfileBtn.style.display = "flex";
 
     if(uploadAvatarBtn)
         uploadAvatarBtn.style.display = "flex";
 
 
-    // Hide Follow
-
+    // Hide visitor controls
     if(followBtn)
         followBtn.style.display = "none";
-    
-    if(sendGiftBtn)
-    sendGiftBtn.style.display = "none";
 
+    if(sendGiftBtn)
+        sendGiftBtn.style.display = "none";
 }
 
 
@@ -124,8 +151,7 @@ if(isOwner){
 
 else{
 
-    // Hide editing controls
-
+    // Hide editing
     if(coverBtn)
         coverBtn.style.display = "none";
 
@@ -144,27 +170,28 @@ else{
     if(newBio)
         newBio.style.display = "none";
 
-    if(saveBtn)
-        saveBtn.style.display = "none";
+
+    // Hide owner-only buttons
+    if(savedVideosBtn)
+        savedVideosBtn.style.display = "none";
+
+    if(walletBtn)
+        walletBtn.style.display = "none";
+
+    if(giftsReceivedBtn)
+        giftsReceivedBtn.style.display = "none";
+
+    if(creatorStudioBtn)
+        creatorStudioBtn.style.display = "none";
+
+    if(saveProfileBtn)
+        saveProfileBtn.style.display = "none";
 
     if(uploadAvatarBtn)
         uploadAvatarBtn.style.display = "none";
 
-    if(sendGiftBtn){
-
-    sendGiftBtn.style.display = "block";
-
-    console.log(
-        "SEND GIFT BUTTON SHOWN",
-        profileUserId,
-        profile.username,
-        user.username
-    );
-
-}
 
     // Show Follow
-
     if(followBtn){
 
         followBtn.style.display = "block";
@@ -174,6 +201,14 @@ else{
             followUser(profile.username);
 
         };
+
+    }
+
+
+    // Show Send Gift
+    if(sendGiftBtn){
+
+        sendGiftBtn.style.display = "block";
 
     }
 
