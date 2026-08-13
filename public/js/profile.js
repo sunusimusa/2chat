@@ -8,6 +8,8 @@ location.href="/login.html";
 const params =
 new URLSearchParams(window.location.search);
 
+let profileUserId = null;
+
 const profileUsername =
 params.get("username") ||
 params.get("user") ||
@@ -29,11 +31,16 @@ return;
 
 const profile = data.user;
 
+    profileUserId =
+    profile._id;
+
 const followBtn = document.getElementById("followBtn");
 
 const isOwner =
     profile.username === user.username;
 
+    const sendGiftBtn =
+    document.getElementById("sendGiftBtn");
 
 // ===============================
 // OWNER / OTHER USER CONTROLS
@@ -99,6 +106,9 @@ if(isOwner){
 
     if(followBtn)
         followBtn.style.display = "none";
+    
+    if(sendGiftBtn)
+    sendGiftBtn.style.display = "none";
 
 }
 
@@ -134,6 +144,9 @@ else{
 
     if(uploadAvatarBtn)
         uploadAvatarBtn.style.display = "none";
+
+    if(sendGiftBtn)
+    sendGiftBtn.style.display = "block";
 
 
     // Show Follow
@@ -653,6 +666,22 @@ if(data.success && badge){
     }
 
 }
+
+}
+
+function openCreatorGifts(){
+
+    if(!profileUserId){
+
+        alert("❌ Creator ID not found");
+
+        return;
+
+    }
+
+    location.href =
+        "/gifts.html?receiverId=" +
+        encodeURIComponent(profileUserId);
 
 }
 
