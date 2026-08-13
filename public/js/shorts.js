@@ -98,14 +98,19 @@ onclick="togglePlay('${video._id}')">
 
         <div>
 
-            <h3>
-@${video.username}
 
-<span class="mini-badge">
-${video.badge || ""}
-</span>
+<h3
+    class="short-username"
+    onclick="openShortProfile('${encodeURIComponent(video.username)}')">
+
+    @${video.username}
+
+    <span class="mini-badge">
+        ${video.badge || ""}
+    </span>
 
 </h3>
+    
         </div>
 
         <div class="user-buttons">
@@ -730,6 +735,17 @@ async function addWatchTime(id, seconds){
 
     }
 
+}
+
+function openShortProfile(username){
+
+    if(!username){
+        return;
+    }
+
+    window.location.href =
+        "/profile.html?username=" +
+        username;
 }
 
 // ================= LOAD =================
