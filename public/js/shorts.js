@@ -589,6 +589,8 @@ async function sendComment() {
 
         }
 
+        closeComments();
+
     } catch (err) {
 
         console.log(err);
