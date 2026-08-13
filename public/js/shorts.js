@@ -6,6 +6,40 @@ let currentVideoId = null;
 let currentTab = "foryou";
 let watchStart = {};
 
+const creatorCache = {};
+
+async function getCreator(username){
+
+    if(creatorCache[username]){
+        return creatorCache[username];
+    }
+
+    try{
+
+        const res = await fetch(
+            "/api/users/profile/" +
+            encodeURIComponent(username)
+        );
+
+        const data = await res.json();
+
+        if(data.success && data.user){
+
+            creatorCache[username] = data.user;
+
+            return data.user;
+
+        }
+
+    }catch(err){
+
+        console.log("Creator profile error:", err);
+
+    }
+
+    return null;
+}
+
 
 // ================= LOAD VIDEOS =================
 
@@ -44,6 +78,18 @@ const savedVideos = savedData.success && Array.isArray(savedData.videos)
     : [];
 
         let videos = [...data.videos];
+
+        const creatorUsernames = [
+    ...new Set(
+        videos.map(video => video.username)
+    )
+];
+
+await Promise.all(
+    creatorUsernames.map(username =>
+        getCreator(username)
+    )
+);
 
 if(currentTab === "following"){
 
@@ -96,22 +142,31 @@ onclick="togglePlay('${video._id}')">
 
     <div class="user-info">
 
-        <div>
+    <div class="creator-info">
 
+        <img
+            src="${
+                creatorCache[video.username]?.avatar
+                || "/images/default.png"
+            }"
+            class="short-avatar"
+            onclick="openShortProfile('${encodeURIComponent(video.username)}')"
+            onerror="this.src='/images/default.png'"
+        >
 
-<h3
-    class="short-username"
-    onclick="openShortProfile('${encodeURIComponent(video.username)}')">
+        <h3
+            class="short-username"
+            onclick="openShortProfile('${encodeURIComponent(video.username)}')">
 
-    @${video.username}
+            @${video.username}
 
-    <span class="mini-badge">
-        ${video.badge || ""}
-    </span>
+            <span class="mini-badge">
+                ${video.badge || ""}
+            </span>
 
-</h3>
-    
-        </div>
+        </h3>
+
+    </div>
 
         <div class="user-buttons">
 
