@@ -1,21 +1,13 @@
-const token =
-    localStorage.getItem("token");
-
+const token = localStorage.getItem("token");
 
 // =====================================
 // URL PARAMETERS
 // =====================================
 
-const params =
-    new URLSearchParams(
-        window.location.search
-    );
+const params = new URLSearchParams(window.location.search);
 
-const receiverId =
-    params.get("receiverId");
-
-const fromShort =
-    params.get("fromShort");
+const receiverId = params.get("receiverId");
+const fromShort = params.get("fromShort");
 
 
 // =====================================
@@ -121,14 +113,14 @@ let selectedGift = null;
 function loadGifts() {
 
     const options =
-        document.getElementById(
-            "giftOptions"
-        );
+        document.getElementById("giftOptions");
 
     if (!options) {
+
         console.error(
-            "giftOptions element not found"
+            "❌ #giftOptions not found in gifts.html"
         );
+
         return;
     }
 
@@ -140,17 +132,13 @@ function loadGifts() {
         const button =
             document.createElement("button");
 
-        button.className =
-            "gift-option";
+        button.type = "button";
 
-        button.type =
-            "button";
+        button.className = "gift-option";
 
-        button.dataset.gift =
-            gift.type;
+        button.dataset.gift = gift.type;
 
-        button.dataset.coins =
-            gift.coins;
+        button.dataset.coins = gift.coins;
 
 
         button.innerHTML = `
@@ -164,7 +152,7 @@ function loadGifts() {
             </strong>
 
             <small>
-                ${gift.coins.toLocaleString()} coins
+                🪙 ${gift.coins.toLocaleString()} coins
             </small>
 
         `;
@@ -172,7 +160,7 @@ function loadGifts() {
 
         button.addEventListener(
             "click",
-            () => {
+            function () {
 
                 selectGift(
                     gift,
@@ -183,9 +171,7 @@ function loadGifts() {
         );
 
 
-        options.appendChild(
-            button
-        );
+        options.appendChild(button);
 
     });
 
@@ -196,44 +182,32 @@ function loadGifts() {
 // SELECT GIFT
 // =====================================
 
-function selectGift(
-    gift,
-    button
-) {
+function selectGift(gift, button) {
 
-    selectedGift =
-        gift;
+    selectedGift = gift;
 
 
     document
-        .querySelectorAll(
-            ".gift-option"
-        )
-        .forEach(item => {
+        .querySelectorAll(".gift-option")
+        .forEach(card => {
 
-            item.classList.remove(
-                "selected"
-            );
+            card.classList.remove("selected");
 
         });
 
 
-    button.classList.add(
-        "selected"
-    );
+    button.classList.add("selected");
 
 
     const selectedBox =
-        document.getElementById(
-            "selectedGift"
-        );
+        document.getElementById("selectedGift");
 
 
     if (selectedBox) {
 
         selectedBox.innerHTML = `
 
-            <span style="font-size:32px;">
+            <span class="selected-gift-icon">
                 ${gift.icon}
             </span>
 
@@ -251,15 +225,12 @@ function selectGift(
 
 
     const sendBtn =
-        document.getElementById(
-            "sendGiftBtn"
-        );
+        document.getElementById("sendGiftBtn");
 
 
     if (sendBtn) {
 
-        sendBtn.disabled =
-            false;
+        sendBtn.disabled = false;
 
     }
 
@@ -275,17 +246,18 @@ async function loadWallet() {
     try {
 
         const res =
-            await fetch(
-                "/api/wallet",
-                {
-                    method: "GET",
+            await fetch("/api/wallet", {
 
-                    headers: {
-                        "Authorization":
-                            "Bearer " + token
-                    }
+                method: "GET",
+
+                headers: {
+
+                    "Authorization":
+                        "Bearer " + token
+
                 }
-            );
+
+            });
 
 
         const data =
@@ -298,9 +270,7 @@ async function loadWallet() {
         ) {
 
             const coins =
-                Number(
-                    data.wallet.coins || 0
-                );
+                Number(data.wallet.coins || 0);
 
 
             const coinBalance =
@@ -321,7 +291,7 @@ async function loadWallet() {
     } catch (err) {
 
         console.error(
-            "WALLET ERROR:",
+            "Wallet error:",
             err
         );
 
@@ -338,60 +308,53 @@ async function sendSelectedGift() {
 
     if (!selectedGift) {
 
-        return alert(
-            "Please select a gift first."
-        );
+        alert("🎁 Please select a gift first.");
+
+        return;
 
     }
 
 
     if (!receiverId) {
 
-        return alert(
-            "Creator ID is missing."
-        );
+        alert("❌ Creator ID is missing.");
+
+        return;
 
     }
 
 
     const coinElement =
-        document.getElementById(
-            "coinBalance"
-        );
+        document.getElementById("coinBalance");
 
 
     const currentCoins =
         Number(
             (coinElement?.innerText || "0")
-                .replaceAll(",", "")
+            .replaceAll(",", "")
         );
 
 
-    if (
-        currentCoins <
-        selectedGift.coins
-    ) {
+    if (currentCoins < selectedGift.coins) {
 
-        return alert(
+        alert(
             "❌ You don't have enough coins."
         );
+
+        return;
 
     }
 
 
     const sendBtn =
-        document.getElementById(
-            "sendGiftBtn"
-        );
+        document.getElementById("sendGiftBtn");
 
 
     if (sendBtn) {
 
-        sendBtn.disabled =
-            true;
+        sendBtn.disabled = true;
 
-        sendBtn.innerText =
-            "Sending...";
+        sendBtn.innerText = "Sending...";
 
     }
 
@@ -406,6 +369,7 @@ async function sendSelectedGift() {
             await fetch(
                 "/api/gifts/send",
                 {
+
                     method: "POST",
 
                     headers: {
@@ -465,27 +429,34 @@ async function sendSelectedGift() {
         // =================================
 
         /*
-         * Idan daga Shorts muka zo,
-         * mu koma Short ɗin da aka fito.
+         * IMPORTANT:
+         * Idan daga Short aka zo,
+         * sai SUCCESS → OK → koma Short.
          */
 
         if (fromShort) {
 
+            alert(
+                "🎁 " +
+                giftBeingSent.name +
+                " sent successfully!"
+            );
+
+
+            // Bayan an danna OK
             window.location.href =
                 "/shorts.html?video=" +
-                encodeURIComponent(
-                    fromShort
-                );
+                encodeURIComponent(fromShort);
+
 
             return;
 
         }
 
 
-        /*
-         * Idan daga wani wuri aka zo,
-         * mu ci gaba da kasancewa a Gift page.
-         */
+        // =================================
+        // NORMAL GIFT PAGE
+        // =================================
 
         alert(
             "🎁 " +
@@ -497,14 +468,11 @@ async function sendSelectedGift() {
         await loadWallet();
 
 
-        selectedGift =
-            null;
+        selectedGift = null;
 
 
         document
-            .querySelectorAll(
-                ".gift-option"
-            )
+            .querySelectorAll(".gift-option")
             .forEach(card => {
 
                 card.classList.remove(
@@ -528,14 +496,6 @@ async function sendSelectedGift() {
         }
 
 
-        if (sendBtn) {
-
-            sendBtn.disabled =
-                true;
-
-        }
-
-
     } catch (err) {
 
         console.error(
@@ -547,7 +507,6 @@ async function sendSelectedGift() {
         alert(
             "❌ Network error. Please try again."
         );
-
 
     } finally {
 
@@ -596,9 +555,7 @@ async function loadReceiver() {
         const res =
             await fetch(
                 "/api/users/" +
-                encodeURIComponent(
-                    receiverId
-                )
+                encodeURIComponent(receiverId)
             );
 
 
@@ -625,12 +582,27 @@ async function loadReceiver() {
 
             }
 
+
+            const avatar =
+                document.getElementById(
+                    "creatorAvatar"
+                );
+
+
+            if (avatar) {
+
+                avatar.src =
+                    data.user.avatar ||
+                    "/images/default.png";
+
+            }
+
         }
 
     } catch (err) {
 
         console.log(
-            "Receiver loading skipped:",
+            "Receiver loading error:",
             err
         );
 
@@ -654,7 +626,7 @@ function setupSendButton() {
     if (!sendBtn) {
 
         console.error(
-            "sendGiftBtn not found"
+            "❌ sendGiftBtn not found"
         );
 
         return;
@@ -662,14 +634,13 @@ function setupSendButton() {
     }
 
 
+    sendBtn.disabled = true;
+
+
     sendBtn.addEventListener(
         "click",
         sendSelectedGift
     );
-
-
-    sendBtn.disabled =
-        true;
 
 }
 
@@ -680,7 +651,7 @@ function setupSendButton() {
 
 if (!token) {
 
-    location.href =
+    window.location.href =
         "/login.html";
 
 } else {
