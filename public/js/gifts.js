@@ -269,6 +269,7 @@ async function sendSelectedGift() {
 
     }
 
+
     if (!receiverId) {
 
         return alert(
@@ -277,8 +278,10 @@ async function sendSelectedGift() {
 
     }
 
+
     const coins =
         selectedGift.coins;
+
 
     const currentCoins =
         Number(
@@ -287,6 +290,7 @@ async function sendSelectedGift() {
             ).innerText
         );
 
+
     if (currentCoins < coins) {
 
         return alert(
@@ -294,6 +298,7 @@ async function sendSelectedGift() {
         );
 
     }
+
 
     const sendBtn =
         document.getElementById(
@@ -305,10 +310,8 @@ async function sendSelectedGift() {
     sendBtn.innerText =
         "Sending...";
 
-    try {
 
-        const giftBeingSent =
-            selectedGift;
+    try {
 
         const res =
             await fetch(
@@ -332,26 +335,51 @@ async function sendSelectedGift() {
                             receiverId,
 
                         giftType:
-                            giftBeingSent.type,
+                            selectedGift.type,
 
                         coins:
-                            giftBeingSent.coins
+                            selectedGift.coins
 
                     })
 
                 }
             );
 
+
         const data =
             await res.json();
 
-        console.log(
-            "SEND GIFT RESPONSE:",
-            data
-        );
 
+        if (data.success) {
 
-        if (!data.success) {
+            alert(
+                "🎁 " +
+                selectedGift.name +
+                " sent successfully!"
+            );
+
+            await loadWallet();
+
+            selectedGift = null;
+
+            document
+                .querySelectorAll(
+                    ".gift-card"
+                )
+                .forEach(card => {
+
+                    card.classList.remove(
+                        "selected"
+                    );
+
+                });
+
+            document.getElementById(
+                "selectedBox"
+            ).style.display =
+                "none";
+
+        } else {
 
             alert(
                 "❌ " +
@@ -361,81 +389,7 @@ async function sendSelectedGift() {
                 )
             );
 
-            return;
         }
-
-
-        // =================================
-        // FROM SHORTS
-        // =================================
-
-        if (fromShort) {
-
-            const giftData = {
-
-                name:
-                    giftBeingSent.name,
-
-                icon:
-                    giftBeingSent.icon,
-
-                type:
-                    giftBeingSent.type,
-
-                coins:
-                    giftBeingSent.coins
-
-            };
-
-
-            sessionStorage.setItem(
-                "shortGiftConfirmation",
-                JSON.stringify(giftData)
-            );  
-
-
-        // =================================
-        // NORMAL GIFT PAGE
-        // =================================
-
-        alert(
-            "🎁 " +
-            giftBeingSent.name +
-            " sent successfully!"
-        );
-
-
-        await loadWallet();
-
-
-        selectedGift = null;
-
-
-        document
-            .querySelectorAll(
-                ".gift-card"
-            )
-            .forEach(card => {
-
-                card.classList.remove(
-                    "selected"
-                );
-
-            });
-
-
-        const selectedBox =
-            document.getElementById(
-                "selectedBox"
-            );
-
-        if (selectedBox) {
-
-            selectedBox.style.display =
-                "none";
-
-        }
-
 
     } catch (err) {
 
@@ -448,15 +402,13 @@ async function sendSelectedGift() {
             "❌ Network error"
         );
 
-    } finally {
-
-        sendBtn.disabled =
-            selectedGift === null;
-
-        sendBtn.innerText =
-            "🎁 Send Gift";
-
     }
+
+
+    sendBtn.disabled = false;
+
+    sendBtn.innerText =
+        "🎁 Send Gift";
 
 }
 
