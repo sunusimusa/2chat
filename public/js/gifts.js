@@ -110,8 +110,6 @@ const params =
 const receiverId =
     params.get("receiverId");
 
-const fromShort =
-    params.get("fromShort");
 
 // =====================================
 // LOAD GIFTS
@@ -354,66 +352,63 @@ async function sendSelectedGift() {
 
         if (data.success) {
 
-    const giftBeingSent = selectedGift;
+            alert(
+                "🎁 " +
+                selectedGift.name +
+                " sent successfully!"
+            );
 
-    // Idan daga Shorts aka zo
-    if (fromShort) {
+            await loadWallet();
 
-        const giftData = {
-            name: giftBeingSent.name,
-            icon: giftBeingSent.icon,
-            type: giftBeingSent.type,
-            coins: giftBeingSent.coins
-        };
+            selectedGift = null;
 
-        sessionStorage.setItem(
-            "shortGiftConfirmation",
-            JSON.stringify(giftData)
+            document
+                .querySelectorAll(
+                    ".gift-card"
+                )
+                .forEach(card => {
+
+                    card.classList.remove(
+                        "selected"
+                    );
+
+                });
+
+            document.getElementById(
+                "selectedBox"
+            ).style.display =
+                "none";
+
+        } else {
+
+            alert(
+                "❌ " +
+                (
+                    data.message ||
+                    "Gift failed"
+                )
+            );
+
+        }
+
+    } catch (err) {
+
+        console.error(
+            "SEND GIFT ERROR:",
+            err
         );
 
         alert(
-            "🎁 " +
-            giftBeingSent.name +
-            " sent successfully!"
+            "❌ Network error"
         );
 
-        window.location.href =
-            "/shorts.html?video=" +
-            encodeURIComponent(fromShort);
-
-        return;
     }
 
-    // Idan ba daga Shorts aka zo ba
-    alert(
-        "🎁 " +
-        giftBeingSent.name +
-        " sent successfully!"
-    );
 
-    await loadWallet();
+    sendBtn.disabled = false;
 
-    selectedGift = null;
-
-    document
-        .querySelectorAll(".gift-card")
-        .forEach(card => {
-            card.classList.remove("selected");
-        });
-
-    document.getElementById(
-        "selectedBox"
-    ).style.display = "none";
-
-} else {
-
-    alert(
-        "❌ " +
-        (
-            data.message ||
-            "Gift failed"
-        )
-    );
+    sendBtn.innerText =
+        "🎁 Send Gift";
 
 }
 
