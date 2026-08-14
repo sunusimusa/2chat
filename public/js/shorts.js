@@ -219,6 +219,14 @@ ${video.shares || 0}
 </span>
 
 <button
+class="gift-short-btn"
+onclick="openShortGift('${video.username}')">
+🎁
+</button>
+
+<span>Gift</span>
+
+<button
 id="saveBtn-${video._id}"
 class="${savedVideos.includes(video._id) ? "liked" : ""}"
 onclick="saveVideo('${video._id}')">
@@ -806,6 +814,26 @@ function openShortProfile(username){
     window.location.href =
         "/profile.html?username=" +
         username;
+}
+
+function openShortGift(username) {
+
+    if (!username) {
+        alert("Creator information is missing.");
+        return;
+    }
+
+    const creator =
+        creatorCache[username];
+
+    if (!creator || !creator._id) {
+        alert("Unable to find creator ID.");
+        return;
+    }
+
+    window.location.href =
+        "/gifts.html?receiverId=" +
+        encodeURIComponent(creator._id);
 }
 
 // ================= LOAD =================
