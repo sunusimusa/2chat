@@ -1203,3 +1203,94 @@ body{
     }
 
 }
+
+/* =========================
+   GIFT CONFIRMATION
+========================= */
+
+.gift-confirmation {
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 30%;
+
+    transform:
+        translate(-50%, 20px)
+        scale(.85);
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 16px 22px;
+
+    border-radius: 18px;
+
+    background: rgba(0, 0, 0, .78);
+
+    color: white;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    z-index: 50;
+
+    transition:
+        opacity .3s ease,
+        transform .3s ease;
+
+    white-space: nowrap;
+}
+
+.gift-confirmation.show {
+
+    opacity: 1;
+
+    transform:
+        translate(-50%, 0)
+        scale(1);
+
+}
+
+.gift-confirmation-icon {
+
+    font-size: 52px;
+
+    animation:
+        giftPop .6s ease;
+}
+
+.gift-confirmation strong {
+
+    font-size: 17px;
+
+}
+
+.gift-confirmation span {
+
+    font-size: 13px;
+
+    opacity: .85;
+
+}
+
+@keyframes giftPop {
+
+    0% {
+        transform: scale(.3);
+    }
+
+    60% {
+        transform: scale(1.25);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+
+}
