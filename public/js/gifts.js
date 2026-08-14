@@ -352,6 +352,35 @@ async function sendSelectedGift() {
 
         if (data.success) {
 
+            const giftBeingSent = selectedGift;
+
+if (fromShort) {
+
+    const giftData = {
+        name: giftBeingSent.name,
+        icon: giftBeingSent.icon,
+        type: giftBeingSent.type,
+        coins: giftBeingSent.coins
+    };
+
+    sessionStorage.setItem(
+        "shortGiftConfirmation",
+        JSON.stringify(giftData)
+    );
+
+    alert(
+        "🎁 " +
+        giftBeingSent.name +
+        " sent successfully!"
+    );
+
+    window.location.href =
+        "/shorts.html?video=" +
+        encodeURIComponent(fromShort);
+
+    return;
+}
+
             alert(
                 "🎁 " +
                 selectedGift.name +
