@@ -113,8 +113,10 @@ let selectedGift = null;
 function loadGifts() {
 
     const options =
-        document.getElementById("giftOptions");
-
+    document.getElementById(
+        "giftGrid"
+    );
+    
     if (!options) {
 
         console.error(
@@ -200,8 +202,7 @@ function selectGift(gift, button) {
 
 
     const selectedBox =
-        document.getElementById("selectedGift");
-
+        document.getElementById("selectedBox")
 
     if (selectedBox) {
 
