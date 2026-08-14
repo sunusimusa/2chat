@@ -270,6 +270,45 @@ if(videoId){
 
         autoPlayVideos();
 
+        // =====================================
+// GIFT CONFIRMATION FROM GIFTS PAGE
+// =====================================
+
+const giftData =
+    sessionStorage.getItem(
+        "shortGiftConfirmation"
+    );
+
+if (giftData) {
+
+    try {
+
+        const gift =
+            JSON.parse(giftData);
+
+        showGiftConfirmation(gift);
+
+        // Kada animation ta sake bayyana
+        // idan user ya refresh page
+        sessionStorage.removeItem(
+            "shortGiftConfirmation"
+        );
+
+    } catch (err) {
+
+        console.error(
+            "Gift confirmation error:",
+            err
+        );
+
+        sessionStorage.removeItem(
+            "shortGiftConfirmation"
+        );
+
+    }
+
+}
+
     } catch (err) {
 
         console.error(err);
