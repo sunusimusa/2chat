@@ -110,6 +110,8 @@ const params =
 const receiverId =
     params.get("receiverId");
 
+const fromShort =
+    params.get("fromShort");
 
 // =====================================
 // LOAD GIFTS
@@ -352,32 +354,45 @@ async function sendSelectedGift() {
 
         if (data.success) {
 
-            alert(
-                "🎁 " +
-                selectedGift.name +
-                " sent successfully!"
+    const giftName =
+        selectedGift.name;
+
+    alert(
+        "🎁 " +
+        giftName +
+        " sent successfully!"
+    );
+
+    // If gift came from Shorts
+    if (fromShort) {
+
+        window.location.href =
+            "/shorts.html?video=" +
+            encodeURIComponent(fromShort);
+
+        return;
+    }
+
+    await loadWallet();
+
+    selectedGift = null;
+
+    document
+        .querySelectorAll(
+            ".gift-card"
+        )
+        .forEach(card => {
+
+            card.classList.remove(
+                "selected"
             );
 
-            await loadWallet();
+        });
 
-            selectedGift = null;
-
-            document
-                .querySelectorAll(
-                    ".gift-card"
-                )
-                .forEach(card => {
-
-                    card.classList.remove(
-                        "selected"
-                    );
-
-                });
-
-            document.getElementById(
-                "selectedBox"
-            ).style.display =
-                "none";
+    document.getElementById(
+        "selectedBox"
+    ).style.display =
+        "none";
 
         } else {
 
