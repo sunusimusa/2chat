@@ -113,9 +113,7 @@ let selectedGift = null;
 function loadGifts() {
 
     const options =
-        document.getElementById(
-            "giftGrid"
-        );
+        document.getElementById("giftGrid");
 
     if (!options) {
 
@@ -131,54 +129,48 @@ function loadGifts() {
 
     GIFTS.forEach(gift => {
 
-        const button =
-            document.createElement("button");
+        const card =
+            document.createElement("div");
 
-        button.type = "button";
-
-        button.className = "gift-option";
-
-        button.dataset.gift = gift.type;
-
-        button.dataset.coins = gift.coins;
+        card.className =
+            "gift-card";
 
 
-        button.innerHTML = `
+        card.innerHTML = `
 
-            <span class="gift-emoji">
+            <div class="gift-icon">
                 ${gift.icon}
+            </div>
+
+            <span class="gift-name">
+                ${gift.name}
             </span>
 
-            <strong>
-                ${gift.name}
-            </strong>
-
-            <small>
-                🪙 ${gift.coins.toLocaleString()} coins
-            </small>
+            <span class="gift-price">
+                🪙 ${gift.coins.toLocaleString()}
+            </span>
 
         `;
 
 
-        button.addEventListener(
+        card.addEventListener(
             "click",
             function () {
 
                 selectGift(
                     gift,
-                    button
+                    card
                 );
 
             }
         );
 
 
-        options.appendChild(button);
+        options.appendChild(card);
 
     });
 
 }
-
 
 // =====================================
 // SELECT GIFT
