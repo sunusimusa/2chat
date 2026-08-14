@@ -113,14 +113,14 @@ let selectedGift = null;
 function loadGifts() {
 
     const options =
-    document.getElementById(
-        "giftGrid"
-    );
-    
+        document.getElementById(
+            "giftGrid"
+        );
+
     if (!options) {
 
         console.error(
-            "❌ #giftOptions not found in gifts.html"
+            "❌ #giftGrid not found in gifts.html"
         );
 
         return;
@@ -226,8 +226,7 @@ function selectGift(gift, button) {
 
 
     const sendBtn =
-        document.getElementById("sendGiftBtn");
-
+        document.getElementById("sendBtn")
 
     if (sendBtn) {
 
@@ -275,9 +274,7 @@ async function loadWallet() {
 
 
             const coinBalance =
-                document.getElementById(
-                    "coinBalance"
-                );
+                document.getElementById("myCoins")
 
 
             if (coinBalance) {
@@ -570,9 +567,7 @@ async function loadReceiver() {
         ) {
 
             const creatorName =
-                document.getElementById(
-                    "creatorName"
-                );
+                document.getElementById("receiverName")
 
 
             if (creatorName) {
