@@ -219,9 +219,12 @@ ${video.shares || 0}
 </span>
 
 <button
-class="gift-short-btn"
- onclick="openShortGift('${video.username}', '${video._id}')">
-🎁
+    class="gift-short-btn"
+    onclick="openShortGift(
+        '${creatorCache[video.username]?._id || ""}',
+        '${video._id}'
+    )">
+    🎁
 </button>
 
 <span>Gift</span>
