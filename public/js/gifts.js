@@ -354,17 +354,7 @@ async function sendSelectedGift() {
 
         if (data.success) {
 
-    const giftName =
-        selectedGift.name;
-
-    alert(
-        "🎁 " +
-        giftName +
-        " sent successfully!"
-    );
-
-    // If gift came from Shorts
-    if (fromShort) {
+    const giftBeingSent = selectedGift;
 
     alert(
         "🎁 " +
@@ -372,12 +362,55 @@ async function sendSelectedGift() {
         " sent successfully!"
     );
 
-    const giftData = {
-        name: giftBeingSent.name,
-        icon: giftBeingSent.icon,
-        type: giftBeingSent.type,
-        coins: giftBeingSent.coins
-    };
+    // Idan gift ya fito daga Shorts
+    if (fromShort) {
+
+        const giftData = {
+            name: giftBeingSent.name,
+            icon: giftBeingSent.icon,
+            type: giftBeingSent.type,
+            coins: giftBeingSent.coins
+        };
+
+        sessionStorage.setItem(
+            "shortGiftConfirmation",
+            JSON.stringify(giftData)
+        );
+
+        window.location.href =
+            "/shorts.html?video=" +
+            encodeURIComponent(fromShort);
+
+        return;
+    }
+
+    await loadWallet();
+
+    selectedGift = null;
+
+    document
+        .querySelectorAll(".gift-card")
+        .forEach(card => {
+
+            card.classList.remove("selected");
+
+        });
+
+    document.getElementById(
+        "selectedBox"
+    ).style.display = "none";
+
+} else {
+
+    alert(
+        "❌ " +
+        (
+            data.message ||
+            "Gift failed"
+        )
+    );
+
+}
 
     sessionStorage.setItem(
         "shortGiftConfirmation",
