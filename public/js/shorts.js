@@ -220,7 +220,7 @@ ${video.shares || 0}
 
 <button
 class="gift-short-btn"
-onclick="openShortGift('${video.username}')">
+ onclick="openShortGift('${video.username}', '${video._id}')">
 🎁
 </button>
 
@@ -816,7 +816,7 @@ function openShortProfile(username){
         username;
 }
 
-function openShortGift(username) {
+function openShortGift(username, videoId) {
 
     if (!username) {
         alert("Creator information is missing.");
@@ -833,7 +833,69 @@ function openShortGift(username) {
 
     window.location.href =
         "/gifts.html?receiverId=" +
-        encodeURIComponent(creator._id);
+        encodeURIComponent(creator._id) +
+        "&fromShort=" +
+        encodeURIComponent(videoId);
+}
+
+function showGiftConfirmation(gift) {
+
+    const videoId = new URLSearchParams(
+        window.location.search
+    ).get("video");
+
+    // Idan muna kan Short page
+    if (videoId) {
+
+        const video = document.getElementById(
+            "video-" + videoId
+        );
+
+        if (!video) return;
+
+        const short = video.closest(".short");
+
+        if (!short) return;
+
+        const animation =
+            document.createElement("div");
+
+        animation.className =
+            "gift-confirmation";
+
+        animation.innerHTML = `
+            <div class="gift-confirmation-icon">
+                ${gift.icon}
+            </div>
+
+            <strong>
+                ${gift.name} Sent!
+            </strong>
+
+            <span>
+                🎁 Gift sent successfully
+            </span>
+        `;
+
+        short.appendChild(animation);
+
+        setTimeout(() => {
+
+            animation.classList.add("show");
+
+        }, 50);
+
+        setTimeout(() => {
+
+            animation.classList.remove("show");
+
+            setTimeout(() => {
+                animation.remove();
+            }, 300);
+
+        }, 2200);
+
+    }
 }
 
 // ================= LOAD =================
