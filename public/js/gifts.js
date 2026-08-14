@@ -1,13 +1,5 @@
-const token = localStorage.getItem("token");
-
-// =====================================
-// URL PARAMETERS
-// =====================================
-
-const params = new URLSearchParams(window.location.search);
-
-const receiverId = params.get("receiverId");
-const fromShort = params.get("fromShort");
+const token =
+    localStorage.getItem("token");
 
 
 // =====================================
@@ -24,7 +16,7 @@ const GIFTS = [
     },
 
     {
-        type: "gift-box",
+        type: "gift",
         name: "Gift Box",
         icon: "🎁",
         coins: 50
@@ -107,25 +99,30 @@ let selectedGift = null;
 
 
 // =====================================
+// RECEIVER ID
+// =====================================
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+const receiverId =
+    params.get("receiverId");
+
+
+// =====================================
 // LOAD GIFTS
 // =====================================
 
 function loadGifts() {
 
-    const options =
-        document.getElementById("giftGrid");
-
-    if (!options) {
-
-        console.error(
-            "❌ #giftGrid not found in gifts.html"
+    const grid =
+        document.getElementById(
+            "giftGrid"
         );
 
-        return;
-    }
-
-    options.innerHTML = "";
-
+    grid.innerHTML = "";
 
     GIFTS.forEach(gift => {
 
@@ -134,7 +131,6 @@ function loadGifts() {
 
         card.className =
             "gift-card";
-
 
         card.innerHTML = `
 
@@ -147,84 +143,68 @@ function loadGifts() {
             </span>
 
             <span class="gift-price">
-                🪙 ${gift.coins.toLocaleString()}
+                🪙 ${gift.coins}
             </span>
 
         `;
 
+        card.onclick = () => {
 
-        card.addEventListener(
-            "click",
-            function () {
+            selectGift(
+                gift,
+                card
+            );
 
-                selectGift(
-                    gift,
-                    card
-                );
+        };
 
-            }
-        );
-
-
-        options.appendChild(card);
+        grid.appendChild(card);
 
     });
 
 }
 
+
 // =====================================
 // SELECT GIFT
 // =====================================
 
-function selectGift(gift, button) {
+function selectGift(gift, card) {
 
     selectedGift = gift;
 
-
     document
-        .querySelectorAll(".gift-option")
-        .forEach(card => {
+        .querySelectorAll(".gift-card")
+        .forEach(item => {
 
-            card.classList.remove("selected");
+            item.classList.remove(
+                "selected"
+            );
 
         });
 
-
-    button.classList.add("selected");
-
-
-    const selectedBox =
-        document.getElementById("selectedBox")
-
-    if (selectedBox) {
-
-        selectedBox.innerHTML = `
-
-            <span class="selected-gift-icon">
-                ${gift.icon}
-            </span>
-
-            <strong>
-                ${gift.name}
-            </strong>
-
-            <span>
-                🪙 ${gift.coins.toLocaleString()} coins
-            </span>
-
-        `;
-
-    }
+    card.classList.add(
+        "selected"
+    );
 
 
-    const sendBtn =
-        document.getElementById("sendBtn")
+    document.getElementById(
+        "selectedBox"
+    ).style.display = "flex";
 
-    if (sendBtn) {
 
-        sendBtn.disabled = false;
+    document.getElementById(
+        "selectedIcon"
+    ).innerText = gift.icon;
 
-    }
+
+    document.getElementById(
+        "selectedName"
+    ).innerText = gift.name;
+
+
+    document.getElementById(
+        "selectedCoins"
+    ).innerText = gift.coins;
 
 }
 
@@ -238,43 +218,28 @@ async function loadWallet() {
     try {
 
         const res =
-            await fetch("/api/wallet", {
-
-                method: "GET",
-
-                headers: {
-
-                    "Authorization":
-                        "Bearer " + token
-
+            await fetch(
+                "/api/wallet",
+                {
+                    headers: {
+                        "Authorization":
+                            "Bearer " + token
+                    }
                 }
-
-            });
-
+            );
 
         const data =
             await res.json();
-
 
         if (
             data.success &&
             data.wallet
         ) {
 
-            const coins =
-                Number(data.wallet.coins || 0);
-
-
-            const coinBalance =
-                document.getElementById("myCoins")
-
-
-            if (coinBalance) {
-
-                coinBalance.innerText =
-                    coins.toLocaleString();
-
-            }
+            document.getElementById(
+                "myCoins"
+            ).innerText =
+                data.wallet.coins || 0;
 
         }
 
@@ -298,57 +263,52 @@ async function sendSelectedGift() {
 
     if (!selectedGift) {
 
-        alert("🎁 Please select a gift first.");
-
-        return;
+        return alert(
+            "Please select a gift"
+        );
 
     }
 
 
     if (!receiverId) {
 
-        alert("❌ Creator ID is missing.");
-
-        return;
+        return alert(
+            "Creator ID is missing"
+        );
 
     }
 
 
-    const coinElement =
-    document.getElementById("myCoins");
+    const coins =
+        selectedGift.coins;
+
 
     const currentCoins =
         Number(
-            (coinElement?.innerText || "0")
-            .replaceAll(",", "")
+            document.getElementById(
+                "myCoins"
+            ).innerText
         );
 
 
-    if (currentCoins < selectedGift.coins) {
+    if (currentCoins < coins) {
 
-        alert(
-            "❌ You don't have enough coins."
+        return alert(
+            "❌ You don't have enough coins"
         );
-
-        return;
 
     }
 
 
     const sendBtn =
-        document.getElementById("sendBtn");
+        document.getElementById(
+            "sendBtn"
+        );
 
-    if (sendBtn) {
+    sendBtn.disabled = true;
 
-        sendBtn.disabled = true;
-
-        sendBtn.innerText = "Sending...";
-
-    }
-
-
-    const giftBeingSent =
-        selectedGift;
+    sendBtn.innerText =
+        "Sending...";
 
 
     try {
@@ -357,7 +317,6 @@ async function sendSelectedGift() {
             await fetch(
                 "/api/gifts/send",
                 {
-
                     method: "POST",
 
                     headers: {
@@ -376,10 +335,10 @@ async function sendSelectedGift() {
                             receiverId,
 
                         giftType:
-                            giftBeingSent.type,
+                            selectedGift.type,
 
                         coins:
-                            giftBeingSent.coins
+                            selectedGift.coins
 
                     })
 
@@ -391,13 +350,36 @@ async function sendSelectedGift() {
             await res.json();
 
 
-        console.log(
-            "SEND GIFT RESPONSE:",
-            data
-        );
+        if (data.success) {
 
+            alert(
+                "🎁 " +
+                selectedGift.name +
+                " sent successfully!"
+            );
 
-        if (!data.success) {
+            await loadWallet();
+
+            selectedGift = null;
+
+            document
+                .querySelectorAll(
+                    ".gift-card"
+                )
+                .forEach(card => {
+
+                    card.classList.remove(
+                        "selected"
+                    );
+
+                });
+
+            document.getElementById(
+                "selectedBox"
+            ).style.display =
+                "none";
+
+        } else {
 
             alert(
                 "❌ " +
@@ -407,82 +389,7 @@ async function sendSelectedGift() {
                 )
             );
 
-            return;
-
         }
-
-
-        // =================================
-        // SUCCESS
-        // =================================
-
-        /*
-         * IMPORTANT:
-         * Idan daga Short aka zo,
-         * sai SUCCESS → OK → koma Short.
-         */
-
-        if (fromShort) {
-
-            alert(
-                "🎁 " +
-                giftBeingSent.name +
-                " sent successfully!"
-            );
-
-
-            // Bayan an danna OK
-            window.location.href =
-                "/shorts.html?video=" +
-                encodeURIComponent(fromShort);
-
-
-            return;
-
-        }
-
-
-        // =================================
-        // NORMAL GIFT PAGE
-        // =================================
-
-        alert(
-            "🎁 " +
-            giftBeingSent.name +
-            " sent successfully!"
-        );
-
-
-        await loadWallet();
-
-
-        selectedGift = null;
-
-
-        document
-            .querySelectorAll(".gift-option")
-            .forEach(card => {
-
-                card.classList.remove(
-                    "selected"
-                );
-
-            });
-
-
-        const selectedBox =
-    document.getElementById(
-        "selectedBox"
-    );
-
-
-        if (selectedBox) {
-
-            selectedBox.innerText =
-                "Choose a gift first.";
-
-        }
-
 
     } catch (err) {
 
@@ -491,24 +398,17 @@ async function sendSelectedGift() {
             err
         );
 
-
         alert(
-            "❌ Network error. Please try again."
+            "❌ Network error"
         );
 
-    } finally {
-
-        if (sendBtn) {
-
-            sendBtn.disabled =
-                selectedGift === null;
-
-            sendBtn.innerText =
-                "🎁 Send Gift";
-
-        }
-
     }
+
+
+    sendBtn.disabled = false;
+
+    sendBtn.innerText =
+        "🎁 Send Gift";
 
 }
 
@@ -519,108 +419,46 @@ async function sendSelectedGift() {
 
 async function loadReceiver() {
 
-    if (!receiverId) {
-
-        const message =
-            document.getElementById(
-                "giftMessage"
-            );
-
-        if (message) {
-
-            message.innerText =
-                "❌ Creator ID is missing.";
-
-        }
-
-        return;
-
-    }
-
+    if (!receiverId) return;
 
     try {
 
         const res =
             await fetch(
                 "/api/users/" +
-                encodeURIComponent(receiverId)
+                receiverId
             );
-
 
         const data =
             await res.json();
-
 
         if (
             data.success &&
             data.user
         ) {
 
-            const creatorName =
-                document.getElementById("receiverName")
+            document.getElementById(
+                "receiverName"
+            ).innerText =
+                "@" +
+                data.user.username;
 
-
-            if (creatorName) {
-
-                creatorName.innerText =
-                    "@" +
-                    data.user.username;
-
-            }
-
-
-            const avatar =
-                const avatar =
-    document.getElementById("receiverAvatar");
-
-            if (avatar) {
-
-                avatar.src =
-                    data.user.avatar ||
-                    "/images/default.png";
-
-            }
+            document.getElementById(
+                "receiverAvatar"
+            ).src =
+                data.user.avatar ||
+                "/images/default.png";
 
         }
 
     } catch (err) {
 
         console.log(
-            "Receiver loading error:",
-            err
+            "Receiver loading skipped"
         );
 
     }
 
-}
-
-
-// =====================================
-// SEND BUTTON
-// =====================================
-
-function setupSendButton() {
-
-    const sendBtn =
-        document.getElementById(
-            "sendBtn"
-        );
-
-    if (!sendBtn) {
-
-        console.error(
-            "❌ sendBtn not found"
-        );
-
-        return;
-    }
-
-    sendBtn.disabled = true;
-
-    sendBtn.addEventListener(
-        "click",
-        sendSelectedGift
-    );
 }
 
 
@@ -630,7 +468,7 @@ function setupSendButton() {
 
 if (!token) {
 
-    window.location.href =
+    location.href =
         "/login.html";
 
 } else {
@@ -640,7 +478,5 @@ if (!token) {
     loadWallet();
 
     loadReceiver();
-
-    setupSendButton();
 
 }
