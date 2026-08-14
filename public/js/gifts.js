@@ -366,12 +366,30 @@ async function sendSelectedGift() {
     // If gift came from Shorts
     if (fromShort) {
 
-        window.location.href =
-            "/shorts.html?video=" +
-            encodeURIComponent(fromShort);
+    alert(
+        "🎁 " +
+        giftBeingSent.name +
+        " sent successfully!"
+    );
 
-        return;
-    }
+    const giftData = {
+        name: giftBeingSent.name,
+        icon: giftBeingSent.icon,
+        type: giftBeingSent.type,
+        coins: giftBeingSent.coins
+    };
+
+    sessionStorage.setItem(
+        "shortGiftConfirmation",
+        JSON.stringify(giftData)
+    );
+
+    window.location.href =
+        "/shorts.html?video=" +
+        encodeURIComponent(fromShort);
+
+    return;
+}
 
     await loadWallet();
 
