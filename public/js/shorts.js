@@ -898,6 +898,35 @@ function showGiftConfirmation(gift) {
     }
 }
 
+function checkReturnedGift() {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const giftType =
+        params.get("gift");
+
+    if (!giftType) return;
+
+
+    const gift =
+        GIFTS_FOR_SHORTS.find(
+            item => item.type === giftType
+        );
+
+    if (!gift) return;
+
+
+    setTimeout(() => {
+
+        showGiftConfirmation(gift);
+
+    }, 800);
+
+}
+
 // ================= LOAD =================
 
 loadVideos();
