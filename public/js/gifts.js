@@ -391,24 +391,7 @@ async function sendSelectedGift() {
             sessionStorage.setItem(
                 "shortGiftConfirmation",
                 JSON.stringify(giftData)
-            );
-
-
-            alert(
-                "🎁 " +
-                giftBeingSent.name +
-                " sent successfully!"
-            );
-
-
-            window.location.href =
-                "/shorts.html?video=" +
-                encodeURIComponent(
-                    fromShort
-                );
-
-            return;
-        }
+            );  
 
 
         // =================================
