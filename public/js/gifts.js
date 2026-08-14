@@ -356,13 +356,7 @@ async function sendSelectedGift() {
 
     const giftBeingSent = selectedGift;
 
-    alert(
-        "🎁 " +
-        giftBeingSent.name +
-        " sent successfully!"
-    );
-
-    // Idan gift ya fito daga Shorts
+    // Idan daga Shorts aka zo
     if (fromShort) {
 
         const giftData = {
@@ -377,12 +371,25 @@ async function sendSelectedGift() {
             JSON.stringify(giftData)
         );
 
+        alert(
+            "🎁 " +
+            giftBeingSent.name +
+            " sent successfully!"
+        );
+
         window.location.href =
             "/shorts.html?video=" +
             encodeURIComponent(fromShort);
 
         return;
     }
+
+    // Idan ba daga Shorts aka zo ba
+    alert(
+        "🎁 " +
+        giftBeingSent.name +
+        " sent successfully!"
+    );
 
     await loadWallet();
 
@@ -391,9 +398,7 @@ async function sendSelectedGift() {
     document
         .querySelectorAll(".gift-card")
         .forEach(card => {
-
             card.classList.remove("selected");
-
         });
 
     document.getElementById(
