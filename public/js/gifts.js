@@ -323,8 +323,7 @@ async function sendSelectedGift() {
 
 
     const coinElement =
-        document.getElementById("coinBalance");
-
+    document.getElementById("myCoins");
 
     const currentCoins =
         Number(
@@ -345,8 +344,7 @@ async function sendSelectedGift() {
 
 
     const sendBtn =
-        document.getElementById("sendGiftBtn");
-
+        document.getElementById("sendBtn");
 
     if (sendBtn) {
 
@@ -481,9 +479,9 @@ async function sendSelectedGift() {
 
 
         const selectedBox =
-            document.getElementById(
-                "selectedGift"
-            );
+    document.getElementById(
+        "selectedBox"
+    );
 
 
         if (selectedBox) {
@@ -580,10 +578,8 @@ async function loadReceiver() {
 
 
             const avatar =
-                document.getElementById(
-                    "creatorAvatar"
-                );
-
+                const avatar =
+    document.getElementById("receiverAvatar");
 
             if (avatar) {
 
@@ -615,29 +611,24 @@ function setupSendButton() {
 
     const sendBtn =
         document.getElementById(
-            "sendGiftBtn"
+            "sendBtn"
         );
-
 
     if (!sendBtn) {
 
         console.error(
-            "❌ sendGiftBtn not found"
+            "❌ sendBtn not found"
         );
 
         return;
-
     }
 
-
     sendBtn.disabled = true;
-
 
     sendBtn.addEventListener(
         "click",
         sendSelectedGift
     );
-
 }
 
 
