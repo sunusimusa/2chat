@@ -269,7 +269,6 @@ async function sendSelectedGift() {
 
     }
 
-
     if (!receiverId) {
 
         return alert(
@@ -278,10 +277,8 @@ async function sendSelectedGift() {
 
     }
 
-
     const coins =
         selectedGift.coins;
-
 
     const currentCoins =
         Number(
@@ -290,7 +287,6 @@ async function sendSelectedGift() {
             ).innerText
         );
 
-
     if (currentCoins < coins) {
 
         return alert(
@@ -298,7 +294,6 @@ async function sendSelectedGift() {
         );
 
     }
-
 
     const sendBtn =
         document.getElementById(
@@ -310,8 +305,10 @@ async function sendSelectedGift() {
     sendBtn.innerText =
         "Sending...";
 
-
     try {
+
+        const giftBeingSent =
+            selectedGift;
 
         const res =
             await fetch(
@@ -335,80 +332,26 @@ async function sendSelectedGift() {
                             receiverId,
 
                         giftType:
-                            selectedGift.type,
+                            giftBeingSent.type,
 
                         coins:
-                            selectedGift.coins
+                            giftBeingSent.coins
 
                     })
 
                 }
             );
 
-
         const data =
             await res.json();
 
+        console.log(
+            "SEND GIFT RESPONSE:",
+            data
+        );
 
-        if (data.success) {
 
-            const giftBeingSent = selectedGift;
-
-if (fromShort) {
-
-    const giftData = {
-        name: giftBeingSent.name,
-        icon: giftBeingSent.icon,
-        type: giftBeingSent.type,
-        coins: giftBeingSent.coins
-    };
-
-    sessionStorage.setItem(
-        "shortGiftConfirmation",
-        JSON.stringify(giftData)
-    );
-
-    alert(
-        "🎁 " +
-        giftBeingSent.name +
-        " sent successfully!"
-    );
-
-    window.location.href =
-        "/shorts.html?video=" +
-        encodeURIComponent(fromShort);
-
-    return;
-}
-
-            alert(
-                "🎁 " +
-                selectedGift.name +
-                " sent successfully!"
-            );
-
-            await loadWallet();
-
-            selectedGift = null;
-
-            document
-                .querySelectorAll(
-                    ".gift-card"
-                )
-                .forEach(card => {
-
-                    card.classList.remove(
-                        "selected"
-                    );
-
-                });
-
-            document.getElementById(
-                "selectedBox"
-            ).style.display =
-                "none";
-
-        } else {
+        if (!data.success) {
 
             alert(
                 "❌ " +
@@ -418,7 +361,98 @@ if (fromShort) {
                 )
             );
 
+            return;
         }
+
+
+        // =================================
+        // FROM SHORTS
+        // =================================
+
+        if (fromShort) {
+
+            const giftData = {
+
+                name:
+                    giftBeingSent.name,
+
+                icon:
+                    giftBeingSent.icon,
+
+                type:
+                    giftBeingSent.type,
+
+                coins:
+                    giftBeingSent.coins
+
+            };
+
+
+            sessionStorage.setItem(
+                "shortGiftConfirmation",
+                JSON.stringify(giftData)
+            );
+
+
+            alert(
+                "🎁 " +
+                giftBeingSent.name +
+                " sent successfully!"
+            );
+
+
+            window.location.href =
+                "/shorts.html?video=" +
+                encodeURIComponent(
+                    fromShort
+                );
+
+            return;
+        }
+
+
+        // =================================
+        // NORMAL GIFT PAGE
+        // =================================
+
+        alert(
+            "🎁 " +
+            giftBeingSent.name +
+            " sent successfully!"
+        );
+
+
+        await loadWallet();
+
+
+        selectedGift = null;
+
+
+        document
+            .querySelectorAll(
+                ".gift-card"
+            )
+            .forEach(card => {
+
+                card.classList.remove(
+                    "selected"
+                );
+
+            });
+
+
+        const selectedBox =
+            document.getElementById(
+                "selectedBox"
+            );
+
+        if (selectedBox) {
+
+            selectedBox.style.display =
+                "none";
+
+        }
+
 
     } catch (err) {
 
@@ -431,13 +465,15 @@ if (fromShort) {
             "❌ Network error"
         );
 
+    } finally {
+
+        sendBtn.disabled =
+            selectedGift === null;
+
+        sendBtn.innerText =
+            "🎁 Send Gift";
+
     }
-
-
-    sendBtn.disabled = false;
-
-    sendBtn.innerText =
-        "🎁 Send Gift";
 
 }
 
