@@ -1,1 +1,315 @@
 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Gifts Received</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding-bottom: 30px;
+        }
+
+        .header {
+            background: white;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.08);
+        }
+
+        .back-btn {
+            width: 48px;
+            height: 48px;
+            border: 0;
+            border-radius: 50%;
+            background: #ff0874;
+            color: white;
+            font-size: 25px;
+            cursor: pointer;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #222;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 760px;
+            margin: auto;
+            padding: 28px 18px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: #fff4f8;
+            border-radius: 18px;
+            padding: 28px 15px;
+            text-align: center;
+            min-height: 155px;
+        }
+
+        .stat-icon {
+            font-size: 27px;
+        }
+
+        .stat-label {
+            margin-top: 8px;
+            color: #666;
+            font-size: 17px;
+        }
+
+        .stat-value {
+            margin-top: 10px;
+            color: #ed0874;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .status {
+            text-align: center;
+            margin: 24px 0 18px;
+            color: #555;
+            font-size: 17px;
+        }
+
+        .gift-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .gift-card {
+            background: white;
+            border-radius: 20px;
+            padding: 22px;
+            box-shadow: 0 5px 18px rgba(0,0,0,.07);
+        }
+
+        .gift-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .gift-name {
+            font-size: 26px;
+            font-weight: bold;
+            color: #222;
+        }
+
+        .gift-price {
+            color: #ed0874;
+            font-size: 21px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .gift-row {
+            margin-top: 14px;
+            color: #555;
+            font-size: 17px;
+        }
+
+        .gift-row strong {
+            color: #222;
+        }
+
+        .earning {
+            font-weight: bold;
+            color: #222;
+        }
+
+        .date {
+            color: #666;
+        }
+
+        .empty {
+            background: white;
+            border-radius: 18px;
+            padding: 35px 20px;
+            text-align: center;
+            color: #777;
+            box-shadow: 0 5px 18px rgba(0,0,0,.06);
+        }
+
+        .refresh-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px;
+            border: 0;
+            border-radius: 12px;
+            background: #ff0874;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .refresh-btn:disabled {
+            opacity: .6;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+    <button
+        class="back-btn"
+        onclick="history.back()">
+
+        ←
+
+    </button>
+
+
+    <h1>
+        🎁 Gifts Received
+    </h1>
+
+</header>
+
+
+
+<main class="container">
+
+
+    <!-- =========================
+         STATISTICS
+    ========================== -->
+
+    <section class="stats">
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                💰
+            </div>
+
+            <div class="stat-label">
+                Total Earned
+            </div>
+
+            <div
+                id="totalEarned"
+                class="stat-value">
+
+                0
+
+            </div>
+
+            <div class="stat-label">
+                coins
+            </div>
+
+        </div>
+
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                🎁
+            </div>
+
+            <div class="stat-label">
+                Gifts Received
+            </div>
+
+            <div
+                id="giftsReceived"
+                class="stat-value">
+
+                0
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =========================
+         STATUS
+    ========================== -->
+
+    <div
+        id="status"
+        class="status">
+
+        Loading gifts...
+
+    </div>
+
+
+
+    <!-- =========================
+         GIFTS LIST
+    ========================== -->
+
+    <section
+        id="giftList"
+        class="gift-list">
+
+    </section>
+
+
+
+    <!-- =========================
+         REFRESH
+    ========================== -->
+
+    <button
+        id="refreshBtn"
+        class="refresh-btn"
+        onclick="loadReceivedGifts()">
+
+        🔄 Refresh Gifts
+
+    </button>
+
+
+</main>
+
+
+
+<script src="/js/gifts-received.js"></script>
+
+
+</body>
+
+</html>
