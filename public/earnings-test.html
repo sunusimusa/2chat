@@ -9,7 +9,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1.0">
 
-    <title>2Chat Creator Earnings</title>
+    <title>Creator Earnings</title>
 
     <style>
 
@@ -27,93 +27,154 @@
 
             min-height: 100vh;
 
-            display: flex;
-
-            justify-content: center;
-
-            align-items: center;
-
             padding: 20px;
 
         }
 
-
-        .box {
+        .container {
 
             width: 100%;
 
-            max-width: 460px;
+            max-width: 450px;
+
+            margin: auto;
+
+        }
+
+        .header {
 
             background: white;
 
-            padding: 25px;
+            padding: 20px;
 
-            border-radius: 18px;
-
-            box-shadow:
-                0 5px 25px
-                rgba(0,0,0,.12);
-
-        }
-
-
-        h1 {
-
-            margin-top: 0;
+            border-radius: 16px;
 
             text-align: center;
 
-            font-size: 24px;
+            box-shadow:
+                0 4px 15px
+                rgba(0,0,0,.08);
 
         }
 
+        .header h1 {
 
-        .earning-card {
+            margin: 0;
 
-            background: #fff3f8;
+            font-size: 24px;
 
-            border-radius: 15px;
+            color: #222;
 
-            padding: 20px;
+        }
+
+        .header p {
+
+            margin: 8px 0 0;
+
+            color: #777;
+
+        }
+
+        .main-balance {
+
+            margin-top: 20px;
+
+            padding: 30px 20px;
+
+            border-radius: 20px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ff0874,
+                    #ff3d91
+                );
+
+            color: white;
+
+            text-align: center;
+
+            box-shadow:
+                0 8px 25px
+                rgba(255, 8, 116, .25);
+
+        }
+
+        .main-balance .icon {
+
+            font-size: 42px;
+
+        }
+
+        .main-balance .label {
+
+            margin-top: 10px;
+
+            font-size: 17px;
+
+            opacity: .9;
+
+        }
+
+        .main-balance .amount {
+
+            margin-top: 8px;
+
+            font-size: 38px;
+
+            font-weight: bold;
+
+        }
+
+        .cards {
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 15px;
 
             margin-top: 20px;
 
         }
 
+        .card {
 
-        .row {
+            background: white;
 
-            display: flex;
+            padding: 20px 15px;
 
-            justify-content: space-between;
+            border-radius: 16px;
 
-            align-items: center;
+            box-shadow:
+                0 4px 15px
+                rgba(0,0,0,.07);
 
-            padding: 15px 0;
-
-            border-bottom:
-                1px solid #eee;
-
-        }
-
-
-        .row:last-child {
-
-            border-bottom: none;
+            text-align: center;
 
         }
 
+        .card .icon {
 
-        .label {
-
-            color: #666;
+            font-size: 28px;
 
         }
 
+        .card .label {
 
-        .value {
+            margin-top: 8px;
 
-            font-size: 20px;
+            color: #777;
+
+            font-size: 14px;
+
+        }
+
+        .card .value {
+
+            margin-top: 8px;
+
+            font-size: 22px;
 
             font-weight: bold;
 
@@ -121,49 +182,90 @@
 
         }
 
+        .info {
+
+            margin-top: 20px;
+
+            background: white;
+
+            padding: 20px;
+
+            border-radius: 16px;
+
+            box-shadow:
+                0 4px 15px
+                rgba(0,0,0,.07);
+
+        }
+
+        .info h2 {
+
+            margin-top: 0;
+
+            font-size: 18px;
+
+        }
+
+        .row {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            padding: 13px 0;
+
+            border-bottom:
+                1px solid #eee;
+
+        }
+
+        .row:last-child {
+
+            border-bottom: none;
+
+        }
+
+        .row span:first-child {
+
+            color: #666;
+
+        }
+
+        .row span:last-child {
+
+            font-weight: bold;
+
+        }
+
+        .commission {
+
+            color: #e67e22;
+
+        }
 
         .available {
 
-            background: #eafff0;
-
-            margin:
-                15px -5px;
-
-            padding:
-                15px 10px;
-
-            border-radius: 12px;
+            color: #16a34a;
 
         }
 
+        .withdrawn {
 
-        .available .value {
-
-            color: #159447;
-
-            font-size: 24px;
+            color: #555;
 
         }
-
-
-        .commission .value {
-
-            color: #d35400;
-
-        }
-
 
         button {
 
             width: 100%;
 
-            padding: 13px;
-
             margin-top: 20px;
+
+            padding: 14px;
 
             border: none;
 
-            border-radius: 10px;
+            border-radius: 12px;
 
             background: #ff0874;
 
@@ -173,10 +275,7 @@
 
             font-weight: bold;
 
-            cursor: pointer;
-
         }
-
 
         button:disabled {
 
@@ -184,19 +283,17 @@
 
         }
 
-
         #message {
 
             text-align: center;
 
-            margin-top: 15px;
+            color: #666;
 
-            color: #555;
+            margin-top: 15px;
 
             min-height: 20px;
 
         }
-
 
         #result {
 
@@ -204,15 +301,15 @@
 
             padding: 12px;
 
-            background: #f5f5f5;
+            background: #eee;
 
             border-radius: 10px;
+
+            font-size: 12px;
 
             white-space: pre-wrap;
 
             word-break: break-word;
-
-            font-size: 13px;
 
             display: none;
 
@@ -222,114 +319,234 @@
 
 </head>
 
-
 <body>
 
 
-<div class="box">
-
-    <h1>
-        💰 Creator Earnings
-    </h1>
+<div class="container">
 
 
-    <div class="earning-card">
+    <div class="header">
+
+        <h1>
+            💰 Creator Earnings
+        </h1>
+
+        <p>
+            Your gift earnings and withdrawable balance
+        </p>
+
+    </div>
 
 
-        <!-- GROSS EARNINGS -->
+    <!-- =========================
+         AVAILABLE BALANCE
+    ========================== -->
 
-        <div class="row">
+    <div class="main-balance">
 
-            <span class="label">
-                Total Earned
-            </span>
+        <div class="icon">
+            💵
+        </div>
 
-            <span
+        <div class="label">
+            Available Balance
+        </div>
+
+        <div
+            id="availableBalance"
+            class="amount">
+
+            ₦0.00
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         STATISTICS
+    ========================== -->
+
+    <div class="cards">
+
+
+        <div class="card">
+
+            <div class="icon">
+                💰
+            </div>
+
+            <div class="label">
+                Gross Earnings
+            </div>
+
+            <div
                 id="totalEarned"
                 class="value">
 
                 ₦0.00
 
-            </span>
+            </div>
 
         </div>
 
 
-        <!-- PLATFORM COMMISSION -->
+        <div class="card">
 
-        <div class="row commission">
+            <div class="icon">
+                🏦
+            </div>
 
-            <span class="label">
+            <div class="label">
                 Platform Commission
-            </span>
+            </div>
 
-            <span
+            <div
                 id="platformCommission"
-                class="value">
+                class="value commission">
 
                 ₦0.00
 
-            </span>
+            </div>
 
         </div>
 
 
-        <!-- AVAILABLE BALANCE -->
+        <div class="card">
 
-        <div class="row available">
+            <div class="icon">
+                💸
+            </div>
 
-            <span class="label">
-                Available Balance
-            </span>
-
-            <span
-                id="availableBalance"
-                class="value">
-
-                ₦0.00
-
-            </span>
-
-        </div>
-
-
-        <!-- TOTAL WITHDRAWN -->
-
-        <div class="row">
-
-            <span class="label">
+            <div class="label">
                 Total Withdrawn
-            </span>
+            </div>
 
-            <span
+            <div
                 id="totalWithdrawn"
-                class="value">
+                class="value withdrawn">
 
                 ₦0.00
 
-            </span>
+            </div>
 
         </div>
 
 
-        <!-- GIFTS RECEIVED -->
+        <div class="card">
 
-        <div class="row">
+            <div class="icon">
+                🎁
+            </div>
 
-            <span class="label">
+            <div class="label">
                 Gifts Received
-            </span>
+            </div>
 
-            <span
+            <div
                 id="giftsReceived"
                 class="value">
 
                 0
 
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =========================
+         BREAKDOWN
+    ========================== -->
+
+    <div class="info">
+
+        <h2>
+            📊 Earnings Breakdown
+        </h2>
+
+
+        <div class="row">
+
+            <span>
+                Gross gift value
+            </span>
+
+            <span id="grossBreakdown">
+                ₦0.00
             </span>
 
         </div>
 
+
+        <div class="row">
+
+            <span>
+                Platform commission (30%)
+            </span>
+
+            <span
+                id="commissionBreakdown"
+                class="commission">
+
+                ₦0.00
+
+            </span>
+
+        </div>
+
+
+        <div class="row">
+
+            <span>
+                Creator share (70%)
+            </span>
+
+            <span
+                id="creatorShare"
+                class="available">
+
+                ₦0.00
+
+            </span>
+
+        </div>
+
+
+        <div class="row">
+
+            <span>
+                Already withdrawn
+            </span>
+
+            <span
+                id="withdrawnBreakdown"
+                class="withdrawn">
+
+                ₦0.00
+
+            </span>
+
+        </div>
+
+
+        <div class="row">
+
+            <span>
+                Currently available
+            </span>
+
+            <span
+                id="availableBreakdown"
+                class="available">
+
+                ₦0.00
+
+            </span>
+
+        </div>
 
     </div>
 
@@ -338,13 +555,13 @@
         id="loadBtn"
         onclick="loadEarnings()">
 
-        🔄 Load Earnings
+        🔄 Refresh Earnings
 
     </button>
 
 
     <p id="message">
-        Ready to test...
+        Loading earnings...
     </p>
 
 
@@ -377,7 +594,7 @@ function formatNaira(amount) {
 
 
 /* =================================
-   LOAD CREATOR EARNINGS
+   LOAD EARNINGS
 ================================= */
 
 async function loadEarnings() {
@@ -387,16 +604,12 @@ async function loadEarnings() {
         localStorage.getItem("token");
 
 
-    /* ===============================
-       CHECK LOGIN
-    =============================== */
-
     if (!token) {
 
         document.getElementById(
             "message"
         ).innerText =
-            "❌ Login token not found. Please login first.";
+            "❌ Please login first.";
 
         return;
 
@@ -428,19 +641,11 @@ async function loadEarnings() {
 
 
     message.innerText =
-        "Connecting to wallet API...";
-
-
-    resultBox.style.display =
-        "none";
+        "Connecting to earnings API...";
 
 
     try {
 
-
-        /* =========================
-           CALL API
-        ========================= */
 
         const res =
             await fetch(
@@ -465,127 +670,164 @@ async function loadEarnings() {
 
 
         console.log(
-            "EARNINGS API:",
+            "EARNINGS:",
             data
         );
 
 
-        /* =========================
-           SUCCESS
-        ========================= */
+        if (!data.success) {
 
-        if (data.success) {
-
-
-            const earnings =
-                data.earnings || {};
-
-
-            const totalEarned =
-                earnings.totalEarned || 0;
-
-
-            const platformCommission =
-                earnings.platformCommission || 0;
-
-
-            const availableBalance =
-                earnings.availableBalance || 0;
-
-
-            const totalWithdrawn =
-                earnings.totalWithdrawn || 0;
-
-
-            const giftsReceived =
-                earnings.giftsReceived || 0;
-
-
-            /* =====================
-               DISPLAY
-            ===================== */
-
-            document.getElementById(
-                "totalEarned"
-            ).innerText =
-                formatNaira(
-                    totalEarned
-                );
-
-
-            document.getElementById(
-                "platformCommission"
-            ).innerText =
-                formatNaira(
-                    platformCommission
-                );
-
-
-            document.getElementById(
-                "availableBalance"
-            ).innerText =
-                formatNaira(
-                    availableBalance
-                );
-
-
-            document.getElementById(
-                "totalWithdrawn"
-            ).innerText =
-                formatNaira(
-                    totalWithdrawn
-                );
-
-
-            document.getElementById(
-                "giftsReceived"
-            ).innerText =
-                giftsReceived;
-
-
-            message.innerText =
-                "✅ Earnings loaded successfully";
-
-
-            /* =====================
-               RAW API RESPONSE
-            ===================== */
-
-            resultBox.innerText =
-                JSON.stringify(
-                    data,
-                    null,
-                    2
-                );
-
-
-            resultBox.style.display =
-                "block";
-
-
-        } else {
-
-
-            message.innerText =
-                "❌ " +
-                (
-                    data.message ||
-                    "Failed to load earnings"
-                );
-
-
-            resultBox.innerText =
-                JSON.stringify(
-                    data,
-                    null,
-                    2
-                );
-
-
-            resultBox.style.display =
-                "block";
+            throw new Error(
+                data.message ||
+                "Failed to load earnings"
+            );
 
         }
+
+
+        const earnings =
+            data.earnings || {};
+
+
+        const totalEarned =
+            Number(
+                earnings.totalEarned || 0
+            );
+
+
+        const platformCommission =
+            Number(
+                earnings.platformCommission || 0
+            );
+
+
+        const availableBalance =
+            Number(
+                earnings.availableBalance || 0
+            );
+
+
+        const totalWithdrawn =
+            Number(
+                earnings.totalWithdrawn || 0
+            );
+
+
+        const giftsReceived =
+            Number(
+                earnings.giftsReceived || 0
+            );
+
+
+        /* =========================
+           MAIN BALANCE
+        ========================= */
+
+        document.getElementById(
+            "availableBalance"
+        ).innerText =
+            formatNaira(
+                availableBalance
+            );
+
+
+        /* =========================
+           CARDS
+        ========================= */
+
+        document.getElementById(
+            "totalEarned"
+        ).innerText =
+            formatNaira(
+                totalEarned
+            );
+
+
+        document.getElementById(
+            "platformCommission"
+        ).innerText =
+            formatNaira(
+                platformCommission
+            );
+
+
+        document.getElementById(
+            "totalWithdrawn"
+        ).innerText =
+            formatNaira(
+                totalWithdrawn
+            );
+
+
+        document.getElementById(
+            "giftsReceived"
+        ).innerText =
+            giftsReceived;
+
+
+        /* =========================
+           BREAKDOWN
+        ========================= */
+
+        document.getElementById(
+            "grossBreakdown"
+        ).innerText =
+            formatNaira(
+                totalEarned
+            );
+
+
+        document.getElementById(
+            "commissionBreakdown"
+        ).innerText =
+            formatNaira(
+                platformCommission
+            );
+
+
+        const creatorShare =
+            totalEarned -
+            platformCommission;
+
+
+        document.getElementById(
+            "creatorShare"
+        ).innerText =
+            formatNaira(
+                creatorShare
+            );
+
+
+        document.getElementById(
+            "withdrawnBreakdown"
+        ).innerText =
+            formatNaira(
+                totalWithdrawn
+            );
+
+
+        document.getElementById(
+            "availableBreakdown"
+        ).innerText =
+            formatNaira(
+                availableBalance
+            );
+
+
+        message.innerText =
+            "✅ Earnings loaded successfully";
+
+
+        resultBox.innerText =
+            JSON.stringify(
+                data,
+                null,
+                2
+            );
+
+
+        resultBox.style.display =
+            "block";
 
 
     } catch (err) {
@@ -598,7 +840,7 @@ async function loadEarnings() {
 
 
         message.innerText =
-            "❌ Server connection error";
+            "❌ " + err.message;
 
 
         resultBox.innerText =
@@ -608,14 +850,13 @@ async function loadEarnings() {
         resultBox.style.display =
             "block";
 
-
     }
 
 
     button.disabled = false;
 
     button.innerText =
-        "🔄 Load Earnings";
+        "🔄 Refresh Earnings";
 
 }
 
