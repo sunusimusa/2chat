@@ -445,43 +445,78 @@ exports.sendGift = async (req, res) => {
 
 };
 
+const Gift = require("../models/Gift");
+const Wallet = require("../models/Wallet");
+
 
 // =========================================
 // GET RECEIVED GIFTS
 // =========================================
 
-exports.getReceivedGifts = async (
-  req,
-  res
-) => {
+exports.getReceivedGifts = async (req, res) => {
 
   try {
 
-    const gifts =
-      await Gift.find({
+    // =====================================
+    // GET RECEIVED GIFTS
+    // =====================================
 
-        receiverId:
-          req.user._id,
+    const gifts = await Gift.find({
 
-        status:
-          "completed"
+      receiverId: req.user._id,
 
-      })
-        .populate(
-          "senderId",
-          "username name"
-        )
-        .sort({
-          createdAt: -1
-        });
+      status: "completed"
 
+    })
+      .populate(
+        "senderId",
+        "username name"
+      )
+      .sort({
+        createdAt: -1
+      });
+
+
+    // =====================================
+    // GET WALLET
+    // =====================================
+
+    const wallet = await Wallet.findOne({
+
+      userId: req.user._id
+
+    });
+
+
+    // =====================================
+    // WALLET TOTAL EARNED
+    // =====================================
+
+    const totalEarned =
+      wallet?.totalEarned || 0;
+
+
+    const giftsReceived =
+      wallet?.giftsReceived || 0;
+
+
+    // =====================================
+    // RESPONSE
+    // =====================================
 
     return res.json({
 
-      success:
-        true,
+      success: true,
 
-      gifts
+      gifts,
+
+      wallet: {
+
+        totalEarned,
+
+        giftsReceived
+
+      }
 
     });
 
@@ -496,11 +531,9 @@ exports.getReceivedGifts = async (
 
     return res.status(500).json({
 
-      success:
-        false,
+      success: false,
 
-      message:
-        err.message
+      message: err.message
 
     });
 
