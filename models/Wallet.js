@@ -75,6 +75,16 @@ const walletSchema = new mongoose.Schema(
     },
 
     // =========================================
+// BALANCE LOCKED FOR WITHDRAWAL
+// =========================================
+
+withdrawalLockedBalance: {
+  type: Number,
+  default: 0,
+  min: 0
+},
+
+    // =========================================
     // TOTAL WITHDRAWN (₦)
     // =========================================
 
