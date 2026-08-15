@@ -9,7 +9,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1.0">
 
-    <title>2Chat Earnings Test</title>
+    <title>2Chat Creator Earnings</title>
 
     <style>
 
@@ -42,7 +42,7 @@
 
             width: 100%;
 
-            max-width: 420px;
+            max-width: 460px;
 
             background: white;
 
@@ -113,11 +113,42 @@
 
         .value {
 
-            font-size: 22px;
+            font-size: 20px;
 
             font-weight: bold;
 
             color: #ff0874;
+
+        }
+
+
+        .available {
+
+            background: #eafff0;
+
+            margin:
+                15px -5px;
+
+            padding:
+                15px 10px;
+
+            border-radius: 12px;
+
+        }
+
+
+        .available .value {
+
+            color: #159447;
+
+            font-size: 24px;
+
+        }
+
+
+        .commission .value {
+
+            color: #d35400;
 
         }
 
@@ -205,6 +236,8 @@
     <div class="earning-card">
 
 
+        <!-- GROSS EARNINGS -->
+
         <div class="row">
 
             <span class="label">
@@ -215,12 +248,71 @@
                 id="totalEarned"
                 class="value">
 
-                0
+                ₦0.00
 
             </span>
 
         </div>
 
+
+        <!-- PLATFORM COMMISSION -->
+
+        <div class="row commission">
+
+            <span class="label">
+                Platform Commission
+            </span>
+
+            <span
+                id="platformCommission"
+                class="value">
+
+                ₦0.00
+
+            </span>
+
+        </div>
+
+
+        <!-- AVAILABLE BALANCE -->
+
+        <div class="row available">
+
+            <span class="label">
+                Available Balance
+            </span>
+
+            <span
+                id="availableBalance"
+                class="value">
+
+                ₦0.00
+
+            </span>
+
+        </div>
+
+
+        <!-- TOTAL WITHDRAWN -->
+
+        <div class="row">
+
+            <span class="label">
+                Total Withdrawn
+            </span>
+
+            <span
+                id="totalWithdrawn"
+                class="value">
+
+                ₦0.00
+
+            </span>
+
+        </div>
+
+
+        <!-- GIFTS RECEIVED -->
 
         <div class="row">
 
@@ -266,6 +358,25 @@
 
 
 /* =================================
+   FORMAT NAIRA
+================================= */
+
+function formatNaira(amount) {
+
+    return "₦" +
+        Number(amount || 0)
+            .toLocaleString(
+                "en-NG",
+                {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }
+            );
+
+}
+
+
+/* =================================
    LOAD CREATOR EARNINGS
 ================================= */
 
@@ -277,7 +388,7 @@ async function loadEarnings() {
 
 
     /* ===============================
-       CHECK LOGIN TOKEN
+       CHECK LOGIN
     =============================== */
 
     if (!token) {
@@ -374,14 +485,56 @@ async function loadEarnings() {
                 earnings.totalEarned || 0;
 
 
+            const platformCommission =
+                earnings.platformCommission || 0;
+
+
+            const availableBalance =
+                earnings.availableBalance || 0;
+
+
+            const totalWithdrawn =
+                earnings.totalWithdrawn || 0;
+
+
             const giftsReceived =
                 earnings.giftsReceived || 0;
 
 
+            /* =====================
+               DISPLAY
+            ===================== */
+
             document.getElementById(
                 "totalEarned"
             ).innerText =
-                totalEarned;
+                formatNaira(
+                    totalEarned
+                );
+
+
+            document.getElementById(
+                "platformCommission"
+            ).innerText =
+                formatNaira(
+                    platformCommission
+                );
+
+
+            document.getElementById(
+                "availableBalance"
+            ).innerText =
+                formatNaira(
+                    availableBalance
+                );
+
+
+            document.getElementById(
+                "totalWithdrawn"
+            ).innerText =
+                formatNaira(
+                    totalWithdrawn
+                );
 
 
             document.getElementById(
@@ -393,6 +546,10 @@ async function loadEarnings() {
             message.innerText =
                 "✅ Earnings loaded successfully";
 
+
+            /* =====================
+               RAW API RESPONSE
+            ===================== */
 
             resultBox.innerText =
                 JSON.stringify(
