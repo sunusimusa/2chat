@@ -13,19 +13,25 @@ const platformWalletSchema = new mongoose.Schema(
       index: true
     },
 
-    // =========================================
-    // TOTAL GROSS REVENUE
-    // =========================================
 
-    totalGrossRevenue: {
+    // =========================================
+    // TOTAL GIFT VOLUME (₦)
+    // =========================================
+    // Jimillar darajar gifts da aka tura.
+    // Misali:
+    // 100 coins = ₦100 gift volume
+
+    totalGiftVolume: {
       type: Number,
       default: 0,
       min: 0
     },
 
+
     // =========================================
-    // TOTAL PLATFORM COMMISSION
+    // TOTAL PLATFORM COMMISSION (₦)
     // =========================================
+    // Platform tana karɓar 30%.
 
     totalCommission: {
       type: Number,
@@ -33,15 +39,31 @@ const platformWalletSchema = new mongoose.Schema(
       min: 0
     },
 
+
     // =========================================
-    // TOTAL CREATOR EARNINGS
+    // TOTAL CREATOR EARNINGS (₦)
     // =========================================
+    // Creator yana samun 70%.
 
     totalCreatorEarnings: {
       type: Number,
       default: 0,
       min: 0
     },
+
+
+    // =========================================
+    // TOTAL CREATOR WITHDRAWN (₦)
+    // =========================================
+    // Jimillar kuɗin da aka riga aka biya
+    // creators ta automatic withdrawal.
+
+    totalCreatorWithdrawn: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+
 
     // =========================================
     // TOTAL GIFTS
@@ -57,6 +79,7 @@ const platformWalletSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
 
 module.exports =
   mongoose.model(
