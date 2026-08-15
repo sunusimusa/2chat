@@ -45,10 +45,40 @@ const walletSchema = new mongoose.Schema(
     },
 
     // =========================================
-    // COINS EARNED FROM GIFTS
+    // GROSS COINS EARNED FROM GIFTS
     // =========================================
 
     totalEarned: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+
+    // =========================================
+    // PLATFORM COMMISSION (₦)
+    // =========================================
+
+    platformCommission: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+
+    // =========================================
+    // CREATOR AVAILABLE BALANCE (₦)
+    // =========================================
+
+    availableBalance: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+
+    // =========================================
+    // TOTAL WITHDRAWN (₦)
+    // =========================================
+
+    totalWithdrawn: {
       type: Number,
       default: 0,
       min: 0
