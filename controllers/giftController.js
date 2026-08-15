@@ -448,25 +448,12 @@ exports.sendGift = async (req, res) => {
 const Gift = require("../models/Gift");
 const Wallet = require("../models/Wallet");
 
-
-// =========================================
-// GET RECEIVED GIFTS
-// =========================================
-
 exports.getReceivedGifts = async (req, res) => {
-
   try {
 
-    // =====================================
-    // GET RECEIVED GIFTS
-    // =====================================
-
     const gifts = await Gift.find({
-
       receiverId: req.user._id,
-
       status: "completed"
-
     })
       .populate(
         "senderId",
@@ -478,26 +465,16 @@ exports.getReceivedGifts = async (req, res) => {
 
 
     // =====================================
-    // GET WALLET
+    // GET TOTAL EARNED FROM WALLET
     // =====================================
 
     const wallet = await Wallet.findOne({
-
       userId: req.user._id
-
     });
 
 
-    // =====================================
-    // WALLET TOTAL EARNED
-    // =====================================
-
     const totalEarned =
       wallet?.totalEarned || 0;
-
-
-    const giftsReceived =
-      wallet?.giftsReceived || 0;
 
 
     // =====================================
@@ -508,15 +485,9 @@ exports.getReceivedGifts = async (req, res) => {
 
       success: true,
 
-      gifts,
+      totalEarned,
 
-      wallet: {
-
-        totalEarned,
-
-        giftsReceived
-
-      }
+      gifts
 
     });
 
@@ -538,5 +509,4 @@ exports.getReceivedGifts = async (req, res) => {
     });
 
   }
-
 };
