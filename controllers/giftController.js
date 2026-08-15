@@ -234,9 +234,8 @@ exports.sendGift = async (req, res) => {
           key:
             "main",
 
-          totalGrossRevenue:
-            0,
-
+          totalGiftVolume: 0,
+          
           totalCommission:
             0,
 
@@ -283,9 +282,9 @@ exports.sendGift = async (req, res) => {
     // PLATFORM ACCOUNTING
     // =====================================
 
-    platformWallet.totalGrossRevenue +=
-      grossAmount;
-
+    platformWallet.totalGiftVolume +=
+  grossAmount;
+    
     platformWallet.totalCommission +=
       platformCommission;
 
