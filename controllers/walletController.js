@@ -2,77 +2,112 @@ const Wallet = require("../models/Wallet");
 
 
 // =========================================
+// CREATE WALLET IF MISSING
+// =========================================
+
+async function getOrCreateWallet(userId) {
+
+  let wallet = await Wallet.findOne({
+    userId
+  });
+
+  if (!wallet) {
+
+    wallet = await Wallet.create({
+
+      userId,
+
+      coins: 0,
+
+      totalPurchased: 0,
+
+      totalSpent: 0,
+
+      totalEarned: 0,
+
+      platformCommission: 0,
+
+      availableBalance: 0,
+
+      withdrawalLockedBalance: 0,
+
+      totalWithdrawn: 0,
+
+      giftsSent: 0,
+
+      giftsReceived: 0
+
+    });
+
+  }
+
+  return wallet;
+}
+
+
+
+// =========================================
 // GET WALLET
 // =========================================
 
 exports.getWallet = async (req, res) => {
+
   try {
 
-    let wallet = await Wallet.findOne({
-      userId: req.user._id
-    });
+    const wallet =
+      await getOrCreateWallet(
+        req.user._id
+      );
 
 
-    // =====================================
-    // CREATE WALLET IF MISSING
-    // =====================================
-
-    if (!wallet) {
-
-      wallet = await Wallet.create({
-        userId: req.user._id,
-        coins: 0,
-        totalPurchased: 0,
-        totalSpent: 0,
-        totalEarned: 0,
-        platformCommission: 0,
-        availableBalance: 0,
-        totalWithdrawn: 0,
-        giftsSent: 0,
-        giftsReceived: 0
-      });
-
-    }
-
-
-    // =====================================
-    // RETURN WALLET
-    // =====================================
-
-    res.json({
+    return res.json({
 
       success: true,
 
       wallet: {
 
-        // -------------------------------
+        // =================================
         // SPENDER COINS
-        // -------------------------------
+        // =================================
 
         coins:
           wallet.coins || 0,
 
+        totalPurchased:
+          wallet.totalPurchased || 0,
 
-        // -------------------------------
+        totalSpent:
+          wallet.totalSpent || 0,
+
+
+        // =================================
         // CREATOR EARNINGS
-        // -------------------------------
+        // =================================
 
+        // Gross gift value in COINS
         totalEarned:
           wallet.totalEarned || 0,
 
+        // Platform 30% commission in ₦
         platformCommission:
           wallet.platformCommission || 0,
 
+        // Creator's current available money in ₦
         availableBalance:
           wallet.availableBalance || 0,
 
+        // Money temporarily locked for withdrawal
+        withdrawalLockedBalance:
+          wallet.withdrawalLockedBalance || 0,
+
+        // Money already withdrawn in ₦
         totalWithdrawn:
           wallet.totalWithdrawn || 0,
 
 
-        // -------------------------------
+        // =================================
         // GIFT STATISTICS
-        // -------------------------------
+        // =================================
 
         giftsSent:
           wallet.giftsSent || 0,
@@ -81,14 +116,9 @@ exports.getWallet = async (req, res) => {
           wallet.giftsReceived || 0,
 
 
-        // -------------------------------
+        // =================================
         // BACKWARD COMPATIBILITY
-        // -------------------------------
-        // Old wallet.html still expects
-        // "balance".
-        //
-        // We now use availableBalance
-        // as the creator's money balance.
+        // =================================
 
         balance:
           wallet.availableBalance || 0
@@ -97,7 +127,6 @@ exports.getWallet = async (req, res) => {
 
     });
 
-
   } catch (err) {
 
     console.error(
@@ -105,7 +134,7 @@ exports.getWallet = async (req, res) => {
       err
     );
 
-    res.status(500).json({
+    return res.status(500).json({
 
       success: false,
 
@@ -115,6 +144,7 @@ exports.getWallet = async (req, res) => {
     });
 
   }
+
 };
 
 
@@ -124,69 +154,141 @@ exports.getWallet = async (req, res) => {
 // =========================================
 
 exports.getEarnings = async (req, res) => {
+
   try {
 
-    let wallet = await Wallet.findOne({
-      userId: req.user._id
-    });
+    const wallet =
+      await getOrCreateWallet(
+        req.user._id
+      );
 
 
     // =====================================
-    // CREATE WALLET IF MISSING
+    // IMPORTANT
+    // =====================================
+    // totalEarned is stored as COINS.
+    //
+    // 1 coin = ₦1
+    //
+    // Therefore gross gift value in ₦
+    // is numerically equal to totalEarned.
+    //
+    // Example:
+    //
+    // 645 coins = ₦645 gross
+    //
     // =====================================
 
-    if (!wallet) {
+    const grossAmount =
+      Number(
+        wallet.totalEarned || 0
+      );
 
-      wallet = await Wallet.create({
-        userId: req.user._id,
-        coins: 0,
-        totalPurchased: 0,
-        totalSpent: 0,
-        totalEarned: 0,
-        platformCommission: 0,
-        availableBalance: 0,
-        totalWithdrawn: 0,
-        giftsSent: 0,
-        giftsReceived: 0
-      });
 
-    }
+    const platformCommission =
+      Number(
+        wallet.platformCommission || 0
+      );
+
+
+    const creatorShare =
+      Number(
+        (
+          grossAmount -
+          platformCommission
+        ).toFixed(2)
+      );
+
+
+    const availableBalance =
+      Number(
+        wallet.availableBalance || 0
+      );
+
+
+    const withdrawalLockedBalance =
+      Number(
+        wallet.withdrawalLockedBalance || 0
+      );
+
+
+    const totalWithdrawn =
+      Number(
+        wallet.totalWithdrawn || 0
+      );
 
 
     // =====================================
-    // RETURN CREATOR EARNINGS
+    // RETURN EARNINGS
     // =====================================
 
-    res.json({
+    return res.json({
 
       success: true,
 
       earnings: {
 
-        // Gross gift earnings
+        // -------------------------------
+        // GROSS
+        // -------------------------------
+
+        // Kept for backward compatibility.
+        // This remains the gross gift value
+        // in coins.
+
         totalEarned:
-          wallet.totalEarned || 0,
+          grossAmount,
 
-        // Platform's 30% commission
+
+        // Gross value expressed in Naira.
+        grossAmount:
+          grossAmount,
+
+
+        // -------------------------------
+        // PLATFORM
+        // -------------------------------
+
         platformCommission:
-          wallet.platformCommission || 0,
+          platformCommission,
 
-        // Creator's current withdrawable money
+
+        // -------------------------------
+        // CREATOR
+        // -------------------------------
+
+        creatorShare:
+          creatorShare,
+
+
+        // Current withdrawable balance
+
         availableBalance:
-          wallet.availableBalance || 0,
+          availableBalance,
 
-        // Money already withdrawn
+
+        // Currently locked withdrawal money
+
+        withdrawalLockedBalance:
+          withdrawalLockedBalance,
+
+
+        // Already withdrawn
+
         totalWithdrawn:
-          wallet.totalWithdrawn || 0,
+          totalWithdrawn,
 
-        // Number of gifts received
+
+        // -------------------------------
+        // GIFTS
+        // -------------------------------
+
         giftsReceived:
           wallet.giftsReceived || 0
 
       }
 
     });
-
 
   } catch (err) {
 
@@ -195,7 +297,7 @@ exports.getEarnings = async (req, res) => {
       err
     );
 
-    res.status(500).json({
+    return res.status(500).json({
 
       success: false,
 
@@ -205,6 +307,7 @@ exports.getEarnings = async (req, res) => {
     });
 
   }
+
 };
 
 
@@ -212,39 +315,21 @@ exports.getEarnings = async (req, res) => {
 // =========================================
 // TEST ADD COINS
 // =========================================
+// DEVELOPMENT / TEST ONLY
+// =========================================
 
 exports.testAddCoins = async (req, res) => {
+
   try {
 
-    let wallet = await Wallet.findOne({
-      userId: req.user._id
-    });
+    const wallet =
+      await getOrCreateWallet(
+        req.user._id
+      );
 
 
     // =====================================
-    // CREATE WALLET IF MISSING
-    // =====================================
-
-    if (!wallet) {
-
-      wallet = await Wallet.create({
-        userId: req.user._id,
-        coins: 0,
-        totalPurchased: 0,
-        totalSpent: 0,
-        totalEarned: 0,
-        platformCommission: 0,
-        availableBalance: 0,
-        totalWithdrawn: 0,
-        giftsSent: 0,
-        giftsReceived: 0
-      });
-
-    }
-
-
-    // =====================================
-    // ADD TEST COINS
+    // ADD 100 TEST COINS
     // =====================================
 
     wallet.coins += 100;
@@ -255,11 +340,7 @@ exports.testAddCoins = async (req, res) => {
     await wallet.save();
 
 
-    // =====================================
-    // RESPONSE
-    // =====================================
-
-    res.json({
+    return res.json({
 
       success: true,
 
@@ -267,10 +348,12 @@ exports.testAddCoins = async (req, res) => {
         "100 test coins added",
 
       coins:
-        wallet.coins
+        wallet.coins,
+
+      totalPurchased:
+        wallet.totalPurchased
 
     });
-
 
   } catch (err) {
 
@@ -279,7 +362,7 @@ exports.testAddCoins = async (req, res) => {
       err
     );
 
-    res.status(500).json({
+    return res.status(500).json({
 
       success: false,
 
@@ -289,4 +372,5 @@ exports.testAddCoins = async (req, res) => {
     });
 
   }
+
 };
