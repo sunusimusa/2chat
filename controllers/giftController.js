@@ -1,6 +1,13 @@
 const mongoose = require("mongoose");
-const Wallet = require("../models/Wallet");
-const Gift = require("../models/Gift");
+
+const Wallet =
+  require("../models/Wallet");
+
+const Gift =
+  require("../models/Gift");
+
+const PlatformWallet =
+  require("../models/PlatformWallet");
 
 
 // =========================================
@@ -10,7 +17,7 @@ const Gift = require("../models/Gift");
 // 100 coins = ₦100
 const COIN_TO_NAIRA = 1;
 
-// Platform keeps 30%
+// Platform commission = 30%
 const PLATFORM_COMMISSION_RATE = 0.30;
 
 
@@ -88,21 +95,29 @@ exports.sendGift = async (req, res) => {
 
 
     // =====================================
-    // CALCULATE EARNINGS
+    // FINANCIAL CALCULATION
     // =====================================
 
-    const grossEarning =
+    const grossAmount =
       amount * COIN_TO_NAIRA;
 
 
     const platformCommission =
-      grossEarning *
-      PLATFORM_COMMISSION_RATE;
+      Number(
+        (
+          grossAmount *
+          PLATFORM_COMMISSION_RATE
+        ).toFixed(2)
+      );
 
 
     const creatorEarning =
-      grossEarning -
-      platformCommission;
+      Number(
+        (
+          grossAmount -
+          platformCommission
+        ).toFixed(2)
+      );
 
 
     // =====================================
@@ -132,7 +147,7 @@ exports.sendGift = async (req, res) => {
 
 
     // =====================================
-    // CHECK COINS
+    // CHECK SENDER COINS
     // =====================================
 
     if (
@@ -172,6 +187,12 @@ exports.sendGift = async (req, res) => {
           coins:
             0,
 
+          totalPurchased:
+            0,
+
+          totalSpent:
+            0,
+
           totalEarned:
             0,
 
@@ -181,13 +202,48 @@ exports.sendGift = async (req, res) => {
           availableBalance:
             0,
 
-          withdrawalLockedBalance:
-            0,
-
           totalWithdrawn:
             0,
 
+          giftsSent:
+            0,
+
           giftsReceived:
+            0
+
+        });
+
+    }
+
+
+    // =====================================
+    // PLATFORM WALLET
+    // =====================================
+
+    let platformWallet =
+      await PlatformWallet.findOne({
+        key: "main"
+      }).session(session);
+
+
+    if (!platformWallet) {
+
+      platformWallet =
+        new PlatformWallet({
+
+          key:
+            "main",
+
+          totalGrossRevenue:
+            0,
+
+          totalCommission:
+            0,
+
+          totalCreatorEarnings:
+            0,
+
+          totalGifts:
             0
 
         });
@@ -210,30 +266,38 @@ exports.sendGift = async (req, res) => {
 
 
     // =====================================
-    // CREATOR EARNINGS
+    // CREATOR ACCOUNTING
     // =====================================
 
-    // Gross earning is stored in coins
     receiverWallet.totalEarned +=
       amount;
 
-
-    // Platform commission in ₦
-    receiverWallet.platformCommission +=
-      platformCommission;
-
-
-    // Creator's actual withdrawable money
     receiverWallet.availableBalance +=
       creatorEarning;
-
 
     receiverWallet.giftsReceived +=
       1;
 
 
     // =====================================
-    // SAVE WALLETS
+    // PLATFORM ACCOUNTING
+    // =====================================
+
+    platformWallet.totalGrossRevenue +=
+      grossAmount;
+
+    platformWallet.totalCommission +=
+      platformCommission;
+
+    platformWallet.totalCreatorEarnings +=
+      creatorEarning;
+
+    platformWallet.totalGifts +=
+      1;
+
+
+    // =====================================
+    // SAVE SENDER
     // =====================================
 
     await senderWallet.save({
@@ -241,7 +305,20 @@ exports.sendGift = async (req, res) => {
     });
 
 
+    // =====================================
+    // SAVE CREATOR
+    // =====================================
+
     await receiverWallet.save({
+      session
+    });
+
+
+    // =====================================
+    // SAVE PLATFORM
+    // =====================================
+
+    await platformWallet.save({
       session
     });
 
@@ -267,7 +344,12 @@ exports.sendGift = async (req, res) => {
             coins:
               amount,
 
-            // Creator's net earning in ₦
+            grossAmount:
+              grossAmount,
+
+            platformCommission:
+              platformCommission,
+
             creatorEarning:
               creatorEarning
 
@@ -280,7 +362,7 @@ exports.sendGift = async (req, res) => {
 
 
     // =====================================
-    // COMMIT
+    // COMMIT TRANSACTION
     // =====================================
 
     await session.commitTransaction();
@@ -290,7 +372,7 @@ exports.sendGift = async (req, res) => {
     // RESPONSE
     // =====================================
 
-    res.json({
+    return res.json({
 
       success:
         true,
@@ -309,8 +391,8 @@ exports.sendGift = async (req, res) => {
         coins:
           amount,
 
-        grossEarning:
-          grossEarning,
+        grossAmount:
+          grossAmount,
 
         platformCommission:
           platformCommission,
@@ -323,8 +405,8 @@ exports.sendGift = async (req, res) => {
       creatorBalance:
         receiverWallet.availableBalance,
 
-      creatorGrossCoins:
-        receiverWallet.totalEarned
+      platformCommissionTotal:
+        platformWallet.totalCommission
 
     });
 
@@ -345,7 +427,7 @@ exports.sendGift = async (req, res) => {
     );
 
 
-    res.status(500).json({
+    return res.status(500).json({
 
       success:
         false,
@@ -395,7 +477,7 @@ exports.getReceivedGifts = async (
         });
 
 
-    res.json({
+    return res.json({
 
       success:
         true,
@@ -413,7 +495,7 @@ exports.getReceivedGifts = async (
     );
 
 
-    res.status(500).json({
+    return res.status(500).json({
 
       success:
         false,
