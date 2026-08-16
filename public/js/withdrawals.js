@@ -1006,6 +1006,250 @@ document.addEventListener(
     }
 );
 
+// =========================================
+// CREATE WITHDRAWAL
+// =========================================
+
+async function createWithdrawal(event) {
+
+    event.preventDefault();
+
+
+    const token =
+        localStorage.getItem("token");
+
+
+    if (!token) {
+
+        alert("❌ Login session expired");
+
+        location.href =
+            "/login.html";
+
+        return;
+
+    }
+
+
+    const form =
+        document.getElementById(
+            "withdrawalForm"
+        );
+
+
+    const button =
+        document.getElementById(
+            "withdrawBtn"
+        );
+
+
+    const message =
+        document.getElementById(
+            "withdrawMessage"
+        );
+
+
+    const amount =
+        document.getElementById(
+            "amount"
+        ).value;
+
+
+    const bankName =
+        document.getElementById(
+            "bankName"
+        ).value.trim();
+
+
+    const accountName =
+        document.getElementById(
+            "accountName"
+        ).value.trim();
+
+
+    const accountNumber =
+        document.getElementById(
+            "accountNumber"
+        ).value.trim();
+
+
+    button.disabled =
+        true;
+
+
+    button.innerText =
+        "Submitting...";
+
+
+    message.innerText =
+        "Processing withdrawal request...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/withdrawals",
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer " + token
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            amount:
+                                Number(amount),
+
+                            bankName:
+                                bankName,
+
+                            accountName:
+                                accountName,
+
+                            accountNumber:
+                                accountNumber
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "CREATE WITHDRAWAL:",
+            data
+        );
+
+
+        if (
+            !response.ok ||
+            !data.success
+        ) {
+
+            throw new Error(
+                data.message ||
+                "Withdrawal request failed"
+            );
+
+        }
+
+
+        message.innerText =
+            "✅ Withdrawal request submitted successfully";
+
+
+        form.reset();
+
+
+        // Update displayed balance
+        if (
+            data.wallet
+        ) {
+
+            const balanceElement =
+                document.getElementById(
+                    "availableBalance"
+                );
+
+
+            if (
+                balanceElement
+            ) {
+
+                balanceElement.innerText =
+                    "₦" +
+                    Number(
+                        data.wallet.availableBalance || 0
+                    ).toLocaleString(
+                        "en-NG",
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }
+                    );
+
+            }
+
+        }
+
+
+        // Reload withdrawal history
+        if (
+            typeof loadWithdrawals ===
+            "function"
+        ) {
+
+            loadWithdrawals();
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "WITHDRAWAL ERROR:",
+            error
+        );
+
+
+        message.innerText =
+            "❌ " +
+            error.message;
+
+
+    } finally {
+
+        button.disabled =
+            false;
+
+        button.innerText =
+            "💸 Request Withdrawal";
+
+    }
+
+}
+
+
+// =========================================
+// FORM EVENT
+// =========================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        const form =
+            document.getElementById(
+                "withdrawalForm"
+            );
+
+
+        if (form) {
+
+            form.addEventListener(
+                "submit",
+                createWithdrawal
+            );
+
+        }
+
+    }
+);
+
 
 // =========================================
 // AUTO LOAD
