@@ -288,3 +288,14 @@ async function testAddCoins(){
 ========================= */
 
 loadWallet();
+
+/* =========================
+   OPEN WITHDRAWALS
+========================= */
+
+function openWithdrawals(){
+
+    location.href =
+        "/withdrawals.html";
+
+}
