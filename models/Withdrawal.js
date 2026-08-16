@@ -37,6 +37,40 @@ const withdrawalSchema =
 
             },
 
+            // =========================================
+// BANK DETAILS
+// =========================================
+
+bankName: {
+
+    type: String,
+
+    required: true,
+
+    trim: true
+
+},
+
+accountName: {
+
+    type: String,
+
+    required: true,
+
+    trim: true
+
+},
+
+accountNumber: {
+
+    type: String,
+
+    required: true,
+
+    trim: true
+
+},
+
 
             // =========================================
             // AMOUNT LOCKED FROM WALLET
