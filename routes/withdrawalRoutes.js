@@ -5,7 +5,8 @@ const protect = require("../middleware/auth");
 const {
     createWithdrawal,
     getWithdrawalHistory,
-    getWithdrawalById
+    getWithdrawalById,
+    cancelWithdrawal
 } = require("../controllers/withdrawalController");
 
 
@@ -39,6 +40,17 @@ router.get(
     "/:id",
     protect,
     getWithdrawalById
+);
+
+
+// =========================================
+// CANCEL WITHDRAWAL
+// =========================================
+
+router.post(
+    "/:id/cancel",
+    protect,
+    cancelWithdrawal
 );
 
 
