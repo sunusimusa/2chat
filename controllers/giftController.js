@@ -269,7 +269,7 @@ exports.sendGift = async (req, res) => {
     // =====================================
 
     receiverWallet.totalEarned +=
-      amount;
+  creatorEarning;
 
     receiverWallet.availableBalance +=
       creatorEarning;
@@ -444,9 +444,6 @@ exports.sendGift = async (req, res) => {
   }
 
 };
-
-const Gift = require("../models/Gift");
-const Wallet = require("../models/Wallet");
 
 exports.getReceivedGifts = async (req, res) => {
   try {
