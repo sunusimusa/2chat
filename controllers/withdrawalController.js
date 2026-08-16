@@ -22,30 +22,74 @@ exports.createWithdrawal = async (req, res) => {
     accountNumber
 } = req.body;
 
+        
         // =====================================
-        // VALIDATION
-        // =====================================
+// VALIDATION
+// =====================================
 
-        const withdrawalAmount =
-            Number(amount);
+const withdrawalAmount =
+    Number(amount);
+
+const cleanBankName =
+    String(bankName || "").trim();
+
+const cleanAccountName =
+    String(accountName || "").trim();
+
+const cleanAccountNumber =
+    String(accountNumber || "")
+        .replace(/\D/g, "");
 
 
-        if (
-            !Number.isFinite(withdrawalAmount) ||
-            withdrawalAmount <= 0
-        ) {
+if (
+    !Number.isFinite(withdrawalAmount) ||
+    withdrawalAmount <= 0
+) {
 
-            return res.status(400).json({
+    return res.status(400).json({
 
-                success: false,
+        success: false,
 
-                message:
-                    "Invalid withdrawal amount"
+        message:
+            "Invalid withdrawal amount"
 
-            });
+    });
 
-        }
+}
 
+
+if (
+    !cleanBankName ||
+    !cleanAccountName ||
+    !cleanAccountNumber
+) {
+
+    return res.status(400).json({
+
+        success: false,
+
+        message:
+            "Bank name, account name and account number are required"
+
+    });
+
+}
+
+
+if (
+    cleanAccountNumber.length !== 10
+) {
+
+    return res.status(400).json({
+
+        success: false,
+
+        message:
+            "Account number must be 10 digits"
+
+    });
+
+}
 
         // =====================================
         // MINIMUM WITHDRAWAL
