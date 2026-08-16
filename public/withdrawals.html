@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>2Chat Withdrawals</title>
+
+    <link
+        rel="stylesheet"
+        href="/css/withdrawals.css">
+
+</head>
+
+<body>
+
+<div class="withdrawals-page">
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <button
+            class="back-btn"
+            onclick="history.back()">
+
+            ←
+
+        </button>
+
+        <div>
+
+            <h1>
+                Withdrawals
+            </h1>
+
+            <p>
+                Manage your withdrawal requests
+            </p>
+
+        </div>
+
+    </header>
+
+
+    <!-- WALLET SUMMARY -->
+
+    <section class="summary-card">
+
+        <div class="summary-icon">
+            💰
+        </div>
+
+        <div>
+
+            <div class="summary-label">
+                Available Balance
+            </div>
+
+            <div
+                id="availableBalance"
+                class="summary-amount">
+
+                ₦0.00
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- MESSAGE -->
+
+    <div
+        id="message"
+        class="message">
+
+        Loading withdrawals...
+
+    </div>
+
+
+    <!-- WITHDRAWAL LIST -->
+
+    <section>
+
+        <div class="section-title">
+
+            <h2>
+                Withdrawal History
+            </h2>
+
+            <button
+                id="refreshBtn"
+                class="refresh-btn"
+                onclick="loadWithdrawals()">
+
+                🔄 Refresh
+
+            </button>
+
+        </div>
+
+
+        <div
+            id="withdrawalList"
+            class="withdrawal-list">
+
+        </div>
+
+    </section>
+
+
+    <!-- DETAILS MODAL -->
+
+    <div
+        id="detailsModal"
+        class="modal">
+
+        <div class="modal-content">
+
+            <button
+                class="close-btn"
+                onclick="closeDetails()">
+
+                ×
+
+            </button>
+
+            <h2>
+                Withdrawal Details
+            </h2>
+
+            <div
+                id="withdrawalDetails">
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<script src="/js/withdrawals.js"></script>
+
+</body>
+
+</html>
