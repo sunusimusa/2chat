@@ -451,6 +451,10 @@ const Wallet = require("../models/Wallet");
 exports.getReceivedGifts = async (req, res) => {
   try {
 
+    // =========================================
+    // GET RECEIVED GIFTS HISTORY
+    // =========================================
+
     const gifts = await Gift.find({
       receiverId: req.user._id,
       status: "completed"
@@ -464,30 +468,44 @@ exports.getReceivedGifts = async (req, res) => {
       });
 
 
-    // =====================================
-    // GET TOTAL EARNED FROM WALLET
-    // =====================================
+    // =========================================
+    // GET WALLET
+    // =========================================
 
     const wallet = await Wallet.findOne({
       userId: req.user._id
     });
 
 
+    // =========================================
+    // WALLET TOTALS
+    // =========================================
+
     const totalEarned =
-      wallet?.totalEarned || 0;
+      Number(wallet?.totalEarned || 0);
+
+    const giftsReceived =
+      Number(wallet?.giftsReceived || 0);
 
 
-    // =====================================
+    // =========================================
     // RESPONSE
-    // =====================================
+    // =========================================
 
     return res.json({
 
       success: true,
 
+      // Gift history
+      gifts,
+
+      // IMPORTANT:
+      // These come directly from Wallet,
+      // NOT by adding old gift records.
+
       totalEarned,
 
-      gifts
+      giftsReceived
 
     });
 
