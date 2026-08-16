@@ -48,11 +48,11 @@ const walletSchema = new mongoose.Schema(
     // GROSS COINS EARNED FROM GIFTS
     // =========================================
 
-    totalEarned: {
-      type: Number,
-      default: 0,
-      min: 0
-    },
+totalEarned: {
+  type: Number,
+  default: 0,
+  min: 0
+},
 
     // =========================================
     // PLATFORM COMMISSION (₦)
