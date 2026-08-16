@@ -15,8 +15,12 @@ exports.createWithdrawal = async (req, res) => {
 
     try {
 
-        const { amount } = req.body;
-
+        const {
+    amount,
+    bankName,
+    accountName,
+    accountNumber
+} = req.body;
 
         // =====================================
         // VALIDATION
@@ -165,13 +169,22 @@ exports.createWithdrawal = async (req, res) => {
                             req.user._id,
 
                         amount:
-                            withdrawalAmount,
+    withdrawalAmount,
 
-                        status:
-                            "pending",
+bankName:
+    bankName.trim(),
 
-                        lockedAmount:
-                            withdrawalAmount
+accountName:
+    accountName.trim(),
+
+accountNumber:
+    cleanAccountNumber,
+
+status:
+    "pending",
+
+lockedAmount:
+    withdrawalAmount
 
                     }
                 ],
