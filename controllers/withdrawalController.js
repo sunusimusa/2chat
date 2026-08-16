@@ -205,37 +205,37 @@ if (
         // =====================================
 
         const withdrawal =
-            await Withdrawal.create(
-                [
-                    {
+    await Withdrawal.create(
+        [
+            {
 
-                        userId:
-                            req.user._id,
+                userId:
+                    req.user._id,
 
-                        amount:
-    withdrawalAmount,
+                amount:
+                    withdrawalAmount,
 
-bankName:
-    bankName.trim(),
+                bankName:
+                    cleanBankName,
 
-accountName:
-    accountName.trim(),
+                accountName:
+                    cleanAccountName,
 
-accountNumber:
-    cleanAccountNumber,
+                accountNumber:
+                    cleanAccountNumber,
 
-status:
-    "pending",
+                status:
+                    "pending",
 
-lockedAmount:
-    withdrawalAmount
+                lockedAmount:
+                    withdrawalAmount
 
-                    }
-                ],
-                {
-                    session
-                }
-            );
+            }
+        ],
+        {
+            session
+        }
+    );
 
 
         // =====================================
