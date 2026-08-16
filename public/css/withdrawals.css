@@ -1,0 +1,623 @@
+/* =========================================
+   2CHAT WITHDRAWALS
+========================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+
+body {
+
+    margin: 0;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    background: #f5f5f5;
+
+    color: #222;
+
+}
+
+
+.withdrawals-page {
+
+    width: 100%;
+
+    max-width: 760px;
+
+    margin: auto;
+
+    min-height: 100vh;
+
+    padding-bottom: 40px;
+
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.header {
+
+    background: white;
+
+    padding: 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    box-shadow:
+        0 2px 10px
+        rgba(0,0,0,.08);
+
+}
+
+
+.back-btn {
+
+    width: 46px;
+
+    height: 46px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #ff0874;
+
+    color: white;
+
+    font-size: 25px;
+
+    cursor: pointer;
+
+}
+
+
+.header h1 {
+
+    margin: 0;
+
+    font-size: 24px;
+
+}
+
+
+.header p {
+
+    margin: 5px 0 0;
+
+    color: #777;
+
+    font-size: 14px;
+
+}
+
+
+/* =========================================
+   SUMMARY
+========================================= */
+
+.summary-card {
+
+    margin: 20px 15px;
+
+    padding: 25px;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff0874,
+            #ff3d91
+        );
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+
+    box-shadow:
+        0 8px 25px
+        rgba(255,8,116,.22);
+
+}
+
+
+.summary-icon {
+
+    font-size: 42px;
+
+}
+
+
+.summary-label {
+
+    opacity: .9;
+
+    font-size: 15px;
+
+}
+
+
+.summary-amount {
+
+    margin-top: 5px;
+
+    font-size: 32px;
+
+    font-weight: bold;
+
+}
+
+
+/* =========================================
+   MESSAGE
+========================================= */
+
+.message {
+
+    text-align: center;
+
+    min-height: 22px;
+
+    margin: 10px 15px 20px;
+
+    color: #666;
+
+}
+
+
+/* =========================================
+   SECTION TITLE
+========================================= */
+
+.section-title {
+
+    margin: 0 15px 15px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+}
+
+
+.section-title h2 {
+
+    margin: 0;
+
+    font-size: 20px;
+
+}
+
+
+.refresh-btn {
+
+    border: none;
+
+    border-radius: 10px;
+
+    padding: 10px 13px;
+
+    background: #ff0874;
+
+    color: white;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+
+.refresh-btn:disabled {
+
+    opacity: .6;
+
+    cursor: not-allowed;
+
+}
+
+
+/* =========================================
+   LIST
+========================================= */
+
+.withdrawal-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 14px;
+
+    padding: 0 15px;
+
+}
+
+
+/* =========================================
+   WITHDRAWAL CARD
+========================================= */
+
+.withdrawal-card {
+
+    background: white;
+
+    padding: 20px;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 4px 15px
+        rgba(0,0,0,.07);
+
+}
+
+
+.withdrawal-top {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+}
+
+
+.withdrawal-amount {
+
+    font-size: 23px;
+
+    font-weight: bold;
+
+}
+
+
+.withdrawal-date {
+
+    margin-top: 6px;
+
+    color: #777;
+
+    font-size: 13px;
+
+}
+
+
+.status {
+
+    padding: 7px 11px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    text-transform: capitalize;
+
+}
+
+
+/* =========================================
+   STATUS COLORS
+========================================= */
+
+.status-pending {
+
+    background: #fff3cd;
+
+    color: #946200;
+
+}
+
+
+.status-processing {
+
+    background: #e0f2fe;
+
+    color: #0369a1;
+
+}
+
+
+.status-completed {
+
+    background: #dcfce7;
+
+    color: #15803d;
+
+}
+
+
+.status-failed {
+
+    background: #fee2e2;
+
+    color: #b91c1c;
+
+}
+
+
+.status-cancelled {
+
+    background: #eeeeee;
+
+    color: #555;
+
+}
+
+
+/* =========================================
+   DETAILS
+========================================= */
+
+.withdrawal-info {
+
+    margin-top: 16px;
+
+    border-top:
+        1px solid #eee;
+
+    padding-top: 12px;
+
+}
+
+
+.info-row {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 7px 0;
+
+    font-size: 14px;
+
+}
+
+
+.info-row span:first-child {
+
+    color: #777;
+
+}
+
+
+.info-row span:last-child {
+
+    font-weight: bold;
+
+    text-align: right;
+
+    word-break: break-word;
+
+}
+
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.card-actions {
+
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 16px;
+
+}
+
+
+.card-btn {
+
+    flex: 1;
+
+    padding: 11px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+
+.details-btn {
+
+    background: #f1f1f1;
+
+    color: #333;
+
+}
+
+
+.cancel-btn {
+
+    background: #fee2e2;
+
+    color: #b91c1c;
+
+}
+
+
+.card-btn:disabled {
+
+    opacity: .6;
+
+    cursor: not-allowed;
+
+}
+
+
+/* =========================================
+   EMPTY
+========================================= */
+
+.empty {
+
+    background: white;
+
+    padding: 35px 20px;
+
+    border-radius: 18px;
+
+    text-align: center;
+
+    color: #777;
+
+    box-shadow:
+        0 4px 15px
+        rgba(0,0,0,.06);
+
+}
+
+
+/* =========================================
+   MODAL
+========================================= */
+
+.modal {
+
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    background:
+        rgba(0,0,0,.5);
+
+    padding: 20px;
+
+    z-index: 1000;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+.modal.show {
+
+    display: flex;
+
+}
+
+
+.modal-content {
+
+    width: 100%;
+
+    max-width: 500px;
+
+    max-height: 85vh;
+
+    overflow-y: auto;
+
+    background: white;
+
+    border-radius: 20px;
+
+    padding: 24px;
+
+    position: relative;
+
+}
+
+
+.modal-content h2 {
+
+    margin-top: 0;
+
+}
+
+
+.close-btn {
+
+    position: absolute;
+
+    top: 12px;
+
+    right: 15px;
+
+    width: 36px;
+
+    height: 36px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #eee;
+
+    font-size: 24px;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 520px) {
+
+    .summary-card {
+
+        margin: 15px;
+
+        padding: 20px;
+
+    }
+
+
+    .summary-amount {
+
+        font-size: 27px;
+
+    }
+
+
+    .withdrawal-top {
+
+        flex-direction: column;
+
+    }
+
+
+    .card-actions {
+
+        flex-direction: column;
+
+    }
+
+}
