@@ -272,3 +272,53 @@ exports.createWithdrawal = async (req, res) => {
     }
 
 };
+
+// =========================================
+// GET WITHDRAWAL HISTORY
+// =========================================
+
+exports.getWithdrawalHistory = async (req, res) => {
+
+    try {
+
+        const withdrawals =
+            await Withdrawal.find({
+                userId: req.user._id
+            })
+            .sort({
+                createdAt: -1
+            });
+
+
+        return res.json({
+
+            success: true,
+
+            count:
+                withdrawals.length,
+
+            withdrawals
+
+        });
+
+    } catch (err) {
+
+        console.error(
+            "GET WITHDRAWAL HISTORY ERROR:",
+            err
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                err.message ||
+                "Failed to load withdrawal history"
+
+        });
+
+    }
+
+};
