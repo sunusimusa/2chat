@@ -413,4 +413,266 @@ exports.getWithdrawalById = async (req, res) => {
 
     }
 
-};      
+}; 
+
+// =========================================
+// CANCEL WITHDRAWAL
+// =========================================
+
+exports.cancelWithdrawal = async (req, res) => {
+
+    const session =
+        await mongoose.startSession();
+
+    try {
+
+        session.startTransaction();
+
+
+        // =====================================
+        // FIND USER'S WITHDRAWAL
+        // =====================================
+
+        const withdrawal =
+            await Withdrawal.findOne({
+
+                _id: req.params.id,
+
+                userId: req.user._id
+
+            }).session(session);
+
+
+        if (!withdrawal) {
+
+            await session.abortTransaction();
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Withdrawal not found"
+
+            });
+
+        }
+
+
+        // =====================================
+        // ONLY PENDING CAN BE CANCELLED
+        // =====================================
+
+        if (
+            withdrawal.status !==
+            "pending"
+        ) {
+
+            await session.abortTransaction();
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Only pending withdrawals can be cancelled",
+
+                status:
+                    withdrawal.status
+
+            });
+
+        }
+
+
+        // =====================================
+        // GET WALLET
+        // =====================================
+
+        const wallet =
+            await Wallet.findOne({
+
+                userId:
+                    req.user._id
+
+            }).session(session);
+
+
+        if (!wallet) {
+
+            throw new Error(
+                "Wallet not found"
+            );
+
+        }
+
+
+        // =====================================
+        // LOCKED AMOUNT
+        // =====================================
+
+        const lockedAmount =
+            Number(
+                withdrawal.lockedAmount ??
+                withdrawal.amount ??
+                0
+            );
+
+
+        if (
+            lockedAmount <= 0
+        ) {
+
+            throw new Error(
+                "Invalid locked withdrawal amount"
+            );
+
+        }
+
+
+        // =====================================
+        // SAFETY CHECK
+        // =====================================
+
+        if (
+            wallet.withdrawalLockedBalance <
+            lockedAmount
+        ) {
+
+            throw new Error(
+                "Withdrawal locked balance is inconsistent"
+            );
+
+        }
+
+
+        // =====================================
+        // RETURN MONEY TO AVAILABLE BALANCE
+        // =====================================
+
+        wallet.withdrawalLockedBalance -=
+            lockedAmount;
+
+        wallet.availableBalance +=
+            lockedAmount;
+
+
+        // =====================================
+        // UPDATE WITHDRAWAL
+        // =====================================
+
+        withdrawal.status =
+            "cancelled";
+
+        withdrawal.cancelledAt =
+            new Date();
+
+        withdrawal.failureReason =
+            null;
+
+
+        // =====================================
+        // SAVE
+        // =====================================
+
+        await wallet.save({
+            session
+        });
+
+        await withdrawal.save({
+            session
+        });
+
+
+        // =====================================
+        // COMMIT
+        // =====================================
+
+        await session.commitTransaction();
+
+
+        // =====================================
+        // RESPONSE
+        // =====================================
+
+        return res.json({
+
+            success: true,
+
+            message:
+                "Withdrawal cancelled successfully",
+
+            withdrawal,
+
+            wallet: {
+
+                availableBalance:
+                    wallet.availableBalance,
+
+                withdrawalLockedBalance:
+                    wallet.withdrawalLockedBalance,
+
+                totalWithdrawn:
+                    wallet.totalWithdrawn
+
+            }
+
+        });
+
+
+    } catch (err) {
+
+        try {
+
+            await session.abortTransaction();
+
+        } catch (abortError) {
+
+            console.error(
+                "CANCEL WITHDRAWAL ABORT ERROR:",
+                abortError
+            );
+
+        }
+
+
+        console.error(
+            "CANCEL WITHDRAWAL ERROR:",
+            err
+        );
+
+
+        if (
+            err.name ===
+            "CastError"
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Invalid withdrawal ID"
+
+            });
+
+        }
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                err.message ||
+                "Failed to cancel withdrawal"
+
+        });
+
+    } finally {
+
+        await session.endSession();
+
+    }
+
+};
