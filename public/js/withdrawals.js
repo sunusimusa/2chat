@@ -442,25 +442,70 @@ function renderWithdrawal(withdrawal) {
 
             </div>
 
-
             <div
-                class="withdrawal-info">
+    class="withdrawal-info">
+
+    <div class="info-row">
+
+        <span>
+            Bank
+        </span>
+
+        <span>
+            ${escapeHTML(
+                withdrawal.bankName ||
+                "Not available"
+            )}
+        </span>
+
+    </div>
 
 
-                <div class="info-row">
+    <div class="info-row">
 
-                    <span>
-                        Locked amount
-                    </span>
+        <span>
+            Account Name
+        </span>
 
-                    <span>
-                        ${formatNaira(
-                            lockedAmount
-                        )}
-                    </span>
+        <span>
+            ${escapeHTML(
+                withdrawal.accountName ||
+                "Not available"
+            )}
+        </span>
 
-                </div>
+    </div>
 
+
+    <div class="info-row">
+
+        <span>
+            Account Number
+        </span>
+
+        <span>
+            ${escapeHTML(
+                withdrawal.accountNumber ||
+                "Not available"
+            )}
+        </span>
+
+    </div>
+
+
+    <div class="info-row">
+
+        <span>
+            Locked amount
+        </span>
+
+        <span>
+            ${formatNaira(
+                lockedAmount
+            )}
+        </span>
+
+    </div>
 
                 <div class="info-row">
 
@@ -519,6 +564,8 @@ function renderWithdrawal(withdrawal) {
                                 ✕ Cancel
 
                             </button>
+
+                            <div class="info-row">
 
                         `
                         : ""
@@ -681,6 +728,53 @@ function showWithdrawalDetails(
                 </span>
 
             </div>
+
+            <div class="info-row">
+
+    <span>
+        Bank Name
+    </span>
+
+    <span>
+        ${escapeHTML(
+            withdrawal.bankName ||
+            "Not available"
+        )}
+    </span>
+
+</div>
+
+
+<div class="info-row">
+
+    <span>
+        Account Name
+    </span>
+
+    <span>
+        ${escapeHTML(
+            withdrawal.accountName ||
+            "Not available"
+        )}
+    </span>
+
+</div>
+
+
+<div class="info-row">
+
+    <span>
+        Account Number
+    </span>
+
+    <span>
+        ${escapeHTML(
+            withdrawal.accountNumber ||
+            "Not available"
+        )}
+    </span>
+
+</div>
 
 
             <div class="info-row">
