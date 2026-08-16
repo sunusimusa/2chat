@@ -322,3 +322,95 @@ exports.getWithdrawalHistory = async (req, res) => {
     }
 
 };
+
+      // =========================================
+// GET SINGLE WITHDRAWAL
+// =========================================
+
+exports.getWithdrawalById = async (req, res) => {
+
+    try {
+
+        const withdrawal =
+            await Withdrawal.findOne({
+
+                _id: req.params.id,
+
+                userId: req.user._id
+
+            });
+
+
+        // =====================================
+        // NOT FOUND
+        // =====================================
+
+        if (!withdrawal) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Withdrawal not found"
+
+            });
+
+        }
+
+
+        // =====================================
+        // RESPONSE
+        // =====================================
+
+        return res.json({
+
+            success: true,
+
+            withdrawal
+
+        });
+
+
+    } catch (err) {
+
+        console.error(
+            "GET WITHDRAWAL BY ID ERROR:",
+            err
+        );
+
+
+        // =====================================
+        // INVALID OBJECT ID
+        // =====================================
+
+        if (
+            err.name ===
+            "CastError"
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Invalid withdrawal ID"
+
+            });
+
+        }
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                err.message ||
+                "Failed to load withdrawal"
+
+        });
+
+    }
+
+};      
