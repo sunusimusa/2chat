@@ -552,25 +552,21 @@ function renderWithdrawal(withdrawal) {
 
                 </button>
 
-
                 ${
-                    status === "pending"
-                        ? `
+    status === "pending"
+        ? `
 
-                            <button
-                                class="card-btn cancel-btn"
-                                onclick="cancelWithdrawal('${id}')">
+            <button
+                class="card-btn cancel-btn"
+                onclick="cancelWithdrawal('${id}')">
 
-                                ✕ Cancel
+                ✕ Cancel
 
-                            </button>
+            </button>
 
-                            <div class="info-row">
-
-                        `
-                        : ""
-                }
-
+        `
+        : ""
+}
 
             </div>
 
