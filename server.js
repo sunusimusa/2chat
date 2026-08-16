@@ -24,6 +24,8 @@ const walletRoutes =
 require("./routes/walletRoutes");
 const giftRoutes =
 require("./routes/giftRoutes");
+const withdrawalRoutes =
+    require("./routes/withdrawalRoutes");
 
 
 const app = express();
@@ -63,6 +65,7 @@ app.use("/api/status", statusRoutes);
 app.use("/api/shorts", shortVideoRoutes);
 app.use("/api/wallet",walletRoutes);
 app.use("/api/gifts", giftRoutes);
+app.use("/api/withdrawals",withdrawalRoutes);
 
 app.get("/",(req,res)=>{
   res.send("🚀 2Chat Server Running Successfully");
