@@ -1,16 +1,14 @@
 const router = require("express").Router();
 
-const protect =
-    require("../middleware/auth");
+const protect = require("../middleware/auth");
 
 const {
     getMonetizationStatus
-} =
-    require("../controllers/monetizationController");
+} = require("../controllers/monetizationController");
 
 
 // =========================================
-// GET CREATOR MONETIZATION STATUS
+// CREATOR MONETIZATION STATUS
 // =========================================
 
 router.get(
