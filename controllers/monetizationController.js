@@ -1,8 +1,7 @@
 const User = require("../models/User");
 const ShortVideo = require("../models/ShortVideo");
+const Wallet = require("../models/Wallet");
 const Monetization = require("../models/Monetization");
-
-
 // =====================================================
 // MONETIZATION RULES
 // =====================================================
@@ -22,49 +21,45 @@ const MONETIZATION_RULES = {
 };
 
 
-// =====================================================
-// GET MONETIZATION STATUS
-// GET /api/monetization/status
-// =====================================================
+// =========================================
+// MONETIZATION STATUS
+// =========================================
 
 exports.getMonetizationStatus = async (req, res) => {
 
     try {
-
-        // =========================================
-        // GET LOGGED-IN USER
-        // =========================================
 
         const userId = req.user._id;
 
         const user = await User.findById(userId);
 
         if (!user) {
-
             return res.status(404).json({
-
                 success: false,
-
                 message: "User not found"
-
             });
-
         }
+
+
+        // =========================================
+        // REQUIREMENTS
+        // =========================================
+
+        const minimumAccountAgeDays = 30;
+        const minimumFollowers = 100;
+        const minimumViews = 10000;
+        const minimumWatchTime = 3600;
+        const minimumEarnings = 5000;
 
 
         // =========================================
         // ACCOUNT AGE
         // =========================================
 
-        const createdAt = new Date(user.createdAt);
-
         const now = new Date();
 
         const accountAgeDays = Math.floor(
-            (
-                now.getTime() -
-                createdAt.getTime()
-            ) /
+            (now - user.createdAt) /
             (1000 * 60 * 60 * 24)
         );
 
@@ -74,26 +69,15 @@ exports.getMonetizationStatus = async (req, res) => {
         // =========================================
 
         const videos = await ShortVideo.find({
-
             username: user.username
-
         });
 
 
-        // =========================================
-        // CALCULATE CREATOR STATS
-        // =========================================
-
         let totalViews = 0;
-
         let totalWatchTime = 0;
-
         let totalLikes = 0;
-
         let totalComments = 0;
-
         let totalShares = 0;
-
         let totalSaves = 0;
 
 
@@ -120,55 +104,26 @@ exports.getMonetizationStatus = async (req, res) => {
 
 
         // =========================================
-        // FIND MONETIZATION RECORD
+        // WALLET
+        // IMPORTANT:
+        // Earnings da balance suna fitowa
+        // daga Wallet, ba Monetization ba.
         // =========================================
 
-        let monetization =
-            await Monetization.findOne({
+        const wallet = await Wallet.findOne({
+            userId: user._id
+        });
 
-                userId
-
-            });
-
-
-        // =========================================
-        // CREATE RECORD IF NOT EXISTS
-        // =========================================
-
-        if (!monetization) {
-
-            monetization =
-                await Monetization.create({
-
-                    userId,
-
-                    status: "not_eligible",
-
-                    totalEarned: 0,
-
-                    availableEarnings: 0,
-
-                    withdrawnAmount: 0,
-
-                    monetizedViews: 0,
-
-                    monetizedVideos: 0
-
-                });
-
-        }
-
-
-        // =========================================
-        // CURRENT EARNINGS
-        // =========================================
 
         const totalEarned =
-            monetization.totalEarned || 0;
+            wallet?.totalEarned || 0;
+
+        const availableBalance =
+            wallet?.availableBalance || 0;
 
 
         // =========================================
-        // CHECK REQUIREMENTS
+        // CURRENT REQUIREMENTS
         // =========================================
 
         const requirements = {
@@ -176,16 +131,14 @@ exports.getMonetizationStatus = async (req, res) => {
             accountAge: {
 
                 required:
-                    MONETIZATION_RULES
-                        .minimumAccountAgeDays,
+                    minimumAccountAgeDays,
 
                 current:
                     accountAgeDays,
 
                 met:
                     accountAgeDays >=
-                    MONETIZATION_RULES
-                        .minimumAccountAgeDays
+                    minimumAccountAgeDays
 
             },
 
@@ -193,18 +146,14 @@ exports.getMonetizationStatus = async (req, res) => {
             followers: {
 
                 required:
-                    MONETIZATION_RULES
-                        .minimumFollowers,
+                    minimumFollowers,
 
                 current:
                     user.followers?.length || 0,
 
                 met:
-                    (
-                        user.followers?.length || 0
-                    ) >=
-                    MONETIZATION_RULES
-                        .minimumFollowers
+                    (user.followers?.length || 0) >=
+                    minimumFollowers
 
             },
 
@@ -212,16 +161,14 @@ exports.getMonetizationStatus = async (req, res) => {
             views: {
 
                 required:
-                    MONETIZATION_RULES
-                        .minimumViews,
+                    minimumViews,
 
                 current:
                     totalViews,
 
                 met:
                     totalViews >=
-                    MONETIZATION_RULES
-                        .minimumViews
+                    minimumViews
 
             },
 
@@ -229,16 +176,14 @@ exports.getMonetizationStatus = async (req, res) => {
             watchTime: {
 
                 required:
-                    MONETIZATION_RULES
-                        .minimumWatchTime,
+                    minimumWatchTime,
 
                 current:
                     totalWatchTime,
 
                 met:
                     totalWatchTime >=
-                    MONETIZATION_RULES
-                        .minimumWatchTime
+                    minimumWatchTime
 
             },
 
@@ -246,16 +191,14 @@ exports.getMonetizationStatus = async (req, res) => {
             earnings: {
 
                 required:
-                    MONETIZATION_RULES
-                        .minimumEarnings,
+                    minimumEarnings,
 
                 current:
                     totalEarned,
 
                 met:
                     totalEarned >=
-                    MONETIZATION_RULES
-                        .minimumEarnings
+                    minimumEarnings
 
             }
 
@@ -263,29 +206,113 @@ exports.getMonetizationStatus = async (req, res) => {
 
 
         // =========================================
-        // CHECK ALL REQUIREMENTS
+        // CHECK IF ALL REQUIREMENTS ARE MET
         // =========================================
 
-        const eligible =
-            Object.values(requirements)
-                .every(requirement =>
-                    requirement.met
-                );
+        const allRequirementsMet =
+            requirements.accountAge.met &&
+            requirements.followers.met &&
+            requirements.views.met &&
+            requirements.watchTime.met &&
+            requirements.earnings.met;
 
 
         // =========================================
-        // UPDATE STATUS
+        // GET / CREATE MONETIZATION RECORD
         // =========================================
 
-        if (monetization.status !== "active") {
+        let monetization =
+            await Monetization.findOne({
+                userId: user._id
+            });
 
-            monetization.status =
-                eligible
-                    ? "eligible"
-                    : "not_eligible";
+
+        if (!monetization) {
+
+            monetization =
+                new Monetization({
+
+                    userId: user._id,
+
+                    eligible: false,
+
+                    eligibleAt: null,
+
+                    status: "not_eligible"
+
+                });
 
         }
 
+
+        // =========================================
+        // GRANDFATHER ELIGIBILITY
+        // =========================================
+
+        if (!monetization.eligible) {
+
+            if (allRequirementsMet) {
+
+                monetization.eligible = true;
+
+                monetization.eligibleAt =
+                    monetization.eligibleAt ||
+                    new Date();
+
+                monetization.status =
+                    "eligible";
+
+
+                // Save stats at the moment
+                // creator becomes eligible.
+
+                monetization.eligibilitySnapshot = {
+
+                    followers:
+                        user.followers?.length || 0,
+
+                    views:
+                        totalViews,
+
+                    watchTime:
+                        totalWatchTime,
+
+                    earnings:
+                        totalEarned,
+
+                    accountAgeDays:
+                        accountAgeDays
+
+                };
+
+
+            } else {
+
+                monetization.eligible =
+                    false;
+
+                // Kada mu taba pending,
+                // approved, etc. idan an riga
+                // an fara wani flow.
+
+                if (
+                    monetization.status ===
+                    "not_eligible"
+                ) {
+
+                    monetization.status =
+                        "not_eligible";
+
+                }
+
+            }
+
+        }
+
+
+        // =========================================
+        // SAVE MONETIZATION
+        // =========================================
 
         await monetization.save();
 
@@ -294,19 +321,34 @@ exports.getMonetizationStatus = async (req, res) => {
         // RESPONSE
         // =========================================
 
-        return res.json({
+        res.json({
 
             success: true,
 
             monetization: {
 
-                eligible,
+                eligible:
+                    monetization.eligible,
+
+                eligibleAt:
+                    monetization.eligibleAt,
 
                 status:
                     monetization.status,
 
-                rules:
-                    MONETIZATION_RULES,
+                rules: {
+
+                    minimumAccountAgeDays,
+
+                    minimumFollowers,
+
+                    minimumViews,
+
+                    minimumWatchTime,
+
+                    minimumEarnings
+
+                },
 
                 requirements,
 
@@ -341,8 +383,7 @@ exports.getMonetizationStatus = async (req, res) => {
 
                     totalEarned,
 
-                    availableBalance:
-                        monetization.availableEarnings || 0,
+                    availableBalance,
 
                     accountAgeDays
 
@@ -353,23 +394,24 @@ exports.getMonetizationStatus = async (req, res) => {
         });
 
 
-    } catch (error) {
+    } catch (err) {
 
         console.error(
             "MONETIZATION STATUS ERROR:",
-            error
+            err
         );
 
-
-        return res.status(500).json({
+        res.status(500).json({
 
             success: false,
 
-            message:
-                "Failed to check monetization status"
+            message: err.message
 
         });
 
     }
 
 };
+
+        
+                    
