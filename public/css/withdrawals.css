@@ -161,6 +161,270 @@ body {
 
 }
 
+/* =========================================
+   REQUEST WITHDRAWAL FORM
+========================================= */
+
+.withdrawal-form {
+
+    margin: 0 15px 25px;
+
+    background: white;
+
+    padding: 22px;
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 4px 18px
+        rgba(0, 0, 0, .07);
+
+}
+
+
+/* =========================================
+   FORM DESCRIPTION
+========================================= */
+
+.withdrawal-form p {
+
+    margin: 0 0 20px;
+
+    color: #666;
+
+    font-size: 15px;
+
+    line-height: 1.5;
+
+}
+
+
+/* =========================================
+   FORM GROUP
+========================================= */
+
+.withdrawal-form .form-group {
+
+    margin-bottom: 16px;
+
+}
+
+
+/* =========================================
+   LABEL
+========================================= */
+
+.withdrawal-form label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    color: #333;
+
+}
+
+
+/* =========================================
+   INPUTS
+========================================= */
+
+.withdrawal-form input {
+
+    width: 100%;
+
+    height: 48px;
+
+    padding: 0 14px;
+
+    border: 1px solid #d5d5d5;
+
+    border-radius: 10px;
+
+    background: #fff;
+
+    color: #222;
+
+    font-size: 15px;
+
+    outline: none;
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease;
+
+}
+
+
+/* =========================================
+   INPUT FOCUS
+========================================= */
+
+.withdrawal-form input:focus {
+
+    border-color: #ff0874;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(255, 8, 116, .10);
+
+}
+
+
+/* =========================================
+   PLACEHOLDER
+========================================= */
+
+.withdrawal-form input::placeholder {
+
+    color: #999;
+
+}
+
+
+/* =========================================
+   NUMBER INPUT
+========================================= */
+
+.withdrawal-form input[type="number"] {
+
+    appearance: textfield;
+
+}
+
+
+/* =========================================
+   SUBMIT BUTTON
+========================================= */
+
+#withdrawBtn {
+
+    width: 100%;
+
+    min-height: 50px;
+
+    margin-top: 5px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background: #ff0874;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 6px 16px
+        rgba(255, 8, 116, .20);
+
+    transition:
+        transform .15s ease,
+        opacity .15s ease;
+
+}
+
+
+/* =========================================
+   BUTTON HOVER
+========================================= */
+
+#withdrawBtn:hover {
+
+    opacity: .92;
+
+}
+
+
+/* =========================================
+   BUTTON ACTIVE
+========================================= */
+
+#withdrawBtn:active {
+
+    transform: scale(.98);
+
+}
+
+
+/* =========================================
+   BUTTON DISABLED
+========================================= */
+
+#withdrawBtn:disabled {
+
+    opacity: .6;
+
+    cursor: not-allowed;
+
+    transform: none;
+
+}
+
+
+/* =========================================
+   WITHDRAW MESSAGE
+========================================= */
+
+#withdrawMessage {
+
+    min-height: 22px;
+
+    margin: 12px 0 0;
+
+    text-align: center;
+
+    color: #666;
+
+    font-size: 14px;
+
+}
+
+
+/* =========================================
+   MOBILE FORM
+========================================= */
+
+@media (max-width: 520px) {
+
+    .withdrawal-form {
+
+        margin: 0 15px 25px;
+
+        padding: 18px;
+
+        border-radius: 18px;
+
+    }
+
+
+    .withdrawal-form input {
+
+        height: 50px;
+
+        font-size: 16px;
+
+    }
+
+
+    #withdrawBtn {
+
+        min-height: 52px;
+
+        font-size: 16px;
+
+    }
+
+}
 
 /* =========================================
    MESSAGE
