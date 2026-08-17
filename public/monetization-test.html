@@ -216,6 +216,17 @@
     🧪 Make Me Eligible (TEST)
 </button>
 
+        <button
+    id="applyBtn"
+    onclick="applyForMonetization()"
+    style="
+        margin-top:10px;
+        background:#168a45;
+    "
+>
+    📩 Apply for Monetization
+</button>
+
 
         <div id="message">
             Ready...
@@ -919,6 +930,134 @@ async function makeMeEligible() {
             "🧪 Make Me Eligible (TEST)";
 
     }
+
+}
+
+
+    async function applyForMonetization() {
+
+    const button =
+        document.getElementById("applyBtn");
+
+    const message =
+        document.getElementById("message");
+
+    const token =
+        localStorage.getItem("token");
+
+
+    if (!token) {
+
+        message.innerText =
+            "❌ Please login first.";
+
+        return;
+
+    }
+
+
+    button.disabled = true;
+
+    button.innerText =
+        "Submitting...";
+
+
+    message.innerText =
+        "📩 Submitting monetization application...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/monetization/apply",
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Authorization":
+                            "Bearer " + token,
+
+                        "Content-Type":
+                            "application/json"
+
+                    }
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "MONETIZATION APPLY:",
+            data
+        );
+
+
+        if (!response.ok) {
+
+            message.innerText =
+                "❌ " +
+                (
+                    data.message ||
+                    "Application failed."
+                );
+
+            return;
+
+        }
+
+
+        if (!data.success) {
+
+            message.innerText =
+                "❌ " +
+                (
+                    data.message ||
+                    "Application failed."
+                );
+
+            return;
+
+        }
+
+
+        message.innerText =
+            "✅ Application submitted successfully.";
+
+
+        /*
+        =====================================
+        REFRESH MONETIZATION STATUS
+        =====================================
+        */
+
+        await testMonetization();
+
+
+    } catch (error) {
+
+        console.error(
+            "APPLY MONETIZATION ERROR:",
+            error
+        );
+
+
+        message.innerText =
+            "❌ Connection error.";
+
+    }
+
+
+    button.disabled = false;
+
+    button.innerText =
+        "📩 Apply for Monetization";
 
 }
 
