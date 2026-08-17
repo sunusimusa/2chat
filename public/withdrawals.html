@@ -17,21 +17,28 @@
 
 </head>
 
+
 <body>
+
 
 <div class="withdrawals-page">
 
-    <!-- HEADER -->
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
 
     <header class="header">
 
         <button
+            type="button"
             class="back-btn"
             onclick="history.back()">
 
             ←
 
         </button>
+
 
         <div>
 
@@ -48,7 +55,9 @@
     </header>
 
 
-    <!-- WALLET SUMMARY -->
+    <!-- =========================================
+         WALLET SUMMARY
+    ========================================== -->
 
     <section class="summary-card">
 
@@ -56,11 +65,13 @@
             💰
         </div>
 
+
         <div>
 
             <div class="summary-label">
                 Available Balance
             </div>
+
 
             <div
                 id="availableBalance"
@@ -74,114 +85,138 @@
 
     </section>
 
+
     <!-- =========================================
-     WITHDRAWAL REQUEST
-========================================= -->
+         WITHDRAWAL REQUEST
+    ========================================== -->
 
-<section class="withdrawal-form-card">
+    <section class="withdrawal-form-card">
 
-    <h2>
-        💸 Request Withdrawal
-    </h2>
-
-    <p class="form-description">
-        Enter the amount and your bank account details.
-    </p>
-
-
-    <form
-        id="withdrawalForm">
-
-
-        <div class="form-group">
-
-            <label for="amount">
-                Withdrawal Amount
-            </label>
-
-            <input
-                type="number"
-                id="amount"
-                name="amount"
-                min="1"
-                step="0.01"
-                placeholder="₦0.00"
-                required>
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label for="bankName">
-                Bank Name
-            </label>
-
-            <input
-                type="text"
-                id="bankName"
-                name="bankName"
-                placeholder="e.g. Access Bank"
-                required>
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label for="accountName">
-                Account Name
-            </label>
-
-            <input
-                type="text"
-                id="accountName"
-                name="accountName"
-                placeholder="Account holder name"
-                required>
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label for="accountNumber">
-                Account Number
-            </label>
-
-            <input
-                type="text"
-                id="accountNumber"
-                name="accountNumber"
-                inputmode="numeric"
-                maxlength="20"
-                placeholder="Account number"
-                required>
-
-        </div>
-
-
-        <button
-            type="submit"
-            id="withdrawBtn">
-
+        <h2>
             💸 Request Withdrawal
-
-        </button>
-
-
-        <div
-            id="withdrawMessage"
-            class="withdraw-message">
-
-        </div>
-
-    </form>
-
-</section>
+        </h2>
 
 
-    <!-- MESSAGE -->
+        <p class="form-description">
+            Enter the amount and your bank account details.
+        </p>
+
+
+        <form
+            id="withdrawalForm">
+
+
+            <!-- AMOUNT -->
+
+            <div class="form-group">
+
+                <label for="amount">
+                    Withdrawal Amount
+                </label>
+
+
+                <input
+                    type="number"
+                    id="amount"
+                    name="amount"
+                    min="1"
+                    step="0.01"
+                    placeholder="₦0.00"
+                    required>
+
+            </div>
+
+
+            <!-- BANK NAME -->
+
+            <div class="form-group">
+
+                <label for="bankName">
+                    Bank Name
+                </label>
+
+
+                <input
+                    type="text"
+                    id="bankName"
+                    name="bankName"
+                    placeholder="e.g. Access Bank"
+                    autocomplete="off"
+                    required>
+
+            </div>
+
+
+            <!-- ACCOUNT NAME -->
+
+            <div class="form-group">
+
+                <label for="accountName">
+                    Account Name
+                </label>
+
+
+                <input
+                    type="text"
+                    id="accountName"
+                    name="accountName"
+                    placeholder="Account holder name"
+                    autocomplete="name"
+                    required>
+
+            </div>
+
+
+            <!-- ACCOUNT NUMBER -->
+
+            <div class="form-group">
+
+                <label for="accountNumber">
+                    Account Number
+                </label>
+
+
+                <input
+                    type="text"
+                    id="accountNumber"
+                    name="accountNumber"
+                    inputmode="numeric"
+                    maxlength="20"
+                    placeholder="Account number"
+                    autocomplete="off"
+                    required>
+
+            </div>
+
+
+            <!-- SUBMIT -->
+
+            <button
+                type="submit"
+                id="withdrawBtn">
+
+                💸 Request Withdrawal
+
+            </button>
+
+
+            <!-- FORM MESSAGE -->
+
+            <div
+                id="withdrawMessage"
+                class="withdraw-message">
+
+            </div>
+
+
+        </form>
+
+    </section>
+
+
+    <!-- =========================================
+         GENERAL MESSAGE
+    ========================================== -->
 
     <div
         id="message"
@@ -192,17 +227,23 @@
     </div>
 
 
-    <!-- WITHDRAWAL LIST -->
+    <!-- =========================================
+         WITHDRAWAL HISTORY
+    ========================================== -->
 
     <section>
 
+
         <div class="section-title">
+
 
             <h2>
                 Withdrawal History
             </h2>
 
+
             <button
+                type="button"
                 id="refreshBtn"
                 class="refresh-btn"
                 onclick="loadWithdrawals()">
@@ -210,6 +251,7 @@
                 🔄 Refresh
 
             </button>
+
 
         </div>
 
@@ -220,18 +262,24 @@
 
         </div>
 
+
     </section>
 
 
-    <!-- DETAILS MODAL -->
+    <!-- =========================================
+         DETAILS MODAL
+    ========================================== -->
 
     <div
         id="detailsModal"
         class="modal">
 
+
         <div class="modal-content">
 
+
             <button
+                type="button"
                 class="close-btn"
                 onclick="closeDetails()">
 
@@ -239,14 +287,17 @@
 
             </button>
 
+
             <h2>
                 Withdrawal Details
             </h2>
+
 
             <div
                 id="withdrawalDetails">
 
             </div>
+
 
         </div>
 
@@ -256,7 +307,14 @@
 </div>
 
 
-<script src="/js/withdrawals.js"></script>
+<!-- =========================================
+     JAVASCRIPT
+========================================== -->
+
+<script
+    src="/js/withdrawals.js">
+</script>
+
 
 </body>
 
