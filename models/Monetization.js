@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const monetizationSchema = new mongoose.Schema(
     {
+
         // =========================================
         // CREATOR
         // =========================================
@@ -14,43 +15,25 @@ const monetizationSchema = new mongoose.Schema(
             index: true
         },
 
-        // =========================================
-        // EARNINGS
-        // =========================================
-
-        totalEarned: {
-            type: Number,
-            default: 0,
-            min: 0
-        },
-
-        availableEarnings: {
-            type: Number,
-            default: 0,
-            min: 0
-        },
-
-        withdrawnAmount: {
-            type: Number,
-            default: 0,
-            min: 0
-        },
 
         // =========================================
-        // MONETIZED ACTIVITY
+        // ELIGIBILITY
         // =========================================
 
-        monetizedViews: {
-            type: Number,
-            default: 0,
-            min: 0
+        eligible: {
+            type: Boolean,
+            default: false,
+            index: true
         },
 
-        monetizedVideos: {
-            type: Number,
-            default: 0,
-            min: 0
+        // Ranar da creator ya fara zama eligible
+        // Wannan shi ne zai taimaka wajen
+        // grandfathering idan requirements sun canza.
+        eligibleAt: {
+            type: Date,
+            default: null
         },
+
 
         // =========================================
         // MONETIZATION STATUS
@@ -58,35 +41,105 @@ const monetizationSchema = new mongoose.Schema(
 
         status: {
             type: String,
+
             enum: [
                 "not_eligible",
                 "eligible",
-                "active",
+                "pending",
+                "approved",
+                "rejected",
                 "suspended"
             ],
+
             default: "not_eligible",
+
             index: true
         },
 
+
         // =========================================
-        // ACTIVATION
+        // APPLICATION
         // =========================================
 
-        activatedAt: {
+        appliedAt: {
             type: Date,
             default: null
         },
 
-        lastEarningAt: {
+        reviewedAt: {
             type: Date,
             default: null
+        },
+
+
+        // =========================================
+        // REJECTION / SUSPENSION
+        // =========================================
+
+        rejectionReason: {
+            type: String,
+            default: null,
+            trim: true
+        },
+
+        suspensionReason: {
+            type: String,
+            default: null,
+            trim: true
+        },
+
+
+        // =========================================
+        // ELIGIBILITY SNAPSHOT
+        // =========================================
+        // Za mu adana stats lokacin da creator
+        // ya zama eligible.
+
+        eligibilitySnapshot: {
+
+            followers: {
+                type: Number,
+                default: 0
+            },
+
+            views: {
+                type: Number,
+                default: 0
+            },
+
+            watchTime: {
+                type: Number,
+                default: 0
+            },
+
+            earnings: {
+                type: Number,
+                default: 0
+            },
+
+            accountAgeDays: {
+                type: Number,
+                default: 0
+            }
+
         }
 
     },
+
     {
         timestamps: true
     }
 );
+
+
+// =========================================
+// INDEXES
+// =========================================
+
+monetizationSchema.index({
+    eligible: 1,
+    status: 1
+});
 
 
 // =========================================
