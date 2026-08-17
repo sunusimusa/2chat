@@ -13,45 +13,39 @@
 
     <style>
 
-        * {
-            box-sizing: border-box;
-        }
-
         body {
             margin: 0;
             padding: 20px;
             font-family: Arial, sans-serif;
             background: #f5f5f5;
-            color: #111;
         }
 
         .container {
-            max-width: 650px;
+            max-width: 600px;
             margin: auto;
         }
 
         .card {
             background: white;
-            padding: 22px;
+            padding: 20px;
             border-radius: 18px;
-            box-shadow:
-                0 4px 18px
-                rgba(0,0,0,.08);
+            box-shadow: 0 4px 15px rgba(0,0,0,.08);
         }
 
         h1 {
             margin-top: 0;
-            margin-bottom: 8px;
+            font-size: 32px;
         }
 
         .subtitle {
             color: #666;
-            margin-top: 0;
+            font-size: 18px;
+            line-height: 1.4;
         }
 
         button {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             border: none;
             border-radius: 12px;
             background: #ff0874;
@@ -59,165 +53,127 @@
             font-size: 17px;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 15px;
+            margin-top: 20px;
         }
 
         button:disabled {
             opacity: .6;
-            cursor: not-allowed;
         }
 
         #message {
             margin-top: 18px;
+            font-size: 17px;
         }
 
-        /* =====================================
-           ELIGIBILITY BADGE
-        ===================================== */
+        /* =========================
+           ELIGIBILITY STATUS
+        ========================= */
 
         .status-box {
             margin-top: 20px;
-            padding: 18px;
-            border-radius: 14px;
+            padding: 22px;
+            border-radius: 18px;
             text-align: center;
+            font-size: 22px;
             font-weight: bold;
-            font-size: 19px;
+            border: 3px solid;
         }
 
         .eligible {
-            background: #e8fff1;
-            color: #087a35;
-            border: 2px solid #18b957;
+            color: #168a45;
+            background: #effff5;
+            border-color: #35b96f;
         }
 
         .not-eligible {
-            background: #fff1f1;
-            color: #b42318;
-            border: 2px solid #ff5c5c;
+            color: #c52c2c;
+            background: #fff3f3;
+            border-color: #ff6666;
         }
 
-        /* =====================================
+        /* =========================
            REQUIREMENTS
-        ===================================== */
+        ========================= */
 
         .section-title {
-            margin-top: 25px;
-            margin-bottom: 12px;
-            font-size: 18px;
-            font-weight: bold;
+            margin-top: 30px;
+            font-size: 25px;
         }
 
         .requirement {
-            background: #fafafa;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 12px;
+            margin-top: 18px;
+            padding: 18px;
+            border: 2px solid #ddd;
+            border-radius: 16px;
         }
 
         .requirement-header {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             gap: 10px;
+            font-size: 18px;
             font-weight: bold;
         }
 
-        .requirement-name {
-            font-size: 15px;
-        }
-
-        .requirement-status {
-            font-size: 14px;
-        }
-
         .met {
-            color: #0a8f42;
+            color: #159447;
         }
 
-        .missing {
-            color: #d92d20;
+        .not-met {
+            color: #d93636;
         }
 
         .progress-bg {
-            width: 100%;
-            height: 10px;
+            height: 14px;
             background: #e5e5e5;
             border-radius: 20px;
-            margin-top: 10px;
             overflow: hidden;
+            margin-top: 15px;
         }
 
-        .progress-bar {
+        .progress {
             height: 100%;
-            width: 0%;
             background: #ff0874;
             border-radius: 20px;
-            transition: width .4s ease;
         }
 
-        .requirement-values {
-            margin-top: 8px;
-            color: #666;
-            font-size: 13px;
+        .numbers {
+            margin-top: 12px;
+            color: #555;
+            font-size: 17px;
         }
 
-        /* =====================================
-           CREATOR STATS
-        ===================================== */
+        /* =========================
+           STATS
+        ========================= */
 
-        .stats {
+        .stats-grid {
             display: grid;
-            grid-template-columns:
-                repeat(2, 1fr);
-
-            gap: 10px;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 18px;
         }
 
         .stat {
-            background: #f8f8f8;
-            border-radius: 12px;
-            padding: 14px;
+            background: #fafafa;
+            padding: 18px;
+            border-radius: 16px;
         }
 
         .stat-label {
             color: #777;
-            font-size: 13px;
+            font-size: 16px;
         }
 
         .stat-value {
-            font-size: 20px;
+            margin-top: 8px;
+            font-size: 24px;
             font-weight: bold;
-            margin-top: 5px;
-        }
-
-        /* =====================================
-           JSON
-        ===================================== */
-
-        pre {
-            margin-top: 20px;
-            background: #111;
-            color: #00ff88;
-            padding: 15px;
-            border-radius: 12px;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            word-break: break-word;
-            font-size: 13px;
         }
 
         .hidden {
             display: none;
-        }
-
-        .success-message {
-            margin-top: 12px;
-            padding: 14px;
-            background: #e8fff1;
-            border-radius: 12px;
-            color: #087a35;
-            font-weight: bold;
-            text-align: center;
         }
 
     </style>
@@ -255,344 +211,86 @@
         </div>
 
 
-        <!-- =====================================
+        <!-- =========================
              ELIGIBILITY STATUS
-        ====================================== -->
+        ========================= -->
 
         <div
             id="statusBox"
             class="status-box hidden">
-
         </div>
 
 
-        <!-- =====================================
-             SUCCESS MESSAGE
-        ====================================== -->
-
-        <div
-            id="successMessage"
-            class="success-message hidden">
-
-            🎉 Congratulations! You have met all
-            monetization requirements.
-
-        </div>
-
-
-        <!-- =====================================
+        <!-- =========================
              REQUIREMENTS
-        ====================================== -->
+        ========================= -->
 
-        <div
-            id="requirementsSection"
-            class="hidden">
+        <div id="requirementsSection"
+             class="hidden">
 
-            <div class="section-title">
+            <h2 class="section-title">
                 📋 Monetization Requirements
-            </div>
+            </h2>
 
             <div id="requirements"></div>
 
         </div>
 
 
-        <!-- =====================================
+        <!-- =========================
              CREATOR STATS
-        ====================================== -->
+        ========================= -->
 
-        <div
-            id="statsSection"
-            class="hidden">
+        <div id="statsSection"
+             class="hidden">
 
-            <div class="section-title">
+            <h2 class="section-title">
                 📊 Creator Stats
-            </div>
+            </h2>
 
             <div
                 id="stats"
-                class="stats">
+                class="stats-grid">
             </div>
 
         </div>
-
-
-        <!-- =====================================
-             RAW API RESPONSE
-        ====================================== -->
-
-        <pre
-            id="result">No result yet.</pre>
 
     </div>
 
 </div>
 
 
-
 <script>
 
-
-// =========================================
-// HELPERS
-// =========================================
-
-function formatNumber(number) {
-
-    return Number(
-        number || 0
-    ).toLocaleString();
-
-}
-
-
-function formatMoney(number) {
-
-    return "₦" +
-        Number(
-            number || 0
-        ).toLocaleString();
-
-}
-
-
-// =========================================
-// CREATE REQUIREMENT
-// =========================================
-
-function createRequirement(
-    name,
-    current,
-    required,
-    money = false
-) {
-
-    current =
-        Number(current || 0);
-
-    required =
-        Number(required || 0);
-
-
-    let percentage = 0;
-
-
-    if (required > 0) {
-
-        percentage =
-            (current / required) * 100;
-
-    }
-
-
-    percentage =
-        Math.min(
-            100,
-            Math.max(
-                0,
-                percentage
-            )
-        );
-
-
-    const met =
-        current >= required;
-
-
-    const currentText =
-        money
-            ? formatMoney(current)
-            : formatNumber(current);
-
-
-    const requiredText =
-        money
-            ? formatMoney(required)
-            : formatNumber(required);
-
-
-    const statusText =
-        met
-            ? "✅ Met"
-            : "❌ Not met";
-
-
-    const statusClass =
-        met
-            ? "met"
-            : "missing";
-
-
-    const remaining =
-        Math.max(
-            0,
-            required - current
-        );
-
-
-    const remainingText =
-        money
-            ? formatMoney(remaining)
-            : formatNumber(remaining);
-
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-
-    div.className =
-        "requirement";
-
-
-    div.innerHTML = `
-
-        <div class="requirement-header">
-
-            <div class="requirement-name">
-                ${name}
-            </div>
-
-            <div
-                class="requirement-status ${statusClass}">
-
-                ${statusText}
-
-            </div>
-
-        </div>
-
-
-        <div class="progress-bg">
-
-            <div
-                class="progress-bar"
-                style="width:${percentage}%">
-
-            </div>
-
-        </div>
-
-
-        <div class="requirement-values">
-
-            ${currentText}
-            /
-            ${requiredText}
-
-            ${
-                met
-                ? ""
-                : `
-                    <br>
-                    Need ${remainingText} more
-                `
-            }
-
-        </div>
-
-    `;
-
-
-    return div;
-
-}
-
-
-// =========================================
-// TEST MONETIZATION
-// =========================================
 
 async function testMonetization() {
 
     const button =
-        document.getElementById(
-            "testBtn"
-        );
-
+        document.getElementById("testBtn");
 
     const message =
-        document.getElementById(
-            "message"
-        );
-
-
-    const result =
-        document.getElementById(
-            "result"
-        );
-
+        document.getElementById("message");
 
     const statusBox =
-        document.getElementById(
-            "statusBox"
-        );
-
-
-    const successMessage =
-        document.getElementById(
-            "successMessage"
-        );
-
+        document.getElementById("statusBox");
 
     const requirementsSection =
         document.getElementById(
             "requirementsSection"
         );
 
-
-    const requirementsContainer =
+    const requirements =
         document.getElementById(
             "requirements"
         );
-
 
     const statsSection =
         document.getElementById(
             "statsSection"
         );
 
-
-    const statsContainer =
-        document.getElementById(
-            "stats"
-        );
-
-
-    // =====================================
-    // RESET
-    // =====================================
-
-    statusBox.className =
-        "status-box hidden";
-
-
-    statusBox.innerText =
-        "";
-
-
-    successMessage.classList.add(
-        "hidden"
-    );
-
-
-    requirementsSection.classList.add(
-        "hidden"
-    );
-
-
-    statsSection.classList.add(
-        "hidden"
-    );
-
-
-    requirementsContainer.innerHTML =
-        "";
-
-
-    statsContainer.innerHTML =
-        "";
+    const stats =
+        document.getElementById("stats");
 
 
     // =====================================
@@ -600,42 +298,31 @@ async function testMonetization() {
     // =====================================
 
     const token =
-        localStorage.getItem(
-            "token"
-        );
+        localStorage.getItem("token");
 
 
     if (!token) {
 
         message.innerText =
-            "❌ No login token found. Please login first.";
-
-        result.innerText =
-            "localStorage.token is missing.";
+            "❌ Please login first.";
 
         return;
 
     }
 
 
-    button.disabled =
-        true;
-
+    button.disabled = true;
 
     button.innerText =
         "Checking...";
 
 
     message.innerText =
-        "🔄 Checking your monetization status...";
+        "Checking your monetization status...";
 
 
     try {
 
-
-        // =====================================
-        // API REQUEST
-        // =====================================
 
         const response =
             await fetch(
@@ -663,27 +350,15 @@ async function testMonetization() {
 
 
         console.log(
-            "MONETIZATION RESPONSE:",
+            "Monetization status:",
             data
         );
 
 
-        result.innerText =
-            JSON.stringify(
-                data,
-                null,
-                2
-            );
-
-
-        // =====================================
-        // API ERROR
-        // =====================================
-
         if (!response.ok) {
 
             message.innerText =
-                "❌ API Error: " +
+                "❌ " +
                 (
                     data.message ||
                     "Request failed"
@@ -700,7 +375,7 @@ async function testMonetization() {
                 "❌ " +
                 (
                     data.message ||
-                    "Monetization check failed"
+                    "Unable to check monetization."
                 );
 
             return;
@@ -715,50 +390,49 @@ async function testMonetization() {
         if (!monetization) {
 
             message.innerText =
-                "❌ Monetization data not found.";
+                "❌ Monetization data unavailable.";
 
             return;
 
         }
 
 
-        // =====================================
-        // STATUS
-        // =====================================
+        /*
+        =====================================
+        ELIGIBILITY STATUS
+        =====================================
+        */
 
-        const eligible =
-            Boolean(
-                monetization.eligible
+
+        statusBox.classList.remove(
+            "hidden",
+            "eligible",
+            "not-eligible"
+        );
+
+
+        if (monetization.eligible) {
+
+            statusBox.classList.add(
+                "eligible"
             );
-
-
-        if (eligible) {
-
-            statusBox.className =
-                "status-box eligible";
-
 
             statusBox.innerHTML =
                 "🟢 ELIGIBLE FOR MONETIZATION";
 
-
-            successMessage.classList.remove(
-                "hidden"
-            );
-
-
             message.innerText =
-                "🎉 All monetization requirements have been met.";
+                "🎉 Congratulations! You have met all monetization requirements.";
 
-        } else {
+        }
 
-            statusBox.className =
-                "status-box not-eligible";
+        else {
 
+            statusBox.classList.add(
+                "not-eligible"
+            );
 
             statusBox.innerHTML =
                 "🔴 NOT YET ELIGIBLE";
-
 
             message.innerText =
                 "ℹ️ Some monetization requirements are still missing.";
@@ -766,302 +440,146 @@ async function testMonetization() {
         }
 
 
-        // =====================================
-        // REQUIREMENTS
-        // =====================================
+        /*
+        =====================================
+        REQUIREMENTS
+        =====================================
+        */
 
-        const requirements =
+
+        requirementsSection.classList.remove(
+            "hidden"
+        );
+
+
+        requirements.innerHTML = "";
+
+
+        const req =
             monetization.requirements;
 
 
-        if (requirements) {
-
-            requirementsSection.classList.remove(
-                "hidden"
-            );
-
-
-            // ---------------------------------
-            // ACCOUNT AGE
-            // ---------------------------------
-
-            if (requirements.accountAge) {
-
-                requirementsContainer.appendChild(
-                    createRequirement(
-                        "📅 Account Age (days)",
-                        requirements.accountAge.current,
-                        requirements.accountAge.required
-                    )
-                );
-
-            }
+        addRequirement(
+            "📅",
+            "Account Age (days)",
+            req.accountAge
+        );
 
 
-            // ---------------------------------
-            // FOLLOWERS
-            // ---------------------------------
-
-            if (requirements.followers) {
-
-                requirementsContainer.appendChild(
-                    createRequirement(
-                        "👥 Followers",
-                        requirements.followers.current,
-                        requirements.followers.required
-                    )
-                );
-
-            }
+        addRequirement(
+            "👥",
+            "Followers",
+            req.followers
+        );
 
 
-            // ---------------------------------
-            // VIEWS
-            // ---------------------------------
-
-            if (requirements.views) {
-
-                requirementsContainer.appendChild(
-                    createRequirement(
-                        "👀 Views",
-                        requirements.views.current,
-                        requirements.views.required
-                    )
-                );
-
-            }
+        addRequirement(
+            "👀",
+            "Views",
+            req.views
+        );
 
 
-            // ---------------------------------
-            // WATCH TIME
-            // ---------------------------------
-
-            if (requirements.watchTime) {
-
-                requirementsContainer.appendChild(
-                    createRequirement(
-                        "⏱️ Watch Time",
-                        requirements.watchTime.current,
-                        requirements.watchTime.required
-                    )
-                );
-
-            }
+        addRequirement(
+            "⏱️",
+            "Watch Time",
+            req.watchTime
+        );
 
 
-            // ---------------------------------
-            // EARNINGS
-            // ---------------------------------
-
-            if (requirements.earnings) {
-
-                requirementsContainer.appendChild(
-                    createRequirement(
-                        "💰 Earnings",
-                        requirements.earnings.current,
-                        requirements.earnings.required,
-                        true
-                    )
-                );
-
-            }
-
-        }
+        addRequirement(
+            "💰",
+            "Earnings",
+            req.earnings,
+            true
+        );
 
 
-        // =====================================
-        // CREATOR STATS
-        // =====================================
+        /*
+        =====================================
+        CREATOR STATS
+        =====================================
+        */
 
-        const creatorStats =
-            monetization.stats;
 
-
-        if (creatorStats) {
+        if (monetization.stats) {
 
             statsSection.classList.remove(
                 "hidden"
             );
 
-
-            statsContainer.innerHTML = `
-
-                <div class="stat">
-
-                    <div class="stat-label">
-                        Username
-                    </div>
-
-                    <div class="stat-value">
-                        ${creatorStats.username || "-"}
-                    </div>
-
-                </div>
+            const s =
+                monetization.stats;
 
 
-                <div class="stat">
+            stats.innerHTML = `
 
-                    <div class="stat-label">
-                        Followers
-                    </div>
+                ${stat(
+                    "Username",
+                    s.username
+                )}
 
-                    <div class="stat-value">
-                        ${formatNumber(
-                            creatorStats.followers
-                        )}
-                    </div>
+                ${stat(
+                    "Followers",
+                    s.followers
+                )}
 
-                </div>
+                ${stat(
+                    "Videos",
+                    s.videos
+                )}
 
+                ${stat(
+                    "Views",
+                    s.views
+                )}
 
-                <div class="stat">
+                ${stat(
+                    "Likes",
+                    s.likes
+                )}
 
-                    <div class="stat-label">
-                        Videos
-                    </div>
+                ${stat(
+                    "Comments",
+                    s.comments
+                )}
 
-                    <div class="stat-value">
-                        ${formatNumber(
-                            creatorStats.videos
-                        )}
-                    </div>
+                ${stat(
+                    "Shares",
+                    s.shares
+                )}
 
-                </div>
+                ${stat(
+                    "Saves",
+                    s.saves
+                )}
 
+                ${stat(
+                    "Watch Time",
+                    s.watchTime
+                )}
 
-                <div class="stat">
+                ${stat(
+                    "Total Earned",
+                    "₦" +
+                    Number(
+                        s.totalEarned || 0
+                    ).toLocaleString()
+                )}
 
-                    <div class="stat-label">
-                        Views
-                    </div>
+                ${stat(
+                    "Available Balance",
+                    "₦" +
+                    Number(
+                        s.availableBalance || 0
+                    ).toLocaleString()
+                )}
 
-                    <div class="stat-value">
-                        ${formatNumber(
-                            creatorStats.views
-                        )}
-                    </div>
-
-                </div>
-
-
-                <div class="stat">
-
-                    <div class="stat-label">
-                        Likes
-                    </div>
-
-                    <div class="stat-value">
-                        ${formatNumber(
-                            creatorStats.likes
-                        )}
-                    </div>
-
-                </div>
-
-
-                <div class="stat">
-
-                    <div class="stat-label">
-                        Comments
-                    </div>
-
-                    <div class="stat-value">
-                        ${formatNumber(
-                            creatorStats.comments
-                        )}
-                    </div>
-
-                </div>
-
-
-                <div class="stat">
-
-                    <div class="stat-label">
-                        Shares
-                    </div>
-
-                    <div class="stat-value">
-                        ${formatNumber(
-                            creatorStats.shares
-                        )}
-                    </div>
-
-                </div>
-
-
-                <div class="stat">
-
-                    <div class="stat-label">
-                        Saves
-                    </div>
-
-                    <div class="stat-value">
-                        ${formatNumber(
-                            creatorStats.saves
-                        )}
-                    </div>
-
-                </div>
-
-
-                <div class="stat">
-
-                    <div class="stat-label">
-                        Watch Time
-                    </div>
-
-                    <div class="stat-value">
-                        ${formatNumber(
-                            creatorStats.watchTime
-                        )}
-                    </div>
-
-                </div>
-
-
-                <div class="stat">
-
-                    <div class="stat-label">
-                        Total Earned
-                    </div>
-
-                    <div class="stat-value">
-                        ${formatMoney(
-                            creatorStats.totalEarned
-                        )}
-                    </div>
-
-                </div>
-
-
-                <div class="stat">
-
-                    <div class="stat-label">
-                        Available Balance
-                    </div>
-
-                    <div class="stat-value">
-                        ${formatMoney(
-                            creatorStats.availableBalance
-                        )}
-                    </div>
-
-                </div>
-
-
-                <div class="stat">
-
-                    <div class="stat-label">
-                        Account Age
-                    </div>
-
-                    <div class="stat-value">
-                        ${formatNumber(
-                            creatorStats.accountAgeDays
-                        )} days
-                    </div>
-
-                </div>
+                ${stat(
+                    "Account Age",
+                    s.accountAgeDays +
+                    " days"
+                )}
 
             `;
 
@@ -1070,9 +588,8 @@ async function testMonetization() {
 
     } catch (error) {
 
-
         console.error(
-            "MONETIZATION TEST ERROR:",
+            "MONETIZATION ERROR:",
             error
         );
 
@@ -1080,24 +597,183 @@ async function testMonetization() {
         message.innerText =
             "❌ Connection error.";
 
+    }
 
-        result.innerText =
-            error.message;
 
+    button.disabled = false;
+
+    button.innerText =
+        "🔍 Check Monetization";
+
+}
+
+
+/*
+=========================================
+REQUIREMENT CARD
+=========================================
+*/
+
+
+function addRequirement(
+    icon,
+    title,
+    data,
+    money = false
+) {
+
+    if (!data) return;
+
+
+    const required =
+        Number(data.required || 0);
+
+    const current =
+        Number(data.current || 0);
+
+
+    let percentage = 0;
+
+
+    if (required > 0) {
+
+        percentage =
+            (current / required) * 100;
 
     }
 
 
-    // =====================================
-    // RESTORE BUTTON
-    // =====================================
+    percentage =
+        Math.min(
+            percentage,
+            100
+        );
 
-    button.disabled =
-        false;
+
+    const remaining =
+        Math.max(
+            required - current,
+            0
+        );
 
 
-    button.innerText =
-        "🔍 Check Monetization";
+    const currentText =
+        money
+            ? "₦" +
+              current.toLocaleString()
+            : current.toLocaleString();
+
+
+    const requiredText =
+        money
+            ? "₦" +
+              required.toLocaleString()
+            : required.toLocaleString();
+
+
+    const remainingText =
+        money
+            ? "₦" +
+              remaining.toLocaleString()
+            : remaining.toLocaleString();
+
+
+    const status =
+        data.met
+            ? `
+                <span class="met">
+                    ✅ Met
+                </span>
+              `
+            : `
+                <span class="not-met">
+                    ❌ Not met
+                </span>
+              `;
+
+
+    const needText =
+        data.met
+            ? ""
+            : `
+                <div class="numbers">
+                    Need ${remainingText} more
+                </div>
+              `;
+
+
+    requirements.innerHTML += `
+
+        <div class="requirement">
+
+            <div class="requirement-header">
+
+                <span>
+                    ${icon}
+                    ${title}
+                </span>
+
+                ${status}
+
+            </div>
+
+
+            <div class="progress-bg">
+
+                <div
+                    class="progress"
+                    style="
+                        width:${percentage}%;
+                    ">
+                </div>
+
+            </div>
+
+
+            <div class="numbers">
+
+                ${currentText}
+                /
+                ${requiredText}
+
+            </div>
+
+            ${needText}
+
+        </div>
+
+    `;
+
+}
+
+
+/*
+=========================================
+STAT CARD
+=========================================
+*/
+
+
+function stat(
+    label,
+    value
+) {
+
+    return `
+
+        <div class="stat">
+
+            <div class="stat-label">
+                ${label}
+            </div>
+
+            <div class="stat-value">
+                ${value}
+            </div>
+
+        </div>
+
+    `;
 
 }
 
