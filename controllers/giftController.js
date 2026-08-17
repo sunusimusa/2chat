@@ -269,8 +269,8 @@ exports.sendGift = async (req, res) => {
     // =====================================
 
     receiverWallet.totalEarned +=
-  creatorEarning;
-
+    grossAmount;
+    
     receiverWallet.availableBalance +=
       creatorEarning;
 
