@@ -788,7 +788,7 @@ function stat(
 
 }
 
-    async function makeMeEligible() {
+async function makeMeEligible() {
 
     const button =
         document.getElementById("eligibleBtn");
@@ -796,9 +796,10 @@ function stat(
     const message =
         document.getElementById("message");
 
-    const result =
-        document.getElementById("result");
 
+    // =====================================
+    // GET LOGIN TOKEN
+    // =====================================
 
     const token =
         localStorage.getItem("token");
@@ -807,7 +808,7 @@ function stat(
     if (!token) {
 
         message.innerText =
-            "❌ No login token found. Please login first.";
+            "❌ Please login first.";
 
         return;
 
@@ -819,6 +820,9 @@ function stat(
     button.innerText =
         "Making eligible...";
 
+    message.innerText =
+        "🧪 Updating test eligibility...";
+
 
     try {
 
@@ -826,15 +830,19 @@ function stat(
             await fetch(
                 "/api/monetization/test-make-eligible",
                 {
+
                     method: "POST",
 
                     headers: {
+
                         "Authorization":
                             "Bearer " + token,
 
                         "Content-Type":
                             "application/json"
+
                     }
+
                 }
             );
 
@@ -844,18 +852,14 @@ function stat(
 
 
         console.log(
-            "TEST ELIGIBILITY:",
+            "TEST ELIGIBILITY RESPONSE:",
             data
         );
 
 
-        result.innerText =
-            JSON.stringify(
-                data,
-                null,
-                2
-            );
-
+        // =====================================
+        // API ERROR
+        // =====================================
 
         if (!response.ok) {
 
@@ -871,6 +875,10 @@ function stat(
         }
 
 
+        // =====================================
+        // SUCCESS
+        // =====================================
+
         if (
             data.success &&
             data.monetization &&
@@ -880,12 +888,16 @@ function stat(
             message.innerText =
                 "✅ TEST SUCCESS: Creator is now eligible.";
 
-        } else {
+            // Automatically refresh status
+            await testMonetization();
 
-            message.innerText =
-                "⚠️ Request completed, but eligibility was not confirmed.";
+            return;
 
         }
+
+
+        message.innerText =
+            "⚠️ Request completed, but eligibility was not confirmed.";
 
 
     } catch (error) {
@@ -897,18 +909,16 @@ function stat(
 
 
         message.innerText =
-            "❌ Connection error.";
+            "❌ Test eligibility request failed.";
 
-        result.innerText =
-            error.message;
+    } finally {
+
+        button.disabled = false;
+
+        button.innerText =
+            "🧪 Make Me Eligible (TEST)";
 
     }
-
-
-    button.disabled = false;
-
-    button.innerText =
-        "🧪 Make Me Eligible (TEST)";
 
 }
 
