@@ -1,59 +1,43 @@
 const User = require("../models/User");
 const ShortVideo = require("../models/ShortVideo");
-const Wallet = require("../models/Wallet");
+const Monetization = require("../models/Monetization");
 
 
-// =========================================
-// 2CHAT CREATOR MONETIZATION RULES
-// =========================================
-//
-// NOTE:
-// Wannan shi ne central place na rules.
-// Idan daga baya muna son canza numbers,
-// sai mu canza a nan kawai.
-//
-// =========================================
+// =====================================================
+// MONETIZATION RULES
+// =====================================================
 
 const MONETIZATION_RULES = {
 
-    // Minimum account age
     minimumAccountAgeDays: 30,
 
-    // Minimum followers
     minimumFollowers: 100,
 
-    // Minimum total views
     minimumViews: 10000,
 
-    // Minimum watch time
-    // 3,600 seconds = 1 hour
     minimumWatchTime: 3600,
 
-    // Minimum creator earnings
     minimumEarnings: 5000
 
 };
 
 
-// =========================================
-// GET CREATOR MONETIZATION STATUS
-// =========================================
+// =====================================================
+// GET MONETIZATION STATUS
+// GET /api/monetization/status
+// =====================================================
 
 exports.getMonetizationStatus = async (req, res) => {
 
     try {
 
-        const userId =
-            req.user._id;
+        // =========================================
+        // GET LOGGED-IN USER
+        // =========================================
 
+        const userId = req.user._id;
 
-        // =====================================
-        // GET USER
-        // =====================================
-
-        const user =
-            await User.findById(userId);
-
+        const user = await User.findById(userId);
 
         if (!user) {
 
@@ -61,30 +45,48 @@ exports.getMonetizationStatus = async (req, res) => {
 
                 success: false,
 
-                message:
-                    "User not found"
+                message: "User not found"
 
             });
 
         }
 
 
-        // =====================================
+        // =========================================
+        // ACCOUNT AGE
+        // =========================================
+
+        const createdAt = new Date(user.createdAt);
+
+        const now = new Date();
+
+        const accountAgeDays = Math.floor(
+            (
+                now.getTime() -
+                createdAt.getTime()
+            ) /
+            (1000 * 60 * 60 * 24)
+        );
+
+
+        // =========================================
         // CREATOR VIDEOS
-        // =====================================
+        // =========================================
 
-        const videos =
-            await ShortVideo.find({
-                username:
-                    user.username
-            });
+        const videos = await ShortVideo.find({
+
+            username: user.username
+
+        });
 
 
-        // =====================================
+        // =========================================
         // CALCULATE CREATOR STATS
-        // =====================================
+        // =========================================
 
         let totalViews = 0;
+
+        let totalWatchTime = 0;
 
         let totalLikes = 0;
 
@@ -94,141 +96,80 @@ exports.getMonetizationStatus = async (req, res) => {
 
         let totalSaves = 0;
 
-        let totalWatchTime = 0;
-
 
         videos.forEach(video => {
 
-            totalViews +=
-                Number(video.views || 0);
-
-            totalLikes +=
-                Number(
-                    video.likes?.length || 0
-                );
-
-            totalComments +=
-                Number(
-                    video.comments?.length || 0
-                );
-
-            totalShares +=
-                Number(video.shares || 0);
-
-            totalSaves +=
-                Number(video.saves || 0);
+            totalViews += video.views || 0;
 
             totalWatchTime +=
-                Number(video.watchTime || 0);
+                video.watchTime || 0;
+
+            totalLikes +=
+                video.likes?.length || 0;
+
+            totalComments +=
+                video.comments?.length || 0;
+
+            totalShares +=
+                video.shares || 0;
+
+            totalSaves +=
+                video.saves || 0;
 
         });
 
 
-        // =====================================
-        // FOLLOWERS
-        // =====================================
+        // =========================================
+        // FIND MONETIZATION RECORD
+        // =========================================
 
-        const followers =
-            Number(
-                user.followers?.length || 0
-            );
+        let monetization =
+            await Monetization.findOne({
 
-
-        // =====================================
-        // ACCOUNT AGE
-        // =====================================
-
-        const createdAt =
-            user.createdAt
-                ? new Date(user.createdAt)
-                : new Date();
-
-
-        const now =
-            new Date();
-
-
-        const accountAgeDays =
-            Math.floor(
-                (
-                    now.getTime() -
-                    createdAt.getTime()
-                ) /
-                (
-                    1000 *
-                    60 *
-                    60 *
-                    24
-                )
-            );
-
-
-        // =====================================
-        // WALLET / EARNINGS
-        // =====================================
-
-        const wallet =
-            await Wallet.findOne({
                 userId
+
             });
 
 
+        // =========================================
+        // CREATE RECORD IF NOT EXISTS
+        // =========================================
+
+        if (!monetization) {
+
+            monetization =
+                await Monetization.create({
+
+                    userId,
+
+                    status: "not_eligible",
+
+                    totalEarned: 0,
+
+                    availableEarnings: 0,
+
+                    withdrawnAmount: 0,
+
+                    monetizedViews: 0,
+
+                    monetizedVideos: 0
+
+                });
+
+        }
+
+
+        // =========================================
+        // CURRENT EARNINGS
+        // =========================================
+
         const totalEarned =
-            Number(
-                wallet?.totalEarned || 0
-            );
+            monetization.totalEarned || 0;
 
 
-        const availableBalance =
-            Number(
-                wallet?.availableBalance || 0
-            );
-
-
-        // =====================================
-        // REQUIREMENT CHECKS
-        // =====================================
-
-        const accountAgeMet =
-            accountAgeDays >=
-            MONETIZATION_RULES.minimumAccountAgeDays;
-
-
-        const followersMet =
-            followers >=
-            MONETIZATION_RULES.minimumFollowers;
-
-
-        const viewsMet =
-            totalViews >=
-            MONETIZATION_RULES.minimumViews;
-
-
-        const watchTimeMet =
-            totalWatchTime >=
-            MONETIZATION_RULES.minimumWatchTime;
-
-
-        const earningsMet =
-            totalEarned >=
-            MONETIZATION_RULES.minimumEarnings;
-
-
-        // =====================================
-        // FINAL ELIGIBILITY
-        // =====================================
-
-        const eligible =
-            accountAgeMet &&
-            followersMet &&
-            viewsMet &&
-            watchTimeMet &&
-            earningsMet;
-
-
-        // =====================================
-        // REQUIREMENTS RESPONSE
-        // =====================================
+        // =========================================
+        // CHECK REQUIREMENTS
+        // =========================================
 
         const requirements = {
 
@@ -242,7 +183,9 @@ exports.getMonetizationStatus = async (req, res) => {
                     accountAgeDays,
 
                 met:
-                    accountAgeMet
+                    accountAgeDays >=
+                    MONETIZATION_RULES
+                        .minimumAccountAgeDays
 
             },
 
@@ -254,10 +197,14 @@ exports.getMonetizationStatus = async (req, res) => {
                         .minimumFollowers,
 
                 current:
-                    followers,
+                    user.followers?.length || 0,
 
                 met:
-                    followersMet
+                    (
+                        user.followers?.length || 0
+                    ) >=
+                    MONETIZATION_RULES
+                        .minimumFollowers
 
             },
 
@@ -272,7 +219,9 @@ exports.getMonetizationStatus = async (req, res) => {
                     totalViews,
 
                 met:
-                    viewsMet
+                    totalViews >=
+                    MONETIZATION_RULES
+                        .minimumViews
 
             },
 
@@ -287,7 +236,9 @@ exports.getMonetizationStatus = async (req, res) => {
                     totalWatchTime,
 
                 met:
-                    watchTimeMet
+                    totalWatchTime >=
+                    MONETIZATION_RULES
+                        .minimumWatchTime
 
             },
 
@@ -302,57 +253,46 @@ exports.getMonetizationStatus = async (req, res) => {
                     totalEarned,
 
                 met:
-                    earningsMet
+                    totalEarned >=
+                    MONETIZATION_RULES
+                        .minimumEarnings
 
             }
 
         };
 
 
-        // =====================================
-        // CREATOR STATS
-        // =====================================
+        // =========================================
+        // CHECK ALL REQUIREMENTS
+        // =========================================
 
-        const stats = {
-
-            username:
-                user.username,
-
-            followers,
-
-            videos:
-                videos.length,
-
-            views:
-                totalViews,
-
-            likes:
-                totalLikes,
-
-            comments:
-                totalComments,
-
-            shares:
-                totalShares,
-
-            saves:
-                totalSaves,
-
-            watchTime:
-                totalWatchTime,
-
-            totalEarned,
-
-            availableBalance,
-
-            accountAgeDays
-
-        };
+        const eligible =
+            Object.values(requirements)
+                .every(requirement =>
+                    requirement.met
+                );
 
 
-        // =====================================
+        // =========================================
+        // UPDATE STATUS
+        // =========================================
+
+        if (monetization.status !== "active") {
+
+            monetization.status =
+                eligible
+                    ? "eligible"
+                    : "not_eligible";
+
+        }
+
+
+        await monetization.save();
+
+
+        // =========================================
         // RESPONSE
-        // =====================================
+        // =========================================
 
         return res.json({
 
@@ -363,27 +303,61 @@ exports.getMonetizationStatus = async (req, res) => {
                 eligible,
 
                 status:
-                    eligible
-                        ? "eligible"
-                        : "not_eligible",
+                    monetization.status,
 
                 rules:
                     MONETIZATION_RULES,
 
                 requirements,
 
-                stats
+                stats: {
+
+                    username:
+                        user.username,
+
+                    followers:
+                        user.followers?.length || 0,
+
+                    videos:
+                        videos.length,
+
+                    views:
+                        totalViews,
+
+                    likes:
+                        totalLikes,
+
+                    comments:
+                        totalComments,
+
+                    shares:
+                        totalShares,
+
+                    saves:
+                        totalSaves,
+
+                    watchTime:
+                        totalWatchTime,
+
+                    totalEarned,
+
+                    availableBalance:
+                        monetization.availableEarnings || 0,
+
+                    accountAgeDays
+
+                }
 
             }
 
         });
 
 
-    } catch (err) {
+    } catch (error) {
 
         console.error(
-            "GET MONETIZATION STATUS ERROR:",
-            err
+            "MONETIZATION STATUS ERROR:",
+            error
         );
 
 
@@ -392,7 +366,6 @@ exports.getMonetizationStatus = async (req, res) => {
             success: false,
 
             message:
-                err.message ||
                 "Failed to check monetization status"
 
         });
