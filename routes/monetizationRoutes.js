@@ -4,7 +4,8 @@ const protect = require("../middleware/auth");
 
 const {
     getMonetizationStatus,
-    applyForMonetization
+    applyForMonetization,
+    testMakeEligible
 } = require("../controllers/monetizationController");
 
 
@@ -23,6 +24,12 @@ router.post(
     "/apply",
     protect,
     applyForMonetization
+);
+
+router.post(
+    "/test-make-eligible",
+    protect,
+    testMakeEligible
 );
 
 module.exports = router;
