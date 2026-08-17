@@ -597,4 +597,94 @@ exports.getMonetizationStatus = async (req, res) => {
 
 };
 
+// =========================================
+// DEVELOPMENT TEST ONLY
+// FORCE ELIGIBLE
+// =========================================
 
+exports.testMakeEligible = async (req, res) => {
+
+    try {
+
+        const userId = req.user._id;
+
+        const monetization =
+            await Monetization.findOneAndUpdate(
+                {
+                    userId
+                },
+                {
+                    $set: {
+                        eligible: true,
+
+                        eligibleAt:
+                            new Date(),
+
+                        status:
+                            "eligible",
+
+                        eligibilitySnapshot: {
+
+                            followers: 100,
+
+                            views: 10000,
+
+                            watchTime: 3600,
+
+                            earnings: 5000,
+
+                            accountAgeDays: 30
+
+                        }
+
+                    }
+
+                },
+                {
+                    new: true,
+                    upsert: true
+                }
+            );
+
+
+        return res.json({
+
+            success: true,
+
+            message:
+                "TEST ONLY: Creator marked as eligible.",
+
+            monetization: {
+
+                eligible:
+                    monetization.eligible,
+
+                eligibleAt:
+                    monetization.eligibleAt,
+
+                status:
+                    monetization.status
+
+            }
+
+        });
+
+    } catch (err) {
+
+        console.error(
+            "TEST MAKE ELIGIBLE ERROR:",
+            err
+        );
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                err.message
+
+        });
+
+    }
+
+};
