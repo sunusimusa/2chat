@@ -414,4 +414,187 @@ exports.getMonetizationStatus = async (req, res) => {
 };
 
         
-                    
+     exports.applyForMonetization = async (req, res) => {
+
+    try {
+
+        const userId = req.user._id;
+
+
+        // =========================================
+        // FIND MONETIZATION RECORD
+        // =========================================
+
+        const monetization =
+            await Monetization.findOne({
+                userId
+            });
+
+
+        if (!monetization) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Monetization record not found. Check eligibility first."
+
+            });
+
+        }
+
+
+        // =========================================
+        // MUST BE ELIGIBLE
+        // =========================================
+
+        if (!monetization.eligible) {
+
+            return res.status(403).json({
+
+                success: false,
+
+                message:
+                    "You are not eligible for monetization yet."
+
+            });
+
+        }
+
+
+        // =========================================
+        // PREVENT DUPLICATE APPLICATION
+        // =========================================
+
+        if (
+            monetization.status ===
+            "pending"
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Your monetization application is already pending."
+
+            });
+
+        }
+
+
+        // =========================================
+        // ALREADY APPROVED
+        // =========================================
+
+        if (
+            monetization.status ===
+            "approved"
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Your monetization account is already approved."
+
+            });
+
+        }
+
+
+        // =========================================
+        // SUSPENDED
+        // =========================================
+
+        if (
+            monetization.status ===
+            "suspended"
+        ) {
+
+            return res.status(403).json({
+
+                success: false,
+
+                message:
+                    "Your monetization account is currently suspended."
+
+            });
+
+        }
+
+
+        // =========================================
+        // APPLY
+        // =========================================
+
+        monetization.status =
+            "pending";
+
+        monetization.appliedAt =
+            new Date();
+
+        monetization.reviewedAt =
+            null;
+
+        monetization.rejectionReason =
+            null;
+
+
+        await monetization.save();
+
+
+        // =========================================
+        // RESPONSE
+        // =========================================
+
+        return res.json({
+
+            success: true,
+
+            message:
+                "Monetization application submitted successfully.",
+
+            monetization: {
+
+                eligible:
+                    monetization.eligible,
+
+                eligibleAt:
+                    monetization.eligibleAt,
+
+                status:
+                    monetization.status,
+
+                appliedAt:
+                    monetization.appliedAt
+
+            }
+
+        });
+
+
+    } catch (err) {
+
+        console.error(
+            "MONETIZATION APPLY ERROR:",
+            err
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Failed to submit monetization application."
+
+        });
+
+    }
+
+};
+
+
