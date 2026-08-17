@@ -3,7 +3,8 @@ const router = require("express").Router();
 const protect = require("../middleware/auth");
 
 const {
-    getMonetizationStatus
+    getMonetizationStatus,
+    applyForMonetization
 } = require("../controllers/monetizationController");
 
 
@@ -17,5 +18,11 @@ router.get(
     getMonetizationStatus
 );
 
+
+router.post(
+    "/apply",
+    protect,
+    applyForMonetization
+);
 
 module.exports = router;
