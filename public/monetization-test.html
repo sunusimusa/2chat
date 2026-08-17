@@ -205,6 +205,17 @@
 
         </button>
 
+        <button
+    id="eligibleBtn"
+    onclick="makeMeEligible()"
+    style="
+        margin-top:10px;
+        background:#111;
+    "
+>
+    🧪 Make Me Eligible (TEST)
+</button>
+
 
         <div id="message">
             Ready...
@@ -774,6 +785,130 @@ function stat(
         </div>
 
     `;
+
+}
+
+    async function makeMeEligible() {
+
+    const button =
+        document.getElementById("eligibleBtn");
+
+    const message =
+        document.getElementById("message");
+
+    const result =
+        document.getElementById("result");
+
+
+    const token =
+        localStorage.getItem("token");
+
+
+    if (!token) {
+
+        message.innerText =
+            "❌ No login token found. Please login first.";
+
+        return;
+
+    }
+
+
+    button.disabled = true;
+
+    button.innerText =
+        "Making eligible...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/monetization/test-make-eligible",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Authorization":
+                            "Bearer " + token,
+
+                        "Content-Type":
+                            "application/json"
+                    }
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "TEST ELIGIBILITY:",
+            data
+        );
+
+
+        result.innerText =
+            JSON.stringify(
+                data,
+                null,
+                2
+            );
+
+
+        if (!response.ok) {
+
+            message.innerText =
+                "❌ " +
+                (
+                    data.message ||
+                    "Failed to make eligible"
+                );
+
+            return;
+
+        }
+
+
+        if (
+            data.success &&
+            data.monetization &&
+            data.monetization.eligible
+        ) {
+
+            message.innerText =
+                "✅ TEST SUCCESS: Creator is now eligible.";
+
+        } else {
+
+            message.innerText =
+                "⚠️ Request completed, but eligibility was not confirmed.";
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "MAKE ELIGIBLE ERROR:",
+            error
+        );
+
+
+        message.innerText =
+            "❌ Connection error.";
+
+        result.innerText =
+            error.message;
+
+    }
+
+
+    button.disabled = false;
+
+    button.innerText =
+        "🧪 Make Me Eligible (TEST)";
 
 }
 
