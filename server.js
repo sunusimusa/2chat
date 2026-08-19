@@ -73,8 +73,16 @@ app.use("/api/withdrawals",withdrawalRoutes);
 app.use("/api/monetization",monetizationRoutes);
 app.use("/api/admin/monetization",adminMonetizationRoutes);
 
-app.get("/",(req,res)=>{
-  res.send("🚀 2Chat Server Running Successfully");
+app.get("/", (req, res) => {
+
+    res.sendFile(
+        path.join(
+            __dirname,
+            "public",
+            "register.html"
+        )
+    );
+
 });
 
 mongoose.connect(process.env.MONGO_URI)
