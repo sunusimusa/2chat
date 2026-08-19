@@ -438,8 +438,20 @@ async function testMonetization() {
             "not-eligible"
         );
 
+/*
+=====================================
+ELIGIBILITY STATUS
+=====================================
+*/
 
-        if (monetization.status === "approved") {
+statusBox.classList.remove(
+    "hidden",
+    "eligible",
+    "not-eligible"
+);
+
+
+if (monetization.status === "approved") {
 
     statusBox.classList.add(
         "eligible"
@@ -452,6 +464,7 @@ async function testMonetization() {
         "🎉 Congratulations! Your monetization application has been approved.";
 
 }
+
 else if (monetization.status === "pending") {
 
     statusBox.classList.add(
@@ -465,6 +478,7 @@ else if (monetization.status === "pending") {
         "⏳ Your monetization application is waiting for admin review.";
 
 }
+
 else if (monetization.status === "rejected") {
 
     statusBox.classList.add(
@@ -478,6 +492,7 @@ else if (monetization.status === "rejected") {
         "❌ Your monetization application was rejected.";
 
 }
+
 else if (monetization.status === "suspended") {
 
     statusBox.classList.add(
@@ -491,6 +506,7 @@ else if (monetization.status === "suspended") {
         "⚠️ Your monetization access has been suspended.";
 
 }
+
 else if (monetization.eligible) {
 
     statusBox.classList.add(
@@ -504,6 +520,7 @@ else if (monetization.eligible) {
         "🎉 You have met all monetization requirements. You can apply.";
 
 }
+
 else {
 
     statusBox.classList.add(
@@ -516,22 +533,8 @@ else {
     message.innerText =
         "ℹ️ Some monetization requirements are still missing.";
 
-    }
-
-        else {
-
-            statusBox.classList.add(
-                "not-eligible"
-            );
-
-            statusBox.innerHTML =
-                "🔴 NOT YET ELIGIBLE";
-
-            message.innerText =
-                "ℹ️ Some monetization requirements are still missing.";
-
-        }
-
+}
+        
 
         /*
         =====================================
