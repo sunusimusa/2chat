@@ -48,56 +48,116 @@ await Wallet.create({
 };
 
 // LOGIN
+// LOGIN
 exports.login = async (req, res) => {
+
   try {
-    const { email, username, password } = req.body;
 
-const loginValue =
-    (email || username || "").trim();
+    const {
+      email,
+      username,
+      password
+    } = req.body;
 
-const user = await User.findOne({
-    $or: [
-        { email: loginValue },
-        { username: loginValue }
-    ]
-});
-    
+
+    if (!password) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Password is required"
+      });
+
+    }
+
+
+    // Login da email KO username
+    const loginValue =
+      email || username;
+
+
+    if (!loginValue) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Email or username is required"
+      });
+
+    }
+
+
+    const user =
+      await User.findOne({
+        $or: [
+          { email: loginValue },
+          { username: loginValue }
+        ]
+      });
+
+
     if (!user) {
+
       return res.status(400).json({
         success: false,
         message: "Invalid credentials"
       });
+
     }
 
-    const match = await bcrypt.compare(
-      password,
-      user.password
-    );
+
+    const match =
+      await bcrypt.compare(
+        password,
+        user.password
+      );
+
 
     if (!match) {
+
       return res.status(400).json({
         success: false,
         message: "Invalid credentials"
       });
+
     }
 
+
     user.online = true;
+
     user.lastSeen = new Date();
 
     await user.save();
 
-    res.json({
+
+    return res.json({
+
       success: true,
-      token: generateToken(user._id),
+
+      token:
+        generateToken(user._id),
+
       user
+
     });
 
+
   } catch (err) {
-    res.status(500).json({
+
+    console.error(
+      "LOGIN ERROR:",
+      err
+    );
+
+    return res.status(500).json({
+
       success: false,
-      message: err.message
+
+      message:
+        err.message
+
     });
+
   }
+
 };
 
 exports.updateProfile = async (req, res) => {
