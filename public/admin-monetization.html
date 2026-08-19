@@ -1,0 +1,2322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>2Chat Admin Monetization</title>
+
+<style>
+
+/* =========================================
+   GLOBAL
+========================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+
+    margin: 0;
+
+    padding: 20px;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    background:
+        #f4f6f9;
+
+    color:
+        #222;
+
+}
+
+.container {
+
+    max-width:
+        1100px;
+
+    margin:
+        auto;
+
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.header {
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff0874,
+            #ff4b9b
+        );
+
+    color:
+        white;
+
+    padding:
+        25px;
+
+    border-radius:
+        20px;
+
+    box-shadow:
+        0 8px 25px
+        rgba(0,0,0,.12);
+
+}
+
+.header h1 {
+
+    margin:
+        0;
+
+    font-size:
+        30px;
+
+}
+
+.header p {
+
+    margin:
+        8px 0 0;
+
+    opacity:
+        .9;
+
+}
+
+
+/* =========================================
+   STATS
+========================================= */
+
+.stats {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            5,
+            1fr
+        );
+
+    gap:
+        15px;
+
+    margin-top:
+        20px;
+
+}
+
+.stat {
+
+    background:
+        white;
+
+    padding:
+        20px;
+
+    border-radius:
+        18px;
+
+    box-shadow:
+        0 4px 15px
+        rgba(0,0,0,.06);
+
+}
+
+.stat-title {
+
+    color:
+        #777;
+
+    font-size:
+        14px;
+
+}
+
+.stat-value {
+
+    margin-top:
+        8px;
+
+    font-size:
+        28px;
+
+    font-weight:
+        bold;
+
+}
+
+.stat.pending
+.stat-value {
+
+    color:
+        #f39c12;
+
+}
+
+
+/* =========================================
+   TOOLBAR
+========================================= */
+
+.toolbar {
+
+    background:
+        white;
+
+    margin-top:
+        20px;
+
+    padding:
+        15px;
+
+    border-radius:
+        16px;
+
+    display:
+        flex;
+
+    gap:
+        10px;
+
+    flex-wrap:
+        wrap;
+
+}
+
+.filter-btn {
+
+    border:
+        none;
+
+    padding:
+        10px 16px;
+
+    border-radius:
+        10px;
+
+    cursor:
+        pointer;
+
+    background:
+        #eee;
+
+    font-weight:
+        bold;
+
+}
+
+.filter-btn.active {
+
+    background:
+        #ff0874;
+
+    color:
+        white;
+
+}
+
+
+/* =========================================
+   APPLICATIONS
+========================================= */
+
+.applications {
+
+    margin-top:
+        20px;
+
+}
+
+.application {
+
+    background:
+        white;
+
+    padding:
+        20px;
+
+    border-radius:
+        18px;
+
+    margin-bottom:
+        15px;
+
+    box-shadow:
+        0 4px 15px
+        rgba(0,0,0,.06);
+
+}
+
+.application-top {
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        center;
+
+    gap:
+        15px;
+
+}
+
+.creator {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        12px;
+
+}
+
+.avatar {
+
+    width:
+        55px;
+
+    height:
+        55px;
+
+    border-radius:
+        50%;
+
+    object-fit:
+        cover;
+
+    background:
+        #ddd;
+
+}
+
+.username {
+
+    font-size:
+        19px;
+
+    font-weight:
+        bold;
+
+}
+
+.email {
+
+    color:
+        #777;
+
+    font-size:
+        14px;
+
+    margin-top:
+        4px;
+
+}
+
+
+/* =========================================
+   STATUS
+========================================= */
+
+.status {
+
+    padding:
+        7px 12px;
+
+    border-radius:
+        20px;
+
+    font-size:
+        13px;
+
+    font-weight:
+        bold;
+
+}
+
+.status.pending {
+
+    background:
+        #fff4d6;
+
+    color:
+        #a86b00;
+
+}
+
+.status.approved {
+
+    background:
+        #e7fff0;
+
+    color:
+        #168a45;
+
+}
+
+.status.rejected {
+
+    background:
+        #ffe9e9;
+
+    color:
+        #c52c2c;
+
+}
+
+.status.suspended {
+
+    background:
+        #eeeeee;
+
+    color:
+        #555;
+
+}
+
+
+/* =========================================
+   SNAPSHOT
+========================================= */
+
+.snapshot {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            5,
+            1fr
+        );
+
+    gap:
+        10px;
+
+    margin-top:
+        18px;
+
+}
+
+.snapshot-item {
+
+    background:
+        #f7f7f7;
+
+    padding:
+        12px;
+
+    border-radius:
+        12px;
+
+}
+
+.snapshot-label {
+
+    font-size:
+        12px;
+
+    color:
+        #777;
+
+}
+
+.snapshot-value {
+
+    margin-top:
+        5px;
+
+    font-weight:
+        bold;
+
+}
+
+
+/* =========================================
+   ACTIONS
+========================================= */
+
+.actions {
+
+    display:
+        flex;
+
+    gap:
+        10px;
+
+    flex-wrap:
+        wrap;
+
+    margin-top:
+        18px;
+
+}
+
+.action-btn {
+
+    border:
+        none;
+
+    padding:
+        11px 15px;
+
+    border-radius:
+        10px;
+
+    color:
+        white;
+
+    cursor:
+        pointer;
+
+    font-weight:
+        bold;
+
+}
+
+.view-btn {
+
+    background:
+        #333;
+
+}
+
+.approve-btn {
+
+    background:
+        #168a45;
+
+}
+
+.reject-btn {
+
+    background:
+        #d93636;
+
+}
+
+.suspend-btn {
+
+    background:
+        #555;
+
+}
+
+.restore-btn {
+
+    background:
+        #168a45;
+
+}
+
+
+/* =========================================
+   EMPTY / LOADING
+========================================= */
+
+.message {
+
+    background:
+        white;
+
+    padding:
+        30px;
+
+    border-radius:
+        18px;
+
+    text-align:
+        center;
+
+    margin-top:
+        20px;
+
+    color:
+        #666;
+
+}
+
+
+/* =========================================
+   MODAL
+========================================= */
+
+.modal {
+
+    position:
+        fixed;
+
+    inset:
+        0;
+
+    background:
+        rgba(
+            0,
+            0,
+            0,
+            .55
+        );
+
+    display:
+        none;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        20px;
+
+    z-index:
+        1000;
+
+}
+
+.modal.show {
+
+    display:
+        flex;
+
+}
+
+.modal-box {
+
+    background:
+        white;
+
+    width:
+        100%;
+
+    max-width:
+        600px;
+
+    max-height:
+        90vh;
+
+    overflow:
+        auto;
+
+    border-radius:
+        20px;
+
+    padding:
+        25px;
+
+}
+
+.modal-box h2 {
+
+    margin-top:
+        0;
+
+}
+
+.close {
+
+    float:
+        right;
+
+    border:
+        none;
+
+    background:
+        #eee;
+
+    width:
+        35px;
+
+    height:
+        35px;
+
+    border-radius:
+        50%;
+
+    cursor:
+        pointer;
+
+    font-size:
+        20px;
+
+}
+
+textarea {
+
+    width:
+        100%;
+
+    min-height:
+        120px;
+
+    padding:
+        12px;
+
+    border:
+        1px solid #ddd;
+
+    border-radius:
+        12px;
+
+    resize:
+        vertical;
+
+    margin-top:
+        12px;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+}
+
+.modal-action {
+
+    width:
+        100%;
+
+    padding:
+        14px;
+
+    margin-top:
+        12px;
+
+    border:
+        none;
+
+    border-radius:
+        12px;
+
+    color:
+        white;
+
+    font-weight:
+        bold;
+
+    cursor:
+        pointer;
+
+}
+
+.modal-reject {
+
+    background:
+        #d93636;
+
+}
+
+.modal-suspend {
+
+    background:
+        #555;
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (
+    max-width: 800px
+) {
+
+    .stats {
+
+        grid-template-columns:
+            repeat(
+                2,
+                1fr
+            );
+
+    }
+
+    .snapshot {
+
+        grid-template-columns:
+            repeat(
+                2,
+                1fr
+            );
+
+    }
+
+}
+
+@media (
+    max-width: 500px
+) {
+
+    body {
+
+        padding:
+            10px;
+
+    }
+
+    .header h1 {
+
+        font-size:
+            24px;
+
+    }
+
+    .application-top {
+
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+
+    }
+
+    .stats {
+
+        grid-template-columns:
+            1fr 1fr;
+
+    }
+
+}
+
+
+/* =========================================
+   HIDDEN
+========================================= */
+
+.hidden {
+
+    display:
+        none;
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<!-- =====================================
+     HEADER
+===================================== -->
+
+<div class="header">
+
+    <h1>
+        🛡️ 2Chat Admin Monetization
+    </h1>
+
+    <p>
+        Manage creator monetization applications.
+    </p>
+
+</div>
+
+
+<!-- =====================================
+     STATS
+===================================== -->
+
+<div class="stats">
+
+    <div class="stat">
+
+        <div class="stat-title">
+            Total
+        </div>
+
+        <div
+            id="totalCount"
+            class="stat-value">
+            0
+        </div>
+
+    </div>
+
+
+    <div class="stat">
+
+        <div class="stat-title">
+            Pending
+        </div>
+
+        <div
+            id="pendingCount"
+            class="stat-value">
+            0
+        </div>
+
+    </div>
+
+
+    <div class="stat">
+
+        <div class="stat-title">
+            Approved
+        </div>
+
+        <div
+            id="approvedCount"
+            class="stat-value">
+            0
+        </div>
+
+    </div>
+
+
+    <div class="stat">
+
+        <div class="stat-title">
+            Rejected
+        </div>
+
+        <div
+            id="rejectedCount"
+            class="stat-value">
+            0
+        </div>
+
+    </div>
+
+
+    <div class="stat">
+
+        <div class="stat-title">
+            Suspended
+        </div>
+
+        <div
+            id="suspendedCount"
+            class="stat-value">
+            0
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     FILTER
+===================================== -->
+
+<div class="toolbar">
+
+    <button
+        class="filter-btn active"
+        onclick="filterApplications('all', this)">
+        All
+    </button>
+
+    <button
+        class="filter-btn"
+        onclick="filterApplications('pending', this)">
+        Pending
+    </button>
+
+    <button
+        class="filter-btn"
+        onclick="filterApplications('approved', this)">
+        Approved
+    </button>
+
+    <button
+        class="filter-btn"
+        onclick="filterApplications('rejected', this)">
+        Rejected
+    </button>
+
+    <button
+        class="filter-btn"
+        onclick="filterApplications('suspended', this)">
+        Suspended
+    </button>
+
+</div>
+
+
+<!-- =====================================
+     APPLICATIONS
+===================================== -->
+
+<div
+    id="applications"
+    class="applications">
+
+    <div class="message">
+        Loading applications...
+    </div>
+
+</div>
+
+
+</div>
+
+
+<!-- =====================================
+     ACTION MODAL
+===================================== -->
+
+<div
+    id="actionModal"
+    class="modal">
+
+    <div class="modal-box">
+
+        <button
+            class="close"
+            onclick="closeModal()">
+            ×
+        </button>
+
+        <h2 id="modalTitle">
+            Action
+        </h2>
+
+        <p id="modalText"></p>
+
+        <textarea
+            id="reason"
+            placeholder="Enter reason...">
+        </textarea>
+
+        <button
+            id="modalActionButton"
+            class="modal-action">
+            Confirm
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     DETAILS MODAL
+===================================== -->
+
+<div
+    id="detailsModal"
+    class="modal">
+
+    <div class="modal-box">
+
+        <button
+            class="close"
+            onclick="closeDetails()">
+            ×
+        </button>
+
+        <h2>
+            Creator Details
+        </h2>
+
+        <div id="detailsContent"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================
+   GLOBAL DATA
+========================================= */
+
+let applications = [];
+
+let currentFilter = "all";
+
+let currentAction = null;
+
+let currentUserId = null;
+
+
+/* =========================================
+   GET TOKEN
+========================================= */
+
+function getToken() {
+
+    return localStorage.getItem(
+        "token"
+    );
+
+}
+
+
+/* =========================================
+   LOAD APPLICATIONS
+========================================= */
+
+async function loadApplications() {
+
+    const container =
+        document.getElementById(
+            "applications"
+        );
+
+    const token =
+        getToken();
+
+
+    if (!token) {
+
+        container.innerHTML = `
+            <div class="message">
+                ❌ Please login first.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML = `
+        <div class="message">
+            🔄 Loading applications...
+        </div>
+    `;
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/admin/monetization/applications",
+                {
+                    method: "GET",
+
+                    headers: {
+
+                        "Authorization":
+                            "Bearer " + token,
+
+                        "Content-Type":
+                            "application/json"
+
+                    }
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "ADMIN MONETIZATION:",
+            data
+        );
+
+
+        if (!response.ok) {
+
+            container.innerHTML = `
+                <div class="message">
+                    ❌ ${
+                        data.message ||
+                        "Failed to load applications."
+                    }
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        if (!data.success) {
+
+            container.innerHTML = `
+                <div class="message">
+                    ❌ ${
+                        data.message ||
+                        "Unable to load applications."
+                    }
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        applications =
+            data.applications || [];
+
+
+        updateStats();
+
+        renderApplications();
+
+
+    } catch (error) {
+
+        console.error(
+            "ADMIN MONETIZATION ERROR:",
+            error
+        );
+
+
+        container.innerHTML = `
+            <div class="message">
+                ❌ Connection error.
+            </div>
+        `;
+
+    }
+
+}
+
+
+/* =========================================
+   UPDATE STATS
+========================================= */
+
+function updateStats() {
+
+    const total =
+        applications.length;
+
+    const pending =
+        applications.filter(
+            app =>
+                app.status ===
+                "pending"
+        ).length;
+
+    const approved =
+        applications.filter(
+            app =>
+                app.status ===
+                "approved"
+        ).length;
+
+    const rejected =
+        applications.filter(
+            app =>
+                app.status ===
+                "rejected"
+        ).length;
+
+    const suspended =
+        applications.filter(
+            app =>
+                app.status ===
+                "suspended"
+        ).length;
+
+
+    document.getElementById(
+        "totalCount"
+    ).innerText = total;
+
+
+    document.getElementById(
+        "pendingCount"
+    ).innerText = pending;
+
+
+    document.getElementById(
+        "approvedCount"
+    ).innerText = approved;
+
+
+    document.getElementById(
+        "rejectedCount"
+    ).innerText = rejected;
+
+
+    document.getElementById(
+        "suspendedCount"
+    ).innerText = suspended;
+
+}
+
+
+/* =========================================
+   FILTER
+========================================= */
+
+function filterApplications(
+    filter,
+    button
+) {
+
+    currentFilter =
+        filter;
+
+
+    document
+        .querySelectorAll(
+            ".filter-btn"
+        )
+        .forEach(
+            btn =>
+                btn.classList.remove(
+                    "active"
+                )
+        );
+
+
+    button.classList.add(
+        "active"
+    );
+
+
+    renderApplications();
+
+}
+
+
+/* =========================================
+   RENDER
+========================================= */
+
+function renderApplications() {
+
+    const container =
+        document.getElementById(
+            "applications"
+        );
+
+
+    let list =
+        applications;
+
+
+    if (
+        currentFilter !==
+        "all"
+    ) {
+
+        list =
+            applications.filter(
+                app =>
+                    app.status ===
+                    currentFilter
+            );
+
+    }
+
+
+    if (!list.length) {
+
+        container.innerHTML = `
+            <div class="message">
+                📭 No ${currentFilter === "all"
+                    ? ""
+                    : currentFilter + " "
+                }applications found.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        list
+        .map(
+            application =>
+                applicationCard(
+                    application
+                )
+        )
+        .join("");
+
+}
+
+
+/* =========================================
+   APPLICATION CARD
+========================================= */
+
+function applicationCard(
+    app
+) {
+
+    const user =
+        app.userId || {};
+
+
+    const username =
+        user.username ||
+        "Unknown User";
+
+
+    const avatar =
+        user.avatar ||
+        "/images/default-avatar.png";
+
+
+    const email =
+        user.email ||
+        "";
+
+
+    const snapshot =
+        app.eligibilitySnapshot ||
+        {};
+
+
+    const appliedAt =
+        app.appliedAt
+            ? formatDate(
+                app.appliedAt
+            )
+            : "Not applied";
+
+
+    return `
+
+        <div class="application">
+
+            <div class="application-top">
+
+                <div class="creator">
+
+                    <img
+                        class="avatar"
+                        src="${avatar}"
+                        onerror="
+                            this.src='/images/default-avatar.png'
+                        "
+                    >
+
+                    <div>
+
+                        <div class="username">
+                            @${escapeHtml(
+                                username
+                            )}
+                        </div>
+
+                        <div class="email">
+                            ${escapeHtml(
+                                email
+                            )}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="
+                    status
+                    ${app.status}
+                ">
+
+                    ${app.status}
+
+                </div>
+
+            </div>
+
+
+            <div class="snapshot">
+
+                ${snapshotItem(
+                    "Followers",
+                    number(
+                        snapshot.followers
+                    )
+                )}
+
+                ${snapshotItem(
+                    "Views",
+                    number(
+                        snapshot.views
+                    )
+                )}
+
+                ${snapshotItem(
+                    "Watch Time",
+                    number(
+                        snapshot.watchTime
+                    )
+                )}
+
+                ${snapshotItem(
+                    "Earnings",
+                    "₦" +
+                    number(
+                        snapshot.earnings
+                    )
+                )}
+
+                ${snapshotItem(
+                    "Account Age",
+                    number(
+                        snapshot.accountAgeDays
+                    ) +
+                    " days"
+                )}
+
+            </div>
+
+
+            <div class="email">
+
+                Applied:
+                ${appliedAt}
+
+            </div>
+
+
+            <div class="actions">
+
+                <button
+                    class="
+                        action-btn
+                        view-btn
+                    "
+                    onclick="
+                        viewApplication(
+                            '${app.userId?._id || ""}'
+                        )
+                    "
+                >
+                     👁️ View
+                </button>
+
+
+                ${
+                    app.status ===
+                    "pending"
+                    ? `
+
+                        <button
+                            class="
+                                action-btn
+                                approve-btn
+                            "
+                            onclick="
+                                approveApplication(
+                                    '${app.userId?._id || ""}'
+                                )
+                            "
+                        >
+                            ✅ Approve
+                        </button>
+
+
+                        <button
+                            class="
+                                action-btn
+                                reject-btn
+                            "
+                            onclick="
+                                openAction(
+                                    'reject',
+                                    '${app.userId?._id || ""}'
+                                )
+                            "
+                        >
+                            ❌ Reject
+                        </button>
+
+                    `
+                    : ""
+                }
+
+
+                ${
+                    app.status ===
+                    "approved"
+                    ? `
+
+                        <button
+                            class="
+                                action-btn
+                                suspend-btn
+                            "
+                            onclick="
+                                openAction(
+                                    'suspend',
+                                    '${app.userId?._id || ""}'
+                                )
+                            "
+                        >
+                            🚫 Suspend
+                        </button>
+
+                    `
+                    : ""
+                }
+
+
+                ${
+                    app.status ===
+                    "suspended"
+                    ? `
+
+                        <button
+                            class="
+                                action-btn
+                                restore-btn
+                            "
+                            onclick="
+                                restoreApplication(
+                                    '${app.userId?._id || ""}'
+                                )
+                            "
+                        >
+                            ♻️ Restore
+                        </button>
+
+                    `
+                    : ""
+                }
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================
+   SNAPSHOT ITEM
+========================================= */
+
+function snapshotItem(
+    label,
+    value
+) {
+
+    return `
+
+        <div class="snapshot-item">
+
+            <div class="snapshot-label">
+                ${label}
+            </div>
+
+            <div class="snapshot-value">
+                ${value}
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================
+   APPROVE
+========================================= */
+
+async function approveApplication(
+    userId
+) {
+
+    if (
+        !confirm(
+            "Approve this monetization application?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    await performAction(
+        "approve",
+        userId
+    );
+
+}
+
+
+/* =========================================
+   OPEN ACTION
+========================================= */
+
+function openAction(
+    action,
+    userId
+) {
+
+    currentAction =
+        action;
+
+    currentUserId =
+        userId;
+
+
+    const modal =
+        document.getElementById(
+            "actionModal"
+        );
+
+    const title =
+        document.getElementById(
+            "modalTitle"
+        );
+
+    const text =
+        document.getElementById(
+            "modalText"
+        );
+
+    const reason =
+        document.getElementById(
+            "reason"
+        );
+
+    const button =
+        document.getElementById(
+            "modalActionButton"
+        );
+
+
+    reason.value = "";
+
+
+    if (
+        action ===
+        "reject"
+    ) {
+
+        title.innerText =
+            "❌ Reject Application";
+
+        text.innerText =
+            "Enter the reason for rejecting this application.";
+
+        button.innerText =
+            "Reject Application";
+
+        button.className =
+            "modal-action modal-reject";
+
+    }
+
+
+    if (
+        action ===
+        "suspend"
+    ) {
+
+        title.innerText =
+            "🚫 Suspend Monetization";
+
+        text.innerText =
+            "Enter the reason for suspending this monetization account.";
+
+        button.innerText =
+            "Suspend Account";
+
+        button.className =
+            "modal-action modal-suspend";
+
+    }
+
+
+    modal.classList.add(
+        "show"
+    );
+
+}
+
+
+function closeModal() {
+
+    document
+        .getElementById(
+            "actionModal"
+        )
+        .classList.remove(
+            "show"
+        );
+
+}
+
+
+/* =========================================
+   CONFIRM MODAL ACTION
+========================================= */
+
+document.getElementById(
+    "modalActionButton"
+)
+.addEventListener(
+    "click",
+    async () => {
+
+        const reason =
+            document.getElementById(
+                "reason"
+            )
+            .value
+            .trim();
+
+
+        if (
+            !reason
+        ) {
+
+            alert(
+                "Please enter a reason."
+            );
+
+            return;
+
+        }
+
+
+        await performAction(
+            currentAction,
+            currentUserId,
+            reason
+        );
+
+    }
+);
+
+
+/* =========================================
+   PERFORM ACTION
+========================================= */
+
+async function performAction(
+    action,
+    userId,
+    reason = ""
+) {
+
+    const token =
+        getToken();
+
+
+    if (!token) {
+
+        alert(
+            "Please login first."
+        );
+
+        return;
+
+    }
+
+
+    let endpoint;
+
+
+    if (
+        action ===
+        "approve"
+    ) {
+
+        endpoint =
+            `/api/admin/monetization/applications/${userId}/approve`;
+
+    }
+
+
+    if (
+        action ===
+        "reject"
+    ) {
+
+        endpoint =
+            `/api/admin/monetization/applications/${userId}/reject`;
+
+    }
+
+
+    if (
+        action ===
+        "suspend"
+    ) {
+
+        endpoint =
+            `/api/admin/monetization/applications/${userId}/suspend`;
+
+    }
+
+
+    if (
+        !endpoint
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                endpoint,
+                {
+
+                    method:
+                        "PUT",
+
+                    headers: {
+
+                        "Authorization":
+                            "Bearer " +
+                            token,
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+                            reason
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !response.ok
+        ) {
+
+            alert(
+                data.message ||
+                "Action failed."
+            );
+
+            return;
+
+        }
+
+
+        alert(
+            data.message ||
+            "Action successful."
+        );
+
+
+        closeModal();
+
+
+        await loadApplications();
+
+
+    } catch (error) {
+
+        console.error(
+            "ACTION ERROR:",
+            error
+        );
+
+
+        alert(
+            "Connection error."
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   RESTORE
+========================================= */
+
+async function restoreApplication(
+    userId
+) {
+
+    if (
+        !confirm(
+            "Restore this monetization account?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    await performAction(
+        "restore",
+        userId
+    );
+
+}
+
+
+/* =========================================
+   VIEW APPLICATION
+========================================= */
+
+async function viewApplication(
+    userId
+) {
+
+    const token =
+        getToken();
+
+
+    if (!token) {
+
+        alert(
+            "Please login first."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/admin/monetization/applications/${userId}`,
+                {
+
+                    method:
+                        "GET",
+
+                    headers: {
+
+                        "Authorization":
+                            "Bearer " +
+                            token,
+
+                        "Content-Type":
+                            "application/json"
+
+                    }
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !response.ok
+        ) {
+
+            alert(
+                data.message ||
+                "Failed to load application."
+            );
+
+            return;
+
+        }
+
+
+        const app =
+            data.monetization;
+
+
+        const user =
+            app.userId ||
+            {};
+
+
+        document.getElementById(
+            "detailsContent"
+        ).innerHTML = `
+
+            <div class="snapshot">
+
+                ${snapshotItem(
+                    "Username",
+                    escapeHtml(
+                        user.username ||
+                        "Unknown"
+                    )
+                )}
+
+                ${snapshotItem(
+                    "Email",
+                    escapeHtml(
+                        user.email ||
+                        "-"
+                    )
+                )}
+
+                ${snapshotItem(
+                    "Status",
+                    escapeHtml(
+                        app.status
+                    )
+                )}
+
+                ${snapshotItem(
+                    "Eligible",
+                    app.eligible
+                        ? "YES"
+                        : "NO"
+                )}
+
+                ${snapshotItem(
+                    "Followers",
+                    number(
+                        app
+                        .eligibilitySnapshot
+                        ?.followers
+                    )
+                )}
+
+                ${snapshotItem(
+                    "Views",
+                    number(
+                        app
+                        .eligibilitySnapshot
+                        ?.views
+                    )
+                )}
+
+                ${snapshotItem(
+                    "Watch Time",
+                    number(
+                        app
+                        .eligibilitySnapshot
+                        ?.watchTime
+                    )
+                )}
+
+                ${snapshotItem(
+                    "Earnings",
+                    "₦" +
+                    number(
+                        app
+                        .eligibilitySnapshot
+                        ?.earnings
+                    )
+                )}
+
+                ${snapshotItem(
+                    "Account Age",
+                    number(
+                        app
+                        .eligibilitySnapshot
+                        ?.accountAgeDays
+                    ) +
+                    " days"
+                )}
+
+            </div>
+
+            ${
+                app.rejectionReason
+                ? `
+                    <p>
+                        <strong>
+                            Rejection Reason:
+                        </strong>
+
+                        ${escapeHtml(
+                            app.rejectionReason
+                        )}
+                    </p>
+                `
+                : ""
+            }
+
+            ${
+                app.suspensionReason
+                ? `
+                    <p>
+                        <strong>
+                            Suspension Reason:
+                        </strong>
+
+                        ${escapeHtml(
+                            app.suspensionReason
+                        )}
+                    </p>
+                `
+                : ""
+            }
+
+            <p>
+                <strong>
+                    Applied:
+                </strong>
+
+                ${
+                    app.appliedAt
+                        ? formatDate(
+                            app.appliedAt
+                        )
+                        : "-"
+                }
+            </p>
+
+            <p>
+                <strong>
+                    Reviewed:
+                </strong>
+
+                ${
+                    app.reviewedAt
+                        ? formatDate(
+                            app.reviewedAt
+                        )
+                        : "-"
+                }
+            </p>
+
+        `;
+
+
+        document
+            .getElementById(
+                "detailsModal"
+            )
+            .classList.add(
+                "show"
+            );
+
+
+    } catch (error) {
+
+        console.error(
+            "VIEW APPLICATION ERROR:",
+            error
+        );
+
+        alert(
+            "Connection error."
+        );
+
+    }
+
+}
+
+
+function closeDetails() {
+
+    document
+        .getElementById(
+            "detailsModal"
+        )
+        .classList.remove(
+            "show"
+        );
+
+}
+
+
+/* =========================================
+   HELPERS
+========================================= */
+
+function number(
+    value
+) {
+
+    return Number(
+        value || 0
+    )
+    .toLocaleString();
+
+}
+
+
+function formatDate(
+    date
+) {
+
+    return new Date(
+        date
+    ).toLocaleString();
+
+}
+
+
+function escapeHtml(
+    text
+) {
+
+    return String(
+        text || ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
+
+
+/* =========================================
+   START
+========================================= */
+
+loadApplications();
+
+</script>
+
+</body>
+
+</html>
