@@ -1014,20 +1014,21 @@ textarea {
     >
 
     <button
-        onclick="adminLogin()"
-        style="
-            width:100%;
-            padding:13px;
-            border:none;
-            border-radius:10px;
-            background:#ff0874;
-            color:white;
-            font-weight:bold;
-            cursor:pointer;
-        "
-    >
-        🔐 Login as Admin
-    </button>
+    id="adminLoginButton"
+    type="button"
+    style="
+        width:100%;
+        padding:13px;
+        border:none;
+        border-radius:10px;
+        background:#ff0874;
+        color:white;
+        font-weight:bold;
+        cursor:pointer;
+    "
+>
+    🔐 Login as Admin
+</button>
 
     <p
         id="adminLoginMessage"
@@ -2671,6 +2672,11 @@ async function checkAdminAccess() {
     }
 
 }
+    
+
+    document
+    .getElementById("adminLoginButton")
+    .addEventListener("click", adminLogin);
 
 
 /* =========================================
