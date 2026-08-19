@@ -964,6 +964,77 @@ textarea {
 
 </div>
 
+    <!-- =====================================
+     ADMIN LOGIN
+===================================== -->
+
+<div
+    id="adminLogin"
+    class="message"
+    style="
+        display:none;
+        margin-top:20px;
+        text-align:left;
+    "
+>
+
+    <h2 style="margin-top:0;">
+        🔐 Admin Login
+    </h2>
+
+    <p>
+        Login as 2Chat Admin
+    </p>
+
+    <input
+        id="adminEmail"
+        type="email"
+        placeholder="Admin email"
+        style="
+            width:100%;
+            padding:13px;
+            border:1px solid #ddd;
+            border-radius:10px;
+            margin-bottom:10px;
+        "
+    >
+
+    <input
+        id="adminPassword"
+        type="password"
+        placeholder="Admin password"
+        style="
+            width:100%;
+            padding:13px;
+            border:1px solid #ddd;
+            border-radius:10px;
+            margin-bottom:10px;
+        "
+    >
+
+    <button
+        onclick="adminLogin()"
+        style="
+            width:100%;
+            padding:13px;
+            border:none;
+            border-radius:10px;
+            background:#ff0874;
+            color:white;
+            font-weight:bold;
+            cursor:pointer;
+        "
+    >
+        🔐 Login as Admin
+    </button>
+
+    <p
+        id="adminLoginMessage"
+        style="color:#d93636;"
+    ></p>
+
+</div>
+
 
 <!-- =====================================
      APPLICATIONS
@@ -2308,12 +2379,302 @@ function escapeHtml(
 
 }
 
+/* =========================================
+   ADMIN AUTH
+========================================= */
+
+async function adminLogin() {
+
+    const email =
+        document.getElementById(
+            "adminEmail"
+        ).value.trim();
+
+    const password =
+        document.getElementById(
+            "adminPassword"
+        ).value;
+
+    const message =
+        document.getElementById(
+            "adminLoginMessage"
+        );
+
+
+    if (!email || !password) {
+
+        message.innerText =
+            "❌ Enter admin email and password.";
+
+        return;
+
+    }
+
+
+    message.innerText =
+        "🔄 Logging in...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/auth/login",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        email,
+                        password
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok || !data.success) {
+
+            message.innerText =
+                "❌ " +
+                (
+                    data.message ||
+                    "Login failed."
+                );
+
+            return;
+
+        }
+
+
+        /*
+        =====================================
+        CHECK ADMIN
+        =====================================
+        */
+
+        if (
+            !data.user ||
+            data.user.role !== "admin"
+        ) {
+
+            message.innerText =
+                "❌ This account is not an admin.";
+
+            return;
+
+        }
+
+
+        /*
+        =====================================
+        SAVE TOKEN
+        =====================================
+        */
+
+        localStorage.setItem(
+            "token",
+            data.token
+        );
+
+        localStorage.setItem(
+            "user",
+            JSON.stringify(data.user)
+        );
+
+
+        /*
+        =====================================
+        HIDE LOGIN
+        =====================================
+        */
+
+        document.getElementById(
+            "adminLogin"
+        ).style.display = "none";
+
+
+        message.innerText =
+            "";
+
+
+        /*
+        =====================================
+        LOAD ADMIN DATA
+        =====================================
+        */
+
+        await loadApplications();
+
+
+    } catch (error) {
+
+        console.error(
+            "ADMIN LOGIN ERROR:",
+            error
+        );
+
+        message.innerText =
+            "❌ Connection error.";
+
+    }
+
+}
+
+
+/* =========================================
+   CHECK ADMIN TOKEN
+========================================= */
+
+async function checkAdminAccess() {
+
+    const token =
+        getToken();
+
+
+    if (!token) {
+
+        document.getElementById(
+            "adminLogin"
+        ).style.display = "block";
+
+        document.getElementById(
+            "applications"
+        ).innerHTML = "";
+
+        return false;
+
+    }
+
+
+    try {
+
+        /*
+        =====================================
+        VERIFY ADMIN BY LOADING APPLICATIONS
+        =====================================
+        */
+
+        const response =
+            await fetch(
+                "/api/admin/monetization/applications",
+                {
+
+                    method: "GET",
+
+                    headers: {
+
+                        "Authorization":
+                            "Bearer " + token
+
+                    }
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            response.status === 401 ||
+            response.status === 403
+        ) {
+
+            /*
+            TOKEN BA YA ADMIN
+            */
+
+            localStorage.removeItem(
+                "token"
+            );
+
+            document.getElementById(
+                "adminLogin"
+            ).style.display = "block";
+
+            document.getElementById(
+                "applications"
+            ).innerHTML = "";
+
+            return false;
+
+        }
+
+
+        if (!response.ok) {
+
+            document.getElementById(
+                "applications"
+            ).innerHTML = `
+                <div class="message">
+                    ❌ ${
+                        data.message ||
+                        "Unable to verify admin access."
+                    }
+                </div>
+            `;
+
+            return false;
+
+        }
+
+
+        /*
+        =====================================
+        DATA ALREADY LOADED
+        =====================================
+        */
+
+        applications =
+            data.applications || [];
+
+
+        updateStats();
+
+        renderApplications();
+
+
+        return true;
+
+
+    } catch (error) {
+
+        console.error(
+            "ADMIN ACCESS ERROR:",
+            error
+        );
+
+        document.getElementById(
+            "applications"
+        ).innerHTML = `
+            <div class="message">
+                ❌ Connection error.
+            </div>
+        `;
+
+        return false;
+
+    }
+
+}
+
 
 /* =========================================
    START
 ========================================= */
 
-loadApplications();
+checkAdminAccess();
 
 </script>
 
