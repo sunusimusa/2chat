@@ -50,10 +50,18 @@ await Wallet.create({
 // LOGIN
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, username, password } = req.body;
 
-    const user = await User.findOne({ email });
+const loginValue =
+    (email || username || "").trim();
 
+const user = await User.findOne({
+    $or: [
+        { email: loginValue },
+        { username: loginValue }
+    ]
+});
+    
     if (!user) {
       return res.status(400).json({
         success: false,
