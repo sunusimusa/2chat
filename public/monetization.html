@@ -1,1 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
+<title>2Chat Monetization</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    color: #222;
+}
+
+.container {
+    max-width: 650px;
+    margin: auto;
+}
+
+.card {
+    background: #fff;
+    padding: 22px;
+    border-radius: 20px;
+    box-shadow: 0 4px 18px rgba(0,0,0,.08);
+}
+
+.back {
+    display: inline-block;
+    margin-bottom: 18px;
+    text-decoration: none;
+    color: #555;
+    font-weight: bold;
+}
+
+h1 {
+    margin: 0;
+    font-size: 30px;
+}
+
+.subtitle {
+    color: #666;
+    line-height: 1.5;
+}
+
+#message {
+    margin-top: 18px;
+    font-size: 16px;
+}
+
+.status-box {
+    margin-top: 20px;
+    padding: 22px;
+    border-radius: 18px;
+    text-align: center;
+    font-size: 21px;
+    font-weight: bold;
+    border: 2px solid;
+}
+
+.status-approved,
+.status-eligible {
+    color: #168a45;
+    background: #effff5;
+    border-color: #35b96f;
+}
+
+.status-pending {
+    color: #9a6800;
+    background: #fff9df;
+    border-color: #e5bd45;
+}
+
+.status-rejected,
+.status-suspended,
+.status-not-eligible {
+    color: #c52c2c;
+    background: #fff3f3;
+    border-color: #ff6666;
+}
+
+.section-title {
+    margin-top: 30px;
+    font-size: 23px;
+}
+
+.requirement {
+    margin-top: 15px;
+    padding: 17px;
+    border: 1px solid #ddd;
+    border-radius: 16px;
+}
+
+.requirement-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-weight: bold;
+}
+
+.met {
+    color: #159447;
+}
+
+.not-met {
+    color: #d93636;
+}
+
+.progress-bg {
+    height: 13px;
+    background: #e5e5e5;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 13px;
+}
+
+.progress {
+    height: 100%;
+    background: #ff0874;
+    border-radius: 20px;
+}
+
+.numbers {
+    margin-top: 10px;
+    color: #555;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 13px;
+    margin-top: 15px;
+}
+
+.stat {
+    background: #fafafa;
+    padding: 16px;
+    border-radius: 15px;
+}
+
+.stat-label {
+    color: #777;
+    font-size: 14px;
+}
+
+.stat-value {
+    margin-top: 7px;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+.action-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 13px;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 18px;
+}
+
+.apply-btn {
+    background: #168a45;
+}
+
+.refresh-btn {
+    background: #ff0874;
+}
+
+.action-btn:disabled {
+    opacity: .6;
+}
+
+.hidden {
+    display: none;
+}
+
+.reason-box {
+    margin-top: 20px;
+    padding: 17px;
+    border-radius: 15px;
+    background: #fff7f7;
+    border: 1px solid #ffd0d0;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <a
+            href="/profile.html"
+            class="back">
+
+            ← Back to Profile
+
+        </a>
+
+
+        <h1>
+            💰 2Chat Monetization
+        </h1>
+
+        <p class="subtitle">
+            Manage your creator monetization account,
+            eligibility and earnings.
+        </p>
+
+
+        <div id="message">
+            Loading monetization status...
+        </div>
+
+
+        <!-- STATUS -->
+
+        <div
+            id="statusBox"
+            class="status-box hidden">
+        </div>
+
+
+        <!-- APPLICATION ACTION -->
+
+        <div id="actionSection">
+
+            <button
+                id="applyBtn"
+                class="action-btn apply-btn hidden"
+                type="button">
+
+                📩 Apply for Monetization
+
+            </button>
+
+        </div>
+
+
+        <!-- REASON -->
+
+        <div
+            id="reasonBox"
+            class="reason-box hidden">
+
+            <strong id="reasonTitle"></strong>
+
+            <p id="reasonText"></p>
+
+        </div>
+
+
+        <!-- REQUIREMENTS -->
+
+        <div
+            id="requirementsSection"
+            class="hidden">
+
+            <h2 class="section-title">
+                📋 Monetization Requirements
+            </h2>
+
+            <div id="requirements"></div>
+
+        </div>
+
+
+        <!-- CREATOR STATS -->
+
+        <div
+            id="statsSection"
+            class="hidden">
+
+            <h2 class="section-title">
+                📊 Creator Stats
+            </h2>
+
+            <div
+                id="stats"
+                class="stats-grid">
+            </div>
+
+        </div>
+
+
+        <button
+            id="refreshBtn"
+            class="action-btn refresh-btn"
+            type="button">
+
+            🔄 Refresh Status
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let monetizationData = null;
+
+
+/* =========================================
+   ELEMENTS
+========================================= */
+
+const message =
+    document.getElementById("message");
+
+const statusBox =
+    document.getElementById("statusBox");
+
+const requirementsSection =
+    document.getElementById(
+        "requirementsSection"
+    );
+
+const requirements =
+    document.getElementById(
+        "requirements"
+    );
+
+const statsSection =
+    document.getElementById(
+        "statsSection"
+    );
+
+const stats =
+    document.getElementById("stats");
+
+const applyBtn =
+    document.getElementById("applyBtn");
+
+const refreshBtn =
+    document.getElementById("refreshBtn");
+
+const reasonBox =
+    document.getElementById("reasonBox");
+
+const reasonTitle =
+    document.getElementById("reasonTitle");
+
+const reasonText =
+    document.getElementById("reasonText");
+
+
+/* =========================================
+   TOKEN
+========================================= */
+
+function getToken() {
+
+    return localStorage.getItem("token");
+
+}
+
+
+/* =========================================
+   LOAD STATUS
+========================================= */
+
+async function loadMonetizationStatus() {
+
+    const token = getToken();
+
+
+    if (!token) {
+
+        message.innerText =
+            "❌ Please login first.";
+
+        statusBox.classList.add(
+            "hidden"
+        );
+
+        return;
+
+    }
+
+
+    message.innerText =
+        "🔄 Loading monetization status...";
+
+
+    refreshBtn.disabled = true;
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/monetization/status",
+                {
+
+                    method: "GET",
+
+                    headers: {
+
+                        "Authorization":
+                            "Bearer " + token
+
+                    }
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "MONETIZATION STATUS:",
+            data
+        );
+
+
+        if (!response.ok) {
+
+            message.innerText =
+                "❌ " +
+                (
+                    data.message ||
+                    "Failed to load monetization status."
+                );
+
+            return;
+
+        }
+
+
+        if (!data.success) {
+
+            message.innerText =
+                "❌ " +
+                (
+                    data.message ||
+                    "Unable to load monetization."
+                );
+
+            return;
+
+        }
+
+
+        monetizationData =
+            data.monetization;
+
+
+        renderStatus(
+            monetizationData
+        );
+
+
+        renderRequirements(
+            monetizationData
+        );
+
+
+        renderStats(
+            monetizationData
+        );
+
+
+        message.innerText =
+            "✅ Monetization status loaded.";
+
+
+    } catch (error) {
+
+        console.error(
+            "MONETIZATION STATUS ERROR:",
+            error
+        );
+
+
+        message.innerText =
+            "❌ Connection error.";
+
+    } finally {
+
+        refreshBtn.disabled = false;
+
+    }
+
+}
+
+
+/* =========================================
+   RENDER STATUS
+========================================= */
+
+function renderStatus(data) {
+
+    const status =
+        data.status || "not_eligible";
+
+
+    statusBox.className =
+        "status-box";
+
+
+    applyBtn.classList.add(
+        "hidden"
+    );
+
+
+    reasonBox.classList.add(
+        "hidden"
+    );
+
+
+    switch (status) {
+
+
+        case "approved":
+
+            statusBox.classList.add(
+                "status-approved"
+            );
+
+            statusBox.innerHTML =
+                "🟢 MONETIZATION APPROVED";
+
+            message.innerText =
+                "🎉 Your monetization account has been approved.";
+
+            break;
+
+
+        case "pending":
+
+            statusBox.classList.add(
+                "status-pending"
+            );
+
+            statusBox.innerHTML =
+                "🟡 APPLICATION PENDING";
+
+            message.innerText =
+                "⏳ Your application is waiting for admin review.";
+
+            break;
+
+
+        case "rejected":
+
+            statusBox.classList.add(
+                "status-rejected"
+            );
+
+            statusBox.innerHTML =
+                "🔴 APPLICATION REJECTED";
+
+            message.innerText =
+                "❌ Your monetization application was rejected.";
+
+            if (data.rejectionReason) {
+
+                showReason(
+                    "Rejection Reason",
+                    data.rejectionReason
+                );
+
+            }
+
+            break;
+
+
+        case "suspended":
+
+            statusBox.classList.add(
+                "status-suspended"
+            );
+
+            statusBox.innerHTML =
+                "🚫 MONETIZATION SUSPENDED";
+
+            message.innerText =
+                "⚠️ Your monetization account is suspended.";
+
+            if (data.suspensionReason) {
+
+                showReason(
+                    "Suspension Reason",
+                    data.suspensionReason
+                );
+
+            }
+
+            break;
+
+
+        case "eligible":
+
+            statusBox.classList.add(
+                "status-eligible"
+            );
+
+            statusBox.innerHTML =
+                "🟢 ELIGIBLE FOR MONETIZATION";
+
+            message.innerText =
+                "🎉 You are eligible. You can apply now.";
+
+            applyBtn.classList.remove(
+                "hidden"
+            );
+
+            break;
+
+
+        default:
+
+            statusBox.classList.add(
+                "status-not-eligible"
+            );
+
+            statusBox.innerHTML =
+                "🔴 NOT YET ELIGIBLE";
+
+            message.innerText =
+                "ℹ️ Some monetization requirements are still missing.";
+
+            break;
+
+    }
+
+
+    statusBox.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+/* =========================================
+   REASON
+========================================= */
+
+function showReason(
+    title,
+    text
+) {
+
+    reasonTitle.innerText =
+        title;
+
+    reasonText.innerText =
+        text;
+
+    reasonBox.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+/* =========================================
+   REQUIREMENTS
+========================================= */
+
+function renderRequirements(data) {
+
+    const req =
+        data.requirements;
+
+
+    if (!req) {
+
+        requirementsSection.classList.add(
+            "hidden"
+        );
+
+        return;
+
+    }
+
+
+    requirements.innerHTML = "";
+
+
+    addRequirement(
+        "📅",
+        "Account Age",
+        req.accountAge
+    );
+
+
+    addRequirement(
+        "👥",
+        "Followers",
+        req.followers
+    );
+
+
+    addRequirement(
+        "👀",
+        "Views",
+        req.views
+    );
+
+
+    addRequirement(
+        "⏱️",
+        "Watch Time",
+        req.watchTime
+    );
+
+
+    addRequirement(
+        "💰",
+        "Earnings",
+        req.earnings,
+        true
+    );
+
+
+    requirementsSection.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+/* =========================================
+   REQUIREMENT CARD
+========================================= */
+
+function addRequirement(
+    icon,
+    title,
+    data,
+    money = false
+) {
+
+    if (!data) return;
+
+
+    const required =
+        Number(data.required || 0);
+
+    const current =
+        Number(data.current || 0);
+
+
+    let percentage = 0;
+
+
+    if (required > 0) {
+
+        percentage =
+            (current / required) * 100;
+
+    }
+
+
+    percentage =
+        Math.min(
+            percentage,
+            100
+        );
+
+
+    const remaining =
+        Math.max(
+            required - current,
+            0
+        );
+
+
+    const currentText =
+        money
+            ? "₦" +
+              current.toLocaleString()
+            : current.toLocaleString();
+
+
+    const requiredText =
+        money
+            ? "₦" +
+              required.toLocaleString()
+            : required.toLocaleString();
+
+
+    const remainingText =
+        money
+            ? "₦" +
+              remaining.toLocaleString()
+            : remaining.toLocaleString();
+
+
+    const status =
+        data.met
+            ? `<span class="met">✅ Met</span>`
+            : `<span class="not-met">❌ Not met</span>`;
+
+
+    const needText =
+        data.met
+            ? ""
+            : `
+                <div class="numbers">
+                    Need ${remainingText} more
+                </div>
+            `;
+
+
+    requirements.innerHTML += `
+
+        <div class="requirement">
+
+            <div class="requirement-header">
+
+                <span>
+                    ${icon}
+                    ${title}
+                </span>
+
+                ${status}
+
+            </div>
+
+
+            <div class="progress-bg">
+
+                <div
+                    class="progress"
+                    style="width:${percentage}%">
+                </div>
+
+            </div>
+
+
+            <div class="numbers">
+
+                ${currentText}
+                /
+                ${requiredText}
+
+            </div>
+
+            ${needText}
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================
+   CREATOR STATS
+========================================= */
+
+function renderStats(data) {
+
+    const s =
+        data.stats;
+
+
+    if (!s) {
+
+        statsSection.classList.add(
+            "hidden"
+        );
+
+        return;
+
+    }
+
+
+    stats.innerHTML = `
+
+        ${stat(
+            "Username",
+            escapeHtml(s.username)
+        )}
+
+        ${stat(
+            "Followers",
+            number(s.followers)
+        )}
+
+        ${stat(
+            "Videos",
+            number(s.videos)
+        )}
+
+        ${stat(
+            "Views",
+            number(s.views)
+        )}
+
+        ${stat(
+            "Likes",
+            number(s.likes)
+        )}
+
+        ${stat(
+            "Comments",
+            number(s.comments)
+        )}
+
+        ${stat(
+            "Shares",
+            number(s.shares)
+        )}
+
+        ${stat(
+            "Saves",
+            number(s.saves)
+        )}
+
+        ${stat(
+            "Watch Time",
+            number(s.watchTime)
+        )}
+
+        ${stat(
+            "Total Earned",
+            "₦" +
+            number(s.totalEarned)
+        )}
+
+        ${stat(
+            "Available Balance",
+            "₦" +
+            number(s.availableBalance)
+        )}
+
+        ${stat(
+            "Account Age",
+            number(s.accountAgeDays) +
+            " days"
+        )}
+
+    `;
+
+
+    statsSection.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+/* =========================================
+   STAT
+========================================= */
+
+function stat(
+    label,
+    value
+) {
+
+    return `
+
+        <div class="stat">
+
+            <div class="stat-label">
+                ${label}
+            </div>
+
+            <div class="stat-value">
+                ${value}
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================
+   APPLY
+========================================= */
+
+async function applyForMonetization() {
+
+    const token =
+        getToken();
+
+
+    if (!token) {
+
+        message.innerText =
+            "❌ Please login first.";
+
+        return;
+
+    }
+
+
+    applyBtn.disabled = true;
+
+    applyBtn.innerText =
+        "Submitting...";
+
+
+    message.innerText =
+        "📩 Submitting monetization application...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/monetization/apply",
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Authorization":
+                            "Bearer " + token,
+
+                        "Content-Type":
+                            "application/json"
+
+                    }
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "MONETIZATION APPLY:",
+            data
+        );
+
+
+        if (!response.ok) {
+
+            message.innerText =
+                "❌ " +
+                (
+                    data.message ||
+                    "Application failed."
+                );
+
+            return;
+
+        }
+
+
+        if (!data.success) {
+
+            message.innerText =
+                "❌ " +
+                (
+                    data.message ||
+                    "Application failed."
+                );
+
+            return;
+
+        }
+
+
+        message.innerText =
+            "✅ Application submitted successfully.";
+
+
+        await loadMonetizationStatus();
+
+
+    } catch (error) {
+
+        console.error(
+            "MONETIZATION APPLY ERROR:",
+            error
+        );
+
+
+        message.innerText =
+            "❌ Connection error.";
+
+    } finally {
+
+        applyBtn.disabled = false;
+
+        applyBtn.innerText =
+            "📩 Apply for Monetization";
+
+    }
+
+}
+
+
+/* =========================================
+   HELPERS
+========================================= */
+
+function number(value) {
+
+    return Number(
+        value || 0
+    ).toLocaleString();
+
+}
+
+
+function escapeHtml(text) {
+
+    return String(
+        text || ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
+
+
+/* =========================================
+   BUTTON EVENTS
+========================================= */
+
+applyBtn.addEventListener(
+    "click",
+    applyForMonetization
+);
+
+
+refreshBtn.addEventListener(
+    "click",
+    loadMonetizationStatus
+);
+
+
+/* =========================================
+   START
+========================================= */
+
+loadMonetizationStatus();
+
+</script>
+
+</body>
+
+  </html>
