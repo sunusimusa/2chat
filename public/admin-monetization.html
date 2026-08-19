@@ -987,9 +987,10 @@ textarea {
     </p>
 
     <input
-        id="adminEmail"
-        type="email"
-        placeholder="Admin email"
+    id="adminEmail"
+    type="text"
+    placeholder="Username or Email"
+
         style="
             width:100%;
             padding:13px;
@@ -2385,11 +2386,11 @@ function escapeHtml(
 
 async function adminLogin() {
 
-    const email =
-        document.getElementById(
-            "adminEmail"
-        ).value.trim();
-
+    const loginValue =
+    document.getElementById(
+        "adminEmail"
+    ).value.trim();
+    
     const password =
         document.getElementById(
             "adminPassword"
@@ -2430,9 +2431,11 @@ async function adminLogin() {
                     },
 
                     body: JSON.stringify({
-                        email,
-                        password
-                    })
+    email: loginValue,
+    username: loginValue,
+    password
+})
+                    
 
                 }
             );
