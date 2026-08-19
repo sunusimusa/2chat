@@ -59,6 +59,9 @@ const giftsReceivedBtn =
 const creatorStudioBtn =
     document.getElementById("creatorStudioBtn");
 
+const monetizationBtn =
+    document.getElementById("monetizationBtn");
+
 const saveProfileBtn =
     document.getElementById("saveProfileBtn");
 
@@ -118,6 +121,20 @@ if(isOwner){
     if(creatorStudioBtn)
         creatorStudioBtn.style.display = "flex";
 
+    if (monetizationBtn) {
+
+    if (profile.isCreator === true) {
+
+        monetizationBtn.style.display = "flex";
+
+    } else {
+
+        monetizationBtn.style.display = "none";
+
+    }
+
+    }
+
     if(saveProfileBtn)
         saveProfileBtn.style.display = "flex";
 
@@ -172,6 +189,9 @@ else{
 
     if(creatorStudioBtn)
         creatorStudioBtn.style.display = "none";
+
+    if (monetizationBtn)
+    monetizationBtn.style.display = "none";
 
     if(saveProfileBtn)
         saveProfileBtn.style.display = "none";
