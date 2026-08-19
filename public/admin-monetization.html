@@ -2403,15 +2403,14 @@ async function adminLogin() {
         );
 
 
-    if (!email || !password) {
+    if (!loginValue || !password) {
 
-        message.innerText =
-            "❌ Enter admin email and password.";
+    message.innerText =
+        "❌ Enter admin username/email and password.";
 
-        return;
+    return;
 
-    }
-
+}
 
     message.innerText =
         "🔄 Logging in...";
