@@ -196,37 +196,43 @@
             Check your creator monetization eligibility.
         </p>
 
+<button
+    type="button"
+    id="testBtn"
+    onclick="window.testMonetization()">
 
-        <button
-            id="testBtn"
-            onclick="testMonetization()">
+    🔍 Check Monetization
 
-            🔍 Check Monetization
+</button>
 
-        </button>
 
-        <button
+<button
+    type="button"
     id="eligibleBtn"
-    onclick="makeMeEligible()"
+    onclick="window.makeMeEligible()"
     style="
         margin-top:10px;
         background:#111;
-    "
->
+    ">
+
     🧪 Make Me Eligible (TEST)
+
 </button>
 
-        <button
+
+<button
+    type="button"
     id="applyBtn"
-    onclick="applyForMonetization()"
+    onclick="window.applyForMonetization()"
     style="
         margin-top:10px;
         background:#168a45;
-    "
->
-    📩 Apply for Monetization
-</button>
+    ">
 
+    📩 Apply for Monetization
+
+</button>
+        
 
         <div id="message">
             Ready...
