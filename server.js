@@ -28,6 +28,8 @@ const withdrawalRoutes =
     require("./routes/withdrawalRoutes");
 const monetizationRoutes =
     require("./routes/monetizationRoutes");
+const adminMonetizationRoutes =
+    require("./routes/adminMonetizationRoutes");
 
 
 const app = express();
@@ -69,6 +71,7 @@ app.use("/api/wallet",walletRoutes);
 app.use("/api/gifts", giftRoutes);
 app.use("/api/withdrawals",withdrawalRoutes);
 app.use("/api/monetization",monetizationRoutes);
+app.use("/api/admin/monetization",adminMonetizationRoutes);
 
 app.get("/",(req,res)=>{
   res.send("🚀 2Chat Server Running Successfully");
