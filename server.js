@@ -30,6 +30,8 @@ const monetizationRoutes =
     require("./routes/monetizationRoutes");
 const adminMonetizationRoutes =
     require("./routes/adminMonetizationRoutes");
+const adminSetupRoutes =
+    require("./routes/adminSetupRoutes");
 
 
 const app = express();
@@ -72,6 +74,7 @@ app.use("/api/gifts", giftRoutes);
 app.use("/api/withdrawals",withdrawalRoutes);
 app.use("/api/monetization",monetizationRoutes);
 app.use("/api/admin/monetization",adminMonetizationRoutes);
+app.use("/api/admin",adminSetupRoutes);
 
 app.get("/", (req, res) => {
 
