@@ -20,6 +20,11 @@ const userSchema = new mongoose.Schema(
     default: "user"
 },
 
+    isCreator: {
+    type: Boolean,
+    default: false
+},
+
     friends:{
 type:[String],
 default:[]
