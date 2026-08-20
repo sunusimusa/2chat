@@ -4,136 +4,252 @@ const Notification =
     require("../models/Notification");
 
 
-// =========================================
+// =====================================================
 // FOLLOW / UNFOLLOW USER
-// =========================================
+// =====================================================
 
 exports.followUser = async (req, res) => {
 
     try {
 
-        const {
-            myUsername,
-            targetUsername
-        } = req.body;
+        // =================================================
+        // CURRENT USER
+        // =================================================
+
+        const myUserId =
+            req.user._id;
 
 
-        if (!myUsername || !targetUsername) {
+        const targetUsername =
+            String(
+                req.body.targetUsername || ""
+            ).trim();
 
-            return res.json({
+
+        // =================================================
+        // VALIDATE TARGET
+        // =================================================
+
+        if (!targetUsername) {
+
+            return res.status(400).json({
+
                 success: false,
-                message: "Username is required."
+
+                message:
+                    "Target username is required."
+
             });
 
         }
 
+
+        // =================================================
+        // FIND CURRENT USER
+        // =================================================
+
+        const me =
+            await User.findById(
+                myUserId
+            );
+
+
+        if (!me) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Your account was not found."
+
+            });
+
+        }
+
+
+        // =================================================
+        // FIND TARGET USER
+        // =================================================
+
+        const target =
+            await User.findOne({
+                username: targetUsername
+            });
+
+
+        if (!target) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "User not found."
+
+            });
+
+        }
+
+
+        // =================================================
+        // PREVENT SELF FOLLOW
+        // =================================================
 
         if (
-            String(myUsername).toLowerCase() ===
-            String(targetUsername).toLowerCase()
+            String(me._id) ===
+            String(target._id)
         ) {
 
-            return res.json({
+            return res.status(400).json({
+
                 success: false,
-                message: "You cannot follow yourself."
+
+                message:
+                    "You cannot follow yourself."
+
             });
 
         }
 
 
-        const me = await User.findOne({
-            username: myUsername
-        });
+        // =================================================
+        // NORMALIZE ARRAYS
+        // =================================================
 
+        if (!Array.isArray(me.following)) {
 
-        const target = await User.findOne({
-            username: targetUsername
-        });
-
-
-        if (!me || !target) {
-
-            return res.json({
-                success: false,
-                message: "User not found."
-            });
+            me.following = [];
 
         }
 
 
-        // =========================================
+        if (!Array.isArray(target.followers)) {
+
+            target.followers = [];
+
+        }
+
+
+        // =================================================
+        // CHECK CURRENT FOLLOW STATUS
+        // =================================================
+
+        const isFollowing =
+            me.following.some(
+                username =>
+                    String(username).toLowerCase() ===
+                    String(target.username).toLowerCase()
+            );
+
+
+        // =================================================
         // UNFOLLOW
-        // =========================================
+        // =================================================
 
-        if (me.following.includes(targetUsername)) {
+        if (isFollowing) {
 
             me.following =
                 me.following.filter(
                     username =>
-                        username !== targetUsername
+                        String(username).toLowerCase() !==
+                        String(target.username).toLowerCase()
                 );
 
 
             target.followers =
                 target.followers.filter(
                     username =>
-                        username !== myUsername
+                        String(username).toLowerCase() !==
+                        String(me.username).toLowerCase()
                 );
 
-        }
+
+            await me.save();
+
+            await target.save();
 
 
-        // =========================================
-        // FOLLOW
-        // =========================================
+            return res.json({
 
-        else {
+                success: true,
 
-            if (!me.following.includes(targetUsername)) {
+                action: "unfollow",
 
-                me.following.push(
-                    targetUsername
-                );
+                following:
+                    me.following.length,
 
-            }
-
-
-            if (!target.followers.includes(myUsername)) {
-
-                target.followers.push(
-                    myUsername
-                );
-
-            }
-
-
-            await Notification.create({
-
-                receiver:
-                    targetUsername,
-
-                sender:
-                    myUsername,
-
-                type:
-                    "follow",
-
-                text:
-                    myUsername +
-                    " started following you 👤"
+                followers:
+                    target.followers.length
 
             });
 
         }
 
 
+        // =================================================
+        // FOLLOW
+        // =================================================
+
+        me.following.push(
+            target.username
+        );
+
+
+        target.followers.push(
+            me.username
+        );
+
+
         await me.save();
+
         await target.save();
 
+
+        // =================================================
+        // NOTIFICATION
+        // =================================================
+
+        try {
+
+            await Notification.create({
+
+                receiver:
+                    target.username,
+
+                sender:
+                    me.username,
+
+                type:
+                    "follow",
+
+                text:
+                    me.username +
+                    " started following you 👤"
+
+            });
+
+        } catch (notificationError) {
+
+            console.error(
+                "FOLLOW NOTIFICATION ERROR:",
+                notificationError
+            );
+
+            // Follow operation ya riga ya yi nasara.
+            // Notification error ba zai karya Follow ba.
+        }
+
+
+        // =================================================
+        // RESPONSE
+        // =================================================
 
         return res.json({
 
             success: true,
+
+            action: "follow",
 
             following:
                 me.following.length,
@@ -166,16 +282,32 @@ exports.followUser = async (req, res) => {
 };
 
 
-// =========================================
+// =====================================================
 // GET USER PROFILE
-// =========================================
+// =====================================================
 
 exports.getUserProfile = async (req, res) => {
 
     try {
 
         const username =
-            req.params.username;
+            String(
+                req.params.username || ""
+            ).trim();
+
+
+        if (!username) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Username is required."
+
+            });
+
+        }
 
 
         const user =
@@ -186,12 +318,12 @@ exports.getUserProfile = async (req, res) => {
 
         if (!user) {
 
-            return res.json({
+            return res.status(404).json({
 
                 success: false,
 
                 message:
-                    "User not found"
+                    "User not found."
 
             });
 
@@ -229,9 +361,9 @@ exports.getUserProfile = async (req, res) => {
 };
 
 
-// =========================================
+// =====================================================
 // GET ALL USERS
-// =========================================
+// =====================================================
 
 exports.getAllUsers = async (req, res) => {
 
@@ -278,17 +410,18 @@ exports.getAllUsers = async (req, res) => {
 };
 
 
-// =========================================
+// =====================================================
 // SEARCH USERS
-// =========================================
+// =====================================================
 
 exports.searchUsers = async (req, res) => {
 
     try {
 
         const keyword =
-            (req.params.keyword || "")
-                .trim();
+            String(
+                req.params.keyword || ""
+            ).trim();
 
 
         if (!keyword) {
