@@ -2,14 +2,28 @@ const Wallet = require("../models/Wallet");
 
 
 // =========================================
-// CREATE WALLET IF MISSING
+// GET OR CREATE WALLET
 // =========================================
+// Wannan yana taimakawa legacy users:
+//
+// User yana nan
+// Wallet babu
+// → API ta ƙirƙiri Wallet automatically
+//
+// Ba sai user ya sake register ba.
+//
 
 async function getOrCreateWallet(userId) {
+
+  if (!userId) {
+    throw new Error("User ID is required");
+  }
+
 
   let wallet = await Wallet.findOne({
     userId
   });
+
 
   if (!wallet) {
 
@@ -41,6 +55,7 @@ async function getOrCreateWallet(userId) {
 
   }
 
+
   return wallet;
 }
 
@@ -67,61 +82,63 @@ exports.getWallet = async (req, res) => {
       wallet: {
 
         // =================================
-        // SPENDER COINS
+        // USER COINS
         // =================================
 
         coins:
-          wallet.coins || 0,
+          Number(wallet.coins || 0),
 
         totalPurchased:
-          wallet.totalPurchased || 0,
+          Number(wallet.totalPurchased || 0),
 
         totalSpent:
-          wallet.totalSpent || 0,
+          Number(wallet.totalSpent || 0),
 
 
         // =================================
         // CREATOR EARNINGS
         // =================================
 
-        // Gross gift value in COINS
         totalEarned:
-          wallet.totalEarned || 0,
+          Number(wallet.totalEarned || 0),
 
-        // Platform 30% commission in ₦
         platformCommission:
-          wallet.platformCommission || 0,
+          Number(wallet.platformCommission || 0),
 
-        // Creator's current available money in ₦
         availableBalance:
-          wallet.availableBalance || 0,
+          Number(wallet.availableBalance || 0),
 
-        // Money temporarily locked for withdrawal
         withdrawalLockedBalance:
-          wallet.withdrawalLockedBalance || 0,
+          Number(
+            wallet.withdrawalLockedBalance || 0
+          ),
 
-        // Money already withdrawn in ₦
         totalWithdrawn:
-          wallet.totalWithdrawn || 0,
+          Number(wallet.totalWithdrawn || 0),
 
 
         // =================================
-        // GIFT STATISTICS
+        // GIFTS
         // =================================
 
         giftsSent:
-          wallet.giftsSent || 0,
+          Number(wallet.giftsSent || 0),
 
         giftsReceived:
-          wallet.giftsReceived || 0,
+          Number(wallet.giftsReceived || 0),
 
 
         // =================================
         // BACKWARD COMPATIBILITY
         // =================================
+        // Wasu tsoffin pages na iya amfani
+        // da "balance".
+        //
+        // Source of truth:
+        // availableBalance
 
         balance:
-          wallet.availableBalance || 0
+          Number(wallet.availableBalance || 0)
 
       }
 
@@ -134,12 +151,13 @@ exports.getWallet = async (req, res) => {
       err
     );
 
+
     return res.status(500).json({
 
       success: false,
 
       message:
-        err.message
+        "Failed to load wallet."
 
     });
 
@@ -164,19 +182,7 @@ exports.getEarnings = async (req, res) => {
 
 
     // =====================================
-    // IMPORTANT
-    // =====================================
-    // totalEarned is stored as COINS.
-    //
-    // 1 coin = ₦1
-    //
-    // Therefore gross gift value in ₦
-    // is numerically equal to totalEarned.
-    //
-    // Example:
-    //
-    // 645 coins = ₦645 gross
-    //
+    // FINANCIAL VALUES
     // =====================================
 
     const grossAmount =
@@ -193,7 +199,8 @@ exports.getEarnings = async (req, res) => {
 
     const creatorShare =
       Number(
-        (
+        Math.max(
+          0,
           grossAmount -
           platformCommission
         ).toFixed(2)
@@ -219,7 +226,7 @@ exports.getEarnings = async (req, res) => {
 
 
     // =====================================
-    // RETURN EARNINGS
+    // RESPONSE
     // =====================================
 
     return res.json({
@@ -228,63 +235,39 @@ exports.getEarnings = async (req, res) => {
 
       earnings: {
 
-        // -------------------------------
-        // GROSS
-        // -------------------------------
-
-        // Kept for backward compatibility.
-        // This remains the gross gift value
-        // in coins.
-
+        // Gross gift value
         totalEarned:
           grossAmount,
 
-
-        // Gross value expressed in Naira.
+        // 1 coin = ₦1
         grossAmount:
           grossAmount,
 
-
-        // -------------------------------
-        // PLATFORM
-        // -------------------------------
-
+        // Platform commission
         platformCommission:
           platformCommission,
 
-
-        // -------------------------------
-        // CREATOR
-        // -------------------------------
-
+        // Creator share
         creatorShare:
           creatorShare,
 
-
-        // Current withdrawable balance
-
+        // Available for withdrawal
         availableBalance:
           availableBalance,
 
-
-        // Currently locked withdrawal money
-
+        // Locked by withdrawal
         withdrawalLockedBalance:
           withdrawalLockedBalance,
 
-
         // Already withdrawn
-
         totalWithdrawn:
           totalWithdrawn,
 
-
-        // -------------------------------
-        // GIFTS
-        // -------------------------------
-
+        // Gift count
         giftsReceived:
-          wallet.giftsReceived || 0
+          Number(
+            wallet.giftsReceived || 0
+          )
 
       }
 
@@ -297,12 +280,13 @@ exports.getEarnings = async (req, res) => {
       err
     );
 
+
     return res.status(500).json({
 
       success: false,
 
       message:
-        err.message
+        "Failed to load earnings."
 
     });
 
@@ -311,66 +295,11 @@ exports.getEarnings = async (req, res) => {
 };
 
 
-
 // =========================================
-// TEST ADD COINS
+// EXPORT HELPER
 // =========================================
-// DEVELOPMENT / TEST ONLY
-// =========================================
+// Gifts / withdrawals za iya amfani da
+// wannan helper daga baya idan muna buƙata.
 
-exports.testAddCoins = async (req, res) => {
-
-  try {
-
-    const wallet =
-      await getOrCreateWallet(
-        req.user._id
-      );
-
-
-    // =====================================
-    // ADD 100 TEST COINS
-    // =====================================
-
-    wallet.coins += 100;
-
-    wallet.totalPurchased += 100;
-
-
-    await wallet.save();
-
-
-    return res.json({
-
-      success: true,
-
-      message:
-        "100 test coins added",
-
-      coins:
-        wallet.coins,
-
-      totalPurchased:
-        wallet.totalPurchased
-
-    });
-
-  } catch (err) {
-
-    console.error(
-      "TEST ADD COINS ERROR:",
-      err
-    );
-
-    return res.status(500).json({
-
-      success: false,
-
-      message:
-        err.message
-
-    });
-
-  }
-
-};
+exports.getOrCreateWallet =
+  getOrCreateWallet;
