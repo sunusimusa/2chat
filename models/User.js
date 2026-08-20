@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-
     // =========================================
     // BASIC USER INFORMATION
     // =========================================
@@ -29,7 +28,6 @@ const userSchema = new mongoose.Schema(
       required: true
     },
 
-
     // =========================================
     // ACCOUNT ROLE
     // =========================================
@@ -40,7 +38,6 @@ const userSchema = new mongoose.Schema(
       default: "user",
       index: true
     },
-
 
     // =========================================
     // CREATOR
@@ -61,7 +58,6 @@ const userSchema = new mongoose.Schema(
       type: [String],
       default: []
     },
-
 
     // =========================================
     // PROFILE
@@ -84,21 +80,20 @@ const userSchema = new mongoose.Schema(
       maxlength: 500
     },
 
-
     // =========================================
     // ONLINE STATUS
     // =========================================
 
     online: {
       type: Boolean,
-      default: false
+      default: false,
+      index: true
     },
 
     lastSeen: {
       type: Date,
       default: Date.now
     },
-
 
     // =========================================
     // FRIENDS
@@ -108,7 +103,6 @@ const userSchema = new mongoose.Schema(
       type: [String],
       default: []
     },
-
 
     // =========================================
     // FOLLOW SYSTEM
@@ -124,7 +118,6 @@ const userSchema = new mongoose.Schema(
       default: []
     },
 
-
     // =========================================
     // SAVED SHORT VIDEOS
     // =========================================
@@ -136,7 +129,6 @@ const userSchema = new mongoose.Schema(
       }
     ],
 
-
     // =========================================
     // BLOCKED USERS
     // =========================================
@@ -145,7 +137,6 @@ const userSchema = new mongoose.Schema(
       type: [String],
       default: []
     }
-
   },
 
   {
@@ -170,10 +161,15 @@ userSchema.index({
   isCreator: 1
 });
 
+userSchema.index({
+  online: 1
+});
+
 
 // =========================================
 // EXPORT
 // =========================================
 
 module.exports =
+  mongoose.models.User ||
   mongoose.model("User", userSchema);
