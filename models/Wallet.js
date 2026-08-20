@@ -2,8 +2,9 @@ const mongoose = require("mongoose");
 
 const walletSchema = new mongoose.Schema(
   {
+
     // =========================================
-    // OWNER
+    // WALLET OWNER
     // =========================================
 
     userId: {
@@ -14,9 +15,12 @@ const walletSchema = new mongoose.Schema(
       index: true
     },
 
+
     // =========================================
-    // COINS
+    // SPENDER COINS
     // =========================================
+    // Coins da user yake da su domin gifts
+    // da sauran abubuwan da za mu ƙara nan gaba.
 
     coins: {
       type: Number,
@@ -24,8 +28,9 @@ const walletSchema = new mongoose.Schema(
       min: 0
     },
 
+
     // =========================================
-    // COINS PURCHASED
+    // TOTAL COINS PURCHASED
     // =========================================
 
     totalPurchased: {
@@ -34,8 +39,9 @@ const walletSchema = new mongoose.Schema(
       min: 0
     },
 
+
     // =========================================
-    // COINS SPENT ON GIFTS
+    // TOTAL COINS SPENT
     // =========================================
 
     totalSpent: {
@@ -44,19 +50,25 @@ const walletSchema = new mongoose.Schema(
       min: 0
     },
 
-    // =========================================
-    // GROSS COINS EARNED FROM GIFTS
-    // =========================================
-
-totalEarned: {
-  type: Number,
-  default: 0,
-  min: 0
-},
 
     // =========================================
-    // PLATFORM COMMISSION (₦)
+    // CREATOR GROSS EARNINGS
     // =========================================
+    // Jimillar value na gifts da creator
+    // ya karɓa kafin platform commission.
+
+    totalEarned: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+
+
+    // =========================================
+    // PLATFORM COMMISSION
+    // =========================================
+    // Adadin commission da platform ta cire
+    // daga creator earnings.
 
     platformCommission: {
       type: Number,
@@ -64,9 +76,11 @@ totalEarned: {
       min: 0
     },
 
+
     // =========================================
-    // CREATOR AVAILABLE BALANCE (₦)
+    // AVAILABLE CREATOR BALANCE
     // =========================================
+    // Kuɗin da creator zai iya withdraw.
 
     availableBalance: {
       type: Number,
@@ -74,19 +88,25 @@ totalEarned: {
       min: 0
     },
 
-    // =========================================
-// BALANCE LOCKED FOR WITHDRAWAL
-// =========================================
-
-withdrawalLockedBalance: {
-  type: Number,
-  default: 0,
-  min: 0
-},
 
     // =========================================
-    // TOTAL WITHDRAWN (₦)
+    // WITHDRAWAL LOCKED BALANCE
     // =========================================
+    // Kuɗin da withdrawal request ya kulle
+    // har sai an kammala ko an soke withdrawal.
+
+    withdrawalLockedBalance: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+
+
+    // =========================================
+    // TOTAL WITHDRAWN
+    // =========================================
+    // Jimillar kuɗin da creator ya riga ya
+    // karɓa ta withdrawals.
 
     totalWithdrawn: {
       type: Number,
@@ -94,8 +114,9 @@ withdrawalLockedBalance: {
       min: 0
     },
 
+
     // =========================================
-    // TOTAL GIFTS SENT
+    // GIFTS SENT
     // =========================================
 
     giftsSent: {
@@ -104,8 +125,9 @@ withdrawalLockedBalance: {
       min: 0
     },
 
+
     // =========================================
-    // TOTAL GIFTS RECEIVED
+    // GIFTS RECEIVED
     // =========================================
 
     giftsReceived: {
@@ -113,7 +135,9 @@ withdrawalLockedBalance: {
       default: 0,
       min: 0
     }
+
   },
+
   {
     timestamps: true
   }
