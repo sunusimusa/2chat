@@ -1,178 +1,304 @@
 const User = require("../models/User");
 
-const Monetization =
-require("../models/Monetization");
-
 const Notification =
-require("../models/Notification");
+    require("../models/Notification");
 
 
+// =========================================
 // FOLLOW / UNFOLLOW USER
+// =========================================
 
-exports.followUser = async (req,res)=>{
+exports.followUser = async (req, res) => {
 
-try{
+    try {
 
-const {
-myUsername,
-targetUsername
-} = req.body;
+        const {
+            myUsername,
+            targetUsername
+        } = req.body;
 
-if(myUsername === targetUsername){
 
-return res.json({
-success:false,
-message:"You cannot follow yourself."
-});
+        if (!myUsername || !targetUsername) {
 
-}
+            return res.json({
+                success: false,
+                message: "Username is required."
+            });
 
-const me = await User.findOne({
-username:myUsername
-});
+        }
 
-const target = await User.findOne({
-username:targetUsername
-});
 
-if(!me || !target){
+        if (
+            String(myUsername).toLowerCase() ===
+            String(targetUsername).toLowerCase()
+        ) {
 
-return res.json({
-success:false,
-message:"User not found."
-});
+            return res.json({
+                success: false,
+                message: "You cannot follow yourself."
+            });
 
-}
+        }
 
-if(me.following.includes(targetUsername)){
 
-me.following =
-me.following.filter(
-u => u !== targetUsername
-);
+        const me = await User.findOne({
+            username: myUsername
+        });
 
-target.followers =
-target.followers.filter(
-u => u !== myUsername
-);
 
-}else{
+        const target = await User.findOne({
+            username: targetUsername
+        });
 
-me.following.push(targetUsername);
 
-target.followers.push(myUsername);
+        if (!me || !target) {
 
-await Notification.create({
+            return res.json({
+                success: false,
+                message: "User not found."
+            });
 
-receiver:targetUsername,
+        }
 
-sender:myUsername,
 
-type:"follow",
+        // =========================================
+        // UNFOLLOW
+        // =========================================
 
-text:myUsername + " started following you 👤"
+        if (me.following.includes(targetUsername)) {
 
-});  
+            me.following =
+                me.following.filter(
+                    username =>
+                        username !== targetUsername
+                );
 
-}
 
-await me.save();
-await target.save();
+            target.followers =
+                target.followers.filter(
+                    username =>
+                        username !== myUsername
+                );
 
-res.json({
-success:true,
-following:me.following.length,
-followers:target.followers.length
-});
+        }
 
-}catch(err){
 
-res.status(500).json({
-success:false,
-message:err.message
-});
+        // =========================================
+        // FOLLOW
+        // =========================================
 
-}
+        else {
+
+            if (!me.following.includes(targetUsername)) {
+
+                me.following.push(
+                    targetUsername
+                );
+
+            }
+
+
+            if (!target.followers.includes(myUsername)) {
+
+                target.followers.push(
+                    myUsername
+                );
+
+            }
+
+
+            await Notification.create({
+
+                receiver:
+                    targetUsername,
+
+                sender:
+                    myUsername,
+
+                type:
+                    "follow",
+
+                text:
+                    myUsername +
+                    " started following you 👤"
+
+            });
+
+        }
+
+
+        await me.save();
+        await target.save();
+
+
+        return res.json({
+
+            success: true,
+
+            following:
+                me.following.length,
+
+            followers:
+                target.followers.length
+
+        });
+
+
+    } catch (err) {
+
+        console.error(
+            "FOLLOW USER ERROR:",
+            err
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Failed to update follow status."
+
+        });
+
+    }
 
 };
 
+
+// =========================================
 // GET USER PROFILE
+// =========================================
 
-exports.getUserProfile = async (req,res)=>{
+exports.getUserProfile = async (req, res) => {
 
-try{
+    try {
 
-const username = req.params.username;
+        const username =
+            req.params.username;
 
-const user = await User.findOne({
-username
-});
 
-if(!user){
+        const user =
+            await User.findOne({
+                username
+            });
 
-return res.json({
-success:false,
-message:"User not found"
-});
 
-}
+        if (!user) {
 
-res.json({
-success:true,
-user
-});
+            return res.json({
 
-}catch(err){
+                success: false,
 
-res.status(500).json({
-success:false,
-message:err.message
-});
+                message:
+                    "User not found"
 
-}
+            });
+
+        }
+
+
+        return res.json({
+
+            success: true,
+
+            user
+
+        });
+
+
+    } catch (err) {
+
+        console.error(
+            "GET USER PROFILE ERROR:",
+            err
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Failed to load user profile."
+
+        });
+
+    }
 
 };
+
+
+// =========================================
+// GET ALL USERS
+// =========================================
 
 exports.getAllUsers = async (req, res) => {
-try {
 
-const users = await User.find(
-{},
-"username avatar online lastSeen"
-).sort({ username: 1 });
+    try {
 
-res.json({
-success: true,
-users
-});
+        const users =
+            await User.find(
+                {},
+                "username avatar online lastSeen"
+            )
+            .sort({
+                username: 1
+            });
 
-} catch (err) {
 
-res.status(500).json({
-success: false,
-message: err.message
-});
+        return res.json({
 
-}
+            success: true,
+
+            users
+
+        });
+
+
+    } catch (err) {
+
+        console.error(
+            "GET ALL USERS ERROR:",
+            err
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Failed to load users."
+
+        });
+
+    }
+
 };
 
-// ==========================
+
+// =========================================
 // SEARCH USERS
-// ==========================
+// =========================================
 
 exports.searchUsers = async (req, res) => {
 
     try {
 
         const keyword =
-            req.params.keyword
+            (req.params.keyword || "")
                 .trim();
+
 
         if (!keyword) {
 
             return res.json({
+
                 success: true,
+
                 users: []
+
             });
 
         }
