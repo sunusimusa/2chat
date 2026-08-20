@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
+
     // =========================================
     // BASIC USER INFORMATION
     // =========================================
@@ -12,7 +13,8 @@ const userSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       minlength: 3,
-      maxlength: 30
+      maxlength: 30,
+      index: true
     },
 
     email: {
@@ -20,13 +22,15 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
       trim: true,
-      lowercase: true
+      lowercase: true,
+      index: true
     },
 
     password: {
       type: String,
       required: true
     },
+
 
     // =========================================
     // ACCOUNT ROLE
@@ -39,8 +43,9 @@ const userSchema = new mongoose.Schema(
       index: true
     },
 
+
     // =========================================
-    // CREATOR
+    // CREATOR SYSTEM
     // =========================================
 
     isCreator: {
@@ -58,6 +63,7 @@ const userSchema = new mongoose.Schema(
       type: [String],
       default: []
     },
+
 
     // =========================================
     // PROFILE
@@ -80,20 +86,21 @@ const userSchema = new mongoose.Schema(
       maxlength: 500
     },
 
+
     // =========================================
     // ONLINE STATUS
     // =========================================
 
     online: {
       type: Boolean,
-      default: false,
-      index: true
+      default: false
     },
 
     lastSeen: {
       type: Date,
       default: Date.now
     },
+
 
     // =========================================
     // FRIENDS
@@ -103,6 +110,7 @@ const userSchema = new mongoose.Schema(
       type: [String],
       default: []
     },
+
 
     // =========================================
     // FOLLOW SYSTEM
@@ -118,6 +126,7 @@ const userSchema = new mongoose.Schema(
       default: []
     },
 
+
     // =========================================
     // SAVED SHORT VIDEOS
     // =========================================
@@ -129,6 +138,7 @@ const userSchema = new mongoose.Schema(
       }
     ],
 
+
     // =========================================
     // BLOCKED USERS
     // =========================================
@@ -137,6 +147,7 @@ const userSchema = new mongoose.Schema(
       type: [String],
       default: []
     }
+
   },
 
   {
@@ -161,15 +172,12 @@ userSchema.index({
   isCreator: 1
 });
 
-userSchema.index({
-  online: 1
-});
-
 
 // =========================================
 // EXPORT
 // =========================================
 
-module.exports =
-  mongoose.models.User ||
-  mongoose.model("User", userSchema);
+module.exports = mongoose.model(
+  "User",
+  userSchema
+);
