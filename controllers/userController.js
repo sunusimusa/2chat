@@ -1,7 +1,11 @@
 const User = require("../models/User");
 
+const Monetization =
+require("../models/Monetization");
+
 const Notification =
 require("../models/Notification");
+
 
 // FOLLOW / UNFOLLOW USER
 
