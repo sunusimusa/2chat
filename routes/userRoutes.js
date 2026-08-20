@@ -1,5 +1,7 @@
 const router = require("express").Router();
 
+const protect = require("../middleware/auth");
+
 const {
     followUser,
     getUserProfile,
@@ -8,37 +10,40 @@ const {
 } = require("../controllers/userController");
 
 
-// ==========================
-// FOLLOW USER
-// ==========================
+// =========================================
+// FOLLOW / UNFOLLOW USER
+// =========================================
 
 router.put(
     "/follow",
+    protect,
     followUser
 );
 
 
-// ==========================
+// =========================================
 // GET USER PROFILE
-// ==========================
+// =========================================
 
 router.get(
     "/profile/:username",
     getUserProfile
 );
 
-// ==========================
+
+// =========================================
 // SEARCH USERS
-// ==========================
+// =========================================
 
 router.get(
     "/search/:keyword",
     searchUsers
 );
 
-// ==========================
+
+// =========================================
 // GET ALL USERS
-// ==========================
+// =========================================
 
 router.get(
     "/all",
