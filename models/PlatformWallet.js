@@ -2,24 +2,29 @@ const mongoose = require("mongoose");
 
 const platformWalletSchema = new mongoose.Schema(
   {
+
     // =========================================
-    // PLATFORM WALLET
+    // PLATFORM WALLET KEY
     // =========================================
 
     key: {
       type: String,
       default: "main",
       unique: true,
-      index: true
+      index: true,
+      trim: true
     },
 
 
     // =========================================
-    // TOTAL GIFT VOLUME (₦)
+    // TOTAL GIFT VOLUME
     // =========================================
-    // Jimillar darajar gifts da aka tura.
+    // Jimillar value na duk gifts da aka tura.
+    //
+    // 1 coin = ₦1
+    //
     // Misali:
-    // 100 coins = ₦100 gift volume
+    // 100 coins = ₦100
 
     totalGiftVolume: {
       type: Number,
@@ -29,9 +34,9 @@ const platformWalletSchema = new mongoose.Schema(
 
 
     // =========================================
-    // TOTAL PLATFORM COMMISSION (₦)
+    // TOTAL PLATFORM COMMISSION
     // =========================================
-    // Platform tana karɓar 30%.
+    // Jimillar 30% commission da platform ta samu.
 
     totalCommission: {
       type: Number,
@@ -41,9 +46,9 @@ const platformWalletSchema = new mongoose.Schema(
 
 
     // =========================================
-    // TOTAL CREATOR EARNINGS (₦)
+    // TOTAL CREATOR EARNINGS
     // =========================================
-    // Creator yana samun 70%.
+    // Jimillar 70% da creators suka samu.
 
     totalCreatorEarnings: {
       type: Number,
@@ -53,10 +58,10 @@ const platformWalletSchema = new mongoose.Schema(
 
 
     // =========================================
-    // TOTAL CREATOR WITHDRAWN (₦)
+    // TOTAL CREATOR WITHDRAWN
     // =========================================
     // Jimillar kuɗin da aka riga aka biya
-    // creators ta automatic withdrawal.
+    // creators ta withdrawal.
 
     totalCreatorWithdrawn: {
       type: Number,
@@ -68,18 +73,25 @@ const platformWalletSchema = new mongoose.Schema(
     // =========================================
     // TOTAL GIFTS
     // =========================================
+    // Yawan gifts da aka kammala.
 
     totalGifts: {
       type: Number,
       default: 0,
       min: 0
     }
+
   },
+
   {
     timestamps: true
   }
 );
 
+
+// =========================================
+// EXPORT
+// =========================================
 
 module.exports =
   mongoose.model(
