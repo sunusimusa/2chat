@@ -4,50 +4,187 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
 
 <title>2Chat Home</title>
 
-<link rel="stylesheet" href="/css/home.css">
+<link
+rel="stylesheet"
+href="/css/home.css">
 
-<link rel="stylesheet"
+<link
+rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
 </head>
 
 <body>
 
-<!-- HEADER -->
+<!-- =====================================================
+     TOP HEADER
+===================================================== -->
 
 <header class="app-header">
 
-<button id="menuBtn" onclick="openMenu()">
+<div class="header-logo">
+    2Chat
+</div>
 
-<i class="fa-solid fa-bars"></i>
+<div class="header-actions">
+
+<button
+id="createHeaderBtn"
+onclick="focusCreatePost()"
+aria-label="Create">
+
+<i class="fa-solid fa-plus"></i>
 
 </button>
 
-<h2>2Chat</h2>
-
-<button id="searchBtn">
+<button
+id="searchBtn"
+onclick="openSearch()"
+aria-label="Search">
 
 <i class="fa-solid fa-magnifying-glass"></i>
 
 </button>
 
+<button
+id="menuBtn"
+onclick="openMenu()"
+aria-label="Menu">
+
+<i class="fa-solid fa-bars"></i>
+
+</button>
+
+</div>
+
 </header>
 
-<!-- SIDE MENU -->
 
-<div id="menuOverlay" class="menu-overlay" onclick="closeMenu()"></div>
+<!-- =====================================================
+     QUICK NAVIGATION
+===================================================== -->
 
-<div id="sideMenu" class="side-menu">
+<nav class="quick-nav">
+
+<a
+href="/home.html"
+class="quick-item active">
+
+<i class="fa-solid fa-house"></i>
+
+</a>
+
+<a
+href="/users.html"
+class="quick-item">
+
+<i class="fa-solid fa-user-group"></i>
+
+</a>
+
+<a
+href="/messenger.html"
+class="quick-item">
+
+<i class="fa-solid fa-comments"></i>
+
+</a>
+
+<a
+href="/groups.html"
+class="quick-item">
+
+<i class="fa-solid fa-users"></i>
+
+</a>
+
+<a
+href="/notification.html"
+class="quick-item notification-item">
+
+<i class="fa-solid fa-bell"></i>
+
+<span
+id="notificationCount">
+</span>
+
+</a>
+
+</nav>
+
+
+<!-- =====================================================
+     SEARCH BOX
+===================================================== -->
+
+<div
+id="searchPanel"
+class="search-panel">
+
+<div class="search-inner">
+
+<button
+onclick="closeSearch()">
+
+<i class="fa-solid fa-arrow-left"></i>
+
+</button>
+
+<input
+id="searchInput"
+type="search"
+placeholder="Search 2Chat...">
+
+<button
+onclick="performSearch()">
+
+<i class="fa-solid fa-magnifying-glass"></i>
+
+</button>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     SIDE MENU OVERLAY
+===================================================== -->
+
+<div
+id="menuOverlay"
+class="menu-overlay"
+onclick="closeMenu()">
+</div>
+
+
+<!-- =====================================================
+     SIDE MENU
+===================================================== -->
+
+<div
+id="sideMenu"
+class="side-menu">
 
 <div class="menu-header">
 
-<h2>2Chat</h2>
+<div>
 
-<button onclick="closeMenu()">
+<strong>2Chat</strong>
+
+<small>Community</small>
+
+</div>
+
+<button
+onclick="closeMenu()">
 
 <i class="fa-solid fa-xmark"></i>
 
@@ -55,100 +192,139 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 
 </div>
 
+
 <div class="menu-user">
+
+<div class="menu-avatar">
 
 <i class="fa-solid fa-user"></i>
 
+</div>
+
+<div>
+
 <b id="userName"></b>
 
+<small>View your profile</small>
+
 </div>
+
+</div>
+
 
 <a href="/home.html">
 
 <i class="fa-solid fa-house"></i>
 
-Home
+<span>Home</span>
 
 </a>
+
 
 <a href="/messenger.html">
 
 <i class="fa-solid fa-comments"></i>
 
-Chats
+<span>Chats</span>
 
 </a>
+
 
 <a href="/groups.html">
 
 <i class="fa-solid fa-users"></i>
 
-Groups
+<span>Groups</span>
 
 </a>
+
 
 <a href="/users.html">
 
 <i class="fa-solid fa-user-group"></i>
 
-Friends
+<span>Friends</span>
 
 </a>
+
 
 <a href="/shorts.html">
 
 <i class="fa-solid fa-clapperboard"></i>
 
-Shorts
+<span>Shorts</span>
 
 </a>
+
 
 <a href="/trending.html">
 
 <i class="fa-solid fa-fire"></i>
 
-Trending
+<span>Trending</span>
 
 </a>
+
 
 <a href="/notification.html">
 
 <i class="fa-solid fa-bell"></i>
 
-Notifications
+<span>Notifications</span>
 
-<span id="notificationCount"></span>
+<span
+class="menu-notification"
+id="menuNotificationCount">
+</span>
 
 </a>
+
 
 <a href="/profile.html">
 
 <i class="fa-solid fa-user"></i>
 
-Profile
+<span>Profile</span>
 
 </a>
 
-<a href="#" onclick="logout()">
+
+<a
+href="#"
+onclick="logout(); return false;">
 
 <i class="fa-solid fa-right-from-bracket"></i>
 
-Logout
+<span>Logout</span>
 
 </a>
 
 </div>
 
-<hr>
 
-<!-- CREATE POST -->
+<!-- =====================================================
+     CREATE POST
+===================================================== -->
 
-<div class="create-post">
+<section
+class="create-post"
+id="createPostSection">
+
+<div class="create-user-row">
+
+<div class="create-avatar">
+
+<i class="fa-solid fa-user"></i>
+
+</div>
 
 <textarea
 id="postText"
 placeholder="What's happening?">
 </textarea>
+
+</div>
+
 
 <input
 type="file"
@@ -156,8 +332,10 @@ id="postImage"
 accept="image/*"
 hidden>
 
+
 <div
 id="postPreview"
+class="post-preview"
 style="display:none;">
 
 <img
@@ -175,21 +353,35 @@ Remove
 
 </div>
 
-<div class="post-actions">
+
+<div class="create-actions">
 
 <label
 for="postImage"
-class="image-btn">
+class="create-action photo-action">
 
 <i class="fa-solid fa-image"></i>
 
-Photo
+<span>Photo</span>
 
 </label>
 
+
+<button
+type="button"
+class="create-action">
+
+<i class="fa-solid fa-video"></i>
+
+<span>Video</span>
+
+</button>
+
+
 <button
 id="postBtn"
-onclick="createPost()">
+onclick="createPost()"
+class="post-submit">
 
 <i class="fa-solid fa-paper-plane"></i>
 
@@ -199,17 +391,46 @@ Post
 
 </div>
 
+</section>
+
+
+<!-- =====================================================
+     STATUS / ONLINE USERS
+===================================================== -->
+
+<div
+id="friendsStatus"
+class="friends-status">
+
 </div>
 
-<!-- FEED -->
 
-<div id="feed"></div>
+<!-- =====================================================
+     FEED
+===================================================== -->
 
-<!-- BOTTOM NAVIGATION -->
+<main id="feed">
 
-<div class="bottom-nav">
+<div class="loading">
 
-<a href="/home.html" class="active">
+<i class="fa-solid fa-spinner fa-spin"></i>
+
+Loading posts...
+
+</div>
+
+</main>
+
+
+<!-- =====================================================
+     BOTTOM NAVIGATION
+===================================================== -->
+
+<nav class="bottom-nav">
+
+<a
+href="/home.html"
+class="active">
 
 <i class="fa-solid fa-house"></i>
 
@@ -217,7 +438,9 @@ Post
 
 </a>
 
-<a href="/shorts.html">
+
+<a
+href="/shorts.html">
 
 <i class="fa-solid fa-clapperboard"></i>
 
@@ -225,7 +448,9 @@ Post
 
 </a>
 
-<a href="/trending.html">
+
+<a
+href="/trending.html">
 
 <i class="fa-solid fa-fire"></i>
 
@@ -233,7 +458,9 @@ Post
 
 </a>
 
-<a href="/messenger.html">
+
+<a
+href="/messenger.html">
 
 <i class="fa-solid fa-comments"></i>
 
@@ -241,7 +468,9 @@ Post
 
 </a>
 
-<a href="/profile.html">
+
+<a
+href="/profile.html">
 
 <i class="fa-solid fa-user"></i>
 
@@ -249,10 +478,13 @@ Post
 
 </a>
 
-</div>
+</nav>
 
-<script src="/js/home.js"></script>
+
+<script
+src="/js/home.js">
+</script>
 
 </body>
 
-</html>
+  </html>
