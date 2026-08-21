@@ -1,111 +1,183 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
-{
-username: {
-type: String,
-required: true,
-unique: true
-},
+  {
 
-email: {  
-  type: String,  
-  required: true,  
-  unique: true  
-},  
+    // =========================================
+    // BASIC USER INFORMATION
+    // =========================================
 
-role: {  
-type: String,  
-enum: ["user", "admin"],  
-default: "user"
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      minlength: 3,
+      maxlength: 30,
+      index: true
+    },
 
-},
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+      index: true
+    },
 
-isCreator: {  
-type: Boolean,  
-default: false
+    password: {
+      type: String,
+      required: true
+    },
 
-},
 
-friends:{
+    // =========================================
+    // ACCOUNT ROLE
+    // =========================================
 
-type:[String],
-default:[]
-},
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+      index: true
+    },
 
-password: {  
-  type: String,  
-  required: true  
-},  
 
-avatar: {
+    // =========================================
+    // CREATOR SYSTEM
+    // =========================================
 
-type: String,
-default: "/images/default.png"
-},
+    isCreator: {
+      type: Boolean,
+      default: false,
+      index: true
+    },
 
-cover: {
+    creatorBadge: {
+      type: String,
+      default: "🥉 Bronze Creator"
+    },
 
-type: String,
-default: "/images/default-cover.jpg"
-},
+    favoriteCategories: {
+      type: [String],
+      default: []
+    },
 
-online:{
 
-type:Boolean,
-default:false
-},
+    // =========================================
+    // PROFILE
+    // =========================================
 
-lastSeen:{
-type:Date,
-default:Date.now
-},
+    avatar: {
+      type: String,
+      default: "/images/default.png"
+    },
 
-followers:{
-type:[String],
-default:[]
-},
+    cover: {
+      type: String,
+      default: "/images/default-cover.jpg"
+    },
 
-following:{
-type:[String],
-default:[]
-},
+    bio: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 500
+    },
 
-favoriteCategories: {  
-type: [String],  
-default: []
 
-},
+    // =========================================
+    // ONLINE STATUS
+    // =========================================
 
-creatorBadge: {  
-type: String,  
-default: "🥉 Bronze Creator"
+    online: {
+      type: Boolean,
+      default: false
+    },
 
-},
+    lastSeen: {
+      type: Date,
+      default: Date.now
+    },
 
-savedVideos: [
 
-{
-type: mongoose.Schema.Types.ObjectId,
-ref: "ShortVideo"
-}
-],
+    // =========================================
+    // FRIENDS
+    // =========================================
 
-blockedUsers: {  
-type: [String],  
-default: []
+    friends: {
+      type: [String],
+      default: []
+    },
 
-},
 
-bio: {  
-  type: String,  
-  default: ""  
-}
+    // =========================================
+    // FOLLOW SYSTEM
+    // =========================================
 
-},
-{
-timestamps: true
-}
+    followers: {
+      type: [String],
+      default: []
+    },
+
+    following: {
+      type: [String],
+      default: []
+    },
+
+
+    // =========================================
+    // SAVED SHORT VIDEOS
+    // =========================================
+
+    savedVideos: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ShortVideo"
+      }
+    ],
+
+
+    // =========================================
+    // BLOCKED USERS
+    // =========================================
+
+    blockedUsers: {
+      type: [String],
+      default: []
+    }
+
+  },
+
+  {
+    timestamps: true
+  }
 );
 
-module.exports = mongoose.model("User", userSchema);
+
+// =========================================
+// INDEXES
+// =========================================
+
+userSchema.index({
+  username: 1
+});
+
+userSchema.index({
+  email: 1
+});
+
+userSchema.index({
+  isCreator: 1
+});
+
+
+// =========================================
+// EXPORT
+// =========================================
+
+module.exports = mongoose.model(
+  "User",
+  userSchema
+);
