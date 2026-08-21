@@ -35,6 +35,20 @@ if (!user) {
 
 
 // =====================================================
+// CREATE POST AVATAR
+// =====================================================
+
+const createPostAvatar =
+    document.getElementById("createPostAvatar");
+
+if (createPostAvatar && user) {
+
+    createPostAvatar.src =
+        user.avatar ||
+        "/images/default.png";
+}
+
+// =====================================================
 // USER NAME
 // =====================================================
 
