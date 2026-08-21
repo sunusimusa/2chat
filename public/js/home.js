@@ -456,124 +456,150 @@ async function editPost(
 // CREATE POST
 // =====================================================
 
-async function createPost(){
-
-    const textElement =
-        document.getElementById(
-            "postText"
-        );
-
-    const imageElement =
-        document.getElementById(
-            "postImage"
-        );
+async function createPost() {
 
     const text =
-        textElement
-            ? textElement.value.trim()
-            : "";
+        document
+            .getElementById("postText")
+            .value
+            .trim();
 
+    const imageInput =
+        document.getElementById("postImage");
+
+    const videoInput =
+        document.getElementById("postVideo");
 
     const image =
-        imageElement?.files?.[0];
+        imageInput.files[0];
 
+    const video =
+        videoInput.files[0];
 
-    if(text === "" && !image){
+    // ==========================================
+    // CHECK
+    // ==========================================
+
+    if (
+        text === "" &&
+        !image &&
+        !video
+    ) {
 
         return;
 
     }
 
+    // ==========================================
+    // PREVENT BOTH IMAGE + VIDEO
+    // ==========================================
+
+    if (image && video) {
+
+        alert(
+            "Please select Photo OR Video, not both."
+        );
+
+        return;
+
+    }
 
     const formData =
         new FormData();
-
 
     formData.append(
         "userId",
         user._id
     );
 
-
     formData.append(
         "username",
         user.username
     );
 
+    formData.append(
+        "avatar",
+        user.avatar || ""
+    );
 
     formData.append(
         "text",
         text
     );
 
+    // ==========================================
+    // FILE
+    // ==========================================
 
-    if(image){
+    if (image) {
 
-        formData.append("file", image);
+        formData.append(
+            "file",
+            image
+        );
 
     }
 
+    if (video) {
 
-    try{
+        formData.append(
+            "file",
+            video
+        );
+
+    }
+
+    try {
 
         const res =
             await fetch(
                 "/api/posts/create",
                 {
-                    method:"POST",
-                    body:formData
+                    method: "POST",
+                    body: formData
                 }
             );
-
 
         const data =
             await res.json();
 
+        if (data.success) {
 
-        if(data.success){
+            // Clear text
+            document.getElementById(
+                "postText"
+            ).value = "";
 
-            if(imageElement){
+            // Clear image
+            imageInput.value = "";
 
-                imageElement.value =
-                    "";
+            // Clear video
+            videoInput.value = "";
 
-            }
-
-
+            // Hide preview
             const preview =
                 document.getElementById(
                     "postPreview"
                 );
 
-
-            if(preview){
-
+            if (preview) {
                 preview.style.display =
                     "none";
-
             }
 
-
-            if(textElement){
-
-                textElement.value =
-                    "";
-
-            }
-
-
+            // Reload posts
             loadPosts();
 
-        }else{
+        } else {
 
             alert(
                 data.message ||
-                "Post failed."
+                "Failed to create post"
             );
 
         }
 
-    }catch(err){
+    } catch (err) {
 
         console.error(
             "CREATE POST ERROR:",
@@ -581,7 +607,7 @@ async function createPost(){
         );
 
         alert(
-            "Failed to create post."
+            "❌ Failed to create post"
         );
 
     }
@@ -1012,33 +1038,39 @@ async function loadPosts(){
                     }
 
 
-                    ${
-                        post.image
+                    ${post.image ?
+`
+<div class="post-image">
 
-                        ?
+<img
+src="${post.image}"
+onclick="window.open('${post.image}','_blank')">
 
-                        `
+</div>
+`
+:
+``
+}
 
-                        <div
-                        class="post-image">
+${post.video ?
+`
+<div class="post-video">
 
-                            <img
-                            src="${post.image}"
-                            onclick="
-                            window.open(
-                                '${post.image}',
-                                '_blank'
-                            )">
+<video
+src="${post.video}"
+controls
+playsinline
+preload="metadata">
 
-                        </div>
+Your browser does not support video.
 
-                        `
+</video>
 
-                        :
-
-                        ""
-
-                    }
+</div>
+`
+:
+``
+}
 
 
                     <div
