@@ -6,78 +6,146 @@ require("../models/Notification");
 
 // CREATE POST
 
-exports.createPost =
-async(req,res)=>{
+exports.createPost = async (req, res) => {
 
-try{
+    try {
 
-const {
-userId,
-username,
-avatar,
-text
-} = req.body;
+        const {
+            userId,
+            username,
+            avatar,
+            text
+        } = req.body;
 
-let image = "";
-let voice = "";
-  
-if(req.file){
+        let image = "";
+        let video = "";
 
-if(req.file.mimetype.startsWith("image")){
+        // ==========================================
+        // UPLOAD FILE
+        // ==========================================
 
-const result =
-await cloudinary.uploader.upload(
-req.file.path,
-{
-folder:"2chat-images"
-}
-);
+        if (req.file) {
 
-image=result.secure_url;
+            const isImage =
+                req.file.mimetype.startsWith("image/");
 
-}
+            const isVideo =
+                req.file.mimetype.startsWith("video/");
 
-else if(req.file.mimetype.startsWith("audio")){
+            // ==========================================
+            // IMAGE
+            // ==========================================
 
-const result =
-await cloudinary.uploader.upload(
-req.file.path,
-{
-resource_type:"video",
-folder:"2chat-voice"
-}
-);
+            if (isImage) {
 
-voice=result.secure_url;
+                const result =
+                    await new Promise((resolve, reject) => {
 
-}
+                        const stream =
+                            cloudinary.uploader.upload_stream(
+                                {
+                                    resource_type: "image",
+                                    folder: "2chat-images"
+                                },
 
-} 
+                                (error, result) => {
 
-const post =
-await Post.create({
+                                    if (error) {
+                                        reject(error);
+                                    } else {
+                                        resolve(result);
+                                    }
 
-userId,
-username,
-avatar,
-text,
-image
+                                }
+                            );
 
-});
-  
-res.json({
-success:true,
-post
-});
+                        stream.end(req.file.buffer);
 
-}catch(err){
+                    });
 
-res.status(500).json({
-success:false,
-message:err.message
-});
+                image = result.secure_url;
 
-}
+            }
+
+            // ==========================================
+            // VIDEO
+            // ==========================================
+
+            else if (isVideo) {
+
+                const result =
+                    await new Promise((resolve, reject) => {
+
+                        const stream =
+                            cloudinary.uploader.upload_stream(
+                                {
+                                    resource_type: "video",
+                                    folder: "2chat-videos"
+                                },
+
+                                (error, result) => {
+
+                                    if (error) {
+                                        reject(error);
+                                    } else {
+                                        resolve(result);
+                                    }
+
+                                }
+                            );
+
+                        stream.end(req.file.buffer);
+
+                    });
+
+                video = result.secure_url;
+
+            }
+
+        }
+
+        // ==========================================
+        // CREATE POST
+        // ==========================================
+
+        const post =
+            await Post.create({
+
+                userId,
+                username,
+                avatar,
+                text,
+                image,
+                video
+
+            });
+
+        // ==========================================
+        // RESPONSE
+        // ==========================================
+
+        res.json({
+
+            success: true,
+            post
+
+        });
+
+    } catch (err) {
+
+        console.error(
+            "CREATE POST ERROR:",
+            err
+        );
+
+        res.status(500).json({
+
+            success: false,
+            message: err.message
+
+        });
+
+    }
 
 };
 
