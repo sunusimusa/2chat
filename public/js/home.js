@@ -1707,13 +1707,17 @@ function toggleComment(
 
 }
 
-const postImage =
+// =====================================================
+// MEDIA PREVIEW
+// =====================================================
+
+const postImageInput =
     document.getElementById("postImage");
 
-const postVideo =
+const postVideoInput =
     document.getElementById("postVideo");
 
-const postPreview =
+const postPreviewBox =
     document.getElementById("postPreview");
 
 const postPreviewImage =
@@ -1723,99 +1727,189 @@ const postPreviewVideo =
     document.getElementById("postPreviewVideo");
 
 
-// ==========================================
+// =====================================================
 // PHOTO PREVIEW
-// ==========================================
+// =====================================================
 
-postImage.addEventListener("change", function () {
+if (postImageInput) {
 
-    const file = this.files[0];
+    postImageInput.addEventListener(
+        "change",
+        function () {
 
-    if (!file) return;
+            const file =
+                this.files &&
+                this.files[0];
 
-    // Clear video
-    postVideo.value = "";
-
-    postPreviewVideo.style.display = "none";
-    postPreviewVideo.pause();
-    postPreviewVideo.removeAttribute("src");
-    postPreviewVideo.load();
-
-    // Show image
-    const reader = new FileReader();
-
-    reader.onload = function (e) {
-
-        postPreviewImage.src =
-            e.target.result;
-
-        postPreviewImage.style.display =
-            "block";
-
-        postPreview.style.display =
-            "block";
-    };
-
-    reader.readAsDataURL(file);
-
-});
+            if (!file) return;
 
 
-// ==========================================
-// VIDEO PREVIEW
-// ==========================================
+            // Clear video
+            if (postVideoInput) {
+                postVideoInput.value = "";
+            }
 
-postVideo.addEventListener("change", function () {
+            if (postPreviewVideo) {
 
-    const file = this.files[0];
+                postPreviewVideo.pause();
 
-    if (!file) return;
+                postPreviewVideo.removeAttribute(
+                    "src"
+                );
 
-    // Clear image
-    postImage.value = "";
+                postPreviewVideo.load();
 
-    postPreviewImage.src = "";
-    postPreviewImage.style.display =
-        "none";
-
-    // Create video preview
-    const videoURL =
-        URL.createObjectURL(file);
-
-    postPreviewVideo.src =
-        videoURL;
-
-    postPreviewVideo.style.display =
-        "block";
-
-    postPreview.style.display =
-        "block";
-
-});
+                postPreviewVideo.style.display =
+                    "none";
+            }
 
 
-// ==========================================
-// REMOVE MEDIA
-// ==========================================
+            // Show image
+            const reader =
+                new FileReader();
 
-function removePostMedia() {
+            reader.onload =
+                function (e) {
 
-    postImage.value = "";
-    postVideo.value = "";
+                    if (postPreviewImage) {
 
-    postPreviewImage.src = "";
-    postPreviewImage.style.display =
-        "none";
+                        postPreviewImage.src =
+                            e.target.result;
 
-    postPreviewVideo.pause();
-    postPreviewVideo.removeAttribute("src");
-    postPreviewVideo.load();
+                        postPreviewImage.style.display =
+                            "block";
+                    }
 
-    postPreviewVideo.style.display =
-        "none";
+                    if (postPreviewBox) {
 
-    postPreview.style.display =
-        "none";
+                        postPreviewBox.style.display =
+                            "block";
+                    }
+
+                };
+
+            reader.readAsDataURL(file);
+
+        }
+    );
+
 }
 
 
+// =====================================================
+// VIDEO PREVIEW
+// =====================================================
+
+if (postVideoInput) {
+
+    postVideoInput.addEventListener(
+        "change",
+        function () {
+
+            const file =
+                this.files &&
+                this.files[0];
+
+            if (!file) return;
+
+
+            // Clear image
+            if (postImageInput) {
+                postImageInput.value = "";
+            }
+
+            if (postPreviewImage) {
+
+                postPreviewImage.src = "";
+
+                postPreviewImage.style.display =
+                    "none";
+            }
+
+
+            // Create temporary video URL
+            const videoURL =
+                URL.createObjectURL(file);
+
+
+            if (postPreviewVideo) {
+
+                postPreviewVideo.src =
+                    videoURL;
+
+                postPreviewVideo.style.display =
+                    "block";
+
+            }
+
+
+            if (postPreviewBox) {
+
+                postPreviewBox.style.display =
+                    "block";
+
+            }
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// REMOVE PHOTO / VIDEO
+// =====================================================
+
+function removePostMedia() {
+
+    if (postImageInput) {
+
+        postImageInput.value =
+            "";
+
+    }
+
+
+    if (postVideoInput) {
+
+        postVideoInput.value =
+            "";
+
+    }
+
+
+    if (postPreviewImage) {
+
+        postPreviewImage.src =
+            "";
+
+        postPreviewImage.style.display =
+            "none";
+
+    }
+
+
+    if (postPreviewVideo) {
+
+        postPreviewVideo.pause();
+
+        postPreviewVideo.removeAttribute(
+            "src"
+        );
+
+        postPreviewVideo.load();
+
+        postPreviewVideo.style.display =
+            "none";
+
+    }
+
+
+    if (postPreviewBox) {
+
+        postPreviewBox.style.display =
+            "none";
+
+    }
+
+}
