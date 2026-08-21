@@ -1706,3 +1706,116 @@ function toggleComment(
     }
 
 }
+
+const postImage =
+    document.getElementById("postImage");
+
+const postVideo =
+    document.getElementById("postVideo");
+
+const postPreview =
+    document.getElementById("postPreview");
+
+const postPreviewImage =
+    document.getElementById("postPreviewImage");
+
+const postPreviewVideo =
+    document.getElementById("postPreviewVideo");
+
+
+// ==========================================
+// PHOTO PREVIEW
+// ==========================================
+
+postImage.addEventListener("change", function () {
+
+    const file = this.files[0];
+
+    if (!file) return;
+
+    // Clear video
+    postVideo.value = "";
+
+    postPreviewVideo.style.display = "none";
+    postPreviewVideo.pause();
+    postPreviewVideo.removeAttribute("src");
+    postPreviewVideo.load();
+
+    // Show image
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+
+        postPreviewImage.src =
+            e.target.result;
+
+        postPreviewImage.style.display =
+            "block";
+
+        postPreview.style.display =
+            "block";
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
+
+// ==========================================
+// VIDEO PREVIEW
+// ==========================================
+
+postVideo.addEventListener("change", function () {
+
+    const file = this.files[0];
+
+    if (!file) return;
+
+    // Clear image
+    postImage.value = "";
+
+    postPreviewImage.src = "";
+    postPreviewImage.style.display =
+        "none";
+
+    // Create video preview
+    const videoURL =
+        URL.createObjectURL(file);
+
+    postPreviewVideo.src =
+        videoURL;
+
+    postPreviewVideo.style.display =
+        "block";
+
+    postPreview.style.display =
+        "block";
+
+});
+
+
+// ==========================================
+// REMOVE MEDIA
+// ==========================================
+
+function removePostMedia() {
+
+    postImage.value = "";
+    postVideo.value = "";
+
+    postPreviewImage.src = "";
+    postPreviewImage.style.display =
+        "none";
+
+    postPreviewVideo.pause();
+    postPreviewVideo.removeAttribute("src");
+    postPreviewVideo.load();
+
+    postPreviewVideo.style.display =
+        "none";
+
+    postPreview.style.display =
+        "none";
+}
+
+
