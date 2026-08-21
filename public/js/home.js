@@ -509,10 +509,7 @@ async function createPost(){
 
     if(image){
 
-        formData.append(
-            "image",
-            image
-        );
+        formData.append("file", image);
 
     }
 
