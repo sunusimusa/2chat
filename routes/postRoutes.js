@@ -1,34 +1,34 @@
 const router = require("express").Router();
 
 const {
-createPost,
-getPosts,
-likePost,
-commentPost,
-editPost,
-deletePost,
-getUserPosts,
-getSinglePost
+    createPost,
+    getPosts,
+    likePost,
+    commentPost,
+    editPost,
+    deletePost,
+    getUserPosts,
+    getSinglePost
 } = require("../controllers/postController");
 
 const upload = require("../middleware/upload");
 
 router.post(
-"/create",
-upload.single("image"),
-createPost
+    "/create",
+    upload.single("file"),
+    createPost
 );
 
 router.get("/", getPosts);
 
 router.get(
-"/user/:username",
-getUserPosts
+    "/user/:username",
+    getUserPosts
 );
 
 router.get(
-"/single/:id",
-getSinglePost
+    "/single/:id",
+    getSinglePost
 );
 
 router.put("/like", likePost);
