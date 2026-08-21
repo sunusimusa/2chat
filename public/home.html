@@ -337,24 +337,32 @@ id="createPostSection">
 
     <!-- PREVIEW -->
     <div
-    id="postPreview"
-    class="post-preview"
+id="postPreview"
+class="post-preview"
+style="display:none;">
+
+    <img
+    id="postPreviewImage"
     style="display:none;">
 
-        <img
-        id="postPreviewImage">
+    <video
+    id="postPreviewVideo"
+    controls
+    playsinline
+    style="display:none;">
+    </video>
 
-        <button
-        type="button"
-        onclick="removePostImage()">
+    <button
+    type="button"
+    onclick="removePostMedia()">
 
-            <i class="fa-solid fa-trash"></i>
-            Remove
+        <i class="fa-solid fa-trash"></i>
+        Remove
 
-        </button>
+    </button>
 
-    </div>
-
+</div>
+    
     <!-- ACTIONS -->
     <div class="post-actions">
 
