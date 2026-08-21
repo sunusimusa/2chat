@@ -305,122 +305,90 @@ onclick="logout(); return false;">
 <!-- =====================================================
      CREATE POST
 ===================================================== -->
-
 <section
 class="create-post"
 id="createPostSection">
 
-<div class="create-user-row">
+    <div class="create-user-row">
 
-<div class="create-avatar">
+        <div class="create-avatar">
+            <i class="fa-solid fa-user"></i>
+        </div>
 
-<i class="fa-solid fa-user"></i>
+        <textarea
+        id="postText"
+        placeholder="What's happening?"></textarea>
 
-</div>
+    </div>
 
-<textarea
-id="postText"
-placeholder="What's happening?">
-</textarea>
+    <!-- PHOTO -->
+    <input
+    type="file"
+    id="postImage"
+    accept="image/*"
+    hidden>
 
-</div>
+    <!-- VIDEO -->
+    <input
+    type="file"
+    id="postVideo"
+    accept="video/*"
+    hidden>
 
+    <!-- PREVIEW -->
+    <div
+    id="postPreview"
+    class="post-preview"
+    style="display:none;">
 
-<input
-type="file"
-id="postImage"
-accept="image/*"
-hidden>
+        <img
+        id="postPreviewImage">
 
-     
-<input
-type="file"
-id="postVideo"
-accept="video/*"
-hidden>
+        <button
+        type="button"
+        onclick="removePostImage()">
 
-<div
-id="postPreview"
-class="post-preview"
-style="display:none;">
+            <i class="fa-solid fa-trash"></i>
+            Remove
 
-<img
-id="postPreviewImage">
+        </button>
 
-<button
-type="button"
-onclick="removePostImage()">
+    </div>
 
-<i class="fa-solid fa-trash"></i>
+    <!-- ACTIONS -->
+    <div class="post-actions">
 
-Remove
+        <label
+        for="postImage"
+        class="image-btn">
 
-</button>
+            <i class="fa-solid fa-image"></i>
+            Photo
 
-</div>
+        </label>
 
+        <label
+        for="postVideo"
+        class="video-btn">
 
-<div class="post-actions">
+            <i class="fa-solid fa-video"></i>
+            Video
 
-<label
-for="postImage"
-class="image-btn">
+        </label>
 
-<i class="fa-solid fa-image"></i>
+        <button
+        id="postBtn"
+        type="button"
+        onclick="createPost()">
 
-Photo
+            <i class="fa-solid fa-paper-plane"></i>
+            Post
 
-</label>
+        </button>
 
-<label
-for="postVideo"
-class="video-btn">
-
-<i class="fa-solid fa-video"></i>
-
-Video
-
-</label>
-
-<button
-id="postBtn"
-onclick="createPost()">
-
-<i class="fa-solid fa-paper-plane"></i>
-
-Post
-
-</button>
-
-</div>
-
-
-<button
-type="button"
-class="create-action">
-
-<i class="fa-solid fa-video"></i>
-
-<span>Video</span>
-
-</button>
-
-
-<button
-id="postBtn"
-onclick="createPost()"
-class="post-submit">
-
-<i class="fa-solid fa-paper-plane"></i>
-
-Post
-
-</button>
-
-</div>
+    </div>
 
 </section>
-
 
 <!-- =====================================================
      STATUS / ONLINE USERS
