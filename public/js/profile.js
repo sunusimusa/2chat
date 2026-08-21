@@ -933,4 +933,717 @@ async function uploadAvatar() {
 
         return alert(
             "Select image"
- 
+        );
+
+    }
+
+
+    if (!token) {
+
+        return alert(
+            "❌ Login session expired. Please login again."
+        );
+
+    }
+
+
+    try {
+
+        const compressedFile =
+            await compressImage(
+                file,
+                700,
+                0.75
+            );
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "avatar",
+            compressedFile
+        );
+
+
+        const res =
+            await fetch(
+                "/api/auth/avatar",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Authorization":
+                            "Bearer " +
+                            token
+                    },
+
+                    body: formData
+                }
+            );
+
+
+        const data =
+            await res.json();
+
+
+        if (data.success) {
+
+            user.avatar =
+                data.avatar;
+
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify(
+                    user
+                )
+            );
+
+
+            alert(
+                "✅ Avatar Updated"
+            );
+
+
+            location.reload();
+
+        } else {
+
+            alert(
+                "❌ " +
+                (
+                    data.message ||
+                    "Upload failed"
+                )
+            );
+
+        }
+
+    } catch (err) {
+
+        console.error(
+            "UPLOAD AVATAR ERROR:",
+            err
+        );
+
+        alert(
+            "❌ Failed to upload avatar."
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// LOAD MY POSTS
+// =====================================================
+
+async function loadMyPosts() {
+
+    try {
+
+        const res =
+            await fetch(
+                "/api/posts/user/" +
+                encodeURIComponent(
+                    profileUsername
+                )
+            );
+
+
+        const data =
+            await res.json();
+
+
+        if (!data.success) {
+            return;
+        }
+
+
+        const postsCount =
+            document.getElementById(
+                "postsCount"
+            );
+
+
+        if (postsCount) {
+
+            postsCount.innerText =
+                data.count || 0;
+
+        }
+
+
+        const myPosts =
+            document.getElementById(
+                "myPosts"
+            );
+
+
+        if (!myPosts) {
+            return;
+        }
+
+
+        let html = "";
+
+
+        if (
+            !Array.isArray(
+                data.posts
+            ) ||
+            data.posts.length === 0
+        ) {
+
+            myPosts.innerHTML = `
+                <p style="text-align:center;">
+                    No posts yet.
+                </p>
+            `;
+
+            return;
+        }
+
+
+        data.posts.forEach(
+            post => {
+
+                html += `
+                    <div class="post">
+
+                        ${
+                            post.image
+                            ?
+                            `
+                            <img
+                                src="${post.image}"
+                                style="
+                                    width:100%;
+                                    border-radius:10px;
+                                "
+                            >
+                            `
+                            :
+                            ""
+                        }
+
+                        <p>
+                            ${
+                                post.text ||
+                                ""
+                            }
+                        </p>
+
+                        <small>
+                            ❤️ ${
+                                post.likes?.length ||
+                                0
+                            }
+
+                            &nbsp;&nbsp;
+
+                            💬 ${
+                                post.comments?.length ||
+                                0
+                            }
+                        </small>
+
+                    </div>
+                `;
+
+            }
+        );
+
+
+        myPosts.innerHTML =
+            html;
+
+    } catch (err) {
+
+        console.error(
+            "LOAD POSTS ERROR:",
+            err
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// FOLLOW BUTTON UI
+// =====================================================
+
+function updateFollowButton(
+    profile,
+    button
+) {
+
+    if (!button) {
+        return;
+    }
+
+
+    const following =
+        Array.isArray(
+            user.following
+        )
+            ? user.following
+            : [];
+
+
+    const isFollowing =
+        following.some(
+            username =>
+                String(username)
+                    .toLowerCase() ===
+                String(profile.username)
+                    .toLowerCase()
+        );
+
+
+    if (isFollowing) {
+
+        button.innerHTML = `
+            <i class="fa-solid fa-user-minus"></i>
+            Unfollow
+        `;
+
+    } else {
+
+        button.innerHTML = `
+            <i class="fa-solid fa-user-plus"></i>
+            Follow
+        `;
+
+    }
+
+}
+
+
+// =====================================================
+// FOLLOW / UNFOLLOW
+// =====================================================
+
+async function followUser(
+    targetUsername
+) {
+
+    if (!token) {
+
+        return alert(
+            "❌ Login session expired."
+        );
+
+    }
+
+
+    try {
+
+        const res =
+            await fetch(
+                "/api/users/follow",
+                {
+                    method: "PUT",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer " +
+                            token
+                    },
+
+                    body: JSON.stringify({
+
+                        myUsername:
+                            user.username,
+
+                        targetUsername:
+                            targetUsername
+
+                    })
+                }
+            );
+
+
+        const data =
+            await res.json();
+
+
+        if (data.success) {
+
+            // Update local user data
+            // so button state stays correct.
+
+            if (
+                Array.isArray(
+                    user.following
+                )
+            ) {
+
+                const index =
+                    user.following.findIndex(
+                        username =>
+                            String(username)
+                                .toLowerCase() ===
+                            String(targetUsername)
+                                .toLowerCase()
+                    );
+
+
+                if (index >= 0) {
+
+                    user.following.splice(
+                        index,
+                        1
+                    );
+
+                } else {
+
+                    user.following.push(
+                        targetUsername
+                    );
+
+                }
+
+            } else {
+
+                user.following = [
+                    targetUsername
+                ];
+
+            }
+
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify(
+                    user
+                )
+            );
+
+
+            await loadProfile();
+
+        } else {
+
+            alert(
+                "❌ " +
+                (
+                    data.message ||
+                    "Follow update failed."
+                )
+            );
+
+        }
+
+    } catch (err) {
+
+        console.error(
+            "FOLLOW ERROR:",
+            err
+        );
+
+        alert(
+            "❌ Failed to update follow."
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// UPLOAD COVER
+// =====================================================
+
+async function uploadCover() {
+
+    const coverFile =
+        document.getElementById(
+            "coverFile"
+        );
+
+
+    const file =
+        coverFile?.files?.[0];
+
+
+    if (!file) {
+        return;
+    }
+
+
+    if (!token) {
+
+        return alert(
+            "❌ Login session expired. Please login again."
+        );
+
+    }
+
+
+    try {
+
+        const compressedFile =
+            await compressImage(
+                file,
+                1400,
+                0.75
+            );
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "cover",
+            compressedFile
+        );
+
+
+        const res =
+            await fetch(
+                "/api/auth/cover",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Authorization":
+                            "Bearer " +
+                            token
+                    },
+
+                    body: formData
+                }
+            );
+
+
+        const data =
+            await res.json();
+
+
+        if (data.success) {
+
+            user.cover =
+                data.cover;
+
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify(
+                    user
+                )
+            );
+
+
+            alert(
+                "✅ Cover Updated"
+            );
+
+
+            location.reload();
+
+        } else {
+
+            alert(
+                "❌ " +
+                (
+                    data.message ||
+                    "Upload failed"
+                )
+            );
+
+        }
+
+    } catch (err) {
+
+        console.error(
+            "UPLOAD COVER ERROR:",
+            err
+        );
+
+        alert(
+            "❌ Failed to upload cover."
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// CREATOR BADGE
+// =====================================================
+
+async function loadCreatorBadge() {
+
+    try {
+
+        const res =
+            await fetch(
+                "/api/shorts/creator-badge/" +
+                encodeURIComponent(
+                    profileUsername
+                )
+            );
+
+
+        const data =
+            await res.json();
+
+
+        const badge =
+            document.getElementById(
+                "creatorBadge"
+            );
+
+
+        if (
+            !badge ||
+            !data.success
+        ) {
+            return;
+        }
+
+
+        const badgeText =
+            data.badge ||
+            "🥉 Bronze Creator";
+
+
+        badge.innerText =
+            badgeText;
+
+
+        // -------------------------------
+        // Badge class
+        // -------------------------------
+
+        if (
+            badgeText.includes(
+                "Diamond"
+            )
+        ) {
+
+            badge.className =
+                "creator-badge badge-diamond";
+
+        }
+
+        else if (
+            badgeText.includes(
+                "Gold"
+            )
+        ) {
+
+            badge.className =
+                "creator-badge badge-gold";
+
+        }
+
+        else if (
+            badgeText.includes(
+                "Silver"
+            )
+        ) {
+
+            badge.className =
+                "creator-badge badge-silver";
+
+        }
+
+        else {
+
+            badge.className =
+                "creator-badge badge-bronze";
+
+        }
+
+    } catch (err) {
+
+        console.error(
+            "CREATOR BADGE ERROR:",
+            err
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// OPEN CREATOR GIFTS
+// =====================================================
+
+function openCreatorGifts() {
+
+    if (!profileUserId) {
+
+        return alert(
+            "❌ Creator ID not found."
+        );
+
+    }
+
+
+    location.href =
+        "/gifts.html?receiverId=" +
+        encodeURIComponent(
+            profileUserId
+        );
+
+}
+
+
+// =====================================================
+// FILE LISTENERS
+// =====================================================
+
+const coverFileInput =
+    document.getElementById(
+        "coverFile"
+    );
+
+
+if (coverFileInput) {
+
+    coverFileInput.addEventListener(
+        "change",
+        uploadCover
+    );
+
+}
+
+
+const avatarFileInput =
+    document.getElementById(
+        "avatarFile"
+    );
+
+
+if (avatarFileInput) {
+
+    avatarFileInput.addEventListener(
+        "change",
+        uploadAvatar
+    );
+
+}
+
+
+// =====================================================
+// START
+// =====================================================
+
+loadProfile();
+
+loadMyPosts();
+
+loadCreatorBadge();
