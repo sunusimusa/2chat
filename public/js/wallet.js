@@ -120,18 +120,17 @@ async function loadWallet(){
 }
 
 
+
 /* =========================
    BUY COINS
 ========================= */
 
 function buyCoins(){
 
-    alert(
-        "Coin purchase system coming soon."
-    );
+    location.href =
+        "/html/coinPackages.html";
 
 }
-
 
 /* =========================
    SEND GIFT
@@ -299,3 +298,4 @@ function openWithdrawals(){
         "/withdrawals.html";
 
 }
+
