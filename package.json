@@ -4,7 +4,8 @@
   "description": "2Chat Community App",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "seed:coins": "node seed/coinPackages.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
