@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const Monetization = require("../models/Monetization");
-
+const Wallet = require("../models/Wallet");
 
 // =====================================================
 // GET ALL MONETIZATION APPLICATIONS
@@ -204,6 +204,26 @@ async (req, res) => {
 
         monetization.suspensionReason =
             null;
+
+        let wallet = await Wallet.findOne({
+    userId: monetization.userId
+});
+
+if (!wallet) {
+    wallet = await Wallet.create({
+        userId: monetization.userId,
+        coins: 0,
+        totalPurchased: 0,
+        totalSpent: 0,
+        totalEarned: 0,
+        platformCommission: 0,
+        availableBalance: 0,
+        withdrawalLockedBalance: 0,
+        totalWithdrawn: 0,
+        giftsSent: 0,
+        giftsReceived: 0
+    });
+}
 
 
         await monetization.save();
