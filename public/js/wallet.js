@@ -128,7 +128,7 @@ async function loadWallet(){
 function buyCoins(){
 
     location.href =
-        "/html/coinPackages.html";
+        "/coinPackages.html";
 
 }
 
