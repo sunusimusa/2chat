@@ -1,26 +1,526 @@
-const crypto = require("crypto");
-
-
 // =====================================================
-// PAYMENT INITIALIZATION SERVICE
+// FLUTTERWAVE LIVE V4 PAYMENT INITIALIZATION SERVICE
 // =====================================================
-//
-// Wannan service yana shirya payment initialization.
 //
 // IMPORTANT:
-// - Ba ya ƙara coins.
-// - Ba ya canza wallet.
-// - Ba ya tabbatar da payment.
-// - Verification/webhook ne zai yi hakan daga baya.
 //
-// Daga baya za mu iya maye gurbin
-// initializePayment() da Paystack ko Flutterwave.
+// - Wannan service yana amfani da Flutterwave LIVE v4.
+// - Ba ya ƙara coins.
+// - Ba ya canza Wallet.
+// - Ba ya saka purchase zuwa "paid".
+// - Webhook + verification ne za su tabbatar da payment.
 // =====================================================
 
 
-async function initializePayment({
-    purchase,
+// =====================================================
+// ENVIRONMENT
+// =====================================================
+
+const FLUTTERWAVE_BASE_URL =
+    process.env.FLW_BASE_URL ||
+    "https://f4bexperience.flutterwave.com";
+
+
+const FLUTTERWAVE_TOKEN_URL =
+    "https://idp.flutterwave.com/realms/flutterwave/protocol/openid-connect/token";
+
+
+// =====================================================
+// GET FLUTTERWAVE ACCESS TOKEN
+// =====================================================
+
+async function getFlutterwaveAccessToken() {
+
+    const clientId =
+        process.env.FLW_CLIENT_ID;
+
+    const clientSecret =
+        process.env.FLW_CLIENT_SECRET;
+
+
+    if (!clientId) {
+
+        throw new Error(
+            "FLW_CLIENT_ID is missing."
+        );
+
+    }
+
+
+    if (!clientSecret) {
+
+        throw new Error(
+            "FLW_CLIENT_SECRET is missing."
+        );
+
+    }
+
+
+    const body =
+        new URLSearchParams({
+
+            client_id:
+                clientId,
+
+            client_secret:
+                clientSecret,
+
+            grant_type:
+                "client_credentials"
+
+        });
+
+
+    const response =
+        await fetch(
+            FLUTTERWAVE_TOKEN_URL,
+            {
+
+                method:
+                    "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/x-www-form-urlencoded"
+
+                },
+
+                body:
+                    body.toString()
+
+            }
+        );
+
+
+    const data =
+        await response.json();
+
+
+    if (!response.ok) {
+
+        console.error(
+            "FLUTTERWAVE TOKEN ERROR:",
+            data
+        );
+
+
+        throw new Error(
+            data?.error_description ||
+            data?.message ||
+            "Failed to obtain Flutterwave access token."
+        );
+
+    }
+
+
+    if (!data?.access_token) {
+
+        throw new Error(
+            "Flutterwave access token was not returned."
+        );
+
+    }
+
+
+    return data.access_token;
+
+}
+
+
+// =====================================================
+// CREATE FLUTTERWAVE CUSTOMER
+// =====================================================
+
+async function createFlutterwaveCustomer({
+
+    accessToken,
+
     user
+
+}) {
+
+    const email =
+        user?.email;
+
+
+    if (!email) {
+
+        throw new Error(
+            "User email is required."
+        );
+
+    }
+
+
+    const username =
+        String(
+            user?.username ||
+            "2Chat User"
+        )
+        .trim();
+
+
+    const nameParts =
+        username
+            .split(/\s+/)
+            .filter(Boolean);
+
+
+    const firstName =
+        nameParts[0] ||
+        "2Chat";
+
+
+    const lastName =
+        nameParts
+            .slice(1)
+            .join(" ") ||
+        "User";
+
+
+    const payload = {
+
+        name: {
+
+            first:
+                firstName,
+
+            last:
+                lastName
+
+        },
+
+        email
+
+    };
+
+
+    const response =
+        await fetch(
+            `${FLUTTERWAVE_BASE_URL}/customers`,
+            {
+
+                method:
+                    "POST",
+
+                headers: {
+
+                    "Authorization":
+                        `Bearer ${accessToken}`,
+
+                    "Content-Type":
+                        "application/json",
+
+                    "X-Trace-Id":
+                        generateTraceId(),
+
+                    "X-Idempotency-Key":
+                        generateIdempotencyKey()
+
+                },
+
+                body:
+                    JSON.stringify(
+                        payload
+                    )
+
+            }
+        );
+
+
+    const data =
+        await response.json();
+
+
+    if (!response.ok) {
+
+        console.error(
+            "FLUTTERWAVE CUSTOMER ERROR:",
+            data
+        );
+
+
+        throw new Error(
+            data?.message ||
+            data?.error ||
+            "Failed to create Flutterwave customer."
+        );
+
+    }
+
+
+    const customerId =
+        data?.data?.id;
+
+
+    if (!customerId) {
+
+        console.error(
+            "FLUTTERWAVE CUSTOMER RESPONSE:",
+            data
+        );
+
+
+        throw new Error(
+            "Flutterwave customer ID was not returned."
+        );
+
+    }
+
+
+    return {
+
+        id:
+            customerId,
+
+        raw:
+            data
+
+    };
+
+}
+
+
+// =====================================================
+// CREATE FLUTTERWAVE CHARGE
+// =====================================================
+
+async function createFlutterwaveCharge({
+
+    accessToken,
+
+    purchase,
+
+    customerId,
+
+    paymentMethodId
+
+}) {
+
+    if (!paymentMethodId) {
+
+        throw new Error(
+            "Flutterwave payment method ID is required."
+        );
+
+    }
+
+
+    const amount =
+        Number(
+            purchase.amount
+        );
+
+
+    if (
+        !Number.isFinite(amount) ||
+        amount <= 0
+    ) {
+
+        throw new Error(
+            "Invalid purchase amount."
+        );
+
+    }
+
+
+    const currency =
+        purchase.currency ||
+        "NGN";
+
+
+    const reference =
+        purchase.reference;
+
+
+    if (!reference) {
+
+        throw new Error(
+            "Purchase reference is missing."
+        );
+
+    }
+
+
+    const redirectUrl =
+        process.env.FLW_REDIRECT_URL ||
+        `${process.env.APP_URL}/coin-payment-success.html`;
+
+
+    const payload = {
+
+        reference,
+
+        currency,
+
+        customer_id:
+            customerId,
+
+        payment_method_id:
+            paymentMethodId,
+
+        redirect_url:
+            redirectUrl,
+
+        amount,
+
+        meta: {
+
+            purchaseId:
+                String(
+                    purchase._id
+                ),
+
+            userId:
+                String(
+                    purchase.userId
+                ),
+
+            packageId:
+                String(
+                    purchase.packageId
+                ),
+
+            coins:
+                Number(
+                    purchase.coins
+                )
+
+        }
+
+    };
+
+
+    const response =
+        await fetch(
+            `${FLUTTERWAVE_BASE_URL}/charges`,
+            {
+
+                method:
+                    "POST",
+
+                headers: {
+
+                    "Authorization":
+                        `Bearer ${accessToken}`,
+
+                    "Content-Type":
+                        "application/json",
+
+                    "X-Trace-Id":
+                        generateTraceId(),
+
+                    "X-Idempotency-Key":
+                        generateIdempotencyKey()
+
+                },
+
+                body:
+                    JSON.stringify(
+                        payload
+                    )
+
+            }
+        );
+
+
+    const data =
+        await response.json();
+
+
+    if (!response.ok) {
+
+        console.error(
+            "FLUTTERWAVE CHARGE ERROR:",
+            data
+        );
+
+
+        throw new Error(
+            data?.message ||
+            data?.error ||
+            "Failed to create Flutterwave charge."
+        );
+
+    }
+
+
+    const charge =
+        data?.data;
+
+
+    if (!charge) {
+
+        console.error(
+            "FLUTTERWAVE CHARGE RESPONSE:",
+            data
+        );
+
+
+        throw new Error(
+            "Flutterwave charge response is missing."
+        );
+
+    }
+
+
+    let paymentUrl =
+        null;
+
+
+    if (
+        charge?.next_action?.type ===
+        "redirect_url"
+    ) {
+
+        paymentUrl =
+            charge
+                ?.next_action
+                ?.redirect_url
+                ?.url ||
+            null;
+
+    }
+
+
+    return {
+
+        chargeId:
+            charge?.id ||
+            null,
+
+        paymentUrl,
+
+        status:
+            data?.status ||
+            charge?.status ||
+            "pending",
+
+        nextAction:
+            charge?.next_action ||
+            null,
+
+        raw:
+            data
+
+    };
+
+}
+
+
+// =====================================================
+// INITIALIZE PAYMENT
+// =====================================================
+
+async function initializePayment({
+
+    purchase,
+
+    user,
+
+    paymentMethodId
+
 }) {
 
     // =========================================
@@ -30,7 +530,7 @@ async function initializePayment({
     if (!purchase) {
 
         throw new Error(
-            "Purchase is required"
+            "Purchase is required."
         );
 
     }
@@ -39,7 +539,7 @@ async function initializePayment({
     if (!user) {
 
         throw new Error(
-            "User is required"
+            "User is required."
         );
 
     }
@@ -68,7 +568,7 @@ async function initializePayment({
 
     if (
         !purchase.amount ||
-        purchase.amount <= 0
+        Number(purchase.amount) <= 0
     ) {
 
         throw new Error(
@@ -78,23 +578,7 @@ async function initializePayment({
     }
 
 
-    // =========================================
-    // PAYMENT REFERENCE
-    // =========================================
-
-    const paymentReference =
-        purchase.reference;
-
-
-    // =========================================
-    // CUSTOMER EMAIL
-    // =========================================
-
-    const email =
-        user.email;
-
-
-    if (!email) {
+    if (!user.email) {
 
         throw new Error(
             "User email is required for payment."
@@ -104,19 +588,84 @@ async function initializePayment({
 
 
     // =========================================
-    // PAYMENT PAYLOAD
+    // PAYMENT METHOD REQUIRED
     // =========================================
     //
-    // Wannan shi ne generic payload.
+    // Flutterwave v4 charge yana buƙatar
+    // payment_method_id.
     //
-    // Daga baya Paystack/Flutterwave service
-    // zai yi amfani da waɗannan values.
-    //
+    // =========================================
 
-    const payload = {
+    const finalPaymentMethodId =
+        paymentMethodId ||
+        purchase.flutterwavePaymentMethodId;
+
+
+    if (!finalPaymentMethodId) {
+
+        throw new Error(
+            "Flutterwave payment method ID is required."
+        );
+
+    }
+
+
+    // =========================================
+    // GET OAUTH ACCESS TOKEN
+    // =========================================
+
+    const accessToken =
+        await getFlutterwaveAccessToken();
+
+
+    // =========================================
+    // CREATE CUSTOMER
+    // =========================================
+
+    const customer =
+        await createFlutterwaveCustomer({
+
+            accessToken,
+
+            user
+
+        });
+
+
+    // =========================================
+    // CREATE CHARGE
+    // =========================================
+
+    const charge =
+        await createFlutterwaveCharge({
+
+            accessToken,
+
+            purchase,
+
+            customerId:
+                customer.id,
+
+            paymentMethodId:
+                finalPaymentMethodId
+
+        });
+
+
+    // =========================================
+    // RESPONSE
+    // =========================================
+
+    return {
+
+        success:
+            true,
+
+        provider:
+            "flutterwave",
 
         reference:
-            paymentReference,
+            purchase.reference,
 
         amount:
             Number(
@@ -127,86 +676,74 @@ async function initializePayment({
             purchase.currency ||
             "NGN",
 
-        email,
-
-        metadata: {
-
-            purchaseId:
-                String(
-                    purchase._id
-                ),
-
-            userId:
-                String(
-                    purchase.userId
-                ),
-
-            packageId:
-                String(
-                    purchase.packageId
-                ),
-
-            coins:
-                Number(
-                    purchase.coins
-                )
-
-        }
-
-    };
-
-
-    // =========================================
-    // TEMPORARY PAYMENT INITIALIZATION
-    // =========================================
-    //
-    // Ba mu kira real payment provider ba tukuna.
-    //
-    // Wannan temporary response ne domin mu iya
-    // gwada complete order flow.
-    //
-
-    const initializationId =
-        crypto
-            .randomBytes(16)
-            .toString("hex");
-
-
-    return {
-
-        success:
-            true,
-
-        provider:
-            purchase.paymentProvider ||
-            "test",
-
-        initializationId,
-
-        reference:
-            paymentReference,
-
-        amount:
-            payload.amount,
-
-        currency:
-            payload.currency,
-
         email:
-            payload.email,
+            user.email,
 
-        metadata:
-            payload.metadata,
+        customerId:
+            customer.id,
 
-        // Daga baya wannan zai zama
-        // Paystack/Flutterwave checkout URL.
-        checkoutUrl:
-            null,
+        paymentMethodId:
+            finalPaymentMethodId,
+
+        chargeId:
+            charge.chargeId,
+
+        paymentUrl:
+            charge.paymentUrl,
+
+        nextAction:
+            charge.nextAction,
 
         status:
-            "initialized"
+            charge.status
 
     };
+
+}
+
+
+// =====================================================
+// TRACE ID
+// =====================================================
+
+function generateTraceId() {
+
+    return (
+
+        Date.now()
+        .toString(36) +
+
+        "-" +
+
+        Math.random()
+            .toString(36)
+            .substring(2, 15)
+
+    );
+
+}
+
+
+// =====================================================
+// IDEMPOTENCY KEY
+// =====================================================
+
+function generateIdempotencyKey() {
+
+    return (
+
+        "2chat-" +
+
+        Date.now()
+        .toString(36) +
+
+        "-" +
+
+        Math.random()
+            .toString(36)
+            .substring(2, 15)
+
+    );
 
 }
 
