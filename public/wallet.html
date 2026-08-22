@@ -25,7 +25,10 @@
 
     <div class="wallet-page">
 
-        <!-- HEADER -->
+
+        <!-- =========================================
+             HEADER
+        ========================================== -->
 
         <header class="wallet-header">
 
@@ -38,14 +41,19 @@
             </button>
 
             <h1>
+
                 <i class="fa-solid fa-wallet"></i>
+
                 My Wallet
+
             </h1>
 
         </header>
 
 
-        <!-- WALLET CARD -->
+        <!-- =========================================
+             WALLET BALANCE
+        ========================================== -->
 
         <section class="wallet-card">
 
@@ -55,9 +63,11 @@
 
             </div>
 
+
             <h2>
                 Wallet Balance
             </h2>
+
 
             <div
                 id="balance"
@@ -70,7 +80,9 @@
         </section>
 
 
-        <!-- COINS -->
+        <!-- =========================================
+             COINS
+        ========================================== -->
 
         <section class="coins-card">
 
@@ -80,17 +92,20 @@
 
             </div>
 
+
             <div class="coins-info">
 
                 <h3>
                     My Coins
                 </h3>
 
+
                 <p>
                     Coins you can use to send gifts.
                 </p>
 
             </div>
+
 
             <strong id="coins">
                 0
@@ -99,7 +114,9 @@
         </section>
 
 
-        <!-- STATUS -->
+        <!-- =========================================
+             WALLET STATUS
+        ========================================== -->
 
         <div
             id="walletMessage"
@@ -110,13 +127,19 @@
         </div>
 
 
-        <!-- ACTIONS -->
+        <!-- =========================================
+             WALLET ACTIONS
+        ========================================== -->
 
         <div class="wallet-actions">
 
-            <!-- BUY COINS -->
+
+            <!-- =====================================
+                 BUY COINS
+            ====================================== -->
 
             <button
+                type="button"
                 onclick="buyCoins()">
 
                 <i class="fa-solid fa-cart-shopping"></i>
@@ -126,20 +149,12 @@
             </button>
 
 
-            <!-- TEST COINS -->
+            <!-- =====================================
+                 SEND GIFT
+            ====================================== -->
 
             <button
-                onclick="testAddCoins()"
-                style="background:green;color:white;">
-
-                🧪 Add 100 Test Coins
-
-            </button>
-
-
-            <!-- SEND GIFT -->
-
-            <button
+                type="button"
                 onclick="sendGift()">
 
                 <i class="fa-solid fa-gift"></i>
@@ -149,9 +164,12 @@
             </button>
 
 
-            <!-- WITHDRAW EARNINGS -->
+            <!-- =====================================
+                 WITHDRAW EARNINGS
+            ====================================== -->
 
             <button
+                type="button"
                 onclick="openWithdrawals()"
                 style="background:#7c3aed;color:white;">
 
@@ -161,10 +179,33 @@
 
             </button>
 
+
+            <!-- =====================================
+                 TEST COINS
+                 DEVELOPMENT ONLY
+            ====================================== -->
+
+            <button
+                type="button"
+                onclick="testAddCoins()"
+                style="background:#198754;color:white;">
+
+                <i class="fa-solid fa-flask"></i>
+
+                Add 100 Test Coins
+
+            </button>
+
+
         </div>
+
 
     </div>
 
+
+    <!-- =========================================
+         WALLET JAVASCRIPT
+    ========================================== -->
 
     <script src="/js/wallet.js"></script>
 
