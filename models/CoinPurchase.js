@@ -1,10 +1,15 @@
 const mongoose = require("mongoose");
 
+
+// =====================================================
+// COIN PURCHASE SCHEMA
+// =====================================================
+
 const coinPurchaseSchema = new mongoose.Schema(
   {
 
     // =========================================
-    // BUYER
+    // USER
     // =========================================
 
     userId: {
@@ -28,13 +33,15 @@ const coinPurchaseSchema = new mongoose.Schema(
 
 
     // =========================================
-    // SNAPSHOT
+    // COINS SNAPSHOT
     // =========================================
-    // Muna ajiye exact values na lokacin
-    // da aka yi purchase.
     //
-    // Wannan yana kare order idan daga baya
-    // an canza price na package.
+    // Muh adana coins ɗin lokacin da aka
+    // ƙirƙiri order.
+    //
+    // Ko package ya canza daga baya,
+    // wannan order ba zai canza ba.
+    //
 
     coins: {
       type: Number,
@@ -42,11 +49,21 @@ const coinPurchaseSchema = new mongoose.Schema(
       min: 1
     },
 
+
+    // =========================================
+    // AMOUNT SNAPSHOT
+    // =========================================
+
     amount: {
       type: Number,
       required: true,
       min: 0
     },
+
+
+    // =========================================
+    // CURRENCY
+    // =========================================
 
     currency: {
       type: String,
@@ -57,7 +74,7 @@ const coinPurchaseSchema = new mongoose.Schema(
 
 
     // =========================================
-    // ORDER REFERENCE
+    // 2CHAT ORDER REFERENCE
     // =========================================
 
     reference: {
@@ -65,6 +82,108 @@ const coinPurchaseSchema = new mongoose.Schema(
       required: true,
       unique: true,
       index: true
+    },
+
+
+    // =========================================
+    // PAYMENT PROVIDER
+    // =========================================
+
+    paymentProvider: {
+      type: String,
+      enum: [
+        "flutterwave"
+      ],
+      default: "flutterwave",
+      index: true
+    },
+
+
+    // =========================================
+    // PROVIDER PAYMENT REFERENCE
+    // =========================================
+    //
+    // Flutterwave/payment reference.
+    //
+
+    paymentReference: {
+      type: String,
+      default: null,
+      index: true
+    },
+
+
+    // =========================================
+    // FLUTTERWAVE CUSTOMER ID
+    // =========================================
+
+    flutterwaveCustomerId: {
+      type: String,
+      default: null
+    },
+
+
+    // =========================================
+    // FLUTTERWAVE PAYMENT METHOD ID
+    // =========================================
+
+    flutterwavePaymentMethodId: {
+      type: String,
+      default: null
+    },
+
+
+    // =========================================
+    // FLUTTERWAVE CHARGE ID
+    // =========================================
+
+    flutterwaveChargeId: {
+      type: String,
+      default: null,
+      index: true
+    },
+
+
+    // =========================================
+    // PAYMENT URL
+    // =========================================
+    //
+    // URL da user zai bi domin kammala payment.
+    //
+
+    paymentUrl: {
+      type: String,
+      default: null
+    },
+
+
+    // =========================================
+    // PAYMENT INITIALIZED AT
+    // =========================================
+
+    paymentInitializedAt: {
+      type: Date,
+      default: null
+    },
+
+
+    // =========================================
+    // PAYMENT COMPLETED AT
+    // =========================================
+
+    paymentCompletedAt: {
+      type: Date,
+      default: null
+    },
+
+
+    // =========================================
+    // PAYMENT VERIFIED AT
+    // =========================================
+
+    paymentVerifiedAt: {
+      type: Date,
+      default: null
     },
 
 
@@ -77,6 +196,7 @@ const coinPurchaseSchema = new mongoose.Schema(
 
       enum: [
         "pending",
+        "processing",
         "paid",
         "failed",
         "cancelled",
@@ -90,36 +210,84 @@ const coinPurchaseSchema = new mongoose.Schema(
 
 
     // =========================================
-    // PAYMENT PROVIDER
+    // PROVIDER STATUS
     // =========================================
+    //
+    // Misali:
+    // succeeded
+    // pending
+    // failed
+    //
 
-    paymentProvider: {
+    providerStatus: {
       type: String,
-
-      enum: [
-        "paystack",
-        "flutterwave",
-        "manual",
-        "test"
-      ],
-
-      default: "test"
+      default: null
     },
 
 
     // =========================================
-    // PAYMENT DATA
+    // FAILURE REASON
     // =========================================
 
-    paidAt: {
+    failureReason: {
+      type: String,
+      default: null
+    },
+
+
+    // =========================================
+    // WEBHOOK RECEIVED
+    // =========================================
+
+    webhookReceived: {
+      type: Boolean,
+      default: false
+    },
+
+
+    // =========================================
+    // WEBHOOK RECEIVED AT
+    // =========================================
+
+    webhookReceivedAt: {
       type: Date,
       default: null
     },
 
-    paymentTransactionId: {
-      type: String,
-      default: null,
+
+    // =========================================
+    // VERIFICATION
+    // =========================================
+
+    verificationAttempts: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+
+
+    // =========================================
+    // COINS CREDITED
+    // =========================================
+    //
+    // Wannan yana hana mu ƙara coins sau biyu
+    // idan webhook ya sake zuwa.
+    //
+
+    coinsCredited: {
+      type: Boolean,
+      default: false,
       index: true
+    },
+
+
+    // =========================================
+    // COINS CREDITED AT
+    // =========================================
+
+    coinsCreditedAt: {
+      type: Date,
+      default: null
     }
 
   },
@@ -129,6 +297,26 @@ const coinPurchaseSchema = new mongoose.Schema(
   }
 );
 
+
+// =====================================================
+// INDEXES
+// =====================================================
+
+coinPurchaseSchema.index({
+  userId: 1,
+  createdAt: -1
+});
+
+
+coinPurchaseSchema.index({
+  status: 1,
+  createdAt: -1
+});
+
+
+// =====================================================
+// EXPORT
+// =====================================================
 
 module.exports =
   mongoose.model(
