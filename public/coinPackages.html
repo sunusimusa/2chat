@@ -1,1 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>2Chat - Buy Coins</title>
+
+    <link
+        rel="stylesheet"
+        href="/css/coinPackages.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    >
+
+</head>
+
+<body>
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <header class="page-header">
+
+        <button
+            class="back-btn"
+            onclick="history.back()"
+        >
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+        </button>
+
+        <div class="header-title">
+
+            <i class="fa-solid fa-coins"></i>
+
+            <h1>
+                Buy Coins
+            </h1>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================
+         PAGE
+    ========================================== -->
+
+    <main class="coin-page">
+
+        <!-- INTRO -->
+
+        <section class="intro">
+
+            <div class="intro-icon">
+
+                <i class="fa-solid fa-coins"></i>
+
+            </div>
+
+            <div>
+
+                <h2>
+                    Choose a Coin Package
+                </h2>
+
+                <p>
+                    Buy coins and use them to send gifts
+                    to your favorite creators.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             MESSAGE
+        ====================================== -->
+
+        <div
+            id="packageMessage"
+            class="message"
+        >
+
+            🔄 Loading coin packages...
+
+        </div>
+
+
+        <!-- =====================================
+             PACKAGES
+        ====================================== -->
+
+        <section
+            id="packages"
+            class="packages"
+        >
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================================
+         PURCHASE MODAL
+    ========================================== -->
+
+    <div
+        id="purchaseModal"
+        class="modal"
+    >
+
+        <div class="modal-box">
+
+            <button
+                id="closeModal"
+                class="close-btn"
+            >
+                ×
+            </button>
+
+            <div class="modal-icon">
+
+                <i class="fa-solid fa-coins"></i>
+
+            </div>
+
+            <h2>
+                Confirm Package
+            </h2>
+
+            <div
+                id="selectedPackage"
+                class="selected-package"
+            >
+
+            </div>
+
+            <p class="payment-info">
+
+                Payment system will be available soon.
+
+            </p>
+
+            <button
+                id="continueButton"
+                class="continue-btn"
+                disabled
+            >
+
+                <i class="fa-solid fa-lock"></i>
+
+                Payment Coming Soon
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        /* =========================================
+           GLOBAL
+        ========================================== */
+
+        let coinPackages = [];
+
+        let selectedPackage = null;
+
+
+        /* =========================================
+           ELEMENTS
+        ========================================== */
+
+        const packagesContainer =
+            document.getElementById(
+                "packages"
+            );
+
+        const packageMessage =
+            document.getElementById(
+                "packageMessage"
+            );
+
+        const purchaseModal =
+            document.getElementById(
+                "purchaseModal"
+            );
+
+        const selectedPackageBox =
+            document.getElementById(
+                "selectedPackage"
+            );
+
+        const closeModal =
+            document.getElementById(
+                "closeModal"
+            );
+
+
+        /* =========================================
+           LOAD PACKAGES
+        ========================================== */
+
+        async function loadCoinPackages() {
+
+            packageMessage.style.display =
+                "block";
+
+            packageMessage.innerText =
+                "🔄 Loading coin packages...";
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/api/coin-packages"
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "COIN PACKAGES:",
+                    data
+                );
+
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+
+                    packageMessage.innerText =
+                        data.message ||
+                        "Failed to load coin packages.";
+
+                    return;
+
+                }
+
+
+                coinPackages =
+                    data.packages || [];
+
+
+                if (
+                    !coinPackages.length
+                ) {
+
+                    packageMessage.innerText =
+                        "📭 No coin packages available.";
+
+                    return;
+
+                }
+
+
+                packageMessage.style.display =
+                    "none";
+
+
+                renderPackages();
+
+
+            } catch (error) {
+
+                console.error(
+                    "COIN PACKAGES ERROR:",
+                    error
+                );
+
+
+                packageMessage.innerText =
+                    "❌ Unable to connect to server.";
+
+            }
+
+        }
+
+
+        /* =========================================
+           RENDER PACKAGES
+        ========================================== */
+
+        function renderPackages() {
+
+            packagesContainer.innerHTML =
+                coinPackages
+                    .map(
+                        packageItem =>
+                            createPackageCard(
+                                packageItem
+                            )
+                    )
+                    .join("");
+
+        }
+
+
+        /* =========================================
+           PACKAGE CARD
+        ========================================== */
+
+        function createPackageCard(
+            packageItem
+        ) {
+
+            const coins =
+                Number(
+                    packageItem.coins || 0
+                );
+
+
+            const price =
+                Number(
+                    packageItem.price || 0
+                );
+
+
+            const currency =
+                packageItem.currency ||
+                "NGN";
+
+
+            return `
+
+                <article
+                    class="coin-package"
+                >
+
+                    <div class="package-icon">
+
+                        <i class="fa-solid fa-coins"></i>
+
+                    </div>
+
+
+                    <div class="package-info">
+
+                        <h3>
+                            ${formatNumber(coins)}
+                            Coins
+                        </h3>
+
+                        <p>
+                            Send gifts to creators
+                        </p>
+
+                    </div>
+
+
+                    <div class="package-price">
+
+                        <strong>
+                            ${currencySymbol(currency)}${formatNumber(price)}
+                        </strong>
+
+                        <span>
+                            1 Coin = ₦1
+                        </span>
+
+                    </div>
+
+
+                    <button
+                        class="buy-btn"
+                        onclick="
+                            selectPackage(
+                                '${packageItem._id}'
+                            )
+                        "
+                    >
+
+                        Buy
+
+                    </button>
+
+                </article>
+
+            `;
+
+        }
+
+
+        /* =========================================
+           SELECT PACKAGE
+        ========================================== */
+
+        function selectPackage(
+            packageId
+        ) {
+
+            selectedPackage =
+                coinPackages.find(
+                    item =>
+                        item._id ===
+                        packageId
+                );
+
+
+            if (!selectedPackage) {
+
+                return;
+
+            }
+
+
+            const coins =
+                Number(
+                    selectedPackage.coins || 0
+                );
+
+
+            const price =
+                Number(
+                    selectedPackage.price || 0
+                );
+
+
+            const currency =
+                selectedPackage.currency ||
+                "NGN";
+
+
+            selectedPackageBox.innerHTML = `
+
+                <div class="selected-icon">
+
+                    <i class="fa-solid fa-coins"></i>
+
+                </div>
+
+                <div>
+
+                    <strong>
+                        ${formatNumber(coins)}
+                        Coins
+                    </strong>
+
+                    <span>
+                        ${currencySymbol(currency)}
+                        ${formatNumber(price)}
+                    </span>
+
+                </div>
+
+            `;
+
+
+            purchaseModal.classList.add(
+                "show"
+            );
+
+        }
+
+
+        /* =========================================
+           CLOSE MODAL
+        ========================================== */
+
+        closeModal.addEventListener(
+            "click",
+            () => {
+
+                purchaseModal.classList.remove(
+                    "show"
+                );
+
+            }
+        );
+
+
+        purchaseModal.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target ===
+                    purchaseModal
+                ) {
+
+                    purchaseModal.classList.remove(
+                        "show"
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =========================================
+           HELPERS
+        ========================================== */
+
+        function formatNumber(
+            value
+        ) {
+
+            return Number(
+                value || 0
+            ).toLocaleString(
+                "en-NG"
+            );
+
+        }
+
+
+        function currencySymbol(
+            currency
+        ) {
+
+            if (
+                currency ===
+                "NGN"
+            ) {
+
+                return "₦";
+
+            }
+
+
+            return currency + " ";
+
+        }
+
+
+        /* =========================================
+           START
+        ========================================== */
+
+        loadCoinPackages();
+
+    </script>
+
+</body>
+
+      </html>
