@@ -34,6 +34,8 @@ const adminSetupRoutes =
     require("./routes/adminSetupRoutes");
 const coinPackageRoutes =
     require("./routes/coinPackageRoutes");
+const coinPurchaseRoutes =
+    require("./routes/coinPurchaseRoutes");
 
 
 const app = express();
@@ -78,6 +80,7 @@ app.use("/api/monetization",monetizationRoutes);
 app.use("/api/admin/monetization",adminMonetizationRoutes);
 app.use("/api/admin",adminSetupRoutes);
 app.use("/api/coin-packages",coinPackageRoutes);
+app.use("/api/coin-purchases",coinPurchaseRoutes);
 
 app.get("/", (req, res) => {
 
