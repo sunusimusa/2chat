@@ -1949,6 +1949,16 @@ async function performAction(
 
     }
 
+    if (
+    action ===
+    "restore"
+) {
+
+    endpoint =
+        `/api/admin/monetization/applications/${userId}/restore`;
+
+}
+
 
     if (
         !endpoint
