@@ -281,12 +281,12 @@ exports.createCoinPurchase = async (
 // =====================================================
 // INITIALIZE COIN PURCHASE PAYMENT
 // =====================================================
+// =====================================================
+// INITIALIZE COIN PURCHASE PAYMENT
+// =====================================================
 
 exports.initializeCoinPurchasePayment =
-async (
-  req,
-  res
-) => {
+async (req, res) => {
 
   try {
 
@@ -299,22 +299,41 @@ async (
     } = req.params;
 
 
-    // =========================================
-    // AUTHENTICATED USER
-    // =========================================
+    if (!id) {
 
-    const userId =
-      req.user?._id;
-
-
-    if (!userId) {
-
-      return res.status(401).json({
+      return res.status(400).json({
 
         success: false,
 
         message:
-          "Authentication required."
+          "Purchase ID is required."
+
+      });
+
+    }
+
+
+    // =========================================
+    // PAYMENT METHOD ID
+    // =========================================
+    //
+    // Flutterwave v4 yana buƙatar
+    // paymentMethodId domin charge.
+    //
+
+    const {
+      paymentMethodId
+    } = req.body;
+
+
+    if (!paymentMethodId) {
+
+      return res.status(400).json({
+
+        success: false,
+
+        message:
+          "Flutterwave payment method ID is required."
 
       });
 
@@ -326,9 +345,7 @@ async (
     // =========================================
 
     const purchase =
-      await CoinPurchase.findById(
-        id
-      );
+      await CoinPurchase.findById(id);
 
 
     if (!purchase) {
@@ -354,7 +371,7 @@ async (
         purchase.userId
       ) !==
       String(
-        userId
+        req.user._id
       )
     ) {
 
@@ -392,33 +409,16 @@ async (
 
 
     // =========================================
-    // CHECK PROVIDER
-    // =========================================
-
-    if (
-      purchase.paymentProvider !==
-      "flutterwave"
-    ) {
-
-      return res.status(400).json({
-
-        success: false,
-
-        message:
-          "This purchase is not configured for Flutterwave."
-
-      });
-
-    }
-
-
-    // =========================================
     // GET USER
     // =========================================
 
+    const User =
+      require("../models/User");
+
+
     const user =
       await User.findById(
-        userId
+        req.user._id
       )
       .select(
         "username email"
@@ -440,19 +440,17 @@ async (
 
 
     // =========================================
-    // USER EMAIL REQUIRED
+    // EMAIL CHECK
     // =========================================
 
-    if (
-      !user.email
-    ) {
+    if (!user.email) {
 
       return res.status(400).json({
 
         success: false,
 
         message:
-          "Your account must have an email address before payment."
+          "Your account does not have an email address required for payment."
 
       });
 
@@ -468,128 +466,67 @@ async (
 
         purchase,
 
-        user
+        user,
+
+        paymentMethodId
 
       });
 
 
     // =========================================
-    // VALIDATE PAYMENT RESPONSE
-    // =========================================
-
-    if (
-      !payment
-    ) {
-
-      return res.status(502).json({
-
-        success: false,
-
-        message:
-          "Flutterwave payment initialization returned an empty response."
-
-      });
-
-    }
-
-
-    // =========================================
-    // SAVE PROVIDER
+    // SAVE FLUTTERWAVE DATA
     // =========================================
 
     purchase.paymentProvider =
       "flutterwave";
 
 
-    // =========================================
-    // PAYMENT REFERENCE
-    // =========================================
-
-    if (
-      payment.reference
-    ) {
-
-      purchase.paymentReference =
-        payment.reference;
-
-    }
+    purchase.paymentReference =
+      payment.reference ||
+      purchase.reference;
 
 
-    // =========================================
-    // FLUTTERWAVE CUSTOMER ID
-    // =========================================
-
-    if (
-      payment.customerId
-    ) {
-
-      purchase.flutterwaveCustomerId =
-        payment.customerId;
-
-    }
+    purchase.flutterwaveCustomerId =
+      payment.customerId ||
+      null;
 
 
-    // =========================================
-    // PAYMENT METHOD ID
-    // =========================================
-
-    if (
-      payment.paymentMethodId
-    ) {
-
-      purchase.flutterwavePaymentMethodId =
-        payment.paymentMethodId;
-
-    }
+    purchase.flutterwavePaymentMethodId =
+      payment.paymentMethodId ||
+      paymentMethodId;
 
 
-    // =========================================
-    // CHARGE ID
-    // =========================================
-
-    if (
-      payment.chargeId
-    ) {
-
-      purchase.flutterwaveChargeId =
-        payment.chargeId;
-
-    }
+    purchase.flutterwaveChargeId =
+      payment.chargeId ||
+      null;
 
 
-    // =========================================
-    // PAYMENT URL
-    // =========================================
-
-    if (
-      payment.paymentUrl
-    ) {
-
-      purchase.paymentUrl =
-        payment.paymentUrl;
-
-    }
+    purchase.paymentUrl =
+      payment.paymentUrl ||
+      null;
 
 
-    // =========================================
-    // INITIALIZED TIME
-    // =========================================
+    purchase.providerStatus =
+      payment.status ||
+      null;
+
 
     purchase.paymentInitializedAt =
       new Date();
 
 
     // =========================================
-    // IMPORTANT
+    // PROCESSING
     // =========================================
-    // Kada mu saka "paid" a nan.
     //
-    // Webhook + verification ne su
-    // za yin hakan daga baya.
-    // =========================================
+    // Ba mu saka "paid" a nan ba.
+    //
+    // Webhook + verification ne za su tabbatar
+    // da payment daga baya.
+    //
 
     purchase.status =
-      "pending";
+      "processing";
 
 
     await purchase.save();
@@ -599,7 +536,7 @@ async (
     // RESPONSE
     // =========================================
 
-    return res.status(200).json({
+    return res.json({
 
       success: true,
 
@@ -609,31 +546,37 @@ async (
       payment: {
 
         provider:
-          "flutterwave",
+          payment.provider,
 
         reference:
-          payment.reference ||
-          purchase.reference,
+          payment.reference,
 
-        paymentUrl:
-          payment.paymentUrl ||
-          null,
+        amount:
+          payment.amount,
+
+        currency:
+          payment.currency,
+
+        email:
+          payment.email,
 
         customerId:
-          payment.customerId ||
-          null,
+          payment.customerId,
 
         paymentMethodId:
-          payment.paymentMethodId ||
-          null,
+          payment.paymentMethodId,
 
         chargeId:
-          payment.chargeId ||
-          null,
+          payment.chargeId,
+
+        paymentUrl:
+          payment.paymentUrl,
+
+        nextAction:
+          payment.nextAction,
 
         status:
-          payment.status ||
-          "pending"
+          payment.status
 
       },
 
@@ -641,6 +584,9 @@ async (
 
         id:
           purchase._id,
+
+        reference:
+          purchase.reference,
 
         coins:
           purchase.coins,
@@ -654,8 +600,11 @@ async (
         status:
           purchase.status,
 
-        reference:
-          purchase.reference
+        paymentProvider:
+          purchase.paymentProvider,
+
+        paymentInitializedAt:
+          purchase.paymentInitializedAt
 
       }
 
@@ -670,18 +619,19 @@ async (
     );
 
 
-    return res.status(
-      err.status || 500
-    ).json({
+    return res.status(500).json({
 
       success: false,
 
       message:
         err.message ||
-        "Failed to initialize Flutterwave payment."
+        "Failed to initialize payment."
 
     });
 
   }
 
 };
+
+  
+              
