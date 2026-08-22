@@ -6,6 +6,11 @@ const CoinPackage =
 const CoinPurchase =
   require("../models/CoinPurchase");
 
+const initializePayment =
+    require("../services/paymentInitializationService");
+
+
+
 
 // =====================================================
 // CREATE COIN PURCHASE ORDER
@@ -256,5 +261,199 @@ exports.createCoinPurchase = async (
     });
 
   }
+
+};
+
+
+// =====================================================
+// INITIALIZE COIN PURCHASE PAYMENT
+// =====================================================
+
+exports.initializeCoinPurchasePayment =
+async (req, res) => {
+
+    try {
+
+        const {
+            id
+        } = req.params;
+
+
+        // =========================================
+        // FIND PURCHASE
+        // =========================================
+
+        const purchase =
+            await CoinPurchase.findById(id);
+
+
+        if (!purchase) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Coin purchase order not found."
+
+            });
+
+        }
+
+
+        // =========================================
+        // OWNERSHIP CHECK
+        // =========================================
+        //
+        // User ba zai iya initialize payment
+        // na wani user's order ba.
+        //
+
+        if (
+            String(
+                purchase.userId
+            ) !==
+            String(
+                req.user._id
+            )
+        ) {
+
+            return res.status(403).json({
+
+                success: false,
+
+                message:
+                    "You are not allowed to access this purchase."
+
+            });
+
+        }
+
+
+        // =========================================
+        // STATUS CHECK
+        // =========================================
+
+        if (
+            purchase.status !==
+            "pending"
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    `Payment cannot be initialized because order status is "${purchase.status}".`
+
+            });
+
+        }
+
+
+        // =========================================
+        // GET USER
+        // =========================================
+
+        const User =
+            require("../models/User");
+
+
+        const user =
+            await User.findById(
+                req.user._id
+            )
+            .select(
+                "username email"
+            );
+
+
+        if (!user) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "User not found."
+
+            });
+
+        }
+
+
+        // =========================================
+        // INITIALIZE PAYMENT
+        // =========================================
+
+        const payment =
+            await initializePayment({
+
+                purchase,
+
+                user
+
+            });
+
+
+        // =========================================
+        // SAVE PAYMENT INITIALIZATION
+        // =========================================
+        //
+        // Ba mu canza status zuwa paid ba.
+        //
+        // Payment kawai aka initialize.
+        //
+
+        purchase.paymentProvider =
+            payment.provider;
+
+
+        purchase.paymentReference =
+            payment.reference;
+
+
+        purchase.paymentInitializedAt =
+            new Date();
+
+
+        await purchase.save();
+
+
+        // =========================================
+        // RESPONSE
+        // =========================================
+
+        return res.json({
+
+            success: true,
+
+            message:
+                "Payment initialized successfully.",
+
+            payment
+
+        });
+
+
+    } catch (err) {
+
+        console.error(
+            "INITIALIZE COIN PAYMENT ERROR:",
+            err
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                err.message ||
+                "Failed to initialize payment."
+
+        });
+
+    }
 
 };
