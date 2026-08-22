@@ -1,13 +1,15 @@
 const router =
-  require("express").Router();
+    require("express").Router();
 
 const protect =
-  require("../middleware/auth");
+    require("../middleware/auth");
+
 
 const {
-  createCoinPurchase
+    createCoinPurchase,
+    initializeCoinPurchasePayment
 } =
-  require("../controllers/coinPurchaseController");
+    require("../controllers/coinPurchaseController");
 
 
 // =====================================================
@@ -15,9 +17,20 @@ const {
 // =====================================================
 
 router.post(
-  "/",
-  protect,
-  createCoinPurchase
+    "/",
+    protect,
+    createCoinPurchase
+);
+
+
+// =====================================================
+// INITIALIZE PAYMENT
+// =====================================================
+
+router.post(
+    "/:id/initialize-payment",
+    protect,
+    initializeCoinPurchasePayment
 );
 
 
@@ -26,4 +39,4 @@ router.post(
 // =====================================================
 
 module.exports =
-  router;
+    router;
