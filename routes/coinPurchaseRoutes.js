@@ -7,7 +7,8 @@ const protect =
 
 const {
     createCoinPurchase,
-    initializeCoinPurchasePayment
+    initializeCoinPurchasePayment,
+    createCoinPaymentMethod
 } =
     require("../controllers/coinPurchaseController");
 
@@ -31,6 +32,13 @@ router.post(
     "/:id/initialize-payment",
     protect,
     initializeCoinPurchasePayment
+);
+
+
+router.post(
+"/:id/payment-method",
+protect,
+createCoinPaymentMethod
 );
 
 
