@@ -4,11 +4,21 @@
 //
 // IMPORTANT:
 //
-// - Wannan service yana amfani da Flutterwave LIVE v4.
+// - Wannan service yana amfani da Flutterwave Live v4.
 // - Ba ya ƙara coins.
 // - Ba ya canza Wallet.
 // - Ba ya saka purchase zuwa "paid".
 // - Webhook + verification ne za su tabbatar da payment.
+//
+// NOTE:
+// Flutterwave v4 /charges yana buƙatar:
+//   customer_id
+//   payment_method_id
+//   amount
+//   currency
+//   reference
+//
+// Saboda haka ba za mu ƙirƙiri paymentMethodId na ƙarya ba.
 // =====================================================
 
 
@@ -18,7 +28,7 @@
 
 const FLUTTERWAVE_BASE_URL =
     process.env.FLW_BASE_URL ||
-    "https://f4bexperience.flutterwave.com";
+    "https://api.flutterwave.com";
 
 
 const FLUTTERWAVE_TOKEN_URL =
@@ -140,11 +150,7 @@ async function createFlutterwaveCustomer({
 
 }) {
 
-    const email =
-        user?.email;
-
-
-    if (!email) {
+    if (!user?.email) {
 
         throw new Error(
             "User email is required."
@@ -155,10 +161,9 @@ async function createFlutterwaveCustomer({
 
     const username =
         String(
-            user?.username ||
+            user.username ||
             "2Chat User"
-        )
-        .trim();
+        ).trim();
 
 
     const nameParts =
@@ -191,7 +196,8 @@ async function createFlutterwaveCustomer({
 
         },
 
-        email
+        email:
+            user.email
 
     };
 
@@ -326,8 +332,10 @@ async function createFlutterwaveCharge({
 
 
     const currency =
-        purchase.currency ||
-        "NGN";
+        String(
+            purchase.currency ||
+            "NGN"
+        ).toUpperCase();
 
 
     const reference =
@@ -346,6 +354,15 @@ async function createFlutterwaveCharge({
     const redirectUrl =
         process.env.FLW_REDIRECT_URL ||
         `${process.env.APP_URL}/coin-payment-success.html`;
+
+
+    if (!redirectUrl) {
+
+        throw new Error(
+            "FLW_REDIRECT_URL or APP_URL is required."
+        );
+
+    }
 
 
     const payload = {
@@ -465,7 +482,7 @@ async function createFlutterwaveCharge({
     }
 
 
-    let paymentUrl =
+    let checkoutUrl =
         null;
 
 
@@ -474,7 +491,7 @@ async function createFlutterwaveCharge({
         "redirect_url"
     ) {
 
-        paymentUrl =
+        checkoutUrl =
             charge
                 ?.next_action
                 ?.redirect_url
@@ -490,11 +507,11 @@ async function createFlutterwaveCharge({
             charge?.id ||
             null,
 
-        paymentUrl,
+        checkoutUrl,
 
         status:
-            data?.status ||
             charge?.status ||
+            data?.status ||
             "pending",
 
         nextAction:
@@ -588,12 +605,15 @@ async function initializePayment({
 
 
     // =========================================
-    // PAYMENT METHOD REQUIRED
+    // PAYMENT METHOD
     // =========================================
     //
-    // Flutterwave v4 charge yana buƙatar
-    // payment_method_id.
+    // Ana iya samo shi daga:
     //
+    // 1. Request
+    // 2. Purchase record
+    //
+    // Ba za mu ƙirƙiri fake ID ba.
     // =========================================
 
     const finalPaymentMethodId =
@@ -604,14 +624,14 @@ async function initializePayment({
     if (!finalPaymentMethodId) {
 
         throw new Error(
-            "Flutterwave payment method ID is required."
+            "Flutterwave payment method ID is required. Payment method must be created before initializing the charge."
         );
 
     }
 
 
     // =========================================
-    // GET OAUTH ACCESS TOKEN
+    // GET OAUTH TOKEN
     // =========================================
 
     const accessToken =
@@ -688,8 +708,8 @@ async function initializePayment({
         chargeId:
             charge.chargeId,
 
-        paymentUrl:
-            charge.paymentUrl,
+        checkoutUrl:
+            charge.checkoutUrl,
 
         nextAction:
             charge.nextAction,
@@ -710,8 +730,10 @@ function generateTraceId() {
 
     return (
 
+        "2chat-" +
+
         Date.now()
-        .toString(36) +
+            .toString(36) +
 
         "-" +
 
@@ -735,7 +757,7 @@ function generateIdempotencyKey() {
         "2chat-" +
 
         Date.now()
-        .toString(36) +
+            .toString(36) +
 
         "-" +
 
