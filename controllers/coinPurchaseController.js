@@ -277,10 +277,6 @@ exports.createCoinPurchase = async (
 };
 
 
-
-// =====================================================
-// INITIALIZE COIN PURCHASE PAYMENT
-// =====================================================
 // =====================================================
 // INITIALIZE COIN PURCHASE PAYMENT
 // =====================================================
@@ -288,350 +284,333 @@ exports.createCoinPurchase = async (
 exports.initializeCoinPurchasePayment =
 async (req, res) => {
 
-  try {
+    try {
 
-    // =========================================
-    // PURCHASE ID
-    // =========================================
+        // =========================================
+        // PURCHASE ID
+        // =========================================
 
-    const {
-      id
-    } = req.params;
+        const {
+            id
+        } = req.params;
 
 
-    if (!id) {
+        if (!id) {
 
-      return res.status(400).json({
+            return res.status(400).json({
 
-        success: false,
+                success: false,
 
-        message:
-          "Purchase ID is required."
+                message:
+                    "Purchase ID is required."
 
-      });
+            });
+
+        }
+
+
+        // =========================================
+        // PAYMENT METHOD ID
+        // =========================================
+        //
+        // Flutterwave v4 charge yana buƙatar
+        // payment_method_id.
+        //
+        // =========================================
+
+        const {
+            paymentMethodId
+        } = req.body || {};
+
+
+        if (!paymentMethodId) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Flutterwave payment method ID is required."
+
+            });
+
+        }
+
+
+        // =========================================
+        // FIND PURCHASE
+        // =========================================
+
+        const purchase =
+            await CoinPurchase.findById(id);
+
+
+        if (!purchase) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Coin purchase order not found."
+
+            });
+
+        }
+
+
+        // =========================================
+        // OWNERSHIP CHECK
+        // =========================================
+
+        if (
+            String(
+                purchase.userId
+            ) !==
+            String(
+                req.user._id
+            )
+        ) {
+
+            return res.status(403).json({
+
+                success: false,
+
+                message:
+                    "You are not allowed to access this purchase."
+
+            });
+
+        }
+
+
+        // =========================================
+        // STATUS CHECK
+        // =========================================
+
+        if (
+            purchase.status !==
+            "pending"
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    `Payment cannot be initialized because order status is "${purchase.status}".`
+
+            });
+
+        }
+
+
+        // =========================================
+        // GET USER
+        // =========================================
+
+        const User =
+            require("../models/User");
+
+
+        const user =
+            await User.findById(
+                req.user._id
+            )
+            .select(
+                "username email"
+            );
+
+
+        if (!user) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "User not found."
+
+            });
+
+        }
+
+
+        // =========================================
+        // EMAIL CHECK
+        // =========================================
+
+        if (!user.email) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Your account does not have an email address. Please add an email before making a payment."
+
+            });
+
+        }
+
+
+        // =========================================
+        // SAVE PAYMENT METHOD ID
+        // =========================================
+        //
+        // Ba mu saka order zuwa paid ba.
+        //
+        // Payment method kawai muke adanawa.
+        //
+        // =========================================
+
+        purchase.flutterwavePaymentMethodId =
+            String(
+                paymentMethodId
+            );
+
+
+        await purchase.save();
+
+
+        // =========================================
+        // INITIALIZE FLUTTERWAVE PAYMENT
+        // =========================================
+
+        const payment =
+            await initializePayment({
+
+                purchase,
+
+                user,
+
+                paymentMethodId:
+                    String(
+                        paymentMethodId
+                    )
+
+            });
+
+
+        // =========================================
+        // SAVE FLUTTERWAVE DETAILS
+        // =========================================
+
+        purchase.paymentProvider =
+            "flutterwave";
+
+
+        purchase.paymentReference =
+            payment.reference;
+
+
+        purchase.paymentInitializedAt =
+            new Date();
+
+
+        // =========================================
+        // SAVE CHARGE ID
+        // =========================================
+
+        if (
+            payment.chargeId
+        ) {
+
+            purchase.flutterwaveChargeId =
+                String(
+                    payment.chargeId
+                );
+
+        }
+
+
+        // =========================================
+        // SAVE PAYMENT STATUS
+        // =========================================
+        //
+        // IMPORTANT:
+        //
+        // Ba mu saka:
+        //
+        // status = paid
+        //
+        // saboda initialize ba verification ba ne.
+        //
+        // =========================================
+
+        await purchase.save();
+
+
+        // =========================================
+        // RESPONSE
+        // =========================================
+
+        return res.json({
+
+            success: true,
+
+            message:
+                "Flutterwave payment initialized successfully.",
+
+            payment: {
+
+                provider:
+                    payment.provider,
+
+                reference:
+                    payment.reference,
+
+                amount:
+                    payment.amount,
+
+                currency:
+                    payment.currency,
+
+                email:
+                    payment.email,
+
+                customerId:
+                    payment.customerId,
+
+                paymentMethodId:
+                    payment.paymentMethodId,
+
+                chargeId:
+                    payment.chargeId,
+
+                checkoutUrl:
+                    payment.checkoutUrl,
+
+                nextAction:
+                    payment.nextAction,
+
+                status:
+                    payment.status
+
+            }
+
+        });
+
+
+    } catch (err) {
+
+        console.error(
+            "INITIALIZE COIN PAYMENT ERROR:",
+            err
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                err.message ||
+                "Failed to initialize Flutterwave payment."
+
+        });
 
     }
-
-
-    // =========================================
-    // PAYMENT METHOD ID
-    // =========================================
-    //
-    // Flutterwave v4 yana buƙatar
-    // paymentMethodId domin charge.
-    //
-
-    const {
-      paymentMethodId
-    } = req.body;
-
-
-    if (!paymentMethodId) {
-
-      return res.status(400).json({
-
-        success: false,
-
-        message:
-          "Flutterwave payment method ID is required."
-
-      });
-
-    }
-
-
-    // =========================================
-    // FIND PURCHASE
-    // =========================================
-
-    const purchase =
-      await CoinPurchase.findById(id);
-
-
-    if (!purchase) {
-
-      return res.status(404).json({
-
-        success: false,
-
-        message:
-          "Coin purchase order not found."
-
-      });
-
-    }
-
-
-    // =========================================
-    // OWNERSHIP CHECK
-    // =========================================
-
-    if (
-      String(
-        purchase.userId
-      ) !==
-      String(
-        req.user._id
-      )
-    ) {
-
-      return res.status(403).json({
-
-        success: false,
-
-        message:
-          "You are not allowed to access this purchase."
-
-      });
-
-    }
-
-
-    // =========================================
-    // STATUS CHECK
-    // =========================================
-
-    if (
-      purchase.status !==
-      "pending"
-    ) {
-
-      return res.status(400).json({
-
-        success: false,
-
-        message:
-          `Payment cannot be initialized because order status is "${purchase.status}".`
-
-      });
-
-    }
-
-
-    // =========================================
-    // GET USER
-    // =========================================
-
-    const User =
-      require("../models/User");
-
-
-    const user =
-      await User.findById(
-        req.user._id
-      )
-      .select(
-        "username email"
-      );
-
-
-    if (!user) {
-
-      return res.status(404).json({
-
-        success: false,
-
-        message:
-          "User not found."
-
-      });
-
-    }
-
-
-    // =========================================
-    // EMAIL CHECK
-    // =========================================
-
-    if (!user.email) {
-
-      return res.status(400).json({
-
-        success: false,
-
-        message:
-          "Your account does not have an email address required for payment."
-
-      });
-
-    }
-
-
-    // =========================================
-    // INITIALIZE FLUTTERWAVE PAYMENT
-    // =========================================
-
-    const payment =
-      await initializePayment({
-
-        purchase,
-
-        user,
-
-        paymentMethodId
-
-      });
-
-
-    // =========================================
-    // SAVE FLUTTERWAVE DATA
-    // =========================================
-
-    purchase.paymentProvider =
-      "flutterwave";
-
-
-    purchase.paymentReference =
-      payment.reference ||
-      purchase.reference;
-
-
-    purchase.flutterwaveCustomerId =
-      payment.customerId ||
-      null;
-
-
-    purchase.flutterwavePaymentMethodId =
-      payment.paymentMethodId ||
-      paymentMethodId;
-
-
-    purchase.flutterwaveChargeId =
-      payment.chargeId ||
-      null;
-
-
-    purchase.paymentUrl =
-      payment.paymentUrl ||
-      null;
-
-
-    purchase.providerStatus =
-      payment.status ||
-      null;
-
-
-    purchase.paymentInitializedAt =
-      new Date();
-
-
-    // =========================================
-    // PROCESSING
-    // =========================================
-    //
-    // Ba mu saka "paid" a nan ba.
-    //
-    // Webhook + verification ne za su tabbatar
-    // da payment daga baya.
-    //
-
-    purchase.status =
-      "processing";
-
-
-    await purchase.save();
-
-
-    // =========================================
-    // RESPONSE
-    // =========================================
-
-    return res.json({
-
-      success: true,
-
-      message:
-        "Flutterwave payment initialized successfully.",
-
-      payment: {
-
-        provider:
-          payment.provider,
-
-        reference:
-          payment.reference,
-
-        amount:
-          payment.amount,
-
-        currency:
-          payment.currency,
-
-        email:
-          payment.email,
-
-        customerId:
-          payment.customerId,
-
-        paymentMethodId:
-          payment.paymentMethodId,
-
-        chargeId:
-          payment.chargeId,
-
-        paymentUrl:
-          payment.paymentUrl,
-
-        nextAction:
-          payment.nextAction,
-
-        status:
-          payment.status
-
-      },
-
-      purchase: {
-
-        id:
-          purchase._id,
-
-        reference:
-          purchase.reference,
-
-        coins:
-          purchase.coins,
-
-        amount:
-          purchase.amount,
-
-        currency:
-          purchase.currency,
-
-        status:
-          purchase.status,
-
-        paymentProvider:
-          purchase.paymentProvider,
-
-        paymentInitializedAt:
-          purchase.paymentInitializedAt
-
-      }
-
-    });
-
-
-  } catch (err) {
-
-    console.error(
-      "INITIALIZE COIN PAYMENT ERROR:",
-      err
-    );
-
-
-    return res.status(500).json({
-
-      success: false,
-
-      message:
-        err.message ||
-        "Failed to initialize payment."
-
-    });
-
-  }
 
 };
 
-  
-              
