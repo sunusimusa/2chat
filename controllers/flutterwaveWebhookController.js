@@ -7,7 +7,7 @@ const CoinPurchase =
 const {
     verifyFlutterwaveCharge
 } =
-    require("./services/flutterwaveVerificationService");
+    require("../services/flutterwaveVerificationService");
 
 const {
     creditCoinPurchase
