@@ -1,1 +1,162 @@
+* {
+  box-sizing: border-box;
+  }
 
+body {
+margin: 0;
+font-family: Arial, sans-serif;
+background: #f4f7fb;
+}
+
+.payment-page {
+max-width: 520px;
+margin: auto;
+min-height: 100vh;
+}
+
+.payment-header {
+display: flex;
+align-items: center;
+gap: 15px;
+padding: 18px;
+background: #2196f3;
+color: white;
+}
+
+.payment-header h1 {
+margin: 0;
+font-size: 21px;
+}
+
+.back-btn {
+border: 0;
+background: transparent;
+color: white;
+font-size: 20px;
+cursor: pointer;
+}
+
+.order-card {
+margin: 20px;
+padding: 20px;
+background: white;
+border-radius: 16px;
+display: flex;
+align-items: center;
+gap: 15px;
+box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.coin-icon {
+width: 55px;
+height: 55px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+background: #fff4c2;
+color: #d69e00;
+font-size: 25px;
+}
+
+.order-info {
+display: flex;
+flex-direction: column;
+gap: 5px;
+}
+
+.order-info span {
+color: #777;
+font-size: 13px;
+}
+
+.order-info strong {
+font-size: 20px;
+}
+
+.order-info small {
+color: #2196f3;
+font-size: 16px;
+}
+
+.payment-card {
+margin: 20px;
+padding: 22px;
+background: white;
+border-radius: 16px;
+box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.payment-card h2 {
+margin-top: 0;
+}
+
+.secure-text {
+color: #666;
+font-size: 13px;
+}
+
+label {
+display: block;
+margin-top: 17px;
+margin-bottom: 7px;
+font-weight: bold;
+font-size: 14px;
+}
+
+input {
+width: 100%;
+padding: 13px;
+border: 1px solid #ddd;
+border-radius: 9px;
+font-size: 16px;
+outline: none;
+}
+
+input:focus {
+border-color: #2196f3;
+}
+
+.card-row {
+display: grid;
+grid-template-columns: 1fr 1fr 1fr;
+gap: 10px;
+}
+
+.payment-message {
+display: none;
+padding: 12px;
+border-radius: 8px;
+margin: 15px 0;
+font-size: 14px;
+}
+
+.pay-button {
+width: 100%;
+margin-top: 25px;
+padding: 15px;
+border: 0;
+border-radius: 10px;
+background: #2196f3;
+color: white;
+font-size: 16px;
+font-weight: bold;
+cursor: pointer;
+}
+
+.pay-button:disabled {
+opacity: 0.6;
+cursor: not-allowed;
+}
+
+@media (max-width: 420px) {
+
+.card-row {
+    grid-template-columns: 1fr 1fr;
+}
+
+.card-row div:last-child {
+    grid-column: span 2;
+}
+
+  }
