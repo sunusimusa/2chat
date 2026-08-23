@@ -614,3 +614,252 @@ async (req, res) => {
 
 };
 
+exports.createCoinPaymentMethod = async (
+req,
+res
+) => {
+
+try {
+
+    const {
+        id
+    } = req.params;
+
+
+    const {
+        card
+    } = req.body;
+
+
+    // =========================================
+    // FIND PURCHASE
+    // =========================================
+
+    const purchase =
+        await CoinPurchase.findById(id);
+
+
+    if (!purchase) {
+
+        return res.status(404).json({
+
+            success: false,
+
+            message:
+                "Coin purchase order not found."
+
+        });
+
+    }
+
+
+    // =========================================
+    // OWNERSHIP
+    // =========================================
+
+    if (
+        String(purchase.userId) !==
+        String(req.user._id)
+    ) {
+
+        return res.status(403).json({
+
+            success: false,
+
+            message:
+                "You are not allowed to access this purchase."
+
+        });
+
+    }
+
+
+    // =========================================
+    // STATUS
+    // =========================================
+
+    if (
+        purchase.status !==
+        "pending"
+    ) {
+
+        return res.status(400).json({
+
+            success: false,
+
+            message:
+                `Payment cannot continue because order status is "${purchase.status}".`
+
+        });
+
+    }
+
+
+    // =========================================
+    // CARD DATA
+    // =========================================
+
+    if (!card) {
+
+        return res.status(400).json({
+
+            success: false,
+
+            message:
+                "Card payment data is required."
+
+        });
+
+    }
+
+
+    // =========================================
+    // USER
+    // =========================================
+
+    const User =
+        require("../models/User");
+
+
+    const user =
+        await User.findById(
+            req.user._id
+        )
+        .select(
+            "username email"
+        );
+
+
+    if (!user) {
+
+        return res.status(404).json({
+
+            success: false,
+
+            message:
+                "User not found."
+
+        });
+
+    }
+
+
+    if (!user.email) {
+
+        return res.status(400).json({
+
+            success: false,
+
+            message:
+                "User email is required."
+
+        });
+
+    }
+
+
+    // =========================================
+    // GET FLUTTERWAVE TOKEN
+    // =========================================
+
+    const accessToken =
+        await getFlutterwaveAccessToken();
+
+
+    // =========================================
+    // CREATE CUSTOMER
+    // =========================================
+
+    const customer =
+        await createFlutterwaveCustomer({
+
+            accessToken,
+
+            user
+
+        });
+
+
+    // =========================================
+    // CREATE PAYMENT METHOD
+    // =========================================
+
+    const paymentMethod =
+        await createFlutterwavePaymentMethod({
+
+            accessToken,
+
+            customerId:
+                customer.id,
+
+            card
+
+        });
+
+
+    // =========================================
+    // SAVE FLUTTERWAVE DATA
+    // =========================================
+
+    purchase.flutterwaveCustomerId =
+        customer.id;
+
+
+    purchase.flutterwavePaymentMethodId =
+        paymentMethod.id;
+
+
+    await purchase.save();
+
+
+    // =========================================
+    // RESPONSE
+    // =========================================
+
+    return res.json({
+
+        success: true,
+
+        message:
+            "Flutterwave payment method created successfully.",
+
+        paymentMethod: {
+
+            id:
+                paymentMethod.id,
+
+            type:
+                paymentMethod.type,
+
+            card:
+                paymentMethod.card
+
+        }
+
+    });
+
+
+} catch (err) {
+
+    console.error(
+        "CREATE COIN PAYMENT METHOD ERROR:",
+        err
+    );
+
+
+    return res.status(500).json({
+
+        success: false,
+
+        message:
+            err.message ||
+            "Failed to create payment method."
+
+    });
+
+}
+
+};
+
+
+
