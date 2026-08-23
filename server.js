@@ -1,6 +1,9 @@
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
+const {
+    flutterwaveWebhook
+} = require("./controllers/flutterwaveWebhookController");
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
@@ -51,6 +54,51 @@ const path = require("path");
 
 app.use(express.static(path.join(__dirname,"public")));
 app.use(cors());
+
+// =====================================================
+// FLUTTERWAVE WEBHOOK
+// =====================================================
+
+app.post(
+    "/api/payments/flutterwave/webhook",
+
+    express.raw({
+        type: "application/json"
+    }),
+
+    (req, res, next) => {
+
+        req.rawBody =
+            req.body;
+
+        try {
+
+            req.body =
+                JSON.parse(
+                    req.body.toString("utf8")
+                );
+
+        } catch (err) {
+
+            return res
+                .status(400)
+                .json({
+
+                    success: false,
+
+                    message:
+                        "Invalid webhook JSON."
+
+                });
+
+        }
+
+        next();
+
+    },
+
+    flutterwaveWebhook
+);
 
 app.use(express.json({
     limit: "15mb"
