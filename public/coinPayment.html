@@ -1,1 +1,199 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>2Chat - Coin Payment</title>
+
+<link
+    rel="stylesheet"
+    href="/css/coinPayment.css"
+>
+
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+>
+
+</head><body><main class="payment-page">
+
+    <header class="payment-header">
+
+        <button
+            class="back-btn"
+            onclick="history.back()"
+        >
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+        </button>
+
+        <h1>
+            <i class="fa-solid fa-credit-card"></i>
+            Payment
+        </h1>
+
+    </header>
+
+
+    <!-- PACKAGE -->
+
+    <section class="order-card">
+
+        <div class="coin-icon">
+
+            <i class="fa-solid fa-coins"></i>
+
+        </div>
+
+        <div class="order-info">
+
+            <span>
+                Coin Package
+            </span>
+
+            <strong id="coinAmount">
+                Loading...
+            </strong>
+
+            <small id="paymentAmount">
+                Loading...
+            </small>
+
+        </div>
+
+    </section>
+
+
+    <!-- PAYMENT FORM -->
+
+    <section class="payment-card">
+
+        <h2>
+            Card Payment
+        </h2>
+
+        <p class="secure-text">
+
+            <i class="fa-solid fa-lock"></i>
+
+            Your payment is securely processed by Flutterwave.
+
+        </p>
+
+
+        <div
+            id="paymentMessage"
+            class="payment-message"
+        ></div>
+
+
+        <!-- EMAIL -->
+
+        <label for="email">
+            Email
+        </label>
+
+        <input
+            type="email"
+            id="email"
+            autocomplete="email"
+            placeholder="you@example.com"
+        >
+
+
+        <!-- CARD -->
+
+        <label for="cardNumber">
+            Card Number
+        </label>
+
+        <input
+            type="text"
+            id="cardNumber"
+            inputmode="numeric"
+            autocomplete="cc-number"
+            maxlength="19"
+            placeholder="1234 5678 9012 3456"
+        >
+
+
+        <div class="card-row">
+
+            <div>
+
+                <label for="expiryMonth">
+                    Expiry Month
+                </label>
+
+                <input
+                    type="text"
+                    id="expiryMonth"
+                    inputmode="numeric"
+                    autocomplete="cc-exp-month"
+                    maxlength="2"
+                    placeholder="MM"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label for="expiryYear">
+                    Expiry Year
+                </label>
+
+                <input
+                    type="text"
+                    id="expiryYear"
+                    inputmode="numeric"
+                    autocomplete="cc-exp-year"
+                    maxlength="4"
+                    placeholder="YYYY"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label for="cvv">
+                    CVV
+                </label>
+
+                <input
+                    type="password"
+                    id="cvv"
+                    inputmode="numeric"
+                    autocomplete="cc-csc"
+                    maxlength="4"
+                    placeholder="CVV"
+                >
+
+            </div>
+
+        </div>
+
+
+        <button
+            id="payButton"
+            class="pay-button"
+        >
+
+            <i class="fa-solid fa-lock"></i>
+
+            Continue to Payment
+
+        </button>
+
+    </section>
+
+</main>
+
+
+<script src="/js/coinPayment.js"></script>
+
+</body></html>
