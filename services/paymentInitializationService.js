@@ -1159,3 +1159,530 @@ module.exports = {
     createFlutterwaveCharge
 
 };
+
+// =====================================================
+// 2CHAT
+// FLUTTERWAVE LIVE V4 PAYMENT VERIFICATION SERVICE
+// =====================================================
+//
+// IMPORTANT:
+//
+// - Yana verify Flutterwave charge.
+// - Ba ya ƙara coins kai tsaye.
+// - Ba ya canza Wallet.
+// - Yana dawo da verified transaction.
+// =====================================================
+
+const {
+    getFlutterwaveAccessToken
+} = require("./paymentInitializationService");
+
+
+// =====================================================
+// ENVIRONMENT
+// =====================================================
+
+const FLUTTERWAVE_BASE_URL =
+    process.env.FLW_BASE_URL ||
+    "https://f4bexperience.flutterwave.com";
+
+
+// =====================================================
+// VERIFY FLUTTERWAVE CHARGE
+// =====================================================
+
+async function verifyFlutterwaveCharge(
+    chargeId
+) {
+
+    if (!chargeId) {
+
+        throw new Error(
+            "Flutterwave charge ID is required."
+        );
+
+    }
+
+
+    // =========================================
+    // GET ACCESS TOKEN
+    // =========================================
+
+    const accessToken =
+        await getFlutterwaveAccessToken();
+
+
+    // =========================================
+    // VERIFY CHARGE
+    // =========================================
+
+    const response =
+        await fetch(
+            `${FLUTTERWAVE_BASE_URL}/charges/${encodeURIComponent(chargeId)}`,
+            {
+
+                method: "GET",
+
+                headers: {
+
+                    "Authorization":
+                        `Bearer ${accessToken}`,
+
+                    "Accept":
+                        "application/json"
+
+                }
+
+            }
+        );
+
+
+    const data =
+        await response.json();
+
+
+    if (!response.ok) {
+
+        console.error(
+            "FLUTTERWAVE VERIFY ERROR:",
+            data
+        );
+
+
+        throw new Error(
+            data?.message ||
+            data?.error?.message ||
+            data?.error ||
+            "Failed to verify Flutterwave payment."
+        );
+
+    }
+
+
+    const charge =
+        data?.data;
+
+
+    if (!charge) {
+
+        throw new Error(
+            "Flutterwave verification data is missing."
+        );
+
+    }
+
+
+    return {
+
+        id:
+            charge.id,
+
+        reference:
+            charge.reference,
+
+        amount:
+            Number(
+                charge.amount
+            ),
+
+        currency:
+            String(
+                charge.currency ||
+                ""
+            ).toUpperCase(),
+
+        status:
+            String(
+                charge.status ||
+                ""
+            ).toLowerCase(),
+
+        customerId:
+            charge.customer_id ||
+            charge.customer?.id ||
+            null,
+
+        raw:
+            data
+
+    };
+
+}
+
+
+// =====================================================
+// EXPORT
+// =====================================================
+
+module.exports = {
+
+    verifyFlutterwaveCharge
+
+};
+
+// =====================================================
+// 2CHAT
+// COIN PURCHASE CREDIT SERVICE
+// =====================================================
+//
+// IMPORTANT:
+//
+// - Ana kira ne bayan an tabbatar da payment.
+// - Ba ya dogara da webhook kawai.
+// - Yana hana double credit.
+// - Legacy user wallet babu shi => zai ƙirƙira.
+// =====================================================
+
+const mongoose =
+    require("mongoose");
+
+const CoinPurchase =
+    require("../models/CoinPurchase");
+
+const Wallet =
+    require("../models/Wallet");
+
+
+// =====================================================
+// CREDIT PURCHASE COINS
+// =====================================================
+
+async function creditCoinPurchase(
+    purchaseId,
+    verifiedPayment
+) {
+
+    if (!purchaseId) {
+
+        throw new Error(
+            "Purchase ID is required."
+        );
+
+    }
+
+
+    if (!verifiedPayment) {
+
+        throw new Error(
+            "Verified payment is required."
+        );
+
+    }
+
+
+    // =========================================
+    // TRANSACTION
+    // =========================================
+
+    const session =
+        await mongoose.startSession();
+
+
+    try {
+
+        let result = null;
+
+
+        await session.withTransaction(
+            async () => {
+
+                // =================================
+                // FIND PURCHASE
+                // =================================
+
+                const purchase =
+                    await CoinPurchase.findById(
+                        purchaseId
+                    )
+                    .session(session);
+
+
+                if (!purchase) {
+
+                    throw new Error(
+                        "Coin purchase order not found."
+                    );
+
+                }
+
+
+                // =================================
+                // ALREADY CREDITED
+                // =================================
+
+                if (
+                    purchase.coinsCredited ===
+                    true
+                ) {
+
+                    result = {
+
+                        alreadyCredited:
+                            true,
+
+                        purchase,
+
+                        wallet:
+                            null
+
+                    };
+
+                    return;
+
+                }
+
+
+                // =================================
+                // VERIFY PURCHASE REFERENCE
+                // =================================
+
+                if (
+                    String(
+                        verifiedPayment.reference
+                    ) !==
+                    String(
+                        purchase.reference
+                    )
+                ) {
+
+                    throw new Error(
+                        "Payment reference does not match purchase."
+                    );
+
+                }
+
+
+                // =================================
+                // VERIFY AMOUNT
+                // =================================
+
+                const expectedAmount =
+                    Number(
+                        purchase.amount
+                    );
+
+                const paidAmount =
+                    Number(
+                        verifiedPayment.amount
+                    );
+
+
+                if (
+                    !Number.isFinite(
+                        paidAmount
+                    ) ||
+                    paidAmount !==
+                    expectedAmount
+                ) {
+
+                    throw new Error(
+                        "Payment amount does not match purchase amount."
+                    );
+
+                }
+
+
+                // =================================
+                // VERIFY CURRENCY
+                // =================================
+
+                const expectedCurrency =
+                    String(
+                        purchase.currency ||
+                        "NGN"
+                    ).toUpperCase();
+
+                const paidCurrency =
+                    String(
+                        verifiedPayment.currency ||
+                        ""
+                    ).toUpperCase();
+
+
+                if (
+                    paidCurrency !==
+                    expectedCurrency
+                ) {
+
+                    throw new Error(
+                        "Payment currency does not match purchase currency."
+                    );
+
+                }
+
+
+                // =================================
+                // VERIFY STATUS
+                // =================================
+
+                if (
+                    verifiedPayment.status !==
+                    "succeeded"
+                ) {
+
+                    throw new Error(
+                        `Payment is not successful. Current status: ${verifiedPayment.status}`
+                    );
+
+                }
+
+
+                // =================================
+                // GET USER WALLET
+                // =================================
+
+                let wallet =
+                    await Wallet.findOne({
+                        userId:
+                            purchase.userId
+                    })
+                    .session(session);
+
+
+                // =================================
+                // LEGACY USER
+                // CREATE WALLET
+                // =================================
+
+                if (!wallet) {
+
+                    const created =
+                        await Wallet.create(
+                            [
+                                {
+
+                                    userId:
+                                        purchase.userId,
+
+                                    coins:
+                                        0,
+
+                                    balance:
+                                        0
+
+                                }
+                            ],
+                            {
+                                session
+                            }
+                        );
+
+
+                    wallet =
+                        created[0];
+
+                }
+
+
+                // =================================
+                // ADD COINS
+                // =================================
+
+                wallet.coins =
+                    Number(
+                        wallet.coins || 0
+                    ) +
+                    Number(
+                        purchase.coins
+                    );
+
+
+                // =================================
+                // ADD BALANCE
+                // =================================
+                //
+                // 100 Coins = ₦100
+                //
+                // =================================
+
+                wallet.balance =
+                    Number(
+                        wallet.balance || 0
+                    ) +
+                    Number(
+                        purchase.amount
+                    );
+
+
+                await wallet.save({
+                    session
+                });
+
+
+                // =================================
+                // MARK PURCHASE VERIFIED
+                // =================================
+
+                purchase.status =
+                    "paid";
+
+
+                purchase.paymentVerifiedAt =
+                    new Date();
+
+
+                purchase.coinsCredited =
+                    true;
+
+
+                purchase.coinsCreditedAt =
+                    new Date();
+
+
+                // =================================
+                // SAVE TRANSACTION ID
+                // =================================
+
+                if (
+                    verifiedPayment.id
+                ) {
+
+                    purchase.flutterwaveChargeId =
+                        String(
+                            verifiedPayment.id
+                        );
+
+                }
+
+
+                await purchase.save({
+                    session
+                });
+
+
+                result = {
+
+                    alreadyCredited:
+                        false,
+
+                    purchase,
+
+                    wallet
+
+                };
+
+            }
+        );
+
+
+        return result;
+
+
+    } finally {
+
+        await session.endSession();
+
+    }
+
+}
+
+
+// =====================================================
+// EXPORT
+// =====================================================
+
+module.exports = {
+
+    creditCoinPurchase
+
+};
