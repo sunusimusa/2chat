@@ -13,7 +13,8 @@ const packages = [
         coins: 100,
         price: 100,
         currency: "NGN",
-        sortOrder: 1
+        sortOrder: 1,
+        active: true
     },
 
     {
@@ -21,7 +22,8 @@ const packages = [
         coins: 200,
         price: 200,
         currency: "NGN",
-        sortOrder: 2
+        sortOrder: 2,
+        active: true
     },
 
     {
@@ -29,7 +31,8 @@ const packages = [
         coins: 300,
         price: 300,
         currency: "NGN",
-        sortOrder: 3
+        sortOrder: 3,
+        active: true
     },
 
     {
@@ -37,7 +40,8 @@ const packages = [
         coins: 500,
         price: 500,
         currency: "NGN",
-        sortOrder: 4
+        sortOrder: 4,
+        active: true
     },
 
     {
@@ -45,7 +49,8 @@ const packages = [
         coins: 1000,
         price: 1000,
         currency: "NGN",
-        sortOrder: 5
+        sortOrder: 5,
+        active: true
     },
 
     {
@@ -53,7 +58,8 @@ const packages = [
         coins: 1500,
         price: 1500,
         currency: "NGN",
-        sortOrder: 6
+        sortOrder: 6,
+        active: true
     },
 
     {
@@ -61,7 +67,8 @@ const packages = [
         coins: 2000,
         price: 2000,
         currency: "NGN",
-        sortOrder: 7
+        sortOrder: 7,
+        active: true
     },
 
     {
@@ -69,7 +76,8 @@ const packages = [
         coins: 3000,
         price: 3000,
         currency: "NGN",
-        sortOrder: 8
+        sortOrder: 8,
+        active: true
     },
 
     {
@@ -77,7 +85,8 @@ const packages = [
         coins: 4000,
         price: 4000,
         currency: "NGN",
-        sortOrder: 9
+        sortOrder: 9,
+        active: true
     },
 
     {
@@ -85,7 +94,8 @@ const packages = [
         coins: 5000,
         price: 5000,
         currency: "NGN",
-        sortOrder: 10
+        sortOrder: 10,
+        active: true
     },
 
     {
@@ -93,7 +103,8 @@ const packages = [
         coins: 10000,
         price: 10000,
         currency: "NGN",
-        sortOrder: 11
+        sortOrder: 11,
+        active: true
     },
 
     {
@@ -101,7 +112,8 @@ const packages = [
         coins: 20000,
         price: 20000,
         currency: "NGN",
-        sortOrder: 12
+        sortOrder: 12,
+        active: true
     }
 
 ];
