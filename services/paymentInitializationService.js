@@ -776,3 +776,176 @@ function generateIdempotencyKey() {
 
 module.exports =
     initializePayment;
+
+async function createFlutterwavePaymentMethod({
+
+accessToken,
+
+customerId,
+
+card
+
+}) {
+
+if (!accessToken) {
+
+    throw new Error(
+        "Flutterwave access token is required."
+    );
+
+}
+
+
+if (!customerId) {
+
+    throw new Error(
+        "Flutterwave customer ID is required."
+    );
+
+}
+
+
+if (!card) {
+
+    throw new Error(
+        "Card payment data is required."
+    );
+
+}
+
+
+const requiredFields = [
+    "encrypted_card_number",
+    "encrypted_expiry_month",
+    "encrypted_expiry_year",
+    "encrypted_cvv",
+    "nonce"
+];
+
+
+for (const field of requiredFields) {
+
+    if (!card[field]) {
+
+        throw new Error(
+            `Missing encrypted card field: ${field}`
+        );
+
+    }
+
+}
+
+
+const response = await fetch(
+    `${FLUTTERWAVE_BASE_URL}/payment-methods`,
+    {
+
+        method: "POST",
+
+        headers: {
+
+            "Authorization":
+                `Bearer ${accessToken}`,
+
+            "Content-Type":
+                "application/json",
+
+            "X-Trace-Id":
+                generateTraceId(),
+
+            "X-Idempotency-Key":
+                generateIdempotencyKey()
+
+        },
+
+        body: JSON.stringify({
+
+            type: "card",
+
+            customer_id:
+                customerId,
+
+            card: {
+
+                encrypted_card_number:
+                    card.encrypted_card_number,
+
+                encrypted_expiry_month:
+                    card.encrypted_expiry_month,
+
+                encrypted_expiry_year:
+                    card.encrypted_expiry_year,
+
+                encrypted_cvv:
+                    card.encrypted_cvv,
+
+                nonce:
+                    card.nonce
+
+            }
+
+        })
+
+    }
+);
+
+
+const data =
+    await response.json();
+
+
+if (!response.ok) {
+
+    console.error(
+        "FLUTTERWAVE PAYMENT METHOD ERROR:",
+        data
+    );
+
+
+    throw new Error(
+        data?.message ||
+        data?.error?.message ||
+        "Failed to create Flutterwave payment method."
+    );
+
+}
+
+
+const paymentMethod =
+    data?.data;
+
+
+if (!paymentMethod?.id) {
+
+    console.error(
+        "FLUTTERWAVE PAYMENT METHOD RESPONSE:",
+        data
+    );
+
+
+    throw new Error(
+        "Flutterwave payment method ID was not returned."
+    );
+
+}
+
+
+return {
+
+    id:
+        paymentMethod.id,
+
+    type:
+        paymentMethod.type,
+
+    card:
+        paymentMethod.card,
+
+    raw:
+        data
+
+};
+
+}
+
+
