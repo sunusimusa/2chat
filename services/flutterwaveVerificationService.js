@@ -4,63 +4,30 @@ const {
 
 
 // =====================================================
-// FLUTTERWAVE PAYMENT VERIFICATION SERVICE
+// VERIFY FLUTTERWAVE CHARGE
 // =====================================================
 //
 // IMPORTANT:
 //
-// - Wannan service yana VERIFY payment ne kawai.
+// - Wannan service verification kawai yake yi.
 // - Ba ya ƙara coins.
 // - Ba ya canza Wallet.
 // - Ba ya canza CoinPurchase zuwa paid.
-//
-// Credit ɗin coins zai faru ne bayan verification.
+// - creditCoinPurchase() ne zai yi credit daga baya.
 // =====================================================
 
-
-async function verifyFlutterwavePayment({
-    purchase
-}) {
+async function verifyFlutterwaveCharge(
+    chargeId
+) {
 
     // =================================================
     // VALIDATION
     // =================================================
 
-    if (!purchase) {
-
-        throw new Error(
-            "Purchase is required for verification."
-        );
-
-    }
-
-
-    if (!purchase.reference) {
-
-        throw new Error(
-            "Purchase reference is missing."
-        );
-
-    }
-
-
-    // =================================================
-    // CHARGE ID
-    // =================================================
-    //
-    // Mafi kyau mu yi verification da Flutterwave
-    // charge ID da muka adana lokacin initialization.
-    //
-    // =================================================
-
-    const chargeId =
-        purchase.flutterwaveChargeId;
-
-
     if (!chargeId) {
 
         throw new Error(
-            "Flutterwave charge ID is missing."
+            "Flutterwave charge ID is required."
         );
 
     }
@@ -90,18 +57,19 @@ async function verifyFlutterwavePayment({
 
 
     // =================================================
-    // EXTRACT VALUES
+    // EXTRACT PAYMENT DATA
     // =================================================
 
-    const providerStatus =
+    const status =
         String(
             charge.status ||
             ""
         )
+        .trim()
         .toLowerCase();
 
 
-    const providerReference =
+    const reference =
         String(
             charge.reference ||
             ""
@@ -120,136 +88,12 @@ async function verifyFlutterwavePayment({
             charge.currency ||
             ""
         )
-        .toUpperCase();
-
-
-    const expectedAmount =
-        Number(
-            purchase.amount
-        );
-
-
-    const expectedCurrency =
-        String(
-            purchase.currency ||
-            "NGN"
-        )
+        .trim()
         .toUpperCase();
 
 
     // =================================================
-    // VERIFY REFERENCE
-    // =================================================
-
-    if (
-        providerReference &&
-        providerReference !==
-            String(
-                purchase.reference
-            )
-    ) {
-
-        return {
-
-            verified:
-                false,
-
-            reason:
-                "Payment reference does not match purchase reference.",
-
-            providerStatus,
-
-            providerReference,
-
-            amount,
-
-            currency,
-
-            raw:
-                response
-
-        };
-
-    }
-
-
-    // =================================================
-    // VERIFY AMOUNT
-    // =================================================
-
-    if (
-        !Number.isFinite(amount) ||
-        amount !== expectedAmount
-    ) {
-
-        return {
-
-            verified:
-                false,
-
-            reason:
-                "Payment amount does not match purchase amount.",
-
-            providerStatus,
-
-            providerReference,
-
-            amount,
-
-            currency,
-
-            expectedAmount,
-
-            raw:
-                response
-
-        };
-
-    }
-
-
-    // =================================================
-    // VERIFY CURRENCY
-    // =================================================
-
-    if (
-        currency !==
-        expectedCurrency
-    ) {
-
-        return {
-
-            verified:
-                false,
-
-            reason:
-                "Payment currency does not match purchase currency.",
-
-            providerStatus,
-
-            providerReference,
-
-            amount,
-
-            currency,
-
-            expectedCurrency,
-
-            raw:
-                response
-
-        };
-
-    }
-
-
-    // =================================================
-    // VERIFY SUCCESS STATUS
-    // =================================================
-    //
-    // Payment sai an tabbatar da shi ne idan
-    // Flutterwave ya nuna successful/succeeded.
-    //
+    // SUCCESS STATUS
     // =================================================
 
     const successfulStatuses = [
@@ -269,26 +113,21 @@ async function verifyFlutterwavePayment({
 
     const verified =
         successfulStatuses.includes(
-            providerStatus
+            status
         );
 
 
     // =================================================
-    // RETURN VERIFICATION RESULT
+    // RESULT
     // =================================================
 
     return {
 
         verified,
 
-        reason:
-            verified
-                ? null
-                : "Flutterwave payment has not been successfully completed.",
+        status,
 
-        providerStatus,
-
-        providerReference,
+        reference,
 
         amount,
 
@@ -297,6 +136,11 @@ async function verifyFlutterwavePayment({
         chargeId:
             charge.id ||
             chargeId,
+
+        reason:
+            verified
+                ? null
+                : "Flutterwave payment is not successful.",
 
         raw:
             response
@@ -312,6 +156,6 @@ async function verifyFlutterwavePayment({
 
 module.exports = {
 
-    verifyFlutterwavePayment
+    verifyFlutterwaveCharge
 
 };
