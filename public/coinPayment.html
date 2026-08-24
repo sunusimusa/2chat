@@ -32,6 +32,7 @@
     <button
         class="back-btn"
         onclick="goBack()"
+        type="button"
     >
 
         <i class="fa-solid fa-arrow-left"></i>
@@ -130,55 +131,139 @@
 
             <h3>
 
-                <i class="fa-solid fa-wallet"></i>
+                <i class="fa-solid fa-credit-card"></i>
 
-                Payment Method
+                Card Payment
 
             </h3>
 
 
+            <!-- =================================
+                 CARD NUMBER
+            ================================== -->
 
-            <div class="method-option active">
+            <div class="form-group">
 
-                <div class="method-icon">
+                <label for="cardNumber">
+
+                    Card Number
+
+                </label>
+
+
+                <div class="input-wrapper">
 
                     <i class="fa-solid fa-credit-card"></i>
 
-                </div>
-
-
-                <div class="method-info">
-
-                    <strong>
-                        Card Payment
-                    </strong>
-
-                    <span>
-                        Secure Flutterwave payment
-                    </span>
+                    <input
+                        id="cardNumber"
+                        type="text"
+                        inputmode="numeric"
+                        autocomplete="cc-number"
+                        maxlength="19"
+                        placeholder="1234 5678 9012 3456"
+                    >
 
                 </div>
-
-
-                <i
-                    class="fa-solid fa-circle-check"
-                    style="margin-left:auto;"
-                ></i>
 
             </div>
 
 
+
+            <!-- =================================
+                 EXPIRY + CVV
+            ================================== -->
+
+            <div class="card-row">
+
+
+                <div class="form-group">
+
+                    <label for="expiryMonth">
+
+                        Expiry Month
+
+                    </label>
+
+
+                    <input
+                        id="expiryMonth"
+                        type="text"
+                        inputmode="numeric"
+                        autocomplete="cc-exp-month"
+                        maxlength="2"
+                        placeholder="MM"
+                    >
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label for="expiryYear">
+
+                        Expiry Year
+
+                    </label>
+
+
+                    <input
+                        id="expiryYear"
+                        type="text"
+                        inputmode="numeric"
+                        autocomplete="cc-exp-year"
+                        maxlength="4"
+                        placeholder="YYYY"
+                    >
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label for="cvv">
+
+                        CVV
+
+                    </label>
+
+
+                    <input
+                        id="cvv"
+                        type="password"
+                        inputmode="numeric"
+                        autocomplete="cc-csc"
+                        maxlength="4"
+                        placeholder="CVV"
+                    >
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================
+                 PAYMENT MESSAGE
+            ================================== -->
 
             <div
                 id="paymentMessage"
                 class="payment-message"
             >
 
-                Ready to continue.
+                Enter your card details to continue.
 
             </div>
 
 
+
+            <!-- =================================
+                 PAY BUTTON
+            ================================== -->
 
             <button
                 id="continuePaymentButton"
@@ -186,22 +271,27 @@
                 type="button"
             >
 
-                <i class="fa-solid fa-credit-card"></i>
+                <i class="fa-solid fa-lock"></i>
 
-                Continue to Payment
+                Pay Now
 
             </button>
 
 
 
+            <!-- =================================
+                 SECURITY
+            ================================== -->
+
             <p class="security-note">
 
-                <i class="fa-solid fa-lock"></i>
+                <i class="fa-solid fa-shield-halved"></i>
 
                 Your payment is processed securely
                 through Flutterwave.
 
             </p>
+
 
         </section>
 
@@ -227,6 +317,8 @@ let purchaseId = null;
 let packageId = null;
 
 let purchase = null;
+
+let processingPayment = false;
 
 
 // =====================================================
@@ -266,6 +358,30 @@ const paymentMessage =
 const continueButton =
     document.getElementById(
         "continuePaymentButton"
+    );
+
+
+const cardNumberInput =
+    document.getElementById(
+        "cardNumber"
+    );
+
+
+const expiryMonthInput =
+    document.getElementById(
+        "expiryMonth"
+    );
+
+
+const expiryYearInput =
+    document.getElementById(
+        "expiryYear"
+    );
+
+
+const cvvInput =
+    document.getElementById(
+        "cvv"
     );
 
 
@@ -515,10 +631,11 @@ async function createPurchase() {
         data.purchase;
 
 
-    // Save for the next page/request
     localStorage.setItem(
         "coinPurchaseId",
-        purchaseId
+        String(
+            purchaseId
+        )
     );
 
 
@@ -539,17 +656,12 @@ async function loadPurchase() {
             getToken();
 
 
-        // =============================================
-        // FIRST: CHECK PURCHASE ID
-        // =============================================
-
         purchaseId =
             getPurchaseId();
 
 
         // =============================================
-        // IF NO PURCHASE ID
-        // CREATE ONE FROM PACKAGE ID
+        // CREATE PURCHASE IF NEEDED
         // =============================================
 
         if (!purchaseId) {
@@ -576,7 +688,7 @@ async function loadPurchase() {
 
 
         // =============================================
-        // IF PURCHASE EXISTS, LOAD IT
+        // LOAD EXISTING PURCHASE
         // =============================================
 
         if (!purchase) {
@@ -640,7 +752,7 @@ async function loadPurchase() {
 
 
         // =============================================
-        // SAVE PURCHASE ID
+        // SAVE ID
         // =============================================
 
         purchaseId =
@@ -662,7 +774,25 @@ async function loadPurchase() {
 
 
         // =============================================
-        // SHOW PURCHASE
+        // CHECK STATUS
+        // =============================================
+
+        if (
+            purchase.status !==
+            "pending"
+        ) {
+
+            paymentMessage.innerText =
+                `This purchase is already ${purchase.status}.`;
+
+            continueButton.disabled =
+                true;
+
+        }
+
+
+        // =============================================
+        // RENDER
         // =============================================
 
         renderPurchase();
@@ -676,8 +806,15 @@ async function loadPurchase() {
             "block";
 
 
-        paymentMessage.innerText =
-            "Ready to continue.";
+        if (
+            purchase.status ===
+            "pending"
+        ) {
+
+            paymentMessage.innerText =
+                "Enter your card details to continue.";
+
+        }
 
 
     } catch (error) {
@@ -795,6 +932,431 @@ function renderPurchase() {
 
 
 // =====================================================
+// CLEAN CARD NUMBER
+// =====================================================
+
+function getCleanCardNumber() {
+
+    return String(
+        cardNumberInput.value ||
+        ""
+    )
+    .replace(
+        /\s+/g,
+        ""
+    )
+    .trim();
+
+}
+
+
+// =====================================================
+// VALIDATE CARD
+// =====================================================
+
+function validateCard() {
+
+    const cardNumber =
+        getCleanCardNumber();
+
+
+    const expiryMonth =
+        String(
+            expiryMonthInput.value ||
+            ""
+        ).trim();
+
+
+    const expiryYear =
+        String(
+            expiryYearInput.value ||
+            ""
+        ).trim();
+
+
+    const cvv =
+        String(
+            cvvInput.value ||
+            ""
+        ).trim();
+
+
+    if (
+        !/^\d{12,19}$/.test(
+            cardNumber
+        )
+    ) {
+
+        throw new Error(
+            "Please enter a valid card number."
+        );
+
+    }
+
+
+    if (
+        !/^\d{1,2}$/.test(
+            expiryMonth
+        )
+    ) {
+
+        throw new Error(
+            "Please enter a valid expiry month."
+        );
+
+    }
+
+
+    const month =
+        Number(
+            expiryMonth
+        );
+
+
+    if (
+        month < 1 ||
+        month > 12
+    ) {
+
+        throw new Error(
+            "Expiry month must be between 01 and 12."
+        );
+
+    }
+
+
+    if (
+        !/^\d{2,4}$/.test(
+            expiryYear
+        )
+    ) {
+
+        throw new Error(
+            "Please enter a valid expiry year."
+        );
+
+    }
+
+
+    if (
+        !/^\d{3,4}$/.test(
+            cvv
+        )
+    ) {
+
+        throw new Error(
+            "Please enter a valid CVV."
+        );
+
+    }
+
+
+    return {
+
+        number:
+            cardNumber,
+
+        expiryMonth:
+            expiryMonth.padStart(
+                2,
+                "0"
+            ),
+
+        expiryYear,
+
+        cvv
+
+    };
+
+}
+
+
+// =====================================================
+// CREATE PAYMENT METHOD
+// =====================================================
+
+async function createPaymentMethod() {
+
+    const token =
+        getToken();
+
+
+    const card =
+        validateCard();
+
+
+    paymentMessage.innerText =
+        "Securing your card information...";
+
+
+    const response =
+        await fetch(
+
+            `/api/coin-purchases/${encodeURIComponent(
+                purchaseId
+            )}/payment-method`,
+
+            {
+
+                method:
+                    "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json",
+
+                    "Authorization":
+                        `Bearer ${token}`
+
+                },
+
+                body:
+                    JSON.stringify({
+
+                        card
+
+                    })
+
+            }
+
+        );
+
+
+    const data =
+        await response.json();
+
+
+    if (
+        !response.ok ||
+        !data.success
+    ) {
+
+        throw new Error(
+
+            data.message ||
+            "Failed to create Flutterwave payment method."
+
+        );
+
+    }
+
+
+    if (
+        !data.paymentMethod ||
+        !data.paymentMethod.id
+    ) {
+
+        throw new Error(
+            "Flutterwave payment method ID was not returned."
+        );
+
+    }
+
+
+    return data.paymentMethod;
+
+}
+
+
+// =====================================================
+// INITIALIZE PAYMENT
+// =====================================================
+
+async function initializePayment(
+    paymentMethodId
+) {
+
+    const token =
+        getToken();
+
+
+    if (!paymentMethodId) {
+
+        throw new Error(
+            "Payment method ID is missing."
+        );
+
+    }
+
+
+    paymentMessage.innerText =
+        "Preparing Flutterwave payment...";
+
+
+    const response =
+        await fetch(
+
+            `/api/coin-purchases/${encodeURIComponent(
+                purchaseId
+            )}/initialize-payment`,
+
+            {
+
+                method:
+                    "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json",
+
+                    "Authorization":
+                        `Bearer ${token}`
+
+                },
+
+                body:
+                    JSON.stringify({
+
+                        paymentMethodId
+
+                    })
+
+            }
+
+        );
+
+
+    const data =
+        await response.json();
+
+
+    if (
+        !response.ok ||
+        !data.success
+    ) {
+
+        throw new Error(
+
+            data.message ||
+            "Failed to initialize Flutterwave payment."
+
+        );
+
+    }
+
+
+    if (!data.payment) {
+
+        throw new Error(
+            "Flutterwave payment response is missing."
+        );
+
+    }
+
+
+    return data.payment;
+
+}
+
+
+// =====================================================
+// OPEN FLUTTERWAVE AUTHORIZATION
+// =====================================================
+
+function openFlutterwaveAuthorization(
+    payment
+) {
+
+    const checkoutUrl =
+        payment.checkoutUrl ||
+        payment.paymentUrl ||
+        payment.link;
+
+
+    // =============================================
+    // REDIRECT AUTHORIZATION
+    // =============================================
+
+    if (checkoutUrl) {
+
+        paymentMessage.innerText =
+            "Opening Flutterwave authorization...";
+
+
+        window.location.href =
+            checkoutUrl;
+
+
+        return true;
+
+    }
+
+
+    // =============================================
+    // NEXT ACTION REDIRECT
+    // =============================================
+
+    const nextAction =
+        payment.nextAction;
+
+
+    if (
+        nextAction &&
+        nextAction.type ===
+        "redirect_url"
+    ) {
+
+        const redirectUrl =
+            nextAction
+                ?.redirect_url
+                ?.url;
+
+
+        if (redirectUrl) {
+
+            paymentMessage.innerText =
+                "Opening Flutterwave authorization...";
+
+
+            window.location.href =
+                redirectUrl;
+
+
+            return true;
+
+        }
+
+    }
+
+
+    // =============================================
+    // AUTHORIZATION REQUIRED
+    // =============================================
+
+    if (
+        nextAction &&
+        nextAction.type ===
+        "authorize"
+    ) {
+
+        const authType =
+            nextAction
+                ?.authorization
+                ?.type ||
+            "authorization";
+
+
+        paymentMessage.innerText =
+            `Flutterwave requires ${authType} authorization. Please follow the authorization instructions.`;
+
+
+        throw new Error(
+
+            `Flutterwave requires ${authType} authorization. Please continue with the authorization step.`
+
+        );
+
+    }
+
+
+    return false;
+
+}
+
+
+// =====================================================
 // CONTINUE PAYMENT
 // =====================================================
 
@@ -802,9 +1364,24 @@ continueButton.addEventListener(
     "click",
     async function () {
 
+        if (
+            processingPayment
+        ) {
+
+            return;
+
+        }
+
+
         try {
 
-            continueButton.disabled = true;
+            processingPayment =
+                true;
+
+
+            continueButton.disabled =
+                true;
+
 
             continueButton.innerHTML = `
 
@@ -815,20 +1392,8 @@ continueButton.addEventListener(
             `;
 
 
-            paymentMessage.innerText =
-                "Preparing Flutterwave payment...";
-
-
             // =========================================
-            // TOKEN
-            // =========================================
-
-            const token =
-                getToken();
-
-
-            // =========================================
-            // PURCHASE CHECK
+            // CHECK PURCHASE
             // =========================================
 
             if (!purchaseId) {
@@ -840,164 +1405,58 @@ continueButton.addEventListener(
             }
 
 
-            // =========================================
-            // INITIALIZE FLUTTERWAVE PAYMENT
-            // =========================================
-            //
-            // IMPORTANT:
-            //
-            // Ba mu tura paymentMethodId ba.
-            //
-            // Backend zai ƙirƙiri Flutterwave
-            // Hosted Checkout ya dawo mana da link.
-            //
-            // =========================================
-
-            const response =
-                await fetch(
-
-                    `/api/coin-purchases/${encodeURIComponent(
-                        purchaseId
-                    )}/initialize-payment`,
-
-                    {
-
-                        method:
-                            "POST",
-
-                        headers: {
-
-                            "Content-Type":
-                                "application/json",
-
-                            "Authorization":
-                                `Bearer ${token}`
-
-                        },
-
-                        body:
-                            JSON.stringify({})
-
-                    }
-
-                );
-
-
-            // =========================================
-            // READ RESPONSE
-            // =========================================
-
-            const data =
-                await response.json();
-
-
             if (
-                !response.ok ||
-                !data.success
+                !purchase ||
+                purchase.status !==
+                "pending"
             ) {
 
                 throw new Error(
-
-                    data.message ||
-                    "Failed to initialize Flutterwave payment."
-
+                    "This purchase is no longer pending."
                 );
 
             }
 
 
             // =========================================
-            // PAYMENT RESPONSE
+            // CREATE PAYMENT METHOD
+            // =========================================
+
+            const paymentMethod =
+                await createPaymentMethod();
+
+
+            // =========================================
+            // INITIALIZE CHARGE
             // =========================================
 
             const payment =
-                data.payment;
+                await initializePayment(
+
+                    paymentMethod.id
+
+                );
 
 
-            if (!payment) {
+            // =========================================
+            // OPEN FLUTTERWAVE
+            // =========================================
+
+            const opened =
+                openFlutterwaveAuthorization(
+                    payment
+                );
+
+
+            if (!opened) {
 
                 throw new Error(
-                    "Flutterwave payment response is missing."
+
+                    "Flutterwave did not return an authorization URL."
+
                 );
 
             }
-
-
-            // =========================================
-            // GET CHECKOUT URL
-            // =========================================
-
-            const checkoutUrl =
-                payment.checkoutUrl ||
-                payment.paymentUrl ||
-                payment.link;
-
-
-            // =========================================
-            // REDIRECT TO FLUTTERWAVE
-            // =========================================
-
-            if (checkoutUrl) {
-
-                paymentMessage.innerText =
-                    "Opening Flutterwave...";
-
-
-                window.location.href =
-                    checkoutUrl;
-
-
-                return;
-
-            }
-
-
-            // =========================================
-            // FALLBACK: NEXT ACTION
-            // =========================================
-
-            const nextAction =
-                payment.nextAction;
-
-
-            if (
-                nextAction &&
-                nextAction.type ===
-                    "redirect_url"
-            ) {
-
-                const redirectUrl =
-                    nextAction
-                        ?.redirect_url
-                        ?.url;
-
-
-                if (redirectUrl) {
-
-                    paymentMessage.innerText =
-                        "Opening Flutterwave...";
-
-
-                    window.location.href =
-                        redirectUrl;
-
-
-                    return;
-
-                }
-
-            }
-
-
-            // =========================================
-            // NO CHECKOUT URL
-            // =========================================
-
-            throw new Error(
-
-                "Flutterwave did not return a checkout URL."
-
-            );
 
 
         } catch (error) {
@@ -1016,15 +1475,19 @@ continueButton.addEventListener(
             );
 
 
+            processingPayment =
+                false;
+
+
             continueButton.disabled =
                 false;
 
 
             continueButton.innerHTML = `
 
-                <i class="fa-solid fa-credit-card"></i>
+                <i class="fa-solid fa-lock"></i>
 
-                Continue to Payment
+                Pay Now
 
             `;
 
@@ -1033,7 +1496,103 @@ continueButton.addEventListener(
     }
 );
 
-    
+
+// =====================================================
+// CARD NUMBER FORMAT
+// =====================================================
+
+cardNumberInput.addEventListener(
+    "input",
+    function () {
+
+        let value =
+            this.value
+                .replace(
+                    /\D/g,
+                    ""
+                )
+                .substring(
+                    0,
+                    19
+                );
+
+
+        const groups =
+            value.match(
+                /.{1,4}/g
+            );
+
+
+        this.value =
+            groups
+                ? groups.join(" ")
+                : "";
+
+    }
+);
+
+
+// =====================================================
+// ONLY NUMBERS
+// =====================================================
+
+expiryMonthInput.addEventListener(
+    "input",
+    function () {
+
+        this.value =
+            this.value
+                .replace(
+                    /\D/g,
+                    ""
+                )
+                .substring(
+                    0,
+                    2
+                );
+
+    }
+);
+
+
+expiryYearInput.addEventListener(
+    "input",
+    function () {
+
+        this.value =
+            this.value
+                .replace(
+                    /\D/g,
+                    ""
+                )
+                .substring(
+                    0,
+                    4
+                );
+
+    }
+);
+
+
+cvvInput.addEventListener(
+    "input",
+    function () {
+
+        this.value =
+            this.value
+                .replace(
+                    /\D/g,
+                    ""
+                )
+                .substring(
+                    0,
+                    4
+                );
+
+    }
+);
+
+
 // =====================================================
 // SHOW ERROR
 // =====================================================
@@ -1065,6 +1624,7 @@ function showError(
         <button
             onclick="goBack()"
             class="back-error-btn"
+            type="button"
         >
 
             Go Back
@@ -1166,6 +1726,7 @@ loadPurchase();
 
 </script>
 
+
 </body>
 
-    </html>
+</html>
