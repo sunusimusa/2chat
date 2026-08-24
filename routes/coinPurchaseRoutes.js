@@ -4,13 +4,12 @@ const express =
 const router =
     express.Router();
 
-
 const protect =
     require("../middleware/auth");
 
-
 const {
     createCoinPurchase,
+    getCoinPurchase,
     initializeCoinPurchasePayment,
     createCoinPaymentMethod
 } =
@@ -24,7 +23,6 @@ const {
 // POST /api/coin-purchases
 //
 // User ya zaɓi package.
-// Wannan zai ƙirƙiri pending purchase.
 // =====================================================
 
 router.post(
@@ -35,13 +33,28 @@ router.post(
 
 
 // =====================================================
+// GET COIN PURCHASE
+// =====================================================
+//
+// GET /api/coin-purchases/:id
+//
+// coinPayment.html yana amfani da wannan.
+// =====================================================
+
+router.get(
+    "/:id",
+    protect,
+    getCoinPurchase
+);
+
+
+// =====================================================
 // INITIALIZE FLUTTERWAVE PAYMENT
 // =====================================================
 //
 // POST /api/coin-purchases/:id/initialize-payment
 //
-// Wannan zai fara payment bayan an shirya payment
-// method.
+// Wannan shi zai fara Flutterwave payment.
 // =====================================================
 
 router.post(
@@ -52,12 +65,11 @@ router.post(
 
 
 // =====================================================
-// CREATE FLUTTERWAVE PAYMENT METHOD
+// CREATE PAYMENT METHOD
 // =====================================================
 //
-// POST /api/coin-purchases/:id/payment-method
-//
-// Wannan endpoint ne na secure payment-method step.
+// Wannan endpoint za mu iya barinsa idan service ɗinmu
+// yana buƙatar shi a wasu payment flows.
 // =====================================================
 
 router.post(
