@@ -4,18 +4,17 @@
  * COIN PURCHASE CREDIT SERVICE
  * =====================================================
  *
- * Wannan service ne kawai zai:
+ * Wannan service:
  *
- * - tabbatar da payment result
- * - ƙara coins cikin Wallet
- * - ƙara totalPurchased
- * - sanya purchase = paid
- * - hana double credit
+ * - yana tabbatar da payment result
+ * - yana hana double credit
+ * - yana ƙirƙirar Wallet ga legacy user idan babu
+ * - yana ƙara coins
+ * - yana ƙara totalPurchased
+ * - yana canza purchase zuwa paid
  *
- * 100 Coins = ₦100
- *
- * Legacy user:
- * Idan Wallet babu, za a ƙirƙira masa.
+ * BA ya ƙara wallet.balance saboda Wallet schema
+ * ɗinka ba shi da balance.
  * =====================================================
  */
 
@@ -30,22 +29,26 @@ const Wallet =
 
 
 // =====================================================
-// SUCCESSFUL PAYMENT STATUSES
+// SUCCESS STATUSES
 // =====================================================
 
-const SUCCESSFUL_STATUSES = [
+const SUCCESS_STATUSES = [
 
     "successful",
+
     "succeeded",
+
     "success",
+
     "completed",
+
     "paid"
 
 ];
 
 
 // =====================================================
-// CREDIT COIN PURCHASE
+// CREDIT COINS
 // =====================================================
 
 async function creditCoinPurchase(
@@ -54,19 +57,15 @@ async function creditCoinPurchase(
 ) {
 
     if (!purchaseId) {
-
         throw new Error(
             "Purchase ID is required."
         );
-
     }
 
     if (!verifiedPayment) {
-
         throw new Error(
             "Verified payment is required."
         );
-
     }
 
     const session =
@@ -80,26 +79,27 @@ async function creditCoinPurchase(
             async () => {
 
                 // =====================================
-                // FIND PURCHASE
+                // PURCHASE
                 // =====================================
 
                 const purchase =
-                    await CoinPurchase.findById(
-                        purchaseId
-                    )
-                    .session(session);
+                    await CoinPurchase
+                        .findById(
+                            purchaseId
+                        )
+                        .session(
+                            session
+                        );
 
                 if (!purchase) {
-
                     throw new Error(
                         "Coin purchase order not found."
                     );
-
                 }
 
 
                 // =====================================
-                // ALREADY CREDITED
+                // DOUBLE CREDIT PROTECTION
                 // =====================================
 
                 if (
@@ -116,37 +116,41 @@ async function creditCoinPurchase(
 
                         wallet:
                             null
-
                     };
 
                     return;
-
                 }
 
 
                 // =====================================
-                // VERIFY REFERENCE
+                // REFERENCE
                 // =====================================
 
-                if (
+                const providerReference =
                     String(
                         verifiedPayment.reference ||
                         ""
-                    ) !==
+                    ).trim();
+
+                const purchaseReference =
                     String(
-                        purchase.reference
-                    )
+                        purchase.reference ||
+                        ""
+                    ).trim();
+
+                if (
+                    providerReference !==
+                    purchaseReference
                 ) {
 
                     throw new Error(
                         "Payment reference does not match purchase."
                     );
-
                 }
 
 
                 // =====================================
-                // VERIFY AMOUNT
+                // AMOUNT
                 // =====================================
 
                 const expectedAmount =
@@ -170,12 +174,11 @@ async function creditCoinPurchase(
                     throw new Error(
                         "Payment amount does not match purchase amount."
                     );
-
                 }
 
 
                 // =====================================
-                // VERIFY CURRENCY
+                // CURRENCY
                 // =====================================
 
                 const expectedCurrency =
@@ -198,48 +201,48 @@ async function creditCoinPurchase(
                     throw new Error(
                         "Payment currency does not match purchase currency."
                     );
-
                 }
 
 
                 // =====================================
-                // VERIFY STATUS
+                // PAYMENT STATUS
                 // =====================================
 
-                const paymentStatus =
+                const providerStatus =
                     String(
                         verifiedPayment.status ||
                         ""
                     ).toLowerCase();
 
                 if (
-                    !SUCCESSFUL_STATUSES.includes(
-                        paymentStatus
+                    !SUCCESS_STATUSES.includes(
+                        providerStatus
                     )
                 ) {
 
                     throw new Error(
-                        `Payment is not successful. Current status: ${paymentStatus}`
+                        `Payment is not successful. Current status: ${providerStatus || "unknown"}`
                     );
-
                 }
 
 
                 // =====================================
-                // FIND WALLET
+                // WALLET
                 // =====================================
 
                 let wallet =
-                    await Wallet.findOne({
-                        userId:
-                            purchase.userId
-                    })
-                    .session(session);
+                    await Wallet
+                        .findOne({
+                            userId:
+                                purchase.userId
+                        })
+                        .session(
+                            session
+                        );
 
 
                 // =====================================
                 // LEGACY USER
-                // CREATE WALLET
                 // =====================================
 
                 if (!wallet) {
@@ -248,7 +251,6 @@ async function creditCoinPurchase(
                         await Wallet.create(
                             [
                                 {
-
                                     userId:
                                         purchase.userId,
 
@@ -256,8 +258,31 @@ async function creditCoinPurchase(
                                         0,
 
                                     totalPurchased:
-                                        0
+                                        0,
 
+                                    totalSpent:
+                                        0,
+
+                                    totalEarned:
+                                        0,
+
+                                    platformCommission:
+                                        0,
+
+                                    availableBalance:
+                                        0,
+
+                                    withdrawalLockedBalance:
+                                        0,
+
+                                    totalWithdrawn:
+                                        0,
+
+                                    giftsSent:
+                                        0,
+
+                                    giftsReceived:
+                                        0
                                 }
                             ],
                             {
@@ -267,28 +292,6 @@ async function creditCoinPurchase(
 
                     wallet =
                         created[0];
-
-                }
-
-
-                // =====================================
-                // COINS
-                // =====================================
-
-                const coins =
-                    Number(
-                        purchase.coins
-                    );
-
-                if (
-                    !Number.isFinite(coins) ||
-                    coins <= 0
-                ) {
-
-                    throw new Error(
-                        "Invalid purchase coin amount."
-                    );
-
                 }
 
 
@@ -300,18 +303,22 @@ async function creditCoinPurchase(
                     Number(
                         wallet.coins || 0
                     ) +
-                    coins;
+                    Number(
+                        purchase.coins
+                    );
 
 
                 // =====================================
-                // ADD TOTAL PURCHASED
+                // TOTAL PURCHASED
                 // =====================================
 
                 wallet.totalPurchased =
                     Number(
                         wallet.totalPurchased || 0
                     ) +
-                    coins;
+                    Number(
+                        purchase.coins
+                    );
 
 
                 await wallet.save({
@@ -327,11 +334,7 @@ async function creditCoinPurchase(
                     "paid";
 
                 purchase.providerStatus =
-                    paymentStatus;
-
-                purchase.paymentReference =
-                    purchase.paymentReference ||
-                    verifiedPayment.reference;
+                    providerStatus;
 
                 purchase.paymentCompletedAt =
                     purchase.paymentCompletedAt ||
@@ -340,10 +343,15 @@ async function creditCoinPurchase(
                 purchase.paymentVerifiedAt =
                     new Date();
 
+                purchase.coinsCredited =
+                    true;
 
-                // =====================================
-                // SAVE CHARGE ID
-                // =====================================
+                purchase.coinsCreditedAt =
+                    new Date();
+
+                purchase.webhookReceived =
+                    purchase.webhookReceived ||
+                    false;
 
                 if (
                     verifiedPayment.id
@@ -353,19 +361,17 @@ async function creditCoinPurchase(
                         String(
                             verifiedPayment.id
                         );
-
                 }
 
+                if (
+                    verifiedPayment.customerId
+                ) {
 
-                // =====================================
-                // CREDIT FLAG
-                // =====================================
-
-                purchase.coinsCredited =
-                    true;
-
-                purchase.coinsCreditedAt =
-                    new Date();
+                    purchase.flutterwaveCustomerId =
+                        String(
+                            verifiedPayment.customerId
+                        );
+                }
 
 
                 await purchase.save({
@@ -385,9 +391,7 @@ async function creditCoinPurchase(
                     purchase,
 
                     wallet
-
                 };
-
             }
         );
 
@@ -399,7 +403,6 @@ async function creditCoinPurchase(
         await session.endSession();
 
     }
-
 }
 
 
@@ -408,7 +411,5 @@ async function creditCoinPurchase(
 // =====================================================
 
 module.exports = {
-
     creditCoinPurchase
-
 };
