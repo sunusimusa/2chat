@@ -1,5 +1,9 @@
+const express =
+    require("express");
+
 const router =
-    require("express").Router();
+    express.Router();
+
 
 const protect =
     require("../middleware/auth");
@@ -14,7 +18,13 @@ const {
 
 
 // =====================================================
-// CREATE COIN PURCHASE ORDER
+// CREATE COIN PURCHASE
+// =====================================================
+//
+// POST /api/coin-purchases
+//
+// User ya zaɓi package.
+// Wannan zai ƙirƙiri pending purchase.
 // =====================================================
 
 router.post(
@@ -25,7 +35,13 @@ router.post(
 
 
 // =====================================================
-// INITIALIZE PAYMENT
+// INITIALIZE FLUTTERWAVE PAYMENT
+// =====================================================
+//
+// POST /api/coin-purchases/:id/initialize-payment
+//
+// Wannan zai fara payment bayan an shirya payment
+// method.
 // =====================================================
 
 router.post(
@@ -35,10 +51,19 @@ router.post(
 );
 
 
+// =====================================================
+// CREATE FLUTTERWAVE PAYMENT METHOD
+// =====================================================
+//
+// POST /api/coin-purchases/:id/payment-method
+//
+// Wannan endpoint ne na secure payment-method step.
+// =====================================================
+
 router.post(
-"/:id/payment-method",
-protect,
-createCoinPaymentMethod
+    "/:id/payment-method",
+    protect,
+    createCoinPaymentMethod
 );
 
 
