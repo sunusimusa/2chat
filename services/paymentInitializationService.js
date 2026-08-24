@@ -1,22 +1,7 @@
 /**
  * =====================================================
  * 2CHAT
- * FLUTTERWAVE PAYMENT INITIALIZATION SERVICE
- * =====================================================
- *
- * Wannan service:
- * - yana samun Flutterwave access token
- * - yana ƙirƙirar customer
- * - yana ƙirƙirar payment method
- * - yana ƙirƙirar charge
- *
- * BA ya:
- * - ƙara coins
- * - canza Wallet
- * - sanya purchase paid
- *
- * Webhook + verification + credit service ne
- * za su kammala payment.
+ * FLUTTERWAVE LIVE V4 PAYMENT INITIALIZATION SERVICE
  * =====================================================
  */
 
@@ -29,16 +14,11 @@ const FLUTTERWAVE_TOKEN_URL =
 
 
 // =====================================================
-// ACCESS TOKEN CACHE
+// ACCESS TOKEN
 // =====================================================
 
 let cachedAccessToken = null;
 let tokenExpiresAt = 0;
-
-
-// =====================================================
-// GET FLUTTERWAVE ACCESS TOKEN
-// =====================================================
 
 async function getFlutterwaveAccessToken() {
 
@@ -166,7 +146,7 @@ function generateIdempotencyKey() {
 
 
 // =====================================================
-// CREATE FLUTTERWAVE CUSTOMER
+// CREATE CUSTOMER
 // =====================================================
 
 async function createFlutterwaveCustomer({
@@ -212,31 +192,23 @@ async function createFlutterwaveCustomer({
         parts[0] || "2Chat";
 
     const lastName =
-        parts
-            .slice(1)
-            .join(" ") || "User";
+        parts.slice(1).join(" ") ||
+        "User";
 
     const payload = {
 
         name: {
-
-            first:
-                firstName,
-
-            last:
-                lastName
-
+            first: firstName,
+            last: lastName
         },
 
         email
-
     };
 
     const response =
         await fetch(
             `${FLUTTERWAVE_BASE_URL}/customers`,
             {
-
                 method: "POST",
 
                 headers: {
@@ -256,10 +228,7 @@ async function createFlutterwaveCustomer({
                 },
 
                 body:
-                    JSON.stringify(
-                        payload
-                    )
-
+                    JSON.stringify(payload)
             }
         );
 
@@ -292,13 +261,8 @@ async function createFlutterwaveCustomer({
     }
 
     return {
-
-        id:
-            customer.id,
-
-        raw:
-            data
-
+        id: customer.id,
+        raw: data
     };
 }
 
@@ -332,33 +296,26 @@ async function createFlutterwavePaymentMethod({
     }
 
     const requiredFields = [
-
         "encrypted_card_number",
         "encrypted_expiry_month",
         "encrypted_expiry_year",
         "encrypted_cvv",
         "nonce"
-
     ];
 
-    for (
-        const field of requiredFields
-    ) {
+    for (const field of requiredFields) {
 
         if (!card[field]) {
 
             throw new Error(
                 `Missing encrypted card field: ${field}`
             );
-
         }
-
     }
 
     const payload = {
 
-        type:
-            "card",
+        type: "card",
 
         customer_id:
             customerId,
@@ -379,9 +336,7 @@ async function createFlutterwavePaymentMethod({
 
             nonce:
                 card.nonce
-
         }
-
     };
 
     const response =
@@ -404,14 +359,10 @@ async function createFlutterwavePaymentMethod({
 
                     "X-Idempotency-Key":
                         generateIdempotencyKey()
-
                 },
 
                 body:
-                    JSON.stringify(
-                        payload
-                    )
-
+                    JSON.stringify(payload)
             }
         );
 
@@ -456,13 +407,12 @@ async function createFlutterwavePaymentMethod({
 
         raw:
             data
-
     };
 }
 
 
 // =====================================================
-// CREATE PAYMENT METHOD
+// CREATE PAYMENT METHOD WRAPPER
 // =====================================================
 
 async function createPaymentMethod({
@@ -470,16 +420,25 @@ async function createPaymentMethod({
     card
 }) {
 
+    if (!user) {
+        throw new Error(
+            "User is required."
+        );
+    }
+
+    if (!card) {
+        throw new Error(
+            "Card payment data is required."
+        );
+    }
+
     const accessToken =
         await getFlutterwaveAccessToken();
 
     const customer =
         await createFlutterwaveCustomer({
-
             accessToken,
-
             user
-
         });
 
     const paymentMethod =
@@ -491,7 +450,6 @@ async function createPaymentMethod({
                 customer.id,
 
             card
-
         });
 
     return {
@@ -510,22 +468,19 @@ async function createPaymentMethod({
 
         raw:
             paymentMethod.raw
-
     };
 }
 
 
 // =====================================================
-// CREATE FLUTTERWAVE CHARGE
+// CREATE CHARGE
 // =====================================================
 
 async function createFlutterwaveCharge({
-
     accessToken,
     purchase,
     customerId,
     paymentMethodId
-
 }) {
 
     if (!accessToken) {
@@ -553,9 +508,7 @@ async function createFlutterwaveCharge({
     }
 
     const amount =
-        Number(
-            purchase.amount
-        );
+        Number(purchase.amount);
 
     if (
         !Number.isFinite(amount) ||
@@ -594,7 +547,7 @@ async function createFlutterwaveCharge({
         process.env.FLW_REDIRECT_URL ||
         (
             appUrl
-                ? `${appUrl}/coin-payment-success.html`
+                ? `${appUrl}/coinPayment.html`
                 : null
         );
 
@@ -642,9 +595,7 @@ async function createFlutterwaveCharge({
                 Number(
                     purchase.coins
                 )
-
         }
-
     };
 
     const response =
@@ -667,14 +618,10 @@ async function createFlutterwaveCharge({
 
                     "X-Idempotency-Key":
                         generateIdempotencyKey()
-
                 },
 
                 body:
-                    JSON.stringify(
-                        payload
-                    )
-
+                    JSON.stringify(payload)
             }
         );
 
@@ -718,14 +665,12 @@ async function createFlutterwaveCharge({
                 ?.redirect_url
                 ?.url ||
             null;
-
     }
 
     return {
 
         chargeId:
-            charge?.id ||
-            null,
+            charge?.id || null,
 
         paymentUrl,
 
@@ -742,7 +687,6 @@ async function createFlutterwaveCharge({
 
         raw:
             data
-
     };
 }
 
@@ -752,11 +696,9 @@ async function createFlutterwaveCharge({
 // =====================================================
 
 async function initializePayment({
-
     purchase,
     user,
     paymentMethodId
-
 }) {
 
     if (!purchase) {
@@ -786,15 +728,12 @@ async function initializePayment({
         );
     }
 
+    const amount =
+        Number(purchase.amount);
+
     if (
-        !Number.isFinite(
-            Number(
-                purchase.amount
-            )
-        ) ||
-        Number(
-            purchase.amount
-        ) <= 0
+        !Number.isFinite(amount) ||
+        amount <= 0
     ) {
         throw new Error(
             "Invalid purchase amount."
@@ -812,8 +751,9 @@ async function initializePayment({
         purchase.flutterwavePaymentMethodId;
 
     if (!finalPaymentMethodId) {
+
         throw new Error(
-            "Flutterwave payment method ID is required."
+            "Flutterwave payment method ID is required. Create the payment method first."
         );
     }
 
@@ -831,12 +771,10 @@ async function initializePayment({
                 accessToken,
 
                 user
-
             });
 
         customerId =
             customer.id;
-
     }
 
     const charge =
@@ -850,13 +788,11 @@ async function initializePayment({
 
             paymentMethodId:
                 finalPaymentMethodId
-
         });
 
     return {
 
-        success:
-            true,
+        success: true,
 
         provider:
             "flutterwave",
@@ -864,14 +800,13 @@ async function initializePayment({
         reference:
             purchase.reference,
 
-        amount:
-            Number(
-                purchase.amount
-            ),
+        amount,
 
         currency:
-            purchase.currency ||
-            "NGN",
+            String(
+                purchase.currency ||
+                "NGN"
+            ).toUpperCase(),
 
         email:
             user.email,
@@ -895,7 +830,6 @@ async function initializePayment({
 
         status:
             charge.status
-
     };
 }
 
@@ -917,5 +851,4 @@ module.exports = {
     createFlutterwavePaymentMethod,
 
     createFlutterwaveCharge
-
 };
