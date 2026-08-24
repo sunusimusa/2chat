@@ -9,20 +9,15 @@ const protect =
 
 const {
     createCoinPurchase,
-    getCoinPurchase,
     initializeCoinPurchasePayment,
-    createCoinPaymentMethod
+    createCoinPaymentMethod,
+    getCoinPurchase
 } =
     require("../controllers/coinPurchaseController");
 
 
 // =====================================================
-// CREATE COIN PURCHASE
-// =====================================================
-//
-// POST /api/coin-purchases
-//
-// User ya zaɓi package.
+// CREATE PURCHASE
 // =====================================================
 
 router.post(
@@ -33,12 +28,7 @@ router.post(
 
 
 // =====================================================
-// GET COIN PURCHASE
-// =====================================================
-//
-// GET /api/coin-purchases/:id
-//
-// coinPayment.html yana amfani da wannan.
+// GET PURCHASE
 // =====================================================
 
 router.get(
@@ -49,27 +39,7 @@ router.get(
 
 
 // =====================================================
-// INITIALIZE FLUTTERWAVE PAYMENT
-// =====================================================
-//
-// POST /api/coin-purchases/:id/initialize-payment
-//
-// Wannan shi zai fara Flutterwave payment.
-// =====================================================
-
-router.post(
-    "/:id/initialize-payment",
-    protect,
-    initializeCoinPurchasePayment
-);
-
-
-// =====================================================
 // CREATE PAYMENT METHOD
-// =====================================================
-//
-// Wannan endpoint za mu iya barinsa idan service ɗinmu
-// yana buƙatar shi a wasu payment flows.
 // =====================================================
 
 router.post(
@@ -80,8 +50,15 @@ router.post(
 
 
 // =====================================================
-// EXPORT
+// INITIALIZE PAYMENT
 // =====================================================
+
+router.post(
+    "/:id/initialize-payment",
+    protect,
+    initializeCoinPurchasePayment
+);
+
 
 module.exports =
     router;
