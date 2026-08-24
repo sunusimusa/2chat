@@ -875,3 +875,168 @@ async (
     }
 
 };
+
+// =====================================================
+// GET COIN PURCHASE
+// =====================================================
+
+exports.getCoinPurchase = async (
+    req,
+    res
+) => {
+
+    try {
+
+        const {
+            id
+        } = req.params;
+
+
+        // =========================================
+        // PURCHASE ID
+        // =========================================
+
+        if (!id) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Purchase ID is required."
+
+            });
+
+        }
+
+
+        // =========================================
+        // FIND PURCHASE
+        // =========================================
+
+        const purchase =
+            await CoinPurchase.findById(id);
+
+
+        if (!purchase) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Coin purchase order not found."
+
+            });
+
+        }
+
+
+        // =========================================
+        // OWNERSHIP CHECK
+        // =========================================
+
+        if (
+            String(
+                purchase.userId
+            ) !==
+            String(
+                req.user._id
+            )
+        ) {
+
+            return res.status(403).json({
+
+                success: false,
+
+                message:
+                    "You are not allowed to access this purchase."
+
+            });
+
+        }
+
+
+        // =========================================
+        // RESPONSE
+        // =========================================
+
+        return res.json({
+
+            success: true,
+
+            purchase: {
+
+                id:
+                    purchase._id,
+
+                reference:
+                    purchase.reference,
+
+                packageId:
+                    purchase.packageId,
+
+                coins:
+                    purchase.coins,
+
+                amount:
+                    purchase.amount,
+
+                currency:
+                    purchase.currency,
+
+                paymentProvider:
+                    purchase.paymentProvider,
+
+                paymentReference:
+                    purchase.paymentReference,
+
+                paymentUrl:
+                    purchase.paymentUrl,
+
+                status:
+                    purchase.status,
+
+                providerStatus:
+                    purchase.providerStatus,
+
+                paymentInitializedAt:
+                    purchase.paymentInitializedAt,
+
+                paymentCompletedAt:
+                    purchase.paymentCompletedAt,
+
+                paymentVerifiedAt:
+                    purchase.paymentVerifiedAt,
+
+                createdAt:
+                    purchase.createdAt,
+
+                updatedAt:
+                    purchase.updatedAt
+
+            }
+
+        });
+
+
+    } catch (err) {
+
+        console.error(
+            "GET COIN PURCHASE ERROR:",
+            err
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Failed to load coin purchase."
+
+        });
+
+    }
+
+};
