@@ -1,28 +1,37 @@
+/**
+ * =====================================================
+ * 2CHAT
+ * FLUTTERWAVE PAYMENT VERIFICATION SERVICE
+ * =====================================================
+ *
+ * Wannan service yana:
+ * - karɓar charge ID
+ * - zuwa Flutterwave
+ * - tabbatar da payment
+ * - dawo da reference/amount/currency/status
+ *
+ * BA ya ƙara coins.
+ * BA ya canza Wallet.
+ * =====================================================
+ */
+
 const {
-    getCharge
-} = require("./flutterwaveService");
+    getFlutterwaveAccessToken
+} = require("./paymentInitializationService");
+
+
+const FLUTTERWAVE_BASE_URL =
+    process.env.FLW_BASE_URL ||
+    "https://f4bexperience.flutterwave.com";
 
 
 // =====================================================
 // VERIFY FLUTTERWAVE CHARGE
 // =====================================================
-//
-// IMPORTANT:
-//
-// - Wannan service verification kawai yake yi.
-// - Ba ya ƙara coins.
-// - Ba ya canza Wallet.
-// - Ba ya canza CoinPurchase zuwa paid.
-// - creditCoinPurchase() ne zai yi credit daga baya.
-// =====================================================
 
 async function verifyFlutterwaveCharge(
     chargeId
 ) {
-
-    // =================================================
-    // VALIDATION
-    // =================================================
 
     if (!chargeId) {
 
@@ -32,100 +41,88 @@ async function verifyFlutterwaveCharge(
 
     }
 
-
-    // =================================================
-    // GET CHARGE FROM FLUTTERWAVE
-    // =================================================
+    const accessToken =
+        await getFlutterwaveAccessToken();
 
     const response =
-        await getCharge(
-            chargeId
+        await fetch(
+            `${FLUTTERWAVE_BASE_URL}/charges/${encodeURIComponent(chargeId)}`,
+            {
+
+                method:
+                    "GET",
+
+                headers: {
+
+                    "Authorization":
+                        `Bearer ${accessToken}`,
+
+                    "Accept":
+                        "application/json"
+
+                }
+
+            }
         );
 
+    const data =
+        await response.json();
 
-    const charge =
-        response?.data;
+    if (!response.ok) {
 
-
-    if (!charge) {
+        console.error(
+            "FLUTTERWAVE VERIFY ERROR:",
+            data
+        );
 
         throw new Error(
-            "Flutterwave charge data was not returned."
+            data?.message ||
+            data?.error?.message ||
+            data?.error ||
+            "Failed to verify Flutterwave payment."
         );
 
     }
 
+    const charge =
+        data?.data;
 
-    // =================================================
-    // EXTRACT PAYMENT DATA
-    // =================================================
+    if (!charge) {
+
+        throw new Error(
+            "Flutterwave verification data is missing."
+        );
+
+    }
 
     const status =
         String(
             charge.status ||
             ""
-        )
-        .trim()
-        .toLowerCase();
-
+        ).toLowerCase();
 
     const reference =
         String(
             charge.reference ||
             ""
-        )
-        .trim();
-
+        ).trim();
 
     const amount =
         Number(
             charge.amount
         );
 
-
     const currency =
         String(
             charge.currency ||
             ""
-        )
-        .trim()
-        .toUpperCase();
-
-
-    // =================================================
-    // SUCCESS STATUS
-    // =================================================
-
-    const successfulStatuses = [
-
-        "successful",
-
-        "succeeded",
-
-        "success",
-
-        "completed",
-
-        "paid"
-
-    ];
-
-
-    const verified =
-        successfulStatuses.includes(
-            status
-        );
-
-
-    // =================================================
-    // RESULT
-    // =================================================
+        ).toUpperCase();
 
     return {
 
-        verified,
-
-        status,
+        id:
+            charge.id ||
+            chargeId,
 
         reference,
 
@@ -133,17 +130,169 @@ async function verifyFlutterwaveCharge(
 
         currency,
 
-        chargeId:
-            charge.id ||
-            chargeId,
+        status,
 
-        reason:
-            verified
-                ? null
-                : "Flutterwave payment is not successful.",
+        customerId:
+            charge.customer_id ||
+            charge.customer?.id ||
+            null,
 
         raw:
-            response
+            data
+
+    };
+
+}
+
+
+// =====================================================
+// CHECK SUCCESS STATUS
+// =====================================================
+
+function isSuccessfulFlutterwavePayment(
+    status
+) {
+
+    const successfulStatuses = [
+
+        "successful",
+        "succeeded",
+        "success",
+        "completed",
+        "paid"
+
+    ];
+
+    return successfulStatuses.includes(
+        String(
+            status || ""
+        ).toLowerCase()
+    );
+
+}
+
+
+// =====================================================
+// VERIFY AGAINST PURCHASE
+// =====================================================
+
+async function verifyPaymentForPurchase({
+    purchase,
+    chargeId
+}) {
+
+    if (!purchase) {
+
+        throw new Error(
+            "Purchase is required."
+        );
+
+    }
+
+    if (!chargeId) {
+
+        throw new Error(
+            "Charge ID is required."
+        );
+
+    }
+
+    const payment =
+        await verifyFlutterwaveCharge(
+            chargeId
+        );
+
+    if (
+        String(
+            payment.reference
+        ) !==
+        String(
+            purchase.reference
+        )
+    ) {
+
+        return {
+
+            verified:
+                false,
+
+            reason:
+                "Payment reference does not match purchase.",
+
+            payment
+
+        };
+
+    }
+
+    const expectedAmount =
+        Number(
+            purchase.amount
+        );
+
+    if (
+        !Number.isFinite(
+            payment.amount
+        ) ||
+        payment.amount !==
+        expectedAmount
+    ) {
+
+        return {
+
+            verified:
+                false,
+
+            reason:
+                "Payment amount does not match purchase amount.",
+
+            payment
+
+        };
+
+    }
+
+    const expectedCurrency =
+        String(
+            purchase.currency ||
+            "NGN"
+        ).toUpperCase();
+
+    if (
+        payment.currency !==
+        expectedCurrency
+    ) {
+
+        return {
+
+            verified:
+                false,
+
+            reason:
+                "Payment currency does not match purchase currency.",
+
+            payment
+
+        };
+
+    }
+
+    const successful =
+        isSuccessfulFlutterwavePayment(
+            payment.status
+        );
+
+    return {
+
+        verified:
+            successful,
+
+        reason:
+            successful
+                ? null
+                : "Flutterwave payment has not been successfully completed.",
+
+        payment
 
     };
 
@@ -156,6 +305,10 @@ async function verifyFlutterwaveCharge(
 
 module.exports = {
 
-    verifyFlutterwaveCharge
+    verifyFlutterwaveCharge,
+
+    verifyPaymentForPurchase,
+
+    isSuccessfulFlutterwavePayment
 
 };
