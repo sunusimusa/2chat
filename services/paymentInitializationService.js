@@ -1,37 +1,11 @@
 /**
  * =====================================================
  * 2CHAT
- * FLUTTERWAVE V4 PAYMENT INITIALIZATION SERVICE
- * =====================================================
- *
- * FLOW:
- *
- * Customer
- *    ↓
- * Payment Method
- *    ↓
- * Charge
- *    ↓
- * Authorization / 3DS
- *    ↓
- * Webhook
- *    ↓
- * Verification
- *
- * IMPORTANT:
- *
- * Card details MUST already be encrypted before they
- * reach this service.
- *
- * Required card fields:
- *
- * encrypted_card_number
- * encrypted_expiry_month
- * encrypted_expiry_year
- * encrypted_cvv
- * nonce
+ * FLUTTERWAVE LIVE V4 PAYMENT INITIALIZATION SERVICE
  * =====================================================
  */
+
+const crypto = require("crypto");
 
 
 // =====================================================
@@ -42,7 +16,6 @@ const FLUTTERWAVE_BASE_URL =
     process.env.FLW_BASE_URL ||
     "https://f4bexperience.flutterwave.com";
 
-
 const FLUTTERWAVE_TOKEN_URL =
     "https://idp.flutterwave.com/realms/flutterwave/protocol/openid-connect/token";
 
@@ -52,57 +25,43 @@ const FLUTTERWAVE_TOKEN_URL =
 // =====================================================
 
 let cachedAccessToken = null;
-
 let tokenExpiresAt = 0;
 
 
 // =====================================================
-// GET FLUTTERWAVE ACCESS TOKEN
+// GET ACCESS TOKEN
 // =====================================================
 
 async function getFlutterwaveAccessToken() {
 
-    const now =
-        Date.now();
-
-
-    // -----------------------------------------
-    // USE CACHED TOKEN
-    // -----------------------------------------
+    const now = Date.now();
 
     if (
         cachedAccessToken &&
         now < tokenExpiresAt - 60000
     ) {
-
         return cachedAccessToken;
-
     }
 
 
     const clientId =
         process.env.FLW_CLIENT_ID;
 
-
     const clientSecret =
         process.env.FLW_CLIENT_SECRET;
 
 
     if (!clientId) {
-
         throw new Error(
             "FLW_CLIENT_ID is missing."
         );
-
     }
 
 
     if (!clientSecret) {
-
         throw new Error(
             "FLW_CLIENT_SECRET is missing."
         );
-
     }
 
 
@@ -154,17 +113,11 @@ async function getFlutterwaveAccessToken() {
             data
         );
 
-
         throw new Error(
-
             data?.error_description ||
-
             data?.message ||
-
             data?.error ||
-
             "Failed to obtain Flutterwave access token."
-
         );
 
     }
@@ -184,11 +137,10 @@ async function getFlutterwaveAccessToken() {
 
 
     tokenExpiresAt =
-        now +
+        Date.now() +
         (
             Number(
-                data.expires_in ||
-                600
+                data.expires_in || 600
             ) * 1000
         );
 
@@ -205,17 +157,12 @@ async function getFlutterwaveAccessToken() {
 function generateTraceId() {
 
     return (
-
         "2chat-" +
-
         Date.now().toString(36) +
-
         "-" +
-
-        Math.random()
-            .toString(36)
-            .substring(2, 15)
-
+        crypto
+            .randomBytes(8)
+            .toString("hex")
     );
 
 }
@@ -228,18 +175,392 @@ function generateTraceId() {
 function generateIdempotencyKey() {
 
     return (
-
         "2chat-" +
-
         Date.now().toString(36) +
-
         "-" +
-
-        Math.random()
-            .toString(36)
-            .substring(2, 15)
-
+        crypto
+            .randomBytes(12)
+            .toString("hex")
     );
+
+}
+
+
+// =====================================================
+// GENERATE FLUTTERWAVE NONCE
+// =====================================================
+
+function generateNonce() {
+
+    const characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    let nonce = "";
+
+    const randomBytes =
+        crypto.randomBytes(12);
+
+
+    for (
+        let i = 0;
+        i < 12;
+        i++
+    ) {
+
+        nonce +=
+            characters[
+                randomBytes[i] %
+                characters.length
+            ];
+
+    }
+
+
+    return nonce;
+
+}
+
+
+// =====================================================
+// ENCRYPT AES-256-GCM
+// =====================================================
+//
+// Flutterwave v4 encryption uses:
+// AES-GCM
+// 12-character nonce
+// Base64 encoded AES key
+//
+// =====================================================
+
+async function encryptAES(
+    plainText,
+    encryptionKey,
+    nonce
+) {
+
+    if (!plainText) {
+
+        throw new Error(
+            "Encryption value is missing."
+        );
+
+    }
+
+
+    if (!encryptionKey) {
+
+        throw new Error(
+            "FLW_ENCRYPTION_KEY is missing."
+        );
+
+    }
+
+
+    if (
+        !nonce ||
+        nonce.length !== 12
+    ) {
+
+        throw new Error(
+            "Flutterwave encryption nonce must be exactly 12 characters."
+        );
+
+    }
+
+
+    const keyBytes =
+        Buffer.from(
+            encryptionKey,
+            "base64"
+        );
+
+
+    if (
+        ![
+            16,
+            24,
+            32
+        ].includes(
+            keyBytes.length
+        )
+    ) {
+
+        throw new Error(
+            "FLW_ENCRYPTION_KEY must be a valid Base64 AES key."
+        );
+
+    }
+
+
+    const subtle =
+        crypto.webcrypto.subtle;
+
+
+    const key =
+        await subtle.importKey(
+            "raw",
+            keyBytes,
+            {
+                name:
+                    "AES-GCM"
+            },
+            false,
+            [
+                "encrypt"
+            ]
+        );
+
+
+    const iv =
+        Buffer.from(
+            nonce,
+            "utf8"
+        );
+
+
+    const encrypted =
+        await subtle.encrypt(
+
+            {
+                name:
+                    "AES-GCM",
+
+                iv
+
+            },
+
+            key,
+
+            Buffer.from(
+                String(
+                    plainText
+                ),
+                "utf8"
+            )
+
+        );
+
+
+    return Buffer
+        .from(
+            encrypted
+        )
+        .toString(
+            "base64"
+        );
+
+}
+
+
+// =====================================================
+// ENCRYPT CARD
+// =====================================================
+
+async function encryptCard(
+    card
+) {
+
+    if (!card) {
+
+        throw new Error(
+            "Card payment data is required."
+        );
+
+    }
+
+
+    const cardNumber =
+        String(
+            card.number ||
+            card.cardNumber ||
+            ""
+        )
+        .replace(
+            /\s+/g,
+            ""
+        );
+
+
+    const expiryMonth =
+        String(
+            card.expiryMonth ||
+            card.expiry_month ||
+            ""
+        )
+        .trim();
+
+
+    const expiryYear =
+        String(
+            card.expiryYear ||
+            card.expiry_year ||
+            ""
+        )
+        .trim();
+
+
+    const cvv =
+        String(
+            card.cvv ||
+            ""
+        )
+        .trim();
+
+
+    if (!cardNumber) {
+
+        throw new Error(
+            "Card number is required."
+        );
+
+    }
+
+
+    if (!expiryMonth) {
+
+        throw new Error(
+            "Card expiry month is required."
+        );
+
+    }
+
+
+    if (!expiryYear) {
+
+        throw new Error(
+            "Card expiry year is required."
+        );
+
+    }
+
+
+    if (!cvv) {
+
+        throw new Error(
+            "Card CVV is required."
+        );
+
+    }
+
+
+    if (
+        !/^\d{12,19}$/.test(
+            cardNumber
+        )
+    ) {
+
+        throw new Error(
+            "Invalid card number."
+        );
+
+    }
+
+
+    if (
+        !/^\d{1,2}$/.test(
+            expiryMonth
+        )
+    ) {
+
+        throw new Error(
+            "Invalid expiry month."
+        );
+
+    }
+
+
+    if (
+        !/^\d{2,4}$/.test(
+            expiryYear
+        )
+    ) {
+
+        throw new Error(
+            "Invalid expiry year."
+        );
+
+    }
+
+
+    if (
+        !/^\d{3,4}$/.test(
+            cvv
+        )
+    ) {
+
+        throw new Error(
+            "Invalid CVV."
+        );
+
+    }
+
+
+    const encryptionKey =
+        process.env.FLW_ENCRYPTION_KEY;
+
+
+    if (!encryptionKey) {
+
+        throw new Error(
+            "FLW_ENCRYPTION_KEY is missing."
+        );
+
+    }
+
+
+    const nonce =
+        generateNonce();
+
+
+    const encryptedCardNumber =
+        await encryptAES(
+            cardNumber,
+            encryptionKey,
+            nonce
+        );
+
+
+    const encryptedExpiryMonth =
+        await encryptAES(
+            expiryMonth,
+            encryptionKey,
+            nonce
+        );
+
+
+    const encryptedExpiryYear =
+        await encryptAES(
+            expiryYear,
+            encryptionKey,
+            nonce
+        );
+
+
+    const encryptedCvv =
+        await encryptAES(
+            cvv,
+            encryptionKey,
+            nonce
+        );
+
+
+    return {
+
+        nonce,
+
+        encrypted_card_number:
+            encryptedCardNumber,
+
+        encrypted_expiry_month:
+            encryptedExpiryMonth,
+
+        encrypted_expiry_year:
+            encryptedExpiryYear,
+
+        encrypted_cvv:
+            encryptedCvv
+
+    };
 
 }
 
@@ -330,7 +651,9 @@ async function createFlutterwaveCustomer({
 
     const response =
         await fetch(
+
             `${FLUTTERWAVE_BASE_URL}/customers`,
+
             {
 
                 method:
@@ -358,6 +681,7 @@ async function createFlutterwaveCustomer({
                     )
 
             }
+
         );
 
 
@@ -372,17 +696,11 @@ async function createFlutterwaveCustomer({
             data
         );
 
-
         throw new Error(
-
             data?.message ||
-
             data?.error?.message ||
-
             data?.error ||
-
             "Failed to create Flutterwave customer."
-
         );
 
     }
@@ -415,61 +733,6 @@ async function createFlutterwaveCustomer({
 
 
 // =====================================================
-// VALIDATE ENCRYPTED CARD
-// =====================================================
-
-function validateEncryptedCard(card) {
-
-    if (!card) {
-
-        throw new Error(
-            "Card payment data is required."
-        );
-
-    }
-
-
-    const requiredFields = [
-
-        "encrypted_card_number",
-
-        "encrypted_expiry_month",
-
-        "encrypted_expiry_year",
-
-        "encrypted_cvv",
-
-        "nonce"
-
-    ];
-
-
-    for (
-        const field of requiredFields
-    ) {
-
-        if (
-            !card[field] ||
-            typeof card[field] !== "string"
-        ) {
-
-            throw new Error(
-
-                `Missing encrypted card field: ${field}`
-
-            );
-
-        }
-
-    }
-
-
-    return true;
-
-}
-
-
-// =====================================================
 // CREATE PAYMENT METHOD
 // =====================================================
 
@@ -497,9 +760,10 @@ async function createFlutterwavePaymentMethod({
     }
 
 
-    validateEncryptedCard(
-        card
-    );
+    const encryptedCard =
+        await encryptCard(
+            card
+        );
 
 
     const payload = {
@@ -510,31 +774,17 @@ async function createFlutterwavePaymentMethod({
         customer_id:
             customerId,
 
-        card: {
-
-            encrypted_card_number:
-                card.encrypted_card_number,
-
-            encrypted_expiry_month:
-                card.encrypted_expiry_month,
-
-            encrypted_expiry_year:
-                card.encrypted_expiry_year,
-
-            encrypted_cvv:
-                card.encrypted_cvv,
-
-            nonce:
-                card.nonce
-
-        }
+        card:
+            encryptedCard
 
     };
 
 
     const response =
         await fetch(
+
             `${FLUTTERWAVE_BASE_URL}/payment-methods`,
+
             {
 
                 method:
@@ -562,6 +812,7 @@ async function createFlutterwavePaymentMethod({
                     )
 
             }
+
         );
 
 
@@ -576,17 +827,11 @@ async function createFlutterwavePaymentMethod({
             data
         );
 
-
         throw new Error(
-
             data?.message ||
-
             data?.error?.message ||
-
             data?.error ||
-
             "Failed to create Flutterwave payment method."
-
         );
 
     }
@@ -642,9 +887,13 @@ async function createPaymentMethod({
     }
 
 
-    validateEncryptedCard(
-        card
-    );
+    if (!card) {
+
+        throw new Error(
+            "Card payment data is required."
+        );
+
+    }
 
 
     const accessToken =
@@ -796,7 +1045,6 @@ async function createFlutterwaveCharge({
 
     const redirectUrl =
         process.env.FLW_REDIRECT_URL ||
-
         (
             appUrl
                 ? `${appUrl}/coinPayment.html`
@@ -859,7 +1107,9 @@ async function createFlutterwaveCharge({
 
     const response =
         await fetch(
+
             `${FLUTTERWAVE_BASE_URL}/charges`,
+
             {
 
                 method:
@@ -887,6 +1137,7 @@ async function createFlutterwaveCharge({
                     )
 
             }
+
         );
 
 
@@ -901,17 +1152,11 @@ async function createFlutterwaveCharge({
             data
         );
 
-
         throw new Error(
-
             data?.message ||
-
             data?.error?.message ||
-
             data?.error ||
-
             "Failed to create Flutterwave charge."
-
         );
 
     }
@@ -930,8 +1175,7 @@ async function createFlutterwaveCharge({
     }
 
 
-    let paymentUrl =
-        null;
+    let paymentUrl = null;
 
 
     if (
@@ -1010,9 +1254,7 @@ async function initializePayment({
     ) {
 
         throw new Error(
-
             `Payment cannot be initialized because order status is "${purchase.status}".`
-
         );
 
     }
@@ -1027,6 +1269,15 @@ async function initializePayment({
     }
 
 
+    if (!user.email) {
+
+        throw new Error(
+            "User email is required for payment."
+        );
+
+    }
+
+
     const finalPaymentMethodId =
         paymentMethodId ||
         purchase.flutterwavePaymentMethodId;
@@ -1035,9 +1286,7 @@ async function initializePayment({
     if (!finalPaymentMethodId) {
 
         throw new Error(
-
             "Flutterwave payment method ID is required. Create the payment method first."
-
         );
 
     }
@@ -1127,10 +1376,7 @@ async function initializePayment({
             charge.nextAction,
 
         status:
-            charge.status,
-
-        raw:
-            charge.raw
+            charge.status
 
     };
 
@@ -1153,7 +1399,8 @@ module.exports = {
 
     createFlutterwavePaymentMethod,
 
-    createFlutterwaveCharge
+    createFlutterwaveCharge,
+
+    encryptCard
 
 };
-
