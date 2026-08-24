@@ -594,7 +594,7 @@ async function createFlutterwaveCharge({
         process.env.FLW_REDIRECT_URL ||
         (
             appUrl
-                ? `${appUrl}/html/coin-payment-success.html`
+                ? `${appUrl}/coin-payment-success.html`
                 : null
         );
 
