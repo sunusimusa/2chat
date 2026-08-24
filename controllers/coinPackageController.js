@@ -1,55 +1,94 @@
-const CoinPackage = require("../models/CoinPackage");
+const CoinPackage =
+  require("../models/CoinPackage");
 
-// =========================================
+
+// =====================================================
+// 2CHAT
 // GET ACTIVE COIN PACKAGES
-// =========================================
+// =====================================================
+//
+// Wannan endpoint yana dawo da packages da user zai
+// iya saya.
+//
+// IMPORTANT:
+//
+// - Ba ya ƙirƙirar purchase.
+// - Ba ya fara Flutterwave payment.
+// - Ba ya canza Wallet.
+// - Yana dawo da active packages kawai.
+// =====================================================
 
-exports.getCoinPackages = async (req, res) => {
+exports.getCoinPackages =
+async (
+  req,
+  res
+) => {
 
-    try {
+  try {
 
-        const packages =
-            await CoinPackage.find({
-                active: true
-            })
-            .sort({
-                sortOrder: 1,
-                coins: 1
-            })
-            .select(
-                "name coins price currency sortOrder"
-            );
+    // =================================================
+    // FIND ACTIVE PACKAGES
+    // =================================================
 
+    const packages =
+      await CoinPackage.find({
 
-        return res.json({
+        active:
+          true
 
-            success: true,
+      })
+      .sort({
 
-            count:
-                packages.length,
+        sortOrder:
+          1,
 
-            packages
+        coins:
+          1
 
-        });
+      })
+      .select(
 
+        "name coins price currency sortOrder"
 
-    } catch (err) {
-
-        console.error(
-            "GET COIN PACKAGES ERROR:",
-            err
-        );
+      )
+      .lean();
 
 
-        return res.status(500).json({
+    // =================================================
+    // RESPONSE
+    // =================================================
 
-            success: false,
+    return res.json({
 
-            message:
-                "Failed to load coin packages."
+      success:
+        true,
 
-        });
+      count:
+        packages.length,
 
-    }
+      packages
+
+    });
+
+
+  } catch (err) {
+
+    console.error(
+      "GET COIN PACKAGES ERROR:",
+      err
+    );
+
+
+    return res.status(500).json({
+
+      success:
+        false,
+
+      message:
+        "Failed to load coin packages."
+
+    });
+
+  }
 
 };
