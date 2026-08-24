@@ -26,856 +26,1185 @@
 
 <body>
 
+
+<header class="payment-header">
+
+    <button
+        class="back-btn"
+        onclick="goBack()"
+    >
+
+        <i class="fa-solid fa-arrow-left"></i>
+
+    </button>
+
+
+    <div class="header-title">
+
+        <i class="fa-solid fa-credit-card"></i>
+
+        <h1>
+            Payment
+        </h1>
+
+    </div>
+
+</header>
+
+
+
+<main class="payment-page">
+
+
     <!-- =========================================
-         HEADER
+         LOADING
     ========================================== -->
 
-    <header class="payment-header">
+    <div
+        id="loading"
+        class="message"
+    >
 
-        <button
-            class="back-btn"
-            onclick="history.back()"
-        >
+        <i class="fa-solid fa-spinner fa-spin"></i>
 
-            <i class="fa-solid fa-arrow-left"></i>
+        Preparing payment...
 
-        </button>
+    </div>
 
-
-        <div class="header-title">
-
-            <i class="fa-solid fa-credit-card"></i>
-
-            <h1>
-                Payment
-            </h1>
-
-        </div>
-
-    </header>
 
 
     <!-- =========================================
-         PAGE
+         ERROR
     ========================================== -->
 
-    <main class="payment-page">
+    <div
+        id="errorMessage"
+        class="message error"
+        style="display:none;"
+    ></div>
+
+
+
+    <!-- =========================================
+         PAYMENT CONTENT
+    ========================================== -->
+
+    <section
+        id="paymentContent"
+        style="display:none;"
+    >
 
 
         <!-- =====================================
-             LOADING
+             PURCHASE
         ====================================== -->
 
-        <div
-            id="loading"
-            class="message"
-        >
+        <section class="payment-card">
 
-            <i class="fa-solid fa-spinner fa-spin"></i>
+            <div class="payment-icon">
 
-            Loading payment...
+                <i class="fa-solid fa-coins"></i>
 
-        </div>
+            </div>
 
 
-        <!-- =====================================
-             ERROR
-        ====================================== -->
-
-        <div
-            id="errorMessage"
-            class="message error"
-            style="display:none;"
-        >
-
-        </div>
+            <h2>
+                Confirm Payment
+            </h2>
 
 
-        <!-- =====================================
-             PAYMENT CONTENT
-        ====================================== -->
-
-        <section
-            id="paymentContent"
-            style="display:none;"
-        >
-
-
-            <!-- =================================
-                 PURCHASE SUMMARY
-            ================================== -->
-
-            <section class="payment-card">
-
-                <div class="payment-icon">
-
-                    <i class="fa-solid fa-coins"></i>
-
-                </div>
-
-
-                <h2>
-                    Confirm Payment
-                </h2>
-
-
-                <div
-                    id="purchaseInfo"
-                    class="purchase-info"
-                >
-
-                </div>
-
-            </section>
-
-
-            <!-- =================================
-                 PAYMENT METHOD
-            ================================== -->
-
-            <section class="payment-card">
-
-                <h3>
-                    <i class="fa-solid fa-wallet"></i>
-
-                    Payment Method
-                </h3>
-
-
-                <div class="method-option active">
-
-                    <div class="method-icon">
-
-                        <i class="fa-solid fa-credit-card"></i>
-
-                    </div>
-
-
-                    <div class="method-info">
-
-                        <strong>
-                            Card Payment
-                        </strong>
-
-                        <span>
-                            Secure Flutterwave payment
-                        </span>
-
-                    </div>
-
-
-                    <i
-                        class="fa-solid fa-circle-check"
-                        style="margin-left:auto;"
-                    ></i>
-
-                </div>
-
-
-                <!-- =================================
-                     STATUS
-                ================================== -->
-
-                <div
-                    id="paymentMessage"
-                    class="payment-message"
-                >
-
-                    Ready to continue.
-
-                </div>
-
-
-                <!-- =================================
-                     CONTINUE
-                ================================== -->
-
-                <button
-                    id="continuePaymentButton"
-                    class="continue-btn"
-                    type="button"
-                >
-
-                    <i class="fa-solid fa-credit-card"></i>
-
-                    Continue to Payment
-
-                </button>
-
-
-                <p class="security-note">
-
-                    <i class="fa-solid fa-lock"></i>
-
-                    Your payment is processed securely
-                    through Flutterwave.
-
-                </p>
-
-            </section>
-
+            <div
+                id="purchaseInfo"
+                class="purchase-info"
+            ></div>
 
         </section>
 
-    </main>
 
 
-    <!-- =========================================
-         SCRIPT
-    ========================================== -->
+        <!-- =====================================
+             PAYMENT METHOD
+        ====================================== -->
 
-    <script>
+        <section class="payment-card">
 
-        // =====================================================
-        // GLOBAL
-        // =====================================================
+            <h3>
 
-        let purchaseId = null;
+                <i class="fa-solid fa-wallet"></i>
 
-        let purchase = null;
+                Payment Method
 
+            </h3>
 
-        // =====================================================
-        // ELEMENTS
-        // =====================================================
 
-        const loading =
-            document.getElementById(
-                "loading"
-            );
 
+            <div class="method-option active">
 
-        const errorMessage =
-            document.getElementById(
-                "errorMessage"
-            );
+                <div class="method-icon">
 
+                    <i class="fa-solid fa-credit-card"></i>
 
-        const paymentContent =
-            document.getElementById(
-                "paymentContent"
-            );
+                </div>
 
 
-        const purchaseInfo =
-            document.getElementById(
-                "purchaseInfo"
-            );
-
-
-        const paymentMessage =
-            document.getElementById(
-                "paymentMessage"
-            );
-
-
-        const continueButton =
-            document.getElementById(
-                "continuePaymentButton"
-            );
-
-
-        // =====================================================
-        // TOKEN
-        // =====================================================
-
-        function getToken() {
-
-            const token =
-                localStorage.getItem(
-                    "token"
-                );
-
-
-            if (!token) {
-
-                throw new Error(
-                    "Please login first."
-                );
-
-            }
-
-
-            return token;
-
-        }
-
-
-        // =====================================================
-        // GET PURCHASE ID
-        // =====================================================
-
-        function getPurchaseId() {
-
-            const params =
-                new URLSearchParams(
-                    window.location.search
-                );
-
-
-            return params.get(
-                "purchaseId"
-            );
-
-        }
-
-
-        // =====================================================
-        // LOAD PURCHASE
-        // =====================================================
-
-        async function loadPurchase() {
-
-            try {
-
-                purchaseId =
-                    getPurchaseId();
-
-
-                if (!purchaseId) {
-
-                    throw new Error(
-                        "Purchase ID is missing."
-                    );
-
-                }
-
-
-                const token =
-                    getToken();
-
-
-                /*
-                 * Wannan endpoint ya kamata ya dawo
-                 * da purchase ɗin user ɗin.
-                 *
-                 * Idan route ɗinka yana amfani da
-                 * /api/coin-purchases/:id,
-                 * wannan shi ne endpoint ɗin.
-                 */
-
-                const response =
-                    await fetch(
-
-                        `/api/coin-purchases/${purchaseId}`,
-
-                        {
-
-                            method:
-                                "GET",
-
-                            headers: {
-
-                                "Authorization":
-                                    `Bearer ${token}`
-
-                            }
-
-                        }
-
-                    );
-
-
-                const data =
-                    await response.json();
-
-
-                if (
-                    !response.ok ||
-                    !data.success
-                ) {
-
-                    throw new Error(
-
-                        data.message ||
-                        "Unable to load purchase."
-
-                    );
-
-                }
-
-
-                purchase =
-                    data.purchase;
-
-
-                if (!purchase) {
-
-                    throw new Error(
-                        "Purchase information was not returned."
-                    );
-
-                }
-
-
-                renderPurchase();
-
-
-                loading.style.display =
-                    "none";
-
-
-                paymentContent.style.display =
-                    "block";
-
-
-            } catch (error) {
-
-                console.error(
-                    "LOAD PURCHASE ERROR:",
-                    error
-                );
-
-
-                showError(
-                    error.message ||
-                    "Unable to load payment."
-                );
-
-            }
-
-        }
-
-
-        // =====================================================
-        // RENDER PURCHASE
-        // =====================================================
-
-        function renderPurchase() {
-
-            const coins =
-                Number(
-                    purchase.coins || 0
-                );
-
-
-            const amount =
-                Number(
-                    purchase.amount || 0
-                );
-
-
-            const currency =
-                purchase.currency ||
-                "NGN";
-
-
-            const reference =
-                purchase.reference ||
-                "";
-
-
-            purchaseInfo.innerHTML = `
-
-                <div class="purchase-row">
-
-                    <span>
-                        Coins
-                    </span>
+                <div class="method-info">
 
                     <strong>
-                        ${formatNumber(coins)}
+                        Card Payment
                     </strong>
 
-                </div>
-
-
-                <div class="purchase-row">
-
                     <span>
-                        Amount
+                        Secure Flutterwave payment
                     </span>
 
-                    <strong>
-                        ${currencySymbol(currency)}
-                        ${formatNumber(amount)}
-                    </strong>
-
                 </div>
 
 
-                <div class="purchase-row">
+                <i
+                    class="fa-solid fa-circle-check"
+                    style="margin-left:auto;"
+                ></i>
 
-                    <span>
-                        Reference
-                    </span>
+            </div>
 
-                    <small>
-                        ${escapeHtml(reference)}
-                    </small>
 
-                </div>
 
+            <div
+                id="paymentMessage"
+                class="payment-message"
+            >
 
-                <div class="purchase-row">
+                Ready to continue.
 
-                    <span>
-                        Status
-                    </span>
+            </div>
 
-                    <strong class="pending">
-                        ${escapeHtml(
-                            purchase.status || "pending"
-                        )}
-                    </strong>
 
-                </div>
 
-            `;
+            <button
+                id="continuePaymentButton"
+                class="continue-btn"
+                type="button"
+            >
 
-        }
+                <i class="fa-solid fa-credit-card"></i>
 
+                Continue to Payment
 
-        // =====================================================
-        // CONTINUE PAYMENT
-        // =====================================================
+            </button>
 
-        continueButton.addEventListener(
-            "click",
-            async function () {
 
-                try {
 
-                    continueButton.disabled =
-                        true;
+            <p class="security-note">
 
+                <i class="fa-solid fa-lock"></i>
 
-                    continueButton.innerHTML = `
+                Your payment is processed securely
+                through Flutterwave.
 
-                        <i class="fa-solid fa-spinner fa-spin"></i>
+            </p>
 
-                        Processing...
+        </section>
 
-                    `;
 
+    </section>
 
-                    paymentMessage.innerText =
-                        "Preparing secure Flutterwave payment...";
 
+</main>
 
-                    /*
-                     * MUHIMMIN BAYANI:
-                     *
-                     * Ba za mu ƙirƙiri fake paymentMethodId ba.
-                     *
-                     * Flutterwave v4 charge yana buƙatar
-                     * payment_method_id na gaske.
-                     *
-                     * Don haka idan backend bai riga ya samu
-                     * payment method ba, sai ya dawo da error.
-                     */
 
 
-                    const existingPaymentMethodId =
-                        purchase
-                            ?.flutterwavePaymentMethodId;
+<script>
 
+"use strict";
 
-                    if (!existingPaymentMethodId) {
 
-                        throw new Error(
+// =====================================================
+// GLOBAL VARIABLES
+// =====================================================
 
-                            "Flutterwave payment method is not ready yet. Please complete the secure payment-method step first."
+let purchaseId = null;
 
-                        );
+let packageId = null;
 
-                    }
+let purchase = null;
 
 
-                    const token =
-                        getToken();
+// =====================================================
+// ELEMENTS
+// =====================================================
 
+const loading =
+    document.getElementById(
+        "loading"
+    );
 
-                    const response =
-                        await fetch(
 
-                            `/api/coin-purchases/${purchaseId}/initialize-payment`,
+const errorMessage =
+    document.getElementById(
+        "errorMessage"
+    );
 
-                            {
 
-                                method:
-                                    "POST",
+const paymentContent =
+    document.getElementById(
+        "paymentContent"
+    );
 
-                                headers: {
 
-                                    "Content-Type":
-                                        "application/json",
+const purchaseInfo =
+    document.getElementById(
+        "purchaseInfo"
+    );
 
-                                    "Authorization":
-                                        `Bearer ${token}`
 
-                                },
+const paymentMessage =
+    document.getElementById(
+        "paymentMessage"
+    );
 
-                                body:
-                                    JSON.stringify({
 
-                                        paymentMethodId:
-                                            existingPaymentMethodId
+const continueButton =
+    document.getElementById(
+        "continuePaymentButton"
+    );
 
-                                    })
 
-                            }
+// =====================================================
+// GO BACK
+// =====================================================
 
-                        );
+function goBack() {
 
+    if (
+        window.history.length > 1
+    ) {
 
-                    const data =
-                        await response.json();
+        window.history.back();
 
+    } else {
 
-                    if (
-                        !response.ok ||
-                        !data.success
-                    ) {
+        window.location.href =
+            "/wallet.html";
 
-                        throw new Error(
+    }
 
-                            data.message ||
-                            "Failed to initialize payment."
+}
 
-                        );
 
-                    }
+// =====================================================
+// GET TOKEN
+// =====================================================
 
+function getToken() {
 
-                    const payment =
-                        data.payment;
-
-
-                    if (!payment) {
-
-                        throw new Error(
-                            "Payment response is missing."
-                        );
-
-                    }
-
-
-                    const checkoutUrl =
-                        payment.checkoutUrl ||
-                        payment.paymentUrl;
-
-
-                    if (checkoutUrl) {
-
-                        paymentMessage.innerText =
-                            "Opening Flutterwave...";
-
-
-                        window.location.href =
-                            checkoutUrl;
-
-
-                        return;
-
-                    }
-
-
-                    /*
-                     * Handle redirect URL returned
-                     * through next_action.
-                     */
-
-                    const nextAction =
-                        payment.nextAction;
-
-
-                    if (
-                        nextAction &&
-                        nextAction.type ===
-                            "redirect_url"
-                    ) {
-
-                        const redirectUrl =
-                            nextAction
-                                ?.redirect_url
-                                ?.url;
-
-
-                        if (redirectUrl) {
-
-                            paymentMessage.innerText =
-                                "Opening Flutterwave...";
-
-
-                            window.location.href =
-                                redirectUrl;
-
-
-                            return;
-
-                        }
-
-                    }
-
-
-                    throw new Error(
-
-                        "Flutterwave did not return a checkout or redirect URL."
-
-                    );
-
-
-                } catch (error) {
-
-                    console.error(
-                        "PAYMENT ERROR:",
-                        error
-                    );
-
-
-                    showError(
-                        error.message ||
-                        "Unable to start payment."
-                    );
-
-
-                    continueButton.disabled =
-                        false;
-
-
-                    continueButton.innerHTML = `
-
-                        <i class="fa-solid fa-credit-card"></i>
-
-                        Continue to Payment
-
-                    `;
-
-                }
-
-            }
+    const token =
+        localStorage.getItem(
+            "token"
         );
 
 
-        // =====================================================
-        // ERROR
-        // =====================================================
+    if (!token) {
 
-        function showError(
-            message
-        ) {
+        throw new Error(
+            "Please login first."
+        );
 
-            loading.style.display =
-                "none";
+    }
 
 
-            paymentContent.style.display =
-                "none";
+    return token;
+
+}
 
 
-            errorMessage.style.display =
-                "block";
+// =====================================================
+// GET URL PARAMETER
+// =====================================================
+
+function getUrlParameter(
+    name
+) {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
 
 
-            errorMessage.innerHTML = `
+    return params.get(
+        name
+    );
 
-                <i class="fa-solid fa-circle-exclamation"></i>
+}
 
-                ${escapeHtml(message)}
 
-                <br><br>
+// =====================================================
+// GET PURCHASE ID
+// =====================================================
 
-                <button
-                    onclick="history.back()"
-                    class="back-error-btn"
-                >
-                    Go Back
-                </button>
+function getPurchaseId() {
+
+    return (
+
+        getUrlParameter(
+            "purchaseId"
+        )
+
+        ||
+
+        getUrlParameter(
+            "purchase"
+        )
+
+        ||
+
+        getUrlParameter(
+            "id"
+        )
+
+        ||
+
+        localStorage.getItem(
+            "coinPurchaseId"
+        )
+
+    );
+
+}
+
+
+// =====================================================
+// GET PACKAGE ID
+// =====================================================
+
+function getPackageId() {
+
+    return (
+
+        getUrlParameter(
+            "packageId"
+        )
+
+        ||
+
+        getUrlParameter(
+            "package"
+        )
+
+        ||
+
+        localStorage.getItem(
+            "selectedCoinPackageId"
+        )
+
+        ||
+
+        localStorage.getItem(
+            "coinPackageId"
+        )
+
+        ||
+
+        localStorage.getItem(
+            "packageId"
+        )
+
+    );
+
+}
+
+
+// =====================================================
+// CREATE PURCHASE
+// =====================================================
+
+async function createPurchase() {
+
+    const token =
+        getToken();
+
+
+    packageId =
+        getPackageId();
+
+
+    if (!packageId) {
+
+        throw new Error(
+
+            "Coin package ID is missing. Please select a coin package again."
+
+        );
+
+    }
+
+
+    paymentMessage.innerText =
+        "Creating your payment order...";
+
+
+    const response =
+        await fetch(
+
+            "/api/coin-purchases",
+
+            {
+
+                method:
+                    "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json",
+
+                    "Authorization":
+                        `Bearer ${token}`
+
+                },
+
+                body:
+                    JSON.stringify({
+
+                        packageId:
+                            packageId
+
+                    })
+
+            }
+
+        );
+
+
+    const data =
+        await response.json();
+
+
+    if (
+        !response.ok ||
+        !data.success
+    ) {
+
+        throw new Error(
+
+            data.message ||
+            "Unable to create coin purchase."
+
+        );
+
+    }
+
+
+    if (
+        !data.purchase ||
+        !data.purchase.id
+    ) {
+
+        throw new Error(
+            "Purchase was created but purchase ID was not returned."
+        );
+
+    }
+
+
+    purchaseId =
+        data.purchase.id;
+
+
+    purchase =
+        data.purchase;
+
+
+    // Save for the next page/request
+    localStorage.setItem(
+        "coinPurchaseId",
+        purchaseId
+    );
+
+
+    return purchase;
+
+}
+
+
+// =====================================================
+// LOAD PURCHASE
+// =====================================================
+
+async function loadPurchase() {
+
+    try {
+
+        const token =
+            getToken();
+
+
+        // =============================================
+        // FIRST: CHECK PURCHASE ID
+        // =============================================
+
+        purchaseId =
+            getPurchaseId();
+
+
+        // =============================================
+        // IF NO PURCHASE ID
+        // CREATE ONE FROM PACKAGE ID
+        // =============================================
+
+        if (!purchaseId) {
+
+            packageId =
+                getPackageId();
+
+
+            if (!packageId) {
+
+                throw new Error(
+
+                    "Please select a coin package before continuing to payment."
+
+                );
+
+            }
+
+
+            purchase =
+                await createPurchase();
+
+        }
+
+
+        // =============================================
+        // IF PURCHASE EXISTS, LOAD IT
+        // =============================================
+
+        if (!purchase) {
+
+            const response =
+                await fetch(
+
+                    `/api/coin-purchases/${encodeURIComponent(
+                        purchaseId
+                    )}`,
+
+                    {
+
+                        method:
+                            "GET",
+
+                        headers: {
+
+                            "Authorization":
+                                `Bearer ${token}`
+
+                        }
+
+                    }
+
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (
+                !response.ok ||
+                !data.success
+            ) {
+
+                throw new Error(
+
+                    data.message ||
+                    "Unable to load purchase."
+
+                );
+
+            }
+
+
+            purchase =
+                data.purchase;
+
+
+            if (!purchase) {
+
+                throw new Error(
+                    "Purchase information was not returned."
+                );
+
+            }
+
+        }
+
+
+        // =============================================
+        // SAVE PURCHASE ID
+        // =============================================
+
+        purchaseId =
+            purchase.id ||
+            purchase._id ||
+            purchaseId;
+
+
+        if (purchaseId) {
+
+            localStorage.setItem(
+                "coinPurchaseId",
+                String(
+                    purchaseId
+                )
+            );
+
+        }
+
+
+        // =============================================
+        // SHOW PURCHASE
+        // =============================================
+
+        renderPurchase();
+
+
+        loading.style.display =
+            "none";
+
+
+        paymentContent.style.display =
+            "block";
+
+
+        paymentMessage.innerText =
+            "Ready to continue.";
+
+
+    } catch (error) {
+
+        console.error(
+            "LOAD PURCHASE ERROR:",
+            error
+        );
+
+
+        showError(
+
+            error.message ||
+            "Unable to prepare payment."
+
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// RENDER PURCHASE
+// =====================================================
+
+function renderPurchase() {
+
+    const coins =
+        Number(
+            purchase.coins || 0
+        );
+
+
+    const amount =
+        Number(
+            purchase.amount || 0
+        );
+
+
+    const currency =
+        purchase.currency ||
+        "NGN";
+
+
+    const reference =
+        purchase.reference ||
+        "";
+
+
+    const status =
+        purchase.status ||
+        "pending";
+
+
+    purchaseInfo.innerHTML = `
+
+        <div class="purchase-row">
+
+            <span>
+                Coins
+            </span>
+
+            <strong>
+                ${formatNumber(coins)}
+            </strong>
+
+        </div>
+
+
+        <div class="purchase-row">
+
+            <span>
+                Amount
+            </span>
+
+            <strong>
+                ${currencySymbol(currency)}
+                ${formatNumber(amount)}
+            </strong>
+
+        </div>
+
+
+        <div class="purchase-row">
+
+            <span>
+                Reference
+            </span>
+
+            <small>
+                ${escapeHtml(reference)}
+            </small>
+
+        </div>
+
+
+        <div class="purchase-row">
+
+            <span>
+                Status
+            </span>
+
+            <strong class="pending">
+
+                ${escapeHtml(status)}
+
+            </strong>
+
+        </div>
+
+    `;
+
+}
+
+
+// =====================================================
+// GET PAYMENT METHOD ID
+// =====================================================
+
+function getPaymentMethodId() {
+
+    return (
+
+        purchase
+            ?.flutterwavePaymentMethodId
+
+        ||
+
+        purchase
+            ?.paymentMethodId
+
+        ||
+
+        getUrlParameter(
+            "paymentMethodId"
+        )
+
+        ||
+
+        localStorage.getItem(
+            "flutterwavePaymentMethodId"
+        )
+
+        ||
+
+        localStorage.getItem(
+            "paymentMethodId"
+        )
+
+        ||
+
+        null
+
+    );
+
+}
+
+
+// =====================================================
+// CONTINUE PAYMENT
+// =====================================================
+
+continueButton.addEventListener(
+    "click",
+    async function () {
+
+        try {
+
+            continueButton.disabled =
+                true;
+
+
+            continueButton.innerHTML = `
+
+                <i class="fa-solid fa-spinner fa-spin"></i>
+
+                Processing...
+
+            `;
+
+
+            paymentMessage.innerText =
+                "Preparing secure Flutterwave payment...";
+
+
+            const token =
+                getToken();
+
+
+            if (!purchaseId) {
+
+                throw new Error(
+                    "Purchase order is not available."
+                );
+
+            }
+
+
+            // =========================================
+            // GET PAYMENT METHOD
+            // =========================================
+
+            const paymentMethodId =
+                getPaymentMethodId();
+
+
+            // =========================================
+            // PAYMENT METHOD MISSING
+            // =========================================
+
+            if (!paymentMethodId) {
+
+                throw new Error(
+
+                    "Flutterwave payment method is not ready. Please complete the secure card/payment-method step first."
+
+                );
+
+            }
+
+
+            // =========================================
+            // INITIALIZE PAYMENT
+            // =========================================
+
+            const response =
+                await fetch(
+
+                    `/api/coin-purchases/${encodeURIComponent(
+                        purchaseId
+                    )}/initialize-payment`,
+
+                    {
+
+                        method:
+                            "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json",
+
+                            "Authorization":
+                                `Bearer ${token}`
+
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                paymentMethodId:
+                                    paymentMethodId
+
+                            })
+
+                    }
+
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (
+                !response.ok ||
+                !data.success
+            ) {
+
+                throw new Error(
+
+                    data.message ||
+                    "Failed to initialize payment."
+
+                );
+
+            }
+
+
+            const payment =
+                data.payment;
+
+
+            if (!payment) {
+
+                throw new Error(
+                    "Payment response is missing."
+                );
+
+            }
+
+
+            // =========================================
+            // CHECKOUT URL
+            // =========================================
+
+            const checkoutUrl =
+                payment.checkoutUrl ||
+                payment.paymentUrl;
+
+
+            if (checkoutUrl) {
+
+                paymentMessage.innerText =
+                    "Opening Flutterwave...";
+
+
+                window.location.href =
+                    checkoutUrl;
+
+
+                return;
+
+            }
+
+
+            // =========================================
+            // NEXT ACTION
+            // =========================================
+
+            const nextAction =
+                payment.nextAction;
+
+
+            if (
+                nextAction &&
+                nextAction.type ===
+                    "redirect_url"
+            ) {
+
+                const redirectUrl =
+                    nextAction
+                        ?.redirect_url
+                        ?.url;
+
+
+                if (redirectUrl) {
+
+                    paymentMessage.innerText =
+                        "Opening Flutterwave...";
+
+
+                    window.location.href =
+                        redirectUrl;
+
+
+                    return;
+
+                }
+
+            }
+
+
+            throw new Error(
+
+                "Flutterwave did not return a checkout or redirect URL."
+
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "PAYMENT ERROR:",
+                error
+            );
+
+
+            showError(
+
+                error.message ||
+                "Unable to start payment."
+
+            );
+
+
+            continueButton.disabled =
+                false;
+
+
+            continueButton.innerHTML = `
+
+                <i class="fa-solid fa-credit-card"></i>
+
+                Continue to Payment
 
             `;
 
         }
 
-
-        // =====================================================
-        // FORMAT NUMBER
-        // =====================================================
-
-        function formatNumber(
-            value
-        ) {
-
-            return Number(
-                value || 0
-            ).toLocaleString(
-                "en-NG"
-            );
-
-        }
+    }
+);
 
 
-        // =====================================================
-        // CURRENCY
-        // =====================================================
+// =====================================================
+// SHOW ERROR
+// =====================================================
 
-        function currencySymbol(
-            currency
-        ) {
+function showError(
+    message
+) {
 
-            if (
-                String(currency)
-                    .toUpperCase() ===
-                "NGN"
-            ) {
-
-                return "₦";
-
-            }
+    loading.style.display =
+        "none";
 
 
-            return (
-                String(currency)
-                .toUpperCase() +
-                " "
-            );
-
-        }
+    paymentContent.style.display =
+        "none";
 
 
-        // =====================================================
-        // ESCAPE HTML
-        // =====================================================
-
-        function escapeHtml(
-            value
-        ) {
-
-            return String(
-                value || ""
-            )
-            .replace(
-                /&/g,
-                "&amp;"
-            )
-            .replace(
-                /</g,
-                "&lt;"
-            )
-            .replace(
-                />/g,
-                "&gt;"
-            )
-            .replace(
-                /"/g,
-                "&quot;"
-            )
-            .replace(
-                /'/g,
-                "&#039;"
-            );
-
-        }
+    errorMessage.style.display =
+        "block";
 
 
-        // =====================================================
-        // START
-        // =====================================================
+    errorMessage.innerHTML = `
 
-        loadPurchase();
+        <i class="fa-solid fa-circle-exclamation"></i>
 
-    </script>
+        ${escapeHtml(message)}
+
+        <br><br>
+
+        <button
+            onclick="goBack()"
+            class="back-error-btn"
+        >
+
+            Go Back
+
+        </button>
+
+    `;
+
+}
+
+
+// =====================================================
+// FORMAT NUMBER
+// =====================================================
+
+function formatNumber(
+    value
+) {
+
+    return Number(
+        value || 0
+    ).toLocaleString(
+        "en-NG"
+    );
+
+}
+
+
+// =====================================================
+// CURRENCY SYMBOL
+// =====================================================
+
+function currencySymbol(
+    currency
+) {
+
+    if (
+        String(currency)
+            .toUpperCase() ===
+        "NGN"
+    ) {
+
+        return "₦";
+
+    }
+
+
+    return (
+
+        String(currency)
+            .toUpperCase() +
+        " "
+
+    );
+
+}
+
+
+// =====================================================
+// ESCAPE HTML
+// =====================================================
+
+function escapeHtml(
+    value
+) {
+
+    return String(
+        value || ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
+
+
+// =====================================================
+// START
+// =====================================================
+
+loadPurchase();
+
+</script>
 
 </body>
 
-</html>
+    </html>
