@@ -2,299 +2,518 @@ const mongoose = require("mongoose");
 
 
 // =====================================================
-// COIN PURCHASE SCHEMA
+// 2CHAT
+// COIN PURCHASE MODEL
 // =====================================================
+//
+// FLOW:
+//
+// Coin Package
+//      ↓
+// CoinPurchase
+//      ↓
+// Flutterwave Payment Method
+//      ↓
+// Flutterwave Charge
+//      ↓
+// Webhook / Verification
+//      ↓
+// Payment Verified
+//      ↓
+// Credit Coins
+//
+// IMPORTANT:
+//
+// - Purchase baya zama "paid" yayin initialization.
+// - Verification ne kawai zai tabbatar da payment.
+// - coinsCredited yana hana double credit.
+// - Legacy user wallet babu shi => credit service zai ƙirƙira.
+// =====================================================
+
 
 const coinPurchaseSchema = new mongoose.Schema(
   {
 
-    // =========================================
+    // =================================================
     // USER
-    // =========================================
+    // =================================================
 
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-      index: true
+
+      type:
+        mongoose.Schema.Types.ObjectId,
+
+      ref:
+        "User",
+
+      required:
+        true,
+
+      index:
+        true
+
     },
 
 
-    // =========================================
+    // =================================================
     // COIN PACKAGE
-    // =========================================
+    // =================================================
 
     packageId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "CoinPackage",
-      required: true,
-      index: true
+
+      type:
+        mongoose.Schema.Types.ObjectId,
+
+      ref:
+        "CoinPackage",
+
+      required:
+        true,
+
+      index:
+        true
+
     },
 
 
-    // =========================================
+    // =================================================
     // COINS SNAPSHOT
-    // =========================================
+    // =================================================
     //
-    // Muh adana coins ɗin lokacin da aka
-    // ƙirƙiri order.
-    //
-    // Ko package ya canza daga baya,
-    // wannan order ba zai canza ba.
+    // Package ɗin da aka saya.
+    // Ana adana value ɗin a lokacin order.
     //
 
     coins: {
-      type: Number,
-      required: true,
-      min: 1
+
+      type:
+        Number,
+
+      required:
+        true,
+
+      min:
+        1
+
     },
 
 
-    // =========================================
+    // =================================================
     // AMOUNT SNAPSHOT
-    // =========================================
+    // =================================================
 
     amount: {
-      type: Number,
-      required: true,
-      min: 0
+
+      type:
+        Number,
+
+      required:
+        true,
+
+      min:
+        0
+
     },
 
 
-    // =========================================
+    // =================================================
     // CURRENCY
-    // =========================================
+    // =================================================
 
     currency: {
-      type: String,
-      default: "NGN",
-      uppercase: true,
-      trim: true
+
+      type:
+        String,
+
+      default:
+        "NGN",
+
+      uppercase:
+        true,
+
+      trim:
+        true
+
     },
 
 
-    // =========================================
-    // 2CHAT ORDER REFERENCE
-    // =========================================
+    // =================================================
+    // 2CHAT PURCHASE REFERENCE
+    // =================================================
 
     reference: {
-      type: String,
-      required: true,
-      unique: true,
-      index: true
+
+      type:
+        String,
+
+      required:
+        true,
+
+      unique:
+        true,
+
+      index:
+        true,
+
+      trim:
+        true
+
     },
 
 
-    // =========================================
+    // =================================================
     // PAYMENT PROVIDER
-    // =========================================
+    // =================================================
 
     paymentProvider: {
-      type: String,
+
+      type:
+        String,
+
       enum: [
+
         "flutterwave"
+
       ],
-      default: "flutterwave",
-      index: true
+
+      default:
+        "flutterwave",
+
+      index:
+        true
+
     },
 
 
-    // =========================================
-    // PROVIDER PAYMENT REFERENCE
-    // =========================================
+    // =================================================
+    // FLUTTERWAVE PAYMENT REFERENCE
+    // =================================================
     //
-    // Flutterwave/payment reference.
+    // Wannan zai iya zama provider reference.
     //
 
     paymentReference: {
-      type: String,
-      default: null,
-      index: true
+
+      type:
+        String,
+
+      default:
+        null,
+
+      index:
+        true
+
     },
 
 
-    // =========================================
+    // =================================================
     // FLUTTERWAVE CUSTOMER ID
-    // =========================================
+    // =================================================
 
     flutterwaveCustomerId: {
-      type: String,
-      default: null
+
+      type:
+        String,
+
+      default:
+        null,
+
+      trim:
+        true
+
     },
 
 
-    // =========================================
+    // =================================================
     // FLUTTERWAVE PAYMENT METHOD ID
-    // =========================================
+    // =================================================
+    //
+    // Za a adana shi idan payment-method flow
+    // ya samar da shi.
+    //
 
     flutterwavePaymentMethodId: {
-      type: String,
-      default: null
+
+      type:
+        String,
+
+      default:
+        null,
+
+      trim:
+        true
+
     },
 
 
-    // =========================================
+    // =================================================
     // FLUTTERWAVE CHARGE ID
-    // =========================================
+    // =================================================
 
     flutterwaveChargeId: {
-      type: String,
-      default: null,
-      index: true
+
+      type:
+        String,
+
+      default:
+        null,
+
+      index:
+        true,
+
+      trim:
+        true
+
     },
 
 
-    // =========================================
+    // =================================================
     // PAYMENT URL
-    // =========================================
+    // =================================================
     //
-    // URL da user zai bi domin kammala payment.
+    // Flutterwave checkout / redirect URL.
     //
 
     paymentUrl: {
-      type: String,
-      default: null
+
+      type:
+        String,
+
+      default:
+        null
+
     },
 
 
-    // =========================================
+    // =================================================
     // PAYMENT INITIALIZED AT
-    // =========================================
+    // =================================================
 
     paymentInitializedAt: {
-      type: Date,
-      default: null
+
+      type:
+        Date,
+
+      default:
+        null
+
     },
 
 
-    // =========================================
+    // =================================================
     // PAYMENT COMPLETED AT
-    // =========================================
+    // =================================================
 
     paymentCompletedAt: {
-      type: Date,
-      default: null
+
+      type:
+        Date,
+
+      default:
+        null
+
     },
 
 
-    // =========================================
+    // =================================================
     // PAYMENT VERIFIED AT
-    // =========================================
+    // =================================================
 
     paymentVerifiedAt: {
-      type: Date,
-      default: null
+
+      type:
+        Date,
+
+      default:
+        null
+
     },
 
 
-    // =========================================
-    // PAYMENT STATUS
-    // =========================================
+    // =================================================
+    // PURCHASE STATUS
+    // =================================================
+    //
+    // pending
+    // processing
+    // paid
+    // failed
+    // cancelled
+    // expired
+    //
 
     status: {
-      type: String,
+
+      type:
+        String,
 
       enum: [
+
         "pending",
+
         "processing",
+
         "paid",
+
         "failed",
+
         "cancelled",
+
         "expired"
+
       ],
 
-      default: "pending",
+      default:
+        "pending",
 
-      index: true
+      index:
+        true
+
     },
 
 
-    // =========================================
-    // PROVIDER STATUS
-    // =========================================
+    // =================================================
+    // FLUTTERWAVE PROVIDER STATUS
+    // =================================================
     //
     // Misali:
-    // succeeded
+    //
     // pending
+    // succeeded
     // failed
     //
 
     providerStatus: {
-      type: String,
-      default: null
+
+      type:
+        String,
+
+      default:
+        null,
+
+      trim:
+        true
+
     },
 
 
-    // =========================================
+    // =================================================
     // FAILURE REASON
-    // =========================================
+    // =================================================
 
     failureReason: {
-      type: String,
-      default: null
+
+      type:
+        String,
+
+      default:
+        null
+
     },
 
 
-    // =========================================
+    // =================================================
     // WEBHOOK RECEIVED
-    // =========================================
+    // =================================================
 
     webhookReceived: {
-      type: Boolean,
-      default: false
+
+      type:
+        Boolean,
+
+      default:
+        false
+
     },
 
 
-    // =========================================
+    // =================================================
     // WEBHOOK RECEIVED AT
-    // =========================================
+    // =================================================
 
     webhookReceivedAt: {
-      type: Date,
-      default: null
+
+      type:
+        Date,
+
+      default:
+        null
+
     },
 
 
-    // =========================================
-    // VERIFICATION
-    // =========================================
+    // =================================================
+    // VERIFICATION ATTEMPTS
+    // =================================================
 
     verificationAttempts: {
-      type: Number,
-      default: 0,
-      min: 0
+
+      type:
+        Number,
+
+      default:
+        0,
+
+      min:
+        0
+
     },
 
 
-    // =========================================
+    // =================================================
     // COINS CREDITED
-    // =========================================
+    // =================================================
     //
-    // Wannan yana hana mu ƙara coins sau biyu
-    // idan webhook ya sake zuwa.
+    // VERY IMPORTANT:
+    //
+    // true = an riga coins an riga.
+    //
+    // Wannan yana hana:
+    //
+    // webhook sau biyu
+    // verification sau biyu
+    // user refresh
+    // duplicate request
+    //
+    // daga ƙara coins sau biyu.
     //
 
     coinsCredited: {
-      type: Boolean,
-      default: false,
-      index: true
+
+      type:
+        Boolean,
+
+      default:
+        false,
+
+      index:
+        true
+
     },
 
 
-    // =========================================
+    // =================================================
     // COINS CREDITED AT
-    // =========================================
+    // =================================================
 
     coinsCreditedAt: {
-      type: Date,
-      default: null
+
+      type:
+        Date,
+
+      default:
+        null
+
     }
 
   },
 
+
   {
-    timestamps: true
+    timestamps:
+      true
   }
+
 );
 
 
@@ -302,15 +521,46 @@ const coinPurchaseSchema = new mongoose.Schema(
 // INDEXES
 // =====================================================
 
+
+// User purchases
 coinPurchaseSchema.index({
-  userId: 1,
-  createdAt: -1
+
+  userId:
+    1,
+
+  createdAt:
+    -1
+
 });
 
 
+// Purchase status
 coinPurchaseSchema.index({
-  status: 1,
-  createdAt: -1
+
+  status:
+    1,
+
+  createdAt:
+    -1
+
+});
+
+
+// Flutterwave charge lookup
+coinPurchaseSchema.index({
+
+  flutterwaveChargeId:
+    1
+
+});
+
+
+// Payment reference lookup
+coinPurchaseSchema.index({
+
+  paymentReference:
+    1
+
 });
 
 
