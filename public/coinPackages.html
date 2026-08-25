@@ -483,6 +483,10 @@ continueButton.addEventListener(
     "click",
     async () => {
 
+        // =========================================
+        // CHECK SELECTED PACKAGE
+        // =========================================
+
         if (!selectedPackage) {
 
             alert(
@@ -494,8 +498,14 @@ continueButton.addEventListener(
         }
 
 
+        // =========================================
+        // GET TOKEN
+        // =========================================
+
         const token =
-            localStorage.getItem("token");
+            localStorage.getItem(
+                "token"
+            );
 
 
         if (!token) {
@@ -504,8 +514,27 @@ continueButton.addEventListener(
                 "Please login first."
             );
 
-            location.href =
+            window.location.href =
                 "/login.html";
+
+            return;
+
+        }
+
+
+        // =========================================
+        // GET PACKAGE ID
+        // =========================================
+
+        const packageId =
+            selectedPackage._id;
+
+
+        if (!packageId) {
+
+            alert(
+                "❌ Coin package ID is missing."
+            );
 
             return;
 
@@ -514,24 +543,30 @@ continueButton.addEventListener(
 
         try {
 
-            continueButton.disabled = true;
+            // =====================================
+            // BUTTON LOADING
+            // =====================================
+
+            continueButton.disabled =
+                true;
 
             continueButton.innerHTML = `
                 <i class="fa-solid fa-spinner fa-spin"></i>
-                Processing...
+                Creating Order...
             `;
 
 
-            /* =====================================
-               STEP 1
-               CREATE PURCHASE ORDER
-            ===================================== */
+            // =====================================
+            // CREATE PURCHASE ORDER
+            // =====================================
 
             const orderResponse =
                 await fetch(
                     "/api/coin-purchases",
                     {
-                        method: "POST",
+
+                        method:
+                            "POST",
 
                         headers: {
 
@@ -543,16 +578,21 @@ continueButton.addEventListener(
 
                         },
 
-                        body: JSON.stringify({
+                        body:
+                            JSON.stringify({
 
-                            packageId:
-                                selectedPackage._id
+                                packageId:
+                                    packageId
 
-                        })
+                            })
 
                     }
                 );
 
+
+            // =====================================
+            // READ RESPONSE
+            // =====================================
 
             const orderData =
                 await orderResponse.json();
@@ -564,16 +604,35 @@ continueButton.addEventListener(
             ) {
 
                 throw new Error(
+
                     orderData.message ||
                     "Failed to create purchase order."
+
+                );
+
+            }
+
+
+            // =====================================
+            // PURCHASE
+            // =====================================
+
+            const purchase =
+                orderData.purchase;
+
+
+            if (!purchase) {
+
+                throw new Error(
+                    "Purchase information was not returned."
                 );
 
             }
 
 
             const purchaseId =
-                orderData.purchase.id ||
-                orderData.purchase._id;
+                purchase.id ||
+                purchase._id;
 
 
             if (!purchaseId) {
@@ -584,98 +643,76 @@ continueButton.addEventListener(
 
             }
 
-            window.location.href =
-    `/coinPayment.html?packageId=${packageId}`;
 
-            /* =====================================
-               STEP 2
-               INITIALIZE FLUTTERWAVE PAYMENT
-            ===================================== */
+            // =====================================
+            // SAVE PURCHASE ID
+            // =====================================
 
-            const paymentResponse =
-                await fetch(
-                    `/api/coin-purchases/${purchaseId}/initialize-payment`,
-                    {
-                        method: "POST",
-
-                        headers: {
-
-                            "Authorization":
-                                "Bearer " + token
-
-                        }
-
-                    }
-                );
+            localStorage.setItem(
+                "coinPurchaseId",
+                String(
+                    purchaseId
+                )
+            );
 
 
-            const paymentData =
-                await paymentResponse.json();
+            // =====================================
+            // SAVE PACKAGE ID
+            // =====================================
+
+            localStorage.setItem(
+                "selectedCoinPackageId",
+                String(
+                    packageId
+                )
+            );
 
 
-            if (
-                !paymentResponse.ok ||
-                !paymentData.success
-            ) {
-
-                throw new Error(
-                    paymentData.message ||
-                    "Failed to initialize payment."
-                );
-
-            }
-
-
-            /* =====================================
-               STEP 3
-               GET CHECKOUT URL
-            ===================================== */
-
-            const payment =
-                paymentData.payment;
-
-
-            if (
-                !payment ||
-                !payment.checkoutUrl
-            ) {
-
-                throw new Error(
-                    "Flutterwave checkout URL was not returned."
-                );
-
-            }
-
-
-            /* =====================================
-               STEP 4
-               OPEN FLUTTERWAVE
-            ===================================== */
+            // =====================================
+            // GO TO PAYMENT PAGE
+            // =====================================
+            //
+            // Muhimmin abu:
+            //
+            // Ba mu initialize Flutterwave
+            // a wannan page ba.
+            //
+            // coinPayment.html ne zai yi:
+            //
+            // POST /:id/initialize-payment
+            //
+            // =====================================
 
             window.location.href =
-                payment.checkoutUrl;
-
+                `/coinPayment.html?purchaseId=${encodeURIComponent(
+                    purchaseId
+                )}`;
 
         } catch (error) {
 
             console.error(
-                "COIN PAYMENT ERROR:",
+                "COIN PURCHASE ERROR:",
                 error
             );
 
 
             alert(
+
                 "❌ " +
                 (
                     error.message ||
-                    "Unable to start payment."
+                    "Unable to create purchase."
                 )
+
             );
 
 
+            // =====================================
+            // RESTORE BUTTON
+            // =====================================
+
             continueButton.disabled =
                 false;
-
 
             continueButton.innerHTML = `
                 <i class="fa-solid fa-credit-card"></i>
@@ -686,7 +723,6 @@ continueButton.addEventListener(
 
     }
 );
-
 
         /* =========================================
            CLOSE MODAL
