@@ -51,6 +51,9 @@ const profileUsername =
     params.get("username") ||
     params.get("user");
 
+console.log("PROFILE USERNAME:", profileUsername);
+console.log("PROFILE URL:", window.location.href);
+
 
 // ===============================
 // DEFAULT TO MY PROFILE
