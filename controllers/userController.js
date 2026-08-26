@@ -311,9 +311,12 @@ exports.getUserProfile = async (req, res) => {
 
 
         const user =
-            await User.findOne({
-                username
-            });
+    await User.findOne({
+        username: {
+            $regex: `^${username.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
+            $options: "i"
+        }
+    });
 
 
         if (!user) {
