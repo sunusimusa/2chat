@@ -29,6 +29,12 @@ exports.register = async (req, res) => {
   password: hashedPassword
 });
 
+user.online = true;
+
+user.lastSeen = new Date();
+
+await user.save();
+
 await Wallet.findOneAndUpdate(
   { userId: user._id },
   {
@@ -52,6 +58,7 @@ await Wallet.findOneAndUpdate(
   }
 );
 
+return res.json({
     res.status(201).json({
       success: true,
       token: generateToken(user._id),
