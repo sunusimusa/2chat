@@ -29,9 +29,28 @@ exports.register = async (req, res) => {
   password: hashedPassword
 });
 
-await Wallet.create({
-  user: user._id
-});
+await Wallet.findOneAndUpdate(
+  { userId: user._id },
+  {
+    $setOnInsert: {
+      userId: user._id,
+      coins: 0,
+      totalPurchased: 0,
+      totalSpent: 0,
+      totalEarned: 0,
+      platformCommission: 0,
+      availableBalance: 0,
+      withdrawalLockedBalance: 0,
+      totalWithdrawn: 0,
+      giftsSent: 0,
+      giftsReceived: 0
+    }
+  },
+  {
+    upsert: true,
+    new: true
+  }
+);
 
     res.status(201).json({
       success: true,
