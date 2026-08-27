@@ -1,339 +1,332 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>2Chat Chat</title>
-
-<link rel="stylesheet" href="/css/chat.css">
-
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-
-</head>
-
-<body>
-
-<!-- ==========================
-MESSAGE MENU
-========================== -->
-
-<div id="messageMenu" class="message-menu">
-
-    <div onclick="replySelected()">
-        <i class="fa-solid fa-reply"></i>
-        <span>Reply</span>
-    </div>
-
-    <div onclick="reactSelected()">
-        <i class="fa-regular fa-face-smile"></i>
-        <span>React</span>
-    </div>
-
-    <div id="deleteMeOption" onclick="deleteSelected()">
-        <i class="fa-solid fa-trash"></i>
-        <span>Delete for me</span>
-    </div>
-
-    <div id="deleteAllOption" onclick="deleteEveryoneSelected()">
-        <i class="fa-solid fa-trash-can"></i>
-        <span>Delete for everyone</span>
-    </div>
-
-</div>
-
-<!-- ==========================
-CHAT MENU
-========================== -->
-
-<div id="chatMenu" class="chat-menu">
-
-    <div onclick="clearChat()">
-        <i class="fa-solid fa-trash"></i>
-        <span>Clear Chat</span>
-    </div>
-
-</div>
-
-<!-- ==========================
-HEADER
-========================== -->
-
-<header class="chat-header">
-
-    <button
-    class="back-btn"
-    onclick="history.back()">
-
-        <i class="fa-solid fa-arrow-left"></i>
-
-    </button>
-
-    <div class="chat-user">
-
-        <img
-        id="chatAvatar"
-        src="/images/default.png"
-        class="chat-avatar">
-
-        <div class="chat-info">
-
-            <h3 id="chatName">
-                Loading...
-            </h3>
-
-            <p id="status">
-
-                <i class="fa-solid fa-circle online-dot"></i>
-
-                Offline
-
-            </p>
-
-            <p id="typing" style="display:none;">
-
-                <i class="fa-solid fa-pen"></i>
-
-                Typing...
-
-            </p>
-
-        </div>
-
-    </div>
-
-    <div class="header-actions">
-
-        <button
-        class="header-btn"
-        onclick="toggleChatMenu()">
-
-            <i class="fa-solid fa-ellipsis-vertical"></i>
-
-        </button>
-
-    </div>
-
-</header>
-
-<!-- ==========================
-CHAT AREA
-========================== -->
-
-<div
-id="chat"
-class="chat-container">
-
-</div>
-
-  <!-- ==========================
-IMAGE PREVIEW
-========================== -->
-
-<div
-id="previewBox"
-class="preview-box"
-style="display:none;">
-
-    <img id="previewImage">
-
-    <div class="preview-actions">
-
-        <button
-        type="button"
-        onclick="removeImage()">
-
-            <i class="fa-solid fa-trash"></i>
-
-            Remove
-
-        </button>
-
-    </div>
-
-</div>
-
-<!-- ==========================
-REPLY PREVIEW
-========================== -->
-
-<div
-id="replyPreview"
-class="reply-preview"
-style="display:none;">
-
-    <div class="reply-info">
-
-        <small>Replying to</small>
-
-        <p id="replyText"></p>
-
-    </div>
-
-    <button
-    type="button"
-    onclick="cancelReply()">
-
-        <i class="fa-solid fa-xmark"></i>
-
-    </button>
-
-</div>
-
-<!-- ==========================
-MESSAGE BAR
-========================== -->
-
-<div class="message-bar">
-
-    <!-- PHOTO -->
-    <label
-        for="image"
-        class="icon-btn">
-
-        <i class="fa-solid fa-image"></i>
-
-    </label>
-
-    <input
-        type="file"
-        id="image"
-        accept="image/*"
-        hidden>
-
-
-    <!-- MESSAGE INPUT -->
-    <textarea
-        id="message"
-        rows="1"
-        placeholder="Type a message..."></textarea>
-
-
-    <!-- ONE ACTION BUTTON -->
-    <button
-        id="sendBtn"
-        type="button"
-        onclick="safeSend()">
-
-        <i
-            id="sendIcon"
-            class="fa-solid fa-microphone">
-        </i>
-
-    </button>
-
-</div>
-
-
-<!-- ==========================
-VOICE RECORDING / PREVIEW
-========================== -->
-
-<div
-    id="recordingBox"
-    class="recording-box"
-    style="display:none;">
-
-    <!-- CANCEL -->
-    <button
-        id="cancelVoiceBtn"
-        type="button"
-        onclick="cancelRecording()">
-
-        <i class="fa-solid fa-trash"></i>
-
-    </button>
-
-
-    <!-- RECORDING DOT -->
-    <span class="record-dot"></span>
-
-
-    <!-- TIME -->
-    <span id="recordTime">
-        00:00
-    </span>
-
-
-    <!-- STATUS -->
-    <span
-        id="recordText"
-        class="record-text">
-
-        Recording...
-
-    </span>
-
-
-    <!-- VOICE PREVIEW -->
-    <audio
-        id="voicePreview"
-        controls
-        preload="metadata"
-        style="display:none;">
-    </audio>
-
-</div>
-
-  <!-- ==========================
-REACTION POPUP
-========================== -->
-
-<div
-id="reactionPopup"
-class="reaction-popup"
-style="display:none;">
-
-    <span onclick="selectReaction('❤️')">❤️</span>
-
-    <span onclick="selectReaction('👍')">👍</span>
-
-    <span onclick="selectReaction('😂')">😂</span>
-
-    <span onclick="selectReaction('😮')">😮</span>
-
-    <span onclick="selectReaction('😢')">😢</span>
-
-    <span onclick="selectReaction('😡')">😡</span>
-
-</div>
-
-<!-- ==========================
-IMAGE VIEWER
-========================== -->
-
-<div
-id="imageViewer"
-class="image-viewer"
-style="display:none;">
-
-    <button
-    class="close-image"
-    type="button"
-    onclick="closeImage()">
-
-        <i class="fa-solid fa-xmark"></i>
-
-    </button>
-
-    <img
-    id="fullImage"
-    src=""
-    alt="Image Preview">
-
-</div>
-
-<!-- ==========================
-SCRIPTS
-========================== -->
-
-<script src="/socket.io/socket.io.js"></script>
-
-<script src="/js/chat.js"></script>
-
-</body>
-
+<!DOCTYPE html>  
+<html lang="en">  
+  
+<head>  
+  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+  
+<title>2Chat Chat</title>  
+  
+<link rel="stylesheet" href="/css/chat.css">  
+  
+<link rel="stylesheet"  
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">  
+  
+</head>  
+  
+<body>  
+  
+<!-- ==========================  
+MESSAGE MENU  
+========================== -->  
+  
+<div id="messageMenu" class="message-menu">  
+  
+    <div onclick="replySelected()">  
+        <i class="fa-solid fa-reply"></i>  
+        <span>Reply</span>  
+    </div>  
+  
+    <div onclick="reactSelected()">  
+        <i class="fa-regular fa-face-smile"></i>  
+        <span>React</span>  
+    </div>  
+  
+    <div id="deleteMeOption" onclick="deleteSelected()">  
+        <i class="fa-solid fa-trash"></i>  
+        <span>Delete for me</span>  
+    </div>  
+  
+    <div id="deleteAllOption" onclick="deleteEveryoneSelected()">  
+        <i class="fa-solid fa-trash-can"></i>  
+        <span>Delete for everyone</span>  
+    </div>  
+  
+</div>  
+  
+<!-- ==========================  
+CHAT MENU  
+========================== -->  
+  
+<div id="chatMenu" class="chat-menu">  
+  
+    <div onclick="clearChat()">  
+        <i class="fa-solid fa-trash"></i>  
+        <span>Clear Chat</span>  
+    </div>  
+  
+</div>  
+  
+<!-- ==========================  
+HEADER  
+========================== -->  
+  
+<header class="chat-header">  
+  
+    <button  
+    class="back-btn"  
+    onclick="history.back()">  
+  
+        <i class="fa-solid fa-arrow-left"></i>  
+  
+    </button>  
+  
+    <div class="chat-user">  
+  
+        <img  
+        id="chatAvatar"  
+        src="/images/default.png"  
+        class="chat-avatar">  
+  
+        <div class="chat-info">  
+  
+            <h3 id="chatName">  
+                Loading...  
+            </h3>  
+  
+            <p id="status">  
+  
+                <i class="fa-solid fa-circle online-dot"></i>  
+  
+                Offline  
+  
+            </p>  
+  
+            <p id="typing" style="display:none;">  
+  
+                <i class="fa-solid fa-pen"></i>  
+  
+                Typing...  
+  
+            </p>  
+  
+        </div>  
+  
+    </div>  
+  
+    <div class="header-actions">  
+  
+        <button  
+        class="header-btn"  
+        onclick="toggleChatMenu()">  
+  
+            <i class="fa-solid fa-ellipsis-vertical"></i>  
+  
+        </button>  
+  
+    </div>  
+  
+</header>  
+  
+<!-- ==========================  
+CHAT AREA  
+========================== -->  
+  
+<div  
+id="chat"  
+class="chat-container">  
+  
+</div>  
+  
+  <!-- ==========================  
+IMAGE PREVIEW  
+========================== -->  
+  
+<div  
+id="previewBox"  
+class="preview-box"  
+style="display:none;">  
+  
+    <img id="previewImage">  
+  
+    <div class="preview-actions">  
+  
+        <button  
+        type="button"  
+        onclick="removeImage()">  
+  
+            <i class="fa-solid fa-trash"></i>  
+  
+            Remove  
+  
+        </button>  
+  
+    </div>  
+  
+</div>  
+  
+<!-- ==========================  
+REPLY PREVIEW  
+========================== -->  
+  
+<div  
+id="replyPreview"  
+class="reply-preview"  
+style="display:none;">  
+  
+    <div class="reply-info">  
+  
+        <small>Replying to</small>  
+  
+        <p id="replyText"></p>  
+  
+    </div>  
+  
+    <button  
+    type="button"  
+    onclick="cancelReply()">  
+  
+        <i class="fa-solid fa-xmark"></i>  
+  
+    </button>  
+  
+</div>  
+  
+<!-- ==========================  
+MESSAGE BAR  
+========================== -->  
+  
+<div class="message-bar">  
+  
+    <label  
+    for="image"  
+    class="icon-btn">  
+  
+        <i class="fa-solid fa-image"></i>  
+  
+    </label>  
+  
+    <input  
+    type="file"  
+    id="image"  
+    accept="image/*"  
+    hidden>  
+  
+    <textarea  
+    id="message"  
+    rows="1"  
+    placeholder="Type a message..."></textarea>  
+  
+    <button  
+    id="recordBtn"  
+    type="button"  
+    onclick="toggleRecording()">  
+  
+        <i  
+        id="recordIcon"  
+        class="fa-solid fa-microphone"></i>  
+  
+    </button>  
+  
+    <button  
+    id="stopRecordBtn"  
+    type="button"  
+    onclick="stopRecording()"  
+    style="display:none;">  
+  
+        <i class="fa-solid fa-stop"></i>  
+  
+    </button>  
+  
+    <button  
+id="sendBtn"  
+type="button"  
+onclick="sendMessage()">  
+  
+<i class="fa-solid fa-paper-plane"></i>  
+  
+</button>  
+  
+</div>  
+  
+<!-- ==========================  
+RECORDING BOX  
+========================== -->  
+  
+<div  
+id="recordingBox"  
+class="recording-box"  
+style="display:none;">  
+  
+    <span class="record-dot"></span>  
+  
+    <span id="recordTime">  
+        00:00  
+    </span>  
+  
+  <span id="recordText" class="record-text">  
+    Recording...  
+   </span>  
+  
+    <button  
+    id="sendVoiceBtn"  
+    type="button"  
+    onclick="sendVoice()"  
+    style="display:none;">  
+  
+        <i class="fa-solid fa-paper-plane"></i>  
+  
+    </button>  
+  
+</div>  
+  
+  <!-- ==========================  
+REACTION POPUP  
+========================== -->  
+  
+<div  
+id="reactionPopup"  
+class="reaction-popup"  
+style="display:none;">  
+  
+    <span onclick="selectReaction('❤️')">❤️</span>  
+  
+    <span onclick="selectReaction('👍')">👍</span>  
+  
+    <span onclick="selectReaction('😂')">😂</span>  
+  
+    <span onclick="selectReaction('😮')">😮</span>  
+  
+    <span onclick="selectReaction('😢')">😢</span>  
+  
+    <span onclick="selectReaction('😡')">😡</span>  
+  
+</div>  
+  
+<!-- ==========================  
+IMAGE VIEWER  
+========================== -->  
+  
+<div  
+id="imageViewer"  
+class="image-viewer"  
+style="display:none;">  
+  
+    <button  
+    class="close-image"  
+    type="button"  
+    onclick="closeImage()">  
+  
+        <i class="fa-solid fa-xmark"></i>  
+  
+    </button>  
+  
+    <img  
+    id="fullImage"  
+    src=""  
+    alt="Image Preview">  
+  
+</div>  
+  
+<!-- ==========================  
+SCRIPTS  
+========================== -->  
+  
+<script src="/socket.io/socket.io.js"></script>  
+  
+<script src="/js/chat.js"></script>  
+  
+</body>  
+  
 </html>
