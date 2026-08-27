@@ -301,8 +301,11 @@ cursor:pointer;
 /* ==========================
    MESSAGE BAR
 ========================== */
+/* ==========================
+   2CHAT MESSAGE COMPOSER
+========================== */
 
-.message-bar {
+.message-composer {
     position: fixed;
     left: 0;
     right: 0;
@@ -313,42 +316,59 @@ cursor:pointer;
     gap: 8px;
 
     padding: 8px 10px;
-    background: #ffffff;
 
+    background: #ffffff;
     border-top: 1px solid #e5e5e5;
 
     z-index: 1000;
+    box-sizing: border-box;
 }
 
 
 /* ==========================
-   IMAGE BUTTON
+   COMPOSER BUTTONS
 ========================== */
 
-.message-bar .icon-btn {
-    width: 44px;
-    height: 44px;
+.composer-btn {
+    width: 42px;
+    height: 42px;
 
-    flex-shrink: 0;
+    flex: 0 0 42px;
+
+    border: none;
+    border-radius: 50%;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    border-radius: 50%;
-
-    color: #2196f3;
-    background: #f1f3f5;
-
     cursor: pointer;
 
-    font-size: 20px;
+    font-size: 18px;
 
-    transition: .2s;
+    transition:
+        transform 0.15s ease,
+        background 0.15s ease;
 }
 
-.message-bar .icon-btn:active {
-    transform: scale(.9);
+.composer-btn:active {
+    transform: scale(0.90);
+}
+
+
+/* IMAGE */
+
+.image-btn {
+    background: #f1f3f5;
+    color: #2196f3;
+}
+
+
+/* SEND / MICROPHONE */
+
+.action-btn {
+    background: #2196f3;
+    color: #ffffff;
 }
 
 
@@ -361,6 +381,7 @@ cursor:pointer;
 
     min-width: 0;
 
+    min-height: 42px;
     max-height: 120px;
 
     padding: 11px 14px;
@@ -374,34 +395,62 @@ cursor:pointer;
 
     background: #f1f3f5;
 
+    color: #222;
+
     font-size: 15px;
     line-height: 20px;
 
     font-family: inherit;
 
-    overflow-y: auto;
+    box-sizing: border-box;
 }
 
 #message::placeholder {
-    color: #888;
+    color: #8a8a8a;
 }
 
 
 /* ==========================
-   RECORD / STOP / SEND
+   VOICE COMPOSER
 ========================== */
 
-#recordBtn,
-#stopRecordBtn,
-#sendBtn {
+.voice-composer {
+    position: fixed;
 
-    width: 44px;
-    height: 44px;
+    left: 0;
+    right: 0;
+    bottom: 0;
 
-    flex-shrink: 0;
+    min-height: 58px;
+
+    padding: 8px 10px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    background: #ffffff;
+
+    border-top: 1px solid #e5e5e5;
+
+    box-sizing: border-box;
+
+    z-index: 1001;
+}
+
+
+/* ==========================
+   VOICE ACTION BUTTON
+========================== */
+
+.voice-action {
+    width: 42px;
+    height: 42px;
+
+    flex: 0 0 42px;
 
     border: none;
-
     border-radius: 50%;
 
     display: flex;
@@ -410,181 +459,294 @@ cursor:pointer;
 
     cursor: pointer;
 
-    font-size: 18px;
+    font-size: 17px;
 
     transition:
-        transform .15s ease,
-        background .2s ease;
+        transform 0.15s ease,
+        background 0.15s ease;
+}
+
+.voice-action:active {
+    transform: scale(0.90);
 }
 
 
-/* Microphone */
+/* CANCEL */
 
-#recordBtn {
+.cancel-voice {
     background: #f1f3f5;
-    color: #2196f3;
+    color: #e53935;
 }
 
 
-/* Stop */
+/* SEND / STOP */
 
-#stopRecordBtn {
-    background: #ffebee;
-    color: #f44336;
-}
-
-
-/* Send */
-
-#sendBtn {
+.send-voice {
     background: #2196f3;
     color: #ffffff;
 }
 
 
-/* Press effect */
-
-#recordBtn:active,
-#stopRecordBtn:active,
-#sendBtn:active {
-    transform: scale(.88);
-}
-
 /* ==========================
-   RECORDING BOX
+   VOICE CONTENT
 ========================== */
 
-.recording-box{
-    width:100%;
-    height:50px;
-    min-height:50px;
-    box-sizing:border-box;
+.voice-content {
+    flex: 1;
+    min-width: 0;
 
-    display:flex;
-    align-items:center;
-    gap:10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 
-    padding:6px 10px;
-
-    background:#ffffff;
-    border-top:1px solid #ddd;
-
-    position:relative;
+    gap: 4px;
 }
 
-/* Recording dot */
 
-.record-dot{
-    width:9px;
-    height:9px;
+/* ==========================
+   RECORD STATUS
+========================== */
 
-    background:#ff3b30;
-    border-radius:50%;
+.voice-status {
+    display: flex;
+    align-items: center;
 
-    flex-shrink:0;
+    gap: 8px;
 
-    animation:recordPulse 1s infinite;
+    height: 22px;
+
+    white-space: nowrap;
 }
 
-/* Timer */
 
-#recordTime{
-    font-size:14px;
-    font-weight:600;
-    color:#333;
+/* RECORD DOT */
 
-    min-width:42px;
+.record-dot {
+    width: 8px;
+    height: 8px;
+
+    flex: 0 0 8px;
+
+    border-radius: 50%;
+
+    background: #e53935;
+
+    animation: recordPulse 1s infinite;
 }
 
-/* Recording text */
+@keyframes recordPulse {
 
-.record-text{
-    flex:1;
-
-    font-size:14px;
-    color:#666;
-
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-}
-
-/* Send voice button */
-
-#sendVoiceBtn{
-    width:40px;
-    height:40px;
-
-    border:none;
-    border-radius:50%;
-
-    display:none;
-
-    align-items:center;
-    justify-content:center;
-
-    background:#2196f3;
-    color:white;
-
-    font-size:16px;
-
-    flex-shrink:0;
-
-    cursor:pointer;
-}
-
-#sendVoiceBtn i{
-    pointer-events:none;
-}
-
-/* Recording animation */
-
-@keyframes recordPulse{
-
-    0%{
-        opacity:1;
-        transform:scale(1);
+    0% {
+        opacity: 1;
+        transform: scale(1);
     }
 
-    50%{
-        opacity:.4;
-        transform:scale(.8);
+    50% {
+        opacity: .35;
+        transform: scale(.75);
     }
 
-    100%{
-        opacity:1;
-        transform:scale(1);
+    100% {
+        opacity: 1;
+        transform: scale(1);
     }
 
 }
+
+
+/* TIMER */
+
+#recordTime {
+    font-size: 14px;
+    font-weight: 600;
+
+    color: #333;
+
+    min-width: 38px;
+}
+
+
+/* RECORDING TEXT */
+
+.record-text {
+    font-size: 13px;
+
+    color: #777;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* ==========================
+   AUDIO PREVIEW
+========================== */
+
+.voice-preview {
+    width: 100%;
+
+    height: 30px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+/* PLAY BUTTON */
+
+.preview-play {
+    width: 28px;
+    height: 28px;
+
+    flex: 0 0 28px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #2196f3;
+
+    color: #ffffff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 12px;
+
+    cursor: pointer;
+}
+
+
+/* ==========================
+   WAVEFORM
+========================== */
+
+.preview-wave {
+    flex: 1;
+
+    height: 28px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 3px;
+
+    overflow: hidden;
+}
+
+.preview-wave span {
+    width: 3px;
+
+    flex: 0 0 3px;
+
+    border-radius: 4px;
+
+    background: #2196f3;
+}
+
+
+/* Different wave heights */
+
+.preview-wave span:nth-child(1) {
+    height: 8px;
+}
+
+.preview-wave span:nth-child(2) {
+    height: 15px;
+}
+
+.preview-wave span:nth-child(3) {
+    height: 22px;
+}
+
+.preview-wave span:nth-child(4) {
+    height: 13px;
+}
+
+.preview-wave span:nth-child(5) {
+    height: 25px;
+}
+
+.preview-wave span:nth-child(6) {
+    height: 17px;
+}
+
+.preview-wave span:nth-child(7) {
+    height: 10px;
+}
+
+.preview-wave span:nth-child(8) {
+    height: 21px;
+}
+
+.preview-wave span:nth-child(9) {
+    height: 14px;
+}
+
+.preview-wave span:nth-child(10) {
+    height: 24px;
+}
+
+
+/* ==========================
+   AUDIO ELEMENT
+========================== */
+
+#voicePreview {
+    display: none;
+}
+
 
 /* ==========================
    MOBILE
 ========================== */
 
-@media (max-width: 600px) {
+@media (max-width: 480px) {
 
-    .message-bar {
+    .message-composer,
+    .voice-composer {
         padding: 7px 8px;
-        gap: 6px;
+        gap: 7px;
     }
 
-    .message-bar .icon-btn,
-    #recordBtn,
-    #stopRecordBtn,
-    #sendBtn,
-    #sendVoiceBtn {
-        width: 42px;
-        height: 42px;
+    .composer-btn,
+    .voice-action {
+        width: 40px;
+        height: 40px;
+
+        flex-basis: 40px;
     }
 
     #message {
-        font-size: 15px;
+        min-height: 40px;
+
+        font-size: 14px;
+
         padding: 10px 13px;
     }
 
-   }
+    .voice-composer {
+        min-height: 56px;
+    }
 
+    .record-text {
+        font-size: 12px;
+    }
+
+}
+
+
+/* ==========================
+   SAFE BOTTOM SPACE
+========================== */
+
+.chat-container {
+    padding-bottom: 70px;
+    box-sizing: border-box;
+}
 /* ==========================
    PART 3
    Menus
