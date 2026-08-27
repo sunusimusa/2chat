@@ -1400,58 +1400,134 @@ function toggleVoicePreview() {
 
 }
 
+/* ==========================================================
+   VOICE PLAYER EVENTS
+========================================================== */
 
-/* ==========================
-   VOICE PLAY EVENTS
-========================== */
+document.addEventListener("click", function(e) {
 
-if (voicePreview) {
+    const button =
+        e.target.closest(".voice-play");
 
-    voicePreview.addEventListener(
-        "play",
-        function() {
+    if (!button) return;
 
-            if (voicePlayIcon) {
+    const box =
+        button.closest(".voice-player");
 
-                voicePlayIcon.className =
-                    "fa-solid fa-pause";
+    if (!box) return;
 
-            }
+    const player =
+        box.querySelector(".voice-audio");
+
+    const progress =
+        box.querySelector(".voice-progress");
+
+    const time =
+        box.querySelector(".voice-time");
+
+    if (!player) return;
+
+
+    /* ==========================
+       PLAY / PAUSE
+    ========================== */
+
+    if (player.paused) {
+
+        player.play().catch(err => {
+
+            console.error(
+                "Voice Play Error:",
+                err
+            );
+
+        });
+
+        button.innerHTML =
+            '<i class="fa-solid fa-pause"></i>';
+
+    } else {
+
+        player.pause();
+
+        button.innerHTML =
+            '<i class="fa-solid fa-play"></i>';
+
+    }
+
+
+    /* ==========================
+       PROGRESS
+    ========================== */
+
+    player.ontimeupdate = function() {
+
+        if (!player.duration) return;
+
+        const percent =
+            (player.currentTime /
+            player.duration) * 100;
+
+        if (progress) {
+
+            progress.style.width =
+                percent + "%";
 
         }
-    );
 
+        const seconds =
+            Math.floor(
+                player.currentTime
+            );
 
-    voicePreview.addEventListener(
-        "pause",
-        function() {
+        const minutes =
+            Math.floor(
+                seconds / 60
+            );
 
-            if (voicePlayIcon) {
+        const remainSeconds =
+            seconds % 60;
 
-                voicePlayIcon.className =
-                    "fa-solid fa-play";
+        if (time) {
 
-            }
-
-        }
-    );
-
-
-    voicePreview.addEventListener(
-        "ended",
-        function() {
-
-            if (voicePlayIcon) {
-
-                voicePlayIcon.className =
-                    "fa-solid fa-play";
-
-            }
+            time.innerText =
+                minutes +
+                ":" +
+                String(
+                    remainSeconds
+                ).padStart(2, "0");
 
         }
-    );
 
-}
+    };
+
+
+    /* ==========================
+       ENDED
+    ========================== */
+
+    player.onended = function() {
+
+        button.innerHTML =
+            '<i class="fa-solid fa-play"></i>';
+
+        if (progress) {
+
+            progress.style.width =
+                "0%";
+
+        }
+
+        if (time) {
+
+            time.innerText =
+                "0:00";
+
+        }
+
+    };
+
+});
 
 
 /* ==========================================================
