@@ -285,6 +285,74 @@ msg.delivered
 }
 
 
+/* ==========================================================
+   PLAY MESSAGE VOICE
+========================================================== */
+
+function playMessageVoice(button) {
+
+    const player =
+        button
+            .closest(".voice-player")
+            ?.querySelector(".voice-audio");
+
+    const icon =
+        button.querySelector("i");
+
+    if (!player) return;
+
+    if (player.paused) {
+
+        player.play()
+            .then(() => {
+
+                if (icon) {
+                    icon.className =
+                        "fa-solid fa-pause";
+                }
+
+            })
+            .catch(err => {
+
+                console.error(
+                    "Voice Play Error:",
+                    err
+                );
+
+                alert(
+                    "Voice cannot be played."
+                );
+
+            });
+
+    } else {
+
+        player.pause();
+
+        if (icon) {
+
+            icon.className =
+                "fa-solid fa-play";
+
+        }
+
+    }
+
+
+    player.onended = function() {
+
+        if (icon) {
+
+            icon.className =
+                "fa-solid fa-play";
+
+        }
+
+    };
+
+}
+
+
 /* ==========================
    LOAD CHAT USER
 ========================== */
