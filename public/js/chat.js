@@ -598,16 +598,6 @@ const voiceSendBtn =
 const cancelVoiceBtn =
     document.getElementById("cancelVoiceBtn");
 
-let recording = false;
-let paused = false;
-
-let mediaRecorder = null;
-let audioChunks = [];
-let audioBlob = null;
-
-let recordTimer = null;
-let recordSeconds = 0;
-
 
 /* ==========================
    UPDATE SEND BUTTON
