@@ -565,6 +565,705 @@ function touchEnd(){
 }
 
 /* ==========================
+   VOICE MESSAGE
+   WhatsApp-Style
+   One Send Button
+========================== */
+
+const recordButton = document.getElementById("sendBtn");
+const sendIcon = document.getElementById("sendIcon");
+
+const recordingBox =
+    document.getElementById("recordingBox");
+
+const recordTime =
+    document.getElementById("recordTime");
+
+const recordText =
+    document.getElementById("recordText");
+
+const voicePreview =
+    document.getElementById("voicePreview");
+
+const cancelVoiceBtn =
+    document.getElementById("cancelVoiceBtn");
+
+
+/* ==========================
+   VOICE STATE
+========================== */
+
+let recording = false;
+let mediaRecorder = null;
+let audioChunks = [];
+let audioBlob = null;
+
+let recordTimer = null;
+let recordSeconds = 0;
+
+
+/* ==========================
+   UPDATE SEND BUTTON
+========================== */
+
+function updateSendButton(){
+
+    if(!recordButton || !sendIcon) return;
+
+    /* Voice ready */
+    if(audioBlob && audioBlob.size > 0 && !recording){
+
+        sendIcon.className =
+            "fa-solid fa-paper-plane";
+
+        return;
+    }
+
+    /* Recording */
+    if(recording){
+
+        sendIcon.className =
+            "fa-solid fa-stop";
+
+        return;
+    }
+
+    /* Text / Image */
+    const text =
+        messageInput.value.trim();
+
+    const image =
+        imageInput.files.length > 0;
+
+    if(text || image){
+
+        sendIcon.className =
+            "fa-solid fa-paper-plane";
+
+    }else{
+
+        sendIcon.className =
+            "fa-solid fa-microphone";
+
+    }
+
+}
+
+
+/* ==========================
+   START RECORDING
+========================== */
+
+async function startRecording(){
+
+    if(recording) return;
+
+    try{
+
+        const stream =
+            await navigator.mediaDevices.getUserMedia({
+                audio:true
+            });
+
+        let mimeType = "";
+
+        if(MediaRecorder.isTypeSupported("audio/webm;codecs=opus")){
+
+            mimeType =
+                "audio/webm;codecs=opus";
+
+        }else if(MediaRecorder.isTypeSupported("audio/webm")){
+
+            mimeType =
+                "audio/webm";
+
+        }
+
+        mediaRecorder =
+            mimeType
+            ? new MediaRecorder(stream,{mimeType})
+            : new MediaRecorder(stream);
+
+
+        audioChunks = [];
+        audioBlob = null;
+        recordSeconds = 0;
+
+        recordTime.innerText =
+            "00:00";
+
+        recordText.innerText =
+            "Recording...";
+
+        recordingBox.style.display =
+            "flex";
+
+        voicePreview.style.display =
+            "none";
+
+        recording = true;
+
+        updateSendButton();
+
+
+        /* ======================
+           AUDIO DATA
+        ====================== */
+
+        mediaRecorder.ondataavailable =
+        function(event){
+
+            if(
+                event.data &&
+                event.data.size > 0
+            ){
+
+                audioChunks.push(
+                    event.data
+                );
+
+            }
+
+        };
+
+
+        /* ======================
+           RECORDING STOP
+        ====================== */
+
+        mediaRecorder.onstop =
+        function(){
+
+            const type =
+                mediaRecorder.mimeType ||
+                "audio/webm";
+
+            audioBlob =
+                new Blob(
+                    audioChunks,
+                    {
+                        type:type
+                    }
+                );
+
+
+            stream
+                .getTracks()
+                .forEach(track =>
+                    track.stop()
+                );
+
+
+            if(!audioBlob.size){
+
+                cancelRecording();
+
+                alert(
+                    "Voice recording failed."
+                );
+
+                return;
+
+            }
+
+
+            recording = false;
+
+            clearInterval(recordTimer);
+
+
+            recordText.innerText =
+                "Voice ready";
+
+
+            /* ======================
+               PREVIEW AUDIO
+            ====================== */
+
+            const audioURL =
+                URL.createObjectURL(
+                    audioBlob
+                );
+
+            voicePreview.src =
+                audioURL;
+
+            voicePreview.controls = true;
+
+            voicePreview.style.display =
+                "block";
+
+
+            /* Send button */
+            updateSendButton();
+
+        };
+
+
+        mediaRecorder.start(250);
+
+
+        /* ======================
+           TIMER
+        ====================== */
+
+        recordTimer =
+        setInterval(function(){
+
+            recordSeconds++;
+
+            const minutes =
+                String(
+                    Math.floor(
+                        recordSeconds / 60
+                    )
+                ).padStart(2,"0");
+
+            const seconds =
+                String(
+                    recordSeconds % 60
+                ).padStart(2,"0");
+
+            recordTime.innerText =
+                `${minutes}:${seconds}`;
+
+        },1000);
+
+
+    }catch(error){
+
+        console.error(
+            "Microphone Error:",
+            error
+        );
+
+        alert(
+            "Microphone permission denied."
+        );
+
+    }
+
+}
+
+
+/* ==========================
+   STOP RECORDING
+========================== */
+
+function stopRecording(){
+
+    if(
+        !mediaRecorder ||
+        mediaRecorder.state === "inactive"
+    ){
+
+        return;
+
+    }
+
+    clearInterval(recordTimer);
+
+    mediaRecorder.stop();
+
+}
+
+
+/* ==========================
+   CANCEL VOICE
+========================== */
+
+function cancelRecording(){
+
+    clearInterval(recordTimer);
+
+
+    if(
+        mediaRecorder &&
+        mediaRecorder.state !== "inactive"
+    ){
+
+        mediaRecorder.onstop = null;
+
+        mediaRecorder.stop();
+
+    }
+
+
+    if(voicePreview){
+
+        voicePreview.pause();
+
+        voicePreview.removeAttribute(
+            "src"
+        );
+
+        voicePreview.load();
+
+        voicePreview.style.display =
+            "none";
+
+    }
+
+
+    audioChunks = [];
+
+    audioBlob = null;
+
+    recordSeconds = 0;
+
+    recording = false;
+
+
+    if(recordingBox){
+
+        recordingBox.style.display =
+            "none";
+
+    }
+
+
+    mediaRecorder = null;
+
+
+    updateSendButton();
+
+}
+
+
+/* ==========================
+   SEND VOICE
+========================== */
+
+async function sendVoice(){
+
+    if(
+        !audioBlob ||
+        !audioBlob.size
+    ){
+
+        return;
+
+    }
+
+
+    const blobToSend =
+        audioBlob;
+
+    const duration =
+        recordSeconds;
+
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "voice",
+        blobToSend,
+        "voice.webm"
+    );
+
+
+    formData.append(
+        "sender",
+        user.username
+    );
+
+
+    formData.append(
+        "receiver",
+        receiver
+    );
+
+
+    formData.append(
+        "duration",
+        duration
+    );
+
+
+    /* ======================
+       REPLY VOICE
+    ====================== */
+
+    if(replyMessage){
+
+        formData.append(
+            "replyTo",
+            replyMessage._id || ""
+        );
+
+        formData.append(
+            "replyUser",
+            replyMessage.sender || ""
+        );
+
+        formData.append(
+            "replyText",
+            replyMessage.text || ""
+        );
+
+        formData.append(
+            "replyImage",
+            replyMessage.image || ""
+        );
+
+        formData.append(
+            "replyVoice",
+            replyMessage.voice || ""
+        );
+
+    }
+
+
+    try{
+
+        const res =
+            await fetch(
+                "/api/messages/voice",
+                {
+                    method:"POST",
+                    body:formData
+                }
+            );
+
+
+        const data =
+            await res.json();
+
+
+        if(!data.success){
+
+            alert(
+                data.message ||
+                "Failed to send voice"
+            );
+
+            return;
+
+        }
+
+
+        appendMessage(
+            data.message
+        );
+
+
+        socket.emit(
+            "newMessage",
+            data.message
+        );
+
+
+        /* ======================
+           RESET
+        ====================== */
+
+        audioChunks = [];
+
+        audioBlob = null;
+
+        recordSeconds = 0;
+
+        clearInterval(recordTimer);
+
+
+        if(voicePreview){
+
+            voicePreview.pause();
+
+            voicePreview.removeAttribute(
+                "src"
+            );
+
+            voicePreview.load();
+
+            voicePreview.style.display =
+                "none";
+
+        }
+
+
+        if(recordingBox){
+
+            recordingBox.style.display =
+                "none";
+
+        }
+
+
+        if(replyMessage){
+
+            replyMessage = null;
+
+            const replyPreview =
+                document.getElementById(
+                    "replyPreview"
+                );
+
+            if(replyPreview){
+
+                replyPreview.style.display =
+                    "none";
+
+            }
+
+        }
+
+
+        mediaRecorder = null;
+
+        recording = false;
+
+
+        updateSendButton();
+
+
+    }catch(error){
+
+        console.error(
+            "Send Voice Error:",
+            error
+        );
+
+        alert(
+            "Network Error"
+        );
+
+    }
+
+}
+
+
+/* ==========================
+   ONE SEND BUTTON
+========================== */
+
+async function safeSend(){
+
+    if(typeof sending !== "undefined" && sending){
+
+        return;
+
+    }
+
+
+    /* ======================
+       VOICE READY
+       SEND
+    ====================== */
+
+    if(
+        audioBlob &&
+        audioBlob.size > 0 &&
+        !recording
+    ){
+
+        await sendVoice();
+
+        return;
+
+    }
+
+
+    /* ======================
+       RECORDING
+       STOP
+    ====================== */
+
+    if(recording){
+
+        stopRecording();
+
+        return;
+
+    }
+
+
+    const text =
+        messageInput.value.trim();
+
+    const image =
+        imageInput.files[0];
+
+
+    /* ======================
+       TEXT / IMAGE
+    ====================== */
+
+    if(text || image){
+
+        if(typeof sending !== "undefined"){
+
+            sending = true;
+
+        }
+
+        try{
+
+            await sendMessage();
+
+        }finally{
+
+            if(typeof sending !== "undefined"){
+
+                sending = false;
+
+            }
+
+            updateSendButton();
+
+        }
+
+        return;
+
+    }
+
+
+    /* ======================
+       EMPTY
+       START VOICE
+    ====================== */
+
+    await startRecording();
+
+}
+
+
+/* ==========================
+   CANCEL BUTTON
+========================== */
+
+if(cancelVoiceBtn){
+
+    cancelVoiceBtn.onclick =
+        cancelRecording;
+
+}
+
+
+/* ==========================
+   INPUT EVENTS
+========================== */
+
+messageInput.addEventListener(
+    "input",
+    updateSendButton
+);
+
+imageInput.addEventListener(
+    "change",
+    updateSendButton
+);
+
+
+/* ==========================
+   INITIAL
+========================== */
+
+updateSendButton();          
+
+/* ==========================
    PART 8
    Menus & Delete
 ========================== */
