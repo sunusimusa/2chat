@@ -469,9 +469,13 @@ async function sendMessage() {
     const text =
         messageInput.value.trim();
 
-    const image =
-        imageInput.files[0];
+   const image =
+    imageInput.files &&
+    imageInput.files.length > 0
+        ? imageInput.files[0]
+        : null;
 
+    
     if (
         text === "" &&
         !image &&
@@ -649,35 +653,42 @@ function handleSendAction() {
         messageInput.value.trim();
 
     const image =
-        imageInput.files[0];
+        imageInput.files &&
+        imageInput.files.length > 0
+            ? imageInput.files[0]
+            : null;
 
 
-    /*
-       Idan akwai text ko image
-       → aika message
-    */
+    // ==========================
+    // TEXT → SEND
+    // ==========================
 
-    if (
-        text !== "" ||
-        image
-    ) {
+    if (text !== "") {
 
         sendMessage();
 
         return;
-
     }
 
 
-    /*
-       Idan babu komai
-       → fara voice recording
-    */
+    // ==========================
+    // IMAGE → SEND
+    // ==========================
+
+    if (image) {
+
+        sendMessage();
+
+        return;
+    }
+
+
+    // ==========================
+    // NOTHING → VOICE
+    // ==========================
 
     startRecording();
-
 }
-
 
 /* ==========================
    UPDATE SEND ICON
@@ -1382,9 +1393,7 @@ if (voicePreview) {
 async function sendVoice() {
 
     if (!audioBlob) {
-
         return;
-
     }
 
 
@@ -1412,20 +1421,31 @@ async function sendVoice() {
         );
 
 
-        /*
-           Voice file
-        */
+        // ==========================
+        // VOICE FILE
+        // ==========================
+
+        const voiceFile =
+            new File(
+                [audioBlob],
+                "voice-message.webm",
+                {
+                    type:
+                        audioBlob.type ||
+                        "audio/webm"
+                }
+            );
+
 
         formData.append(
             "file",
-            audioBlob,
-            "voice-message.webm"
+            voiceFile
         );
 
 
-        /*
-           Reply support
-        */
+        // ==========================
+        // REPLY
+        // ==========================
 
         if (replyMessage) {
 
@@ -1453,15 +1473,11 @@ async function sendVoice() {
                 "replyVoice",
                 replyMessage.voice || ""
             );
-
         }
 
 
         if (voiceActionBtn) {
-
-            voiceActionBtn.disabled =
-                true;
-
+            voiceActionBtn.disabled = true;
         }
 
 
@@ -1479,17 +1495,26 @@ async function sendVoice() {
             await res.json();
 
 
-        if (!data.success) {
+        console.log(
+            "VOICE SEND RESPONSE:",
+            data
+        );
+
+
+        if (!res.ok || !data.success) {
 
             alert(
                 data.message ||
-                "Failed to send voice"
+                "Failed to send voice message"
             );
 
             return;
-
         }
 
+
+        // ==========================
+        // ADD MESSAGE
+        // ==========================
 
         appendMessage(
             data.message
@@ -1502,9 +1527,9 @@ async function sendVoice() {
         );
 
 
-        /*
-           Reset voice
-        */
+        // ==========================
+        // RESET
+        // ==========================
 
         resetVoiceComposer();
 
@@ -1517,20 +1542,17 @@ async function sendVoice() {
         );
 
         alert(
-            "Network Error"
+            "Voice message failed to send"
         );
+
 
     } finally {
 
         if (voiceActionBtn) {
-
-            voiceActionBtn.disabled =
-                false;
-
+            voiceActionBtn.disabled = false;
         }
 
     }
-
 }
 
 
