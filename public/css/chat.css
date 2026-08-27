@@ -450,138 +450,113 @@ cursor:pointer;
     transform: scale(.88);
 }
 
-
 /* ==========================
    RECORDING BOX
 ========================== */
 
-.recording-box {
+.recording-box{
+    width:100%;
+    height:50px;
+    min-height:50px;
+    box-sizing:border-box;
 
-    position: fixed;
+    display:flex;
+    align-items:center;
+    gap:10px;
 
-    left: 0;
-    right: 0;
-    bottom: 0;
+    padding:6px 10px;
 
-    min-height: 60px;
+    background:#ffffff;
+    border-top:1px solid #ddd;
 
-    padding: 8px 12px;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    background: #ffffff;
-
-    border-top: 1px solid #e5e5e5;
-
-    z-index: 1100;
+    position:relative;
 }
-
 
 /* Recording dot */
 
-.record-dot {
+.record-dot{
+    width:9px;
+    height:9px;
 
-    width: 10px;
-    height: 10px;
+    background:#ff3b30;
+    border-radius:50%;
 
-    flex-shrink: 0;
+    flex-shrink:0;
 
-    border-radius: 50%;
-
-    background: #f44336;
-
-    animation: recordingPulse 1s infinite;
+    animation:recordPulse 1s infinite;
 }
 
+/* Timer */
 
-/* Recording time */
+#recordTime{
+    font-size:14px;
+    font-weight:600;
+    color:#333;
 
-#recordTime {
-
-    min-width: 45px;
-
-    font-size: 14px;
-
-    font-weight: 600;
-
-    color: #333;
+    min-width:42px;
 }
-
 
 /* Recording text */
 
-.record-text {
+.record-text{
+    flex:1;
 
-    flex: 1;
+    font-size:14px;
+    color:#666;
 
-    color: #666;
-
-    font-size: 14px;
-
-    white-space: nowrap;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
+/* Send voice button */
 
-/* Send voice */
+#sendVoiceBtn{
+    width:40px;
+    height:40px;
 
-#sendVoiceBtn {
+    border:none;
+    border-radius:50%;
 
-    width: 44px;
-    height: 44px;
+    display:none;
 
-    border: none;
+    align-items:center;
+    justify-content:center;
 
-    border-radius: 50%;
+    background:#2196f3;
+    color:white;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size:16px;
 
-    background: #2196f3;
+    flex-shrink:0;
 
-    color: #ffffff;
-
-    font-size: 18px;
-
-    cursor: pointer;
+    cursor:pointer;
 }
 
-#sendVoiceBtn:active {
-    transform: scale(.88);
+#sendVoiceBtn i{
+    pointer-events:none;
 }
 
+/* Recording animation */
 
-/* ==========================
-   RECORDING ANIMATION
-========================== */
+@keyframes recordPulse{
 
-@keyframes recordingPulse {
-
-    0% {
-        transform: scale(1);
-        opacity: 1;
+    0%{
+        opacity:1;
+        transform:scale(1);
     }
 
-    50% {
-        transform: scale(1.35);
-        opacity: .5;
+    50%{
+        opacity:.4;
+        transform:scale(.8);
     }
 
-    100% {
-        transform: scale(1);
-        opacity: 1;
+    100%{
+        opacity:1;
+        transform:scale(1);
     }
 
 }
-
 
 /* ==========================
    MOBILE
