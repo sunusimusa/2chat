@@ -579,7 +579,73 @@ function touchEnd(){
 }
 
 /* ==========================
-   Voice Recording
+   VOICE RECORDING
+   WhatsApp-Style
+========================== */
+
+const recordBtn = document.getElementById("sendBtn");
+const sendIcon = document.getElementById("sendIcon");
+
+const recordingBox =
+    document.getElementById("recordingBox");
+
+const voicePreview =
+    document.getElementById("voicePreview");
+
+const voiceSendBtn =
+    document.getElementById("voiceSendBtn");
+
+const cancelVoiceBtn =
+    document.getElementById("cancelVoiceBtn");
+
+let recording = false;
+let paused = false;
+
+let mediaRecorder = null;
+let audioChunks = [];
+let audioBlob = null;
+
+let recordTimer = null;
+let recordSeconds = 0;
+
+
+/* ==========================
+   UPDATE SEND BUTTON
+========================== */
+
+function updateSendButton(){
+
+    if(recording){
+
+        sendIcon.className =
+            "fa-solid fa-stop";
+
+        return;
+    }
+
+    const hasText =
+        messageInput.value.trim() !== "";
+
+    const hasImage =
+        imageInput.files.length > 0;
+
+    if(hasText || hasImage){
+
+        sendIcon.className =
+            "fa-solid fa-paper-plane";
+
+    }else{
+
+        sendIcon.className =
+            "fa-solid fa-microphone";
+
+    }
+
+}
+
+
+/* ==========================
+   START RECORDING
 ========================== */
 
 async function startRecording(){
@@ -588,177 +654,196 @@ async function startRecording(){
 
     try{
 
-        const stream = await navigator.mediaDevices.getUserMedia({
-            audio:true
-        });
+        const stream =
+            await navigator.mediaDevices.getUserMedia({
+                audio:true
+            });
 
-        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder =
+            new MediaRecorder(stream);
 
         audioChunks = [];
+        audioBlob = null;
 
-        mediaRecorder.ondataavailable = (e) => {
+        recordSeconds = 0;
+        paused = false;
 
-    console.log("Chunk Size:", e.data.size);
+        mediaRecorder.ondataavailable = (event)=>{
 
-    if (e.data && e.data.size > 0) {
+            if(
+                event.data &&
+                event.data.size > 0
+            ){
 
-        audioChunks.push(e.data);
+                audioChunks.push(event.data);
 
-    }
+            }
 
-};
+        };
 
 
-       mediaRecorder.onstop = () => {
+        mediaRecorder.onstop = ()=>{
 
-    audioBlob = new Blob(audioChunks, {
-        type: "audio/webm"
-    });
+            audioBlob =
+                new Blob(
+                    audioChunks,
+                    {
+                        type:"audio/webm"
+                    }
+                );
 
-    console.log("Audio Chunks:", audioChunks);
-    console.log("Chunks Length:", audioChunks.length);
-    console.log("Audio Size:", audioBlob.size);
+            stream
+                .getTracks()
+                .forEach(track=>track.stop());
 
-    stream.getTracks().forEach(track => track.stop());
 
-    if (audioBlob.size === 0) {
+            if(audioBlob.size === 0){
 
-        alert("Voice recording failed.");
-        return;
+                cancelRecording();
 
-    }
+                alert(
+                    "Voice recording failed."
+                );
 
-    // Nuna Send Voice button
-    document.getElementById("sendVoiceBtn").style.display = "inline-flex";
+                return;
 
-    // Ɓoye Stop button
-    document.getElementById("stopRecordBtn").style.display = "none";
+            }
 
-    // Canza rubutu
-    document.querySelector(".record-text").innerText = "Voice Ready";
 
-};
-       
-       
+            /* Create local preview */
+
+            const audioURL =
+                URL.createObjectURL(audioBlob);
+
+            voicePreview.src = audioURL;
+
+            voicePreview.style.display =
+                "block";
+
+
+            recordingBox.style.display =
+                "flex";
+
+
+            document.getElementById(
+                "recordText"
+            ).innerText =
+                "Voice Ready";
+
+
+            document.getElementById(
+                "recordDot"
+            ).style.display =
+                "none";
+
+
+            /*
+             * IMPORTANT:
+             * The same SEND button remains
+             * the button used to send voice.
+             */
+
+            sendIcon.className =
+                "fa-solid fa-paper-plane";
+
+            recording = false;
+            paused = false;
+
+        };
+
+
         mediaRecorder.start(1000);
 
-        recording=true;
+        recording = true;
 
-        paused=false;
+        recordSeconds = 0;
 
-        recordSeconds=0;
+        recordingBox.style.display =
+            "flex";
 
-       document.getElementById("sendVoiceBtn").style.display = "none";
-        document.getElementById("recordingBox").style.display="flex";
 
-        document.getElementById("stopRecordBtn").style.display="flex";
+        voicePreview.style.display =
+            "none";
 
-        document.getElementById("recordBtn").innerHTML=
-        '<i class="fa-solid fa-pause"></i>';
 
-        recordTimer=setInterval(()=>{
+        document.getElementById(
+            "recordText"
+        ).innerText =
+            "Recording...";
 
-            recordSeconds++;
 
-            const m=String(Math.floor(recordSeconds/60)).padStart(2,"0");
+        document.getElementById(
+            "recordDot"
+        ).style.display =
+            "inline-block";
 
-            const s=String(recordSeconds%60).padStart(2,"0");
 
-            document.getElementById("recordTime").innerText=
-            `${m}:${s}`;
+        document.getElementById(
+            "recordTime"
+        ).innerText =
+            "00:00";
 
-        },1000);
 
-    }catch(err){
+        sendIcon.className =
+            "fa-solid fa-stop";
 
-        console.error(err);
 
-        alert("Microphone permission denied.");
+        recordTimer =
+            setInterval(()=>{
 
-    }
+                recordSeconds++;
 
-}
+                const minutes =
+                    String(
+                        Math.floor(
+                            recordSeconds / 60
+                        )
+                    ).padStart(2,"0");
 
-/* ==========================
-   Pause
-========================== */
+                const seconds =
+                    String(
+                        recordSeconds % 60
+                    ).padStart(2,"0");
 
-function pauseRecording(){
 
-    if(!mediaRecorder) return;
+                document.getElementById(
+                    "recordTime"
+                ).innerText =
+                    `${minutes}:${seconds}`;
 
-    mediaRecorder.pause();
+            },1000);
 
-    paused=true;
 
-    clearInterval(recordTimer);
+    }catch(error){
 
-    document.getElementById("recordBtn").innerHTML=
-    '<i class="fa-solid fa-play"></i>';
+        console.error(
+            "Microphone Error:",
+            error
+        );
 
-}
-
-/* ==========================
-   Resume
-========================== */
-
-function resumeRecording(){
-
-    if(!mediaRecorder) return;
-
-    mediaRecorder.resume();
-
-    paused=false;
-
-    document.getElementById("recordBtn").innerHTML=
-    '<i class="fa-solid fa-pause"></i>';
-
-    recordTimer=setInterval(()=>{
-
-        recordSeconds++;
-
-        const m=String(Math.floor(recordSeconds/60)).padStart(2,"0");
-
-        const s=String(recordSeconds%60).padStart(2,"0");
-
-        document.getElementById("recordTime").innerText=
-        `${m}:${s}`;
-
-    },1000);
-
-}
-
-/* ==========================
-   Toggle
-========================== */
-
-function toggleRecording() {
-
-    if (!recording) {
-
-        startRecording();
-
-    } else {
-
-        stopRecording();
+        alert(
+            "Microphone permission denied."
+        );
 
     }
 
 }
 
+
 /* ==========================
-   Stop Recording
+   STOP RECORDING
 ========================== */
 
-function stopRecording() {
+function stopRecording(){
 
-    if (!recording) return;
-
-    recording = false;
+    if(!mediaRecorder) return;
 
     clearInterval(recordTimer);
 
-    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    if(
+        mediaRecorder.state !==
+        "inactive"
+    ){
 
         mediaRecorder.stop();
 
@@ -766,171 +851,293 @@ function stopRecording() {
 
 }
 
+
 /* ==========================
-   Send Voice
+   CANCEL RECORDING
 ========================== */
 
-async function sendVoice() {
+function cancelRecording(){
 
-    if (!audioBlob || audioBlob.size === 0) {
-        alert("No voice recorded.");
-        return;
+    clearInterval(recordTimer);
+
+    if(
+        mediaRecorder &&
+        mediaRecorder.state !==
+        "inactive"
+    ){
+
+        mediaRecorder.stop();
+
     }
 
-    const formData = new FormData();
 
-    formData.append("voice", audioBlob, "voice.webm");
-    formData.append("sender", user.username);
-    formData.append("receiver", receiver);
-    formData.append("duration", recordSeconds);
+    mediaRecorder = null;
 
-    const res = await fetch("/api/messages/voice", {
-        method: "POST",
-        body: formData
-    });
+    audioChunks = [];
 
-    const data = await res.json();
+    audioBlob = null;
 
-    if (data.success) {
+    recordSeconds = 0;
 
-        appendMessage(data.message);
-        socket.emit("newMessage", data.message);
+    recording = false;
 
-        // Reset
+    paused = false;
+
+
+    if(voicePreview){
+
+        voicePreview.pause();
+
+        voicePreview.removeAttribute(
+            "src"
+        );
+
+        voicePreview.load();
+
+        voicePreview.style.display =
+            "none";
+
+    }
+
+
+    if(recordingBox){
+
+        recordingBox.style.display =
+            "none";
+
+    }
+
+
+    updateSendButton();
+
+}
+
+
+/* ==========================
+   SEND VOICE
+========================== */
+
+async function sendVoice(){
+
+    if(
+        !audioBlob ||
+        audioBlob.size === 0
+    ){
+
+        alert("No voice recorded.");
+
+        return;
+
+    }
+
+
+    const formData =
+        new FormData();
+
+    formData.append(
+        "voice",
+        audioBlob,
+        "voice.webm"
+    );
+
+    formData.append(
+        "sender",
+        user.username
+    );
+
+    formData.append(
+        "receiver",
+        receiver
+    );
+
+    formData.append(
+        "duration",
+        recordSeconds
+    );
+
+
+    try{
+
+        const res =
+            await fetch(
+                "/api/messages/voice",
+                {
+                    method:"POST",
+                    body:formData
+                }
+            );
+
+
+        const data =
+            await res.json();
+
+
+        if(!data.success){
+
+            alert(
+                data.message ||
+                "Failed to send voice"
+            );
+
+            return;
+
+        }
+
+
+        appendMessage(
+            data.message
+        );
+
+        socket.emit(
+            "newMessage",
+            data.message
+        );
+
+
+        /*
+         * Reset voice state
+         */
+
         audioChunks = [];
+
         audioBlob = null;
+
         recordSeconds = 0;
 
-        document.getElementById("recordingBox").style.display = "none";
-        document.getElementById("stopRecordBtn").style.display = "none";
-        document.getElementById("sendVoiceBtn").style.display = "none";
+        mediaRecorder = null;
 
-        document.getElementById("recordBtn").style.display = "flex";
-        document.getElementById("recordBtn").innerHTML =
-            '<i class="fa-solid fa-microphone"></i>';
+        recording = false;
 
-    } else {
+        paused = false;
 
-        alert(data.message);
+
+        if(voicePreview){
+
+            voicePreview.pause();
+
+            voicePreview.removeAttribute(
+                "src"
+            );
+
+            voicePreview.load();
+
+            voicePreview.style.display =
+                "none";
+
+        }
+
+
+        recordingBox.style.display =
+            "none";
+
+
+        updateSendButton();
+
+
+    }catch(error){
+
+        console.error(
+            "Send Voice Error:",
+            error
+        );
+
+        alert(
+            "Network Error"
+        );
 
     }
 
 }
 
+
 /* ==========================
-   Voice Player
+   ONE BUTTON
 ========================== */
 
-    function loadVoicePlayers(){
+recordBtn.onclick = async function(){
 
-    document.querySelectorAll(".voice-player").forEach(player=>{
+    /*
+     * If a voice has already been
+     * recorded and is ready,
+     * the same button sends it.
+     */
 
-        const playBtn = player.querySelector(".voice-play");
-        const audio = player.querySelector(".voice-audio");
-        const progress = player.querySelector(".voice-progress");
-        const time = player.querySelector(".voice-time");
+    if(
+        audioBlob &&
+        audioBlob.size > 0 &&
+        !recording
+    ){
 
-        if(!playBtn || !audio) return;
+        await sendVoice();
 
-        // Load duration
-        audio.addEventListener("loadedmetadata",()=>{
+        return;
 
-            if(isNaN(audio.duration) || !isFinite(audio.duration)){
-                time.innerText = "0:00";
-                return;
-            }
+    }
 
-            const total = Math.floor(audio.duration);
-            const m = Math.floor(total/60);
-            const s = String(total%60).padStart(2,"0");
 
-            time.innerText = `${m}:${s}`;
+    /*
+     * If currently recording,
+     * stop and create preview.
+     */
 
-        });
+    if(recording){
 
-        playBtn.onclick = ()=>{
+        stopRecording();
 
-            // Stop sauran audio
-            document.querySelectorAll(".voice-audio").forEach(a=>{
+        return;
 
-                if(a !== audio){
+    }
 
-                    a.pause();
-                    a.currentTime = 0;
 
-                    const p = a.closest(".voice-player");
+    /*
+     * Otherwise:
+     *
+     * - text/photo => send message
+     * - nothing => start voice
+     */
 
-                    if(p){
+    const text =
+        messageInput.value.trim();
 
-                        p.querySelector(".voice-play").innerHTML =
-                        '<i class="fa-solid fa-play"></i>';
+    const image =
+        imageInput.files[0];
 
-                        p.querySelector(".voice-progress").style.width="0%";
 
-                    }
+    if(text || image){
 
-                }
+        safeSend();
 
-            });
+        return;
 
-            if(audio.paused){
+    }
 
-                audio.play();
 
-                playBtn.innerHTML =
-                '<i class="fa-solid fa-pause"></i>';
+    await startRecording();
 
-            }else{
+};
 
-                audio.pause();
 
-                playBtn.innerHTML =
-                '<i class="fa-solid fa-play"></i>';
+/* ==========================
+   INPUT CHANGES
+========================== */
 
-            }
+messageInput.addEventListener(
+    "input",
+    updateSendButton
+);
 
-        };
 
-        audio.ontimeupdate = ()=>{
+imageInput.addEventListener(
+    "change",
+    updateSendButton
+);
 
-            if(audio.duration && isFinite(audio.duration)){
 
-                const percent =
-                (audio.currentTime/audio.duration)*100;
+/* ==========================
+   INITIAL STATE
+========================== */
 
-                progress.style.width = percent + "%";
-
-            }
-
-            const current = Math.floor(audio.currentTime);
-
-            const m = Math.floor(current/60);
-            const s = String(current%60).padStart(2,"0");
-
-            time.innerText = `${m}:${s}`;
-
-        };
-
-        audio.onended = ()=>{
-
-            playBtn.innerHTML =
-            '<i class="fa-solid fa-play"></i>';
-
-            progress.style.width="0%";
-
-        };
-
-        audio.onerror = ()=>{
-
-            time.innerText = "Error";
-
-            console.log("Voice failed to load:", audio.src);
-
-        };
-
-    });
-
-}
+updateSendButton();
 
 /* ==========================
    PART 8
