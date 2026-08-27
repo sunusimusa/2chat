@@ -1404,6 +1404,9 @@ function toggleVoicePreview() {
 /* ==========================================================
    VOICE PLAYER EVENTS
 ========================================================== */
+/* ==========================================================
+   VOICE PLAYER EVENTS (GYARARRE - daya kadai ke kunna a lokaci daya)
+========================================================== */
 
 document.addEventListener("click", function(e) {
 
@@ -1427,6 +1430,62 @@ document.addEventListener("click", function(e) {
         voicePlayer.querySelector(".voice-time");
 
     if (!player) return;
+
+
+    /* ==========================================================
+       SABON SASHE: DAKATAR DA DUK SAURAN VOICE PLAYERS
+       Kafin a kunna wanda aka danna, dole a tsayar (pause) da
+       reset duk sauran audio elements domin daya kadai ke kunna
+       a kowanne lokaci - kamar WhatsApp.
+    ========================================================== */
+
+    if (player.paused) {
+
+        document
+            .querySelectorAll(".voice-audio")
+            .forEach(function(otherPlayer) {
+
+                if (otherPlayer !== player && !otherPlayer.paused) {
+
+                    otherPlayer.pause();
+                    otherPlayer.currentTime = 0;
+
+                    const otherContainer =
+                        otherPlayer.closest(".voice-player");
+
+                    if (otherContainer) {
+
+                        const otherButton =
+                            otherContainer.querySelector(".voice-play");
+
+                        const otherIcon =
+                            otherButton
+                                ? otherButton.querySelector("i")
+                                : null;
+
+                        if (otherIcon) {
+                            otherIcon.className = "fa-solid fa-play";
+                        }
+
+                        const otherProgress =
+                            otherContainer.querySelector(".voice-progress");
+
+                        if (otherProgress) {
+                            otherProgress.style.width = "0%";
+                        }
+
+                        const otherTime =
+                            otherContainer.querySelector(".voice-time");
+
+                        if (otherTime) {
+                            otherTime.innerText = "0:00";
+                        }
+                    }
+                }
+
+            });
+
+    }
 
 
     /* ==========================
@@ -1573,6 +1632,7 @@ document.addEventListener("click", function(e) {
     }
 
 });
+
 
 
 /* ==========================================================
