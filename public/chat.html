@@ -187,89 +187,148 @@ style="display:none;">
 MESSAGE BAR  
 ========================== -->  
   
-<div class="message-bar">  
-  
-    <label  
-    for="image"  
-    class="icon-btn">  
-  
-        <i class="fa-solid fa-image"></i>  
-  
-    </label>  
-  
-    <input  
-    type="file"  
-    id="image"  
-    accept="image/*"  
-    hidden>  
-  
-    <textarea  
-    id="message"  
-    rows="1"  
-    placeholder="Type a message..."></textarea>  
-  
-    <button  
-    id="recordBtn"  
-    type="button"  
-    onclick="toggleRecording()">  
-  
-        <i  
-        id="recordIcon"  
-        class="fa-solid fa-microphone"></i>  
-  
-    </button>  
-  
-    <button  
-    id="stopRecordBtn"  
-    type="button"  
-    onclick="stopRecording()"  
-    style="display:none;">  
-  
-        <i class="fa-solid fa-stop"></i>  
-  
-    </button>  
-  
-    <button  
-id="sendBtn"  
-type="button"  
-onclick="sendMessage()">  
-  
-<i class="fa-solid fa-paper-plane"></i>  
-  
-</button>  
-  
-</div>  
-  
-<!-- ==========================  
-RECORDING BOX  
-========================== -->  
-  
-<div  
-id="recordingBox"  
-class="recording-box"  
-style="display:none;">  
-  
-    <span class="record-dot"></span>  
-  
-    <span id="recordTime">  
-        00:00  
-    </span>  
-  
-  <span id="recordText" class="record-text">  
-    Recording...  
-   </span>  
-  
-    <button  
-    id="sendVoiceBtn"  
-    type="button"  
-    onclick="sendVoice()"  
-    style="display:none;">  
-  
-        <i class="fa-solid fa-paper-plane"></i>  
-  
-    </button>  
-  
-</div>  
+<!-- ==========================
+     2CHAT MESSAGE COMPOSER
+========================== -->
+
+<div class="message-composer">
+
+    <!-- IMAGE BUTTON -->
+    <label for="image" class="composer-btn image-btn">
+        <i class="fa-solid fa-image"></i>
+    </label>
+
+    <input
+        type="file"
+        id="image"
+        accept="image/*"
+        hidden
+    >
+
+    <!-- MESSAGE INPUT -->
+    <textarea
+        id="message"
+        rows="1"
+        placeholder="Type a message..."
+    ></textarea>
+
+    <!-- SINGLE ACTION BUTTON -->
+    <button
+        id="sendBtn"
+        class="composer-btn action-btn"
+        type="button"
+        onclick="handleSendAction()"
+    >
+        <i
+            id="sendIcon"
+            class="fa-solid fa-microphone"
+        ></i>
+    </button>
+
+</div>
+
+
+<!-- ==========================
+     VOICE RECORDING / PREVIEW
+========================== -->
+
+<div
+    id="recordingBox"
+    class="voice-composer"
+    style="display:none;"
+>
+
+    <!-- CANCEL -->
+    <button
+        id="cancelVoiceBtn"
+        class="voice-action cancel-voice"
+        type="button"
+        onclick="cancelRecording()"
+    >
+        <i class="fa-solid fa-xmark"></i>
+    </button>
+
+
+    <!-- VOICE CONTENT -->
+    <div class="voice-content">
+
+        <div class="voice-status">
+
+            <span
+                id="recordDot"
+                class="record-dot"
+            ></span>
+
+            <span id="recordTime">
+                00:00
+            </span>
+
+            <span
+                id="recordText"
+                class="record-text"
+            >
+                Recording...
+            </span>
+
+        </div>
+
+
+        <!-- AUDIO PREVIEW -->
+        <div
+            id="voicePreviewBox"
+            class="voice-preview"
+            style="display:none;"
+        >
+
+            <button
+                id="voicePlayBtn"
+                type="button"
+                class="preview-play"
+                onclick="toggleVoicePreview()"
+            >
+                <i
+                    id="voicePlayIcon"
+                    class="fa-solid fa-play"
+                ></i>
+            </button>
+
+            <div class="preview-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+        </div>
+
+        <audio
+            id="voicePreview"
+            preload="metadata"
+        ></audio>
+
+    </div>
+
+
+    <!-- STOP / SEND -->
+    <button
+        id="voiceActionBtn"
+        class="voice-action send-voice"
+        type="button"
+        onclick="handleVoiceAction()"
+    >
+        <i
+            id="voiceActionIcon"
+            class="fa-solid fa-stop"
+        ></i>
+    </button>
+
+</div>
   
   <!-- ==========================  
 REACTION POPUP  
