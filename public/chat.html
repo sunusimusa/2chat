@@ -187,12 +187,13 @@ style="display:none;">
 MESSAGE BAR
 ========================== -->
 
-<div class="message-bar">
+<div class="message-bar" id="messageBar">
 
     <!-- PHOTO -->
     <label
         for="image"
-        class="icon-btn">
+        class="icon-btn"
+        id="photoBtn">
 
         <i class="fa-solid fa-image"></i>
 
@@ -212,27 +213,16 @@ MESSAGE BAR
         placeholder="Type a message..."></textarea>
 
 
-    <!-- VOICE BUTTON -->
-    <button
-        id="recordBtn"
-        type="button"
-        onclick="toggleRecording()">
-
-        <i
-            id="recordIcon"
-            class="fa-solid fa-microphone">
-        </i>
-
-    </button>
-
-
-    <!-- SEND BUTTON -->
+    <!-- ONE SEND / VOICE BUTTON -->
     <button
         id="sendBtn"
         type="button"
-        onclick="sendMessage()">
+        onclick="safeSend()">
 
-        <i class="fa-solid fa-paper-plane"></i>
+        <i
+            id="sendIcon"
+            class="fa-solid fa-microphone">
+        </i>
 
     </button>
 
@@ -248,6 +238,7 @@ VOICE RECORDING / PREVIEW
     class="recording-box"
     style="display:none;">
 
+    <!-- CANCEL VOICE -->
     <button
         id="cancelVoiceBtn"
         type="button"
@@ -258,14 +249,20 @@ VOICE RECORDING / PREVIEW
     </button>
 
 
-    <span class="record-dot"></span>
+    <!-- RECORDING INDICATOR -->
+    <span
+        class="record-dot"
+        id="recordDot">
+    </span>
 
 
+    <!-- TIME -->
     <span id="recordTime">
         00:00
     </span>
 
 
+    <!-- STATUS -->
     <span
         id="recordText"
         class="record-text">
@@ -275,12 +272,24 @@ VOICE RECORDING / PREVIEW
     </span>
 
 
-    <!-- AUDIO PREVIEW -->
+    <!-- VOICE PREVIEW -->
     <audio
         id="voicePreview"
         controls
+        preload="metadata"
         style="display:none;">
     </audio>
+
+
+    <!-- SEND VOICE -->
+    <button
+        id="voiceSendBtn"
+        type="button"
+        onclick="sendVoice()">
+
+        <i class="fa-solid fa-paper-plane"></i>
+
+    </button>
 
 </div>
 
