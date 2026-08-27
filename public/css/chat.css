@@ -1045,6 +1045,149 @@ box-shadow:0 1px 3px rgba(0,0,0,.2);
 
 }
 
+/* ==========================================================
+   2CHAT MESSAGE BUBBLES
+========================================================== */
+
+.bubble-me,
+.bubble-other {
+
+    width: fit-content;
+
+    max-width: 78%;
+
+    min-width: 70px;
+
+    padding: 10px 12px;
+
+    border-radius: 18px;
+
+    position: relative;
+
+    box-sizing: border-box;
+
+    margin: 5px 0;
+
+}
+
+
+/* MY MESSAGE */
+
+.bubble-me {
+
+    min-height: 48px;
+
+    border-bottom-right-radius: 5px;
+
+}
+
+
+/* OTHER MESSAGE */
+
+.bubble-other {
+
+    min-height: 48px;
+
+    border-bottom-left-radius: 5px;
+
+}
+
+
+/* ==========================================================
+   VOICE BUBBLE
+========================================================== */
+
+.voice-player {
+
+    width: 260px;
+
+    min-height: 64px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 8px 10px;
+
+    box-sizing: border-box;
+
+}
+
+
+/* PLAY BUTTON */
+
+.voice-play {
+
+    width: 42px;
+
+    height: 42px;
+
+    min-width: 42px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    cursor: pointer;
+
+}
+
+
+/* WAVE */
+
+.voice-wave {
+
+    flex: 1;
+
+    height: 30px;
+
+    position: relative;
+
+    overflow: hidden;
+
+}
+
+
+/* PROGRESS */
+
+.voice-progress {
+
+    height: 100%;
+
+    width: 0%;
+
+}
+
+
+/* TIME */
+
+.voice-time {
+
+    min-width: 35px;
+
+    font-size: 12px;
+
+    white-space: nowrap;
+
+}
+
+
+/* AUDIO */
+
+.voice-audio {
+
+    display: none;
+
+   }
+
 /* ==========================
    FINISHED
 ========================== */
