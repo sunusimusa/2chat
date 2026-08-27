@@ -1400,6 +1400,7 @@ function toggleVoicePreview() {
 
 }
 
+
 /* ==========================================================
    VOICE PLAYER EVENTS
 ========================================================== */
@@ -1411,19 +1412,19 @@ document.addEventListener("click", function(e) {
 
     if (!button) return;
 
-    const box =
+    const voicePlayer =
         button.closest(".voice-player");
 
-    if (!box) return;
+    if (!voicePlayer) return;
 
     const player =
-        box.querySelector(".voice-audio");
+        voicePlayer.querySelector(".voice-audio");
 
     const progress =
-        box.querySelector(".voice-progress");
+        voicePlayer.querySelector(".voice-progress");
 
     const time =
-        box.querySelector(".voice-time");
+        voicePlayer.querySelector(".voice-time");
 
     if (!player) return;
 
@@ -1434,98 +1435,142 @@ document.addEventListener("click", function(e) {
 
     if (player.paused) {
 
-        player.play().catch(err => {
+        player.play()
+            .then(() => {
 
-            console.error(
-                "Voice Play Error:",
-                err
-            );
+                const icon =
+                    button.querySelector("i");
 
-        });
+                if (icon) {
 
-        button.innerHTML =
-            '<i class="fa-solid fa-pause"></i>';
+                    icon.className =
+                        "fa-solid fa-pause";
+
+                }
+
+            })
+            .catch(err => {
+
+                console.error(
+                    "Voice Play Error:",
+                    err
+                );
+
+                alert(
+                    "Voice could not be played."
+                );
+
+            });
 
     } else {
 
         player.pause();
 
-        button.innerHTML =
-            '<i class="fa-solid fa-play"></i>';
+        const icon =
+            button.querySelector("i");
+
+        if (icon) {
+
+            icon.className =
+                "fa-solid fa-play";
+
+        }
 
     }
 
 
     /* ==========================
-       PROGRESS
+       TIME UPDATE
     ========================== */
 
-    player.ontimeupdate = function() {
+    if (!player.dataset.eventsAttached) {
 
-        if (!player.duration) return;
-
-        const percent =
-            (player.currentTime /
-            player.duration) * 100;
-
-        if (progress) {
-
-            progress.style.width =
-                percent + "%";
-
-        }
-
-        const seconds =
-            Math.floor(
-                player.currentTime
-            );
-
-        const minutes =
-            Math.floor(
-                seconds / 60
-            );
-
-        const remainSeconds =
-            seconds % 60;
-
-        if (time) {
-
-            time.innerText =
-                minutes +
-                ":" +
-                String(
-                    remainSeconds
-                ).padStart(2, "0");
-
-        }
-
-    };
+        player.dataset.eventsAttached = "true";
 
 
-    /* ==========================
-       ENDED
-    ========================== */
+        player.addEventListener(
+            "timeupdate",
+            function() {
 
-    player.onended = function() {
+                if (!player.duration) return;
 
-        button.innerHTML =
-            '<i class="fa-solid fa-play"></i>';
 
-        if (progress) {
+                const percent =
+                    (
+                        player.currentTime /
+                        player.duration
+                    ) * 100;
 
-            progress.style.width =
-                "0%";
 
-        }
+                if (progress) {
 
-        if (time) {
+                    progress.style.width =
+                        percent + "%";
 
-            time.innerText =
-                "0:00";
+                }
 
-        }
 
-    };
+                const seconds =
+                    Math.floor(
+                        player.currentTime
+                    );
+
+
+                const minutes =
+                    Math.floor(
+                        seconds / 60
+                    );
+
+
+                const remainSeconds =
+                    seconds % 60;
+
+
+                if (time) {
+
+                    time.innerText =
+                        minutes +
+                        ":" +
+                        String(
+                            remainSeconds
+                        ).padStart(2, "0");
+
+                }
+
+            }
+        );
+
+
+        /* ==========================
+           WHEN VOICE ENDS
+        ========================== */
+
+        player.addEventListener(
+            "ended",
+            function() {
+
+                const icon =
+                    button.querySelector("i");
+
+                if (icon) {
+
+                    icon.className =
+                        "fa-solid fa-play";
+
+                }
+
+
+                if (progress) {
+
+                    progress.style.width =
+                        "0%";
+
+                }
+
+            }
+        );
+
+    }
 
 });
 
