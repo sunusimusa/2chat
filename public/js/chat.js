@@ -27,16 +27,6 @@ let currentBubble = null;
 let swipeMessage = null;
 let startX = 0;
 
-let recording = false;
-let paused = false;
-
-let mediaRecorder = null;
-let audioChunks = [];
-let audioBlob = null;
-
-let recordTimer = null;
-let recordSeconds = 0;
-
 /* ==========================
    DOM
 ========================== */
