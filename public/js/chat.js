@@ -1438,8 +1438,8 @@ async function sendVoice() {
 
 
         formData.append(
-            "file",
-            voiceFile
+         "voice",
+         voiceFile
         );
 
 
@@ -1483,7 +1483,7 @@ async function sendVoice() {
 
         const res =
             await fetch(
-                "/api/messages/send",
+                "/api/messages/voice",
                 {
                     method: "POST",
                     body: formData
