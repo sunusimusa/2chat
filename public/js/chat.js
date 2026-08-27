@@ -633,13 +633,10 @@ function updateSendButton(){
 
 }
 
-
-/* ==========================
-   START RECORDING
-========================== */
 /* ==========================
    VOICE RECORDING
-   ONE SEND BUTTON SYSTEM
+   WhatsApp-Style
+   ONE SEND BUTTON
 ========================== */
 
 const recordButton = document.getElementById("sendBtn");
@@ -650,6 +647,11 @@ const recordTime = document.getElementById("recordTime");
 const recordText = document.getElementById("recordText");
 const voicePreview = document.getElementById("voicePreview");
 const cancelVoiceBtn = document.getElementById("cancelVoiceBtn");
+
+
+/* ==========================
+   VOICE STATE
+========================== */
 
 let recording = false;
 let mediaRecorder = null;
@@ -668,8 +670,29 @@ function updateSendButton(){
 
     if(!recordButton || !sendIcon) return;
 
-    const text = messageInput.value.trim();
-    const image = imageInput.files[0];
+    // Idan voice preview yana ready
+    if(audioBlob && audioBlob.size > 0){
+
+        sendIcon.className =
+            "fa-solid fa-paper-plane";
+
+        return;
+    }
+
+    // Idan ana recording
+    if(recording){
+
+        sendIcon.className =
+            "fa-solid fa-stop";
+
+        return;
+    }
+
+    const text =
+        messageInput.value.trim();
+
+    const image =
+        imageInput.files.length > 0;
 
     if(text || image){
 
@@ -706,7 +729,6 @@ async function startRecording(){
 
         audioChunks = [];
         audioBlob = null;
-
         recordSeconds = 0;
 
         recordTime.innerText = "00:00";
@@ -720,13 +742,14 @@ async function startRecording(){
         voicePreview.style.display =
             "none";
 
-        recordButton.style.display =
-            "flex";
-
-        sendIcon.className =
-            "fa-solid fa-stop";
-
         recording = true;
+
+        updateSendButton();
+
+
+        /* ======================
+           AUDIO DATA
+        ====================== */
 
         mediaRecorder.ondataavailable =
             event => {
@@ -745,20 +768,30 @@ async function startRecording(){
             };
 
 
+        /* ======================
+           STOP
+        ====================== */
+
         mediaRecorder.onstop = () => {
 
-            audioBlob = new Blob(
-                audioChunks,
-                {
-                    type:"audio/webm"
-                }
-            );
+            const blob =
+                new Blob(
+                    audioChunks,
+                    {
+                        type:
+                            mediaRecorder.mimeType ||
+                            "audio/webm"
+                    }
+                );
+
+            audioBlob = blob;
 
             stream
                 .getTracks()
                 .forEach(track =>
                     track.stop()
                 );
+
 
             if(!audioBlob.size){
 
@@ -772,9 +805,6 @@ async function startRecording(){
 
             }
 
-            /* ======================
-               VOICE READY
-            ====================== */
 
             recording = false;
 
@@ -783,10 +813,10 @@ async function startRecording(){
             recordText.innerText =
                 "Voice ready";
 
-            sendIcon.className =
-                "fa-solid fa-paper-plane";
 
-            /* Create preview */
+            /* ======================
+               AUDIO PREVIEW
+            ====================== */
 
             const audioURL =
                 URL.createObjectURL(
@@ -798,6 +828,14 @@ async function startRecording(){
 
             voicePreview.style.display =
                 "block";
+
+
+            /*
+             * Yanzu sendBtn zai koma
+             * paper-plane
+             */
+
+            updateSendButton();
 
         };
 
@@ -883,6 +921,8 @@ function cancelRecording(){
         mediaRecorder.state !== "inactive"
     ){
 
+        mediaRecorder.onstop = null;
+
         mediaRecorder.stop();
 
     }
@@ -903,97 +943,16 @@ function cancelRecording(){
     }
 
     audioChunks = [];
-
     audioBlob = null;
-
     recordSeconds = 0;
-
     recording = false;
 
     recordingBox.style.display =
         "none";
 
-    sendIcon.className =
-        "fa-solid fa-microphone";
+    mediaRecorder = null;
 
-    if(mediaRecorder){
-
-        mediaRecorder = null;
-
-    }
-
-}
-
-
-/* ==========================
-   ONE BUTTON ACTION
-========================== */
-
-async function safeSend(){
-
-    if(sending) return;
-
-    const text =
-        messageInput.value.trim();
-
-    const image =
-        imageInput.files[0];
-
-
-    /* ======================
-       RECORDING
-    ====================== */
-
-    if(recording){
-
-        stopRecording();
-
-        return;
-
-    }
-
-
-    /* ======================
-       VOICE READY → SEND
-    ====================== */
-
-    if(audioBlob && audioBlob.size > 0){
-
-        await sendVoice();
-
-        return;
-
-    }
-
-
-    /* ======================
-       TEXT / PHOTO
-    ====================== */
-
-    if(text || image){
-
-        sending = true;
-
-        try{
-
-            await sendMessage();
-
-        }finally{
-
-            sending = false;
-
-        }
-
-        return;
-
-    }
-
-
-    /* ======================
-       EMPTY → START VOICE
-    ====================== */
-
-    await startRecording();
+    updateSendButton();
 
 }
 
@@ -1088,9 +1047,7 @@ async function sendVoice(){
         ====================== */
 
         audioChunks = [];
-
         audioBlob = null;
-
         recordSeconds = 0;
 
         clearInterval(recordTimer);
@@ -1113,12 +1070,11 @@ async function sendVoice(){
         recordingBox.style.display =
             "none";
 
-        sendIcon.className =
-            "fa-solid fa-microphone";
-
         mediaRecorder = null;
 
         recording = false;
+
+        updateSendButton();
 
 
     }catch(error){
@@ -1138,7 +1094,90 @@ async function sendVoice(){
 
 
 /* ==========================
-   CANCEL BUTTON
+   ONE SEND BUTTON
+========================== */
+
+async function safeSend(){
+
+    if(sending) return;
+
+
+    const text =
+        messageInput.value.trim();
+
+    const image =
+        imageInput.files[0];
+
+
+    /* ======================
+       VOICE READY
+       SEND VOICE
+    ====================== */
+
+    if(
+        audioBlob &&
+        audioBlob.size > 0 &&
+        !recording
+    ){
+
+        await sendVoice();
+
+        return;
+
+    }
+
+
+    /* ======================
+       CURRENTLY RECORDING
+       STOP
+    ====================== */
+
+    if(recording){
+
+        stopRecording();
+
+        return;
+
+    }
+
+
+    /* ======================
+       TEXT / PHOTO
+    ====================== */
+
+    if(text || image){
+
+        sending = true;
+
+        try{
+
+            await sendMessage();
+
+        }finally{
+
+            sending = false;
+
+            updateSendButton();
+
+        }
+
+        return;
+
+    }
+
+
+    /* ======================
+       EMPTY
+       START VOICE
+    ====================== */
+
+    await startRecording();
+
+}
+
+
+/* ==========================
+   CANCEL VOICE BUTTON
 ========================== */
 
 if(cancelVoiceBtn){
@@ -1150,18 +1189,13 @@ if(cancelVoiceBtn){
 
 
 /* ==========================
-   MESSAGE INPUT
+   INPUT EVENTS
 ========================== */
 
 messageInput.addEventListener(
     "input",
     updateSendButton
 );
-
-
-/* ==========================
-   IMAGE INPUT
-========================== */
 
 imageInput.addEventListener(
     "change",
@@ -1170,7 +1204,7 @@ imageInput.addEventListener(
 
 
 /* ==========================
-   INITIAL BUTTON
+   INITIAL
 ========================== */
 
 updateSendButton();
