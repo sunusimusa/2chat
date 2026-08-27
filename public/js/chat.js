@@ -1675,29 +1675,7 @@ messageInput.addEventListener("input",()=>{
 
 });
 
-/* ---------- Prevent Double Send ---------- */
-
-let sending=false;
-
-async function safeSend(){
-
-    if(sending) return;
-
-    sending=true;
-
-    try{
-
-        await sendMessage();
-
-    }finally{
-
-        sending=false;
-
-    }
-
-}
-
-sendBtn.onclick=safeSend;
+/* ---------- Prevent Double Send ---------- *
 
 /* ---------- Network ---------- */
 
