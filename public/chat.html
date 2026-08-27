@@ -189,85 +189,98 @@ MESSAGE BAR
 
 <div class="message-bar">
 
+    <!-- PHOTO -->
     <label
-    for="image"
-    class="icon-btn">
+        for="image"
+        class="icon-btn">
 
         <i class="fa-solid fa-image"></i>
 
     </label>
 
     <input
-    type="file"
-    id="image"
-    accept="image/*"
-    hidden>
+        type="file"
+        id="image"
+        accept="image/*"
+        hidden>
 
+
+    <!-- MESSAGE INPUT -->
     <textarea
-    id="message"
-    rows="1"
-    placeholder="Type a message..."></textarea>
+        id="message"
+        rows="1"
+        placeholder="Type a message..."></textarea>
 
+
+    <!-- VOICE BUTTON -->
     <button
-    id="recordBtn"
-    type="button"
-    onclick="toggleRecording()">
+        id="recordBtn"
+        type="button"
+        onclick="toggleRecording()">
 
         <i
-        id="recordIcon"
-        class="fa-solid fa-microphone"></i>
+            id="recordIcon"
+            class="fa-solid fa-microphone">
+        </i>
 
     </button>
 
-    <button
-    id="stopRecordBtn"
-    type="button"
-    onclick="stopRecording()"
-    style="display:none;">
 
-        <i class="fa-solid fa-stop"></i>
+    <!-- SEND BUTTON -->
+    <button
+        id="sendBtn"
+        type="button"
+        onclick="sendMessage()">
+
+        <i class="fa-solid fa-paper-plane"></i>
 
     </button>
-
-    <button
-id="sendBtn"
-type="button"
-onclick="sendMessage()">
-
-<i class="fa-solid fa-paper-plane"></i>
-
-</button>
 
 </div>
 
+
 <!-- ==========================
-RECORDING BOX
+VOICE RECORDING / PREVIEW
 ========================== -->
 
 <div
-id="recordingBox"
-class="recording-box"
-style="display:none;">
+    id="recordingBox"
+    class="recording-box"
+    style="display:none;">
+
+    <button
+        id="cancelVoiceBtn"
+        type="button"
+        onclick="cancelRecording()">
+
+        <i class="fa-solid fa-trash"></i>
+
+    </button>
+
 
     <span class="record-dot"></span>
+
 
     <span id="recordTime">
         00:00
     </span>
 
-  <span id="recordText" class="record-text">
-    Recording...
-   </span>
 
-    <button
-    id="sendVoiceBtn"
-    type="button"
-    onclick="sendVoice()"
-    style="display:none;">
+    <span
+        id="recordText"
+        class="record-text">
 
-        <i class="fa-solid fa-paper-plane"></i>
+        Recording...
 
-    </button>
+    </span>
+
+
+    <!-- AUDIO PREVIEW -->
+    <audio
+        id="voicePreview"
+        controls
+        style="display:none;">
+    </audio>
 
 </div>
 
