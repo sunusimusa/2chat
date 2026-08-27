@@ -187,13 +187,12 @@ style="display:none;">
 MESSAGE BAR
 ========================== -->
 
-<div class="message-bar" id="messageBar">
+<div class="message-bar">
 
     <!-- PHOTO -->
     <label
         for="image"
-        class="icon-btn"
-        id="photoBtn">
+        class="icon-btn">
 
         <i class="fa-solid fa-image"></i>
 
@@ -213,7 +212,7 @@ MESSAGE BAR
         placeholder="Type a message..."></textarea>
 
 
-    <!-- ONE SEND / VOICE BUTTON -->
+    <!-- ONE ACTION BUTTON -->
     <button
         id="sendBtn"
         type="button"
@@ -238,7 +237,7 @@ VOICE RECORDING / PREVIEW
     class="recording-box"
     style="display:none;">
 
-    <!-- CANCEL VOICE -->
+    <!-- CANCEL -->
     <button
         id="cancelVoiceBtn"
         type="button"
@@ -249,11 +248,8 @@ VOICE RECORDING / PREVIEW
     </button>
 
 
-    <!-- RECORDING INDICATOR -->
-    <span
-        class="record-dot"
-        id="recordDot">
-    </span>
+    <!-- RECORDING DOT -->
+    <span class="record-dot"></span>
 
 
     <!-- TIME -->
@@ -279,17 +275,6 @@ VOICE RECORDING / PREVIEW
         preload="metadata"
         style="display:none;">
     </audio>
-
-
-    <!-- SEND VOICE -->
-    <button
-        id="voiceSendBtn"
-        type="button"
-        onclick="sendVoice()">
-
-        <i class="fa-solid fa-paper-plane"></i>
-
-    </button>
 
 </div>
 
