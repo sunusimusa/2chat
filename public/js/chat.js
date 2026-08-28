@@ -1404,6 +1404,9 @@ function toggleVoicePreview() {
 /* ==========================================================
    VOICE PLAYER EVENTS
 ========================================================== */
+/* ==========================================================
+   VOICE PLAYER EVENTS
+========================================================== */
 
 document.addEventListener("click", function(e) {
 
@@ -1412,13 +1415,18 @@ document.addEventListener("click", function(e) {
 
     if (!button) return;
 
+
     const voicePlayer =
         button.closest(".voice-player");
 
     if (!voicePlayer) return;
 
+
     const player =
         voicePlayer.querySelector(".voice-audio");
+
+    if (!player) return;
+
 
     const progress =
         voicePlayer.querySelector(".voice-progress");
@@ -1426,20 +1434,95 @@ document.addEventListener("click", function(e) {
     const time =
         voicePlayer.querySelector(".voice-time");
 
-    if (!player) return;
+
+    const icon =
+        button.querySelector("i");
 
 
-    /* ==========================
-       PLAY / PAUSE
-    ========================== */
+    /* ======================================================
+       IDAN WANNAN VOICE YANA PLAYING
+       → PAUSE / STOP
+    ====================================================== */
 
-    if (player.paused) {
+    if (!player.paused) {
 
-        player.play()
-            .then(() => {
+        player.pause();
 
-                const icon =
-                    button.querySelector("i");
+        if (icon) {
+
+            icon.className =
+                "fa-solid fa-play";
+
+        }
+
+        return;
+
+    }
+
+
+    /* ======================================================
+       IDAN ZA A KUNNA WANNAN VOICE
+       → TSAYA DUK WATA VOICE
+    ====================================================== */
+
+    document
+        .querySelectorAll(".voice-audio")
+        .forEach(function(otherPlayer) {
+
+            if (otherPlayer !== player) {
+
+                otherPlayer.pause();
+
+                otherPlayer.currentTime = 0;
+
+
+                const otherButton =
+                    otherPlayer
+                        .closest(".voice-player")
+                        ?.querySelector(".voice-play i");
+
+
+                if (otherButton) {
+
+                    otherButton.className =
+                        "fa-solid fa-play";
+
+                }
+
+
+                const otherProgress =
+                    otherPlayer
+                        .closest(".voice-player")
+                        ?.querySelector(".voice-progress");
+
+
+                if (otherProgress) {
+
+                    otherProgress.style.width =
+                        "0%";
+
+                }
+
+            }
+
+        });
+
+
+    /* ======================================================
+       PLAY VOICE
+    ====================================================== */
+
+    player.volume = 1.0;
+
+
+    const playPromise =
+        player.play();
+
+
+    if (playPromise !== undefined) {
+
+        playPromise
+            .then(function() {
 
                 if (icon) {
 
@@ -1449,44 +1532,33 @@ document.addEventListener("click", function(e) {
                 }
 
             })
-            .catch(err => {
+            .catch(function(error) {
 
                 console.error(
                     "Voice Play Error:",
-                    err
-                );
-
-                alert(
-                    "Voice could not be played."
+                    error
                 );
 
             });
 
-    } else {
-
-        player.pause();
-
-        const icon =
-            button.querySelector("i");
-
-        if (icon) {
-
-            icon.className =
-                "fa-solid fa-play";
-
-        }
-
     }
 
 
-    /* ==========================
-       TIME UPDATE
-    ========================== */
+    /* ======================================================
+       EVENTS - SAU DAYA
+    ====================================================== */
 
-    if (!player.dataset.eventsAttached) {
+    if (
+        player.dataset.eventsAttached !== "true"
+    ) {
 
-        player.dataset.eventsAttached = "true";
+        player.dataset.eventsAttached =
+            "true";
 
+
+        /* ==========================
+           TIME UPDATE
+        ========================== */
 
         player.addEventListener(
             "timeupdate",
@@ -1522,7 +1594,7 @@ document.addEventListener("click", function(e) {
                     );
 
 
-                const remainSeconds =
+                const remainingSeconds =
                     seconds % 60;
 
 
@@ -1532,7 +1604,7 @@ document.addEventListener("click", function(e) {
                         minutes +
                         ":" +
                         String(
-                            remainSeconds
+                            remainingSeconds
                         ).padStart(2, "0");
 
                 }
@@ -1542,15 +1614,50 @@ document.addEventListener("click", function(e) {
 
 
         /* ==========================
-           WHEN VOICE ENDS
+           PLAY
+        ========================== */
+
+        player.addEventListener(
+            "play",
+            function() {
+
+                if (icon) {
+
+                    icon.className =
+                        "fa-solid fa-pause";
+
+                }
+
+            }
+        );
+
+
+        /* ==========================
+           PAUSE
+        ========================== */
+
+        player.addEventListener(
+            "pause",
+            function() {
+
+                if (icon) {
+
+                    icon.className =
+                        "fa-solid fa-play";
+
+                }
+
+            }
+        );
+
+
+        /* ==========================
+           ENDED
         ========================== */
 
         player.addEventListener(
             "ended",
             function() {
-
-                const icon =
-                    button.querySelector("i");
 
                 if (icon) {
 
@@ -1566,6 +1673,23 @@ document.addEventListener("click", function(e) {
                         "0%";
 
                 }
+
+            }
+        );
+
+
+        /* ==========================
+           ERROR
+        ========================== */
+
+        player.addEventListener(
+            "error",
+            function() {
+
+                console.error(
+                    "Voice Audio Error:",
+                    player.error
+                );
 
             }
         );
