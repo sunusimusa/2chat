@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html>
+
 <head>
+
   <title>2Chat Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
 
   <style>
+
     body{
       font-family:Arial,sans-serif;
       background:#f5f5f5;
@@ -12,7 +19,9 @@
       justify-content:center;
       align-items:center;
       height:100vh;
+      margin:0;
     }
+
 
     .box{
       background:white;
@@ -22,12 +31,14 @@
       box-shadow:0 0 10px rgba(0,0,0,.1);
     }
 
+
     input{
       width:100%;
       padding:10px;
       margin:8px 0;
       box-sizing:border-box;
     }
+
 
     button{
       width:100%;
@@ -38,122 +49,304 @@
       cursor:pointer;
     }
 
+
+    button:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+    }
+
+
     h2{
       text-align:center;
     }
+
 
     #msg{
       color:red;
       text-align:center;
     }
+
+
+    /* ==========================
+       LEGAL
+    =========================== */
+
+    .legal-text{
+
+      text-align:center;
+
+      margin-top:16px;
+
+      font-size:12px;
+
+      line-height:1.6;
+
+      color:#777;
+
+    }
+
+
+    .legal-text a{
+
+      color:#0084ff;
+
+      text-decoration:none;
+
+      font-weight:bold;
+
+    }
+
+
+    .legal-text a:hover{
+
+      text-decoration:underline;
+
+    }
+
   </style>
+
 </head>
+
+
 <body>
+
 
 <div class="box">
 
-<h2>2Chat Login</h2>
 
-<input
-  type="email"
-  id="email"
-  placeholder="Email"
-/>
+  <h2>
+    2Chat Login
+  </h2>
 
-<input
-  type="password"
-  id="password"
-  placeholder="Password"
-/>
 
-<button onclick="login()">
-Login
-</button>
+  <input
+    type="email"
+    id="email"
+    placeholder="Email"
+    autocomplete="email"
+  />
 
-<p id="msg"></p>
+
+  <input
+    type="password"
+    id="password"
+    placeholder="Password"
+    autocomplete="current-password"
+  />
+
+
+  <button
+    id="loginButton"
+    onclick="login()"
+  >
+
+    Login
+
+  </button>
+
+
+  <p id="msg"></p>
+
+
+  <!-- ==========================
+       TERMS & PRIVACY
+  =========================== -->
+
+  <p class="legal-text">
+
+    By continuing to 2Chat, you agree to our
+
+    <a href="/terms.html">
+      Terms of Service
+    </a>
+
+    and acknowledge our
+
+    <a href="/privacy.html">
+      Privacy Policy
+    </a>.
+
+  </p>
+
 
 </div>
 
+
 <script>
+
 
 async function login(){
 
+
   const email =
-  document.getElementById("email").value;
+    document
+      .getElementById("email")
+      .value
+      .trim();
+
 
   const password =
-  document.getElementById("password").value;
+    document
+      .getElementById("password")
+      .value;
 
-  const res = await fetch(
-    "/api/auth/login",
-    {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        email,
-        password
-      })
-    }
-  );
 
-  const data = await res.json();
+  const msg =
+    document.getElementById("msg");
 
-  if(data.success){
 
-    localStorage.setItem(
-      "token",
-      data.token
+  const button =
+    document.getElementById("loginButton");
+
+
+  // ==========================
+  // VALIDATION
+  // ==========================
+
+  if(!email || !password){
+
+    msg.innerText =
+      "Please enter your email and password.";
+
+    return;
+
+  }
+
+
+  // ==========================
+  // LOADING
+  // ==========================
+
+  button.disabled = true;
+
+  button.innerText =
+    "Logging in...";
+
+  msg.innerText = "";
+
+
+  try{
+
+
+    const res = await fetch(
+      "/api/auth/login",
+      {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:JSON.stringify({
+          email,
+          password
+        })
+
+      }
     );
 
-    localStorage.setItem(
-      "user",
-      JSON.stringify(data.user)
-    );
+
+    const data =
+      await res.json();
 
 
     // ==========================
-    // CHECK GROUP REDIRECT
+    // SUCCESS
     // ==========================
 
-    const afterAuthRedirect =
-        localStorage.getItem("afterAuthRedirect");
+    if(data.success){
 
 
-    if (afterAuthRedirect) {
+      localStorage.setItem(
+        "token",
+        data.token
+      );
 
-        localStorage.removeItem(
-            "afterAuthRedirect"
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(data.user)
+      );
+
+
+      // ==========================
+      // CHECK GROUP REDIRECT
+      // ==========================
+
+      const afterAuthRedirect =
+        localStorage.getItem(
+          "afterAuthRedirect"
         );
 
+
+      if(afterAuthRedirect){
+
+
+        localStorage.removeItem(
+          "afterAuthRedirect"
+        );
+
+
         location.href =
-            afterAuthRedirect;
+          afterAuthRedirect;
+
 
         return;
 
-    }
+      }
 
 
-    // ==========================
-    // NORMAL LOGIN
-    // ==========================
+      // ==========================
+      // NORMAL LOGIN
+      // ==========================
 
-    location.href =
+      location.href =
         "/home.html";
 
 
-}else{
+    }else{
 
-    document.getElementById("msg")
-      .innerText =
-      data.message || "Login failed";
+
+      msg.innerText =
+        data.message ||
+        "Login failed";
+
+
+    }
+
+
+  }catch(error){
+
+
+    console.error(
+      "LOGIN ERROR:",
+      error
+    );
+
+
+    msg.innerText =
+      "Network error. Please try again.";
+
 
   }
+
+
+  // ==========================
+  // RESTORE BUTTON
+  // ==========================
+
+  button.disabled = false;
+
+  button.innerText =
+    "Login";
 
 }
 
 </script>
 
+
 </body>
-</html>
+
+  </html>
