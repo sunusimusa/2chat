@@ -9,7 +9,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1.0">
 
-    <title>2Chat Gift History Test</title>
+    <title>2Chat Gift History</title>
 
     <style>
 
@@ -177,31 +177,12 @@
         🎁 Gift History
     </h1>
 
-
-    <button
-        id="loadBtn"
-        onclick="loadGiftHistory()">
-
-        🔄 Load Gift History
-
-    </button>
-
-
     <div id="message">
         Loading...
     </div>
 
 
     <div id="giftList"></div>
-
-
-    <h3>
-        API Response
-    </h3>
-
-    <pre id="apiResponse">
-Waiting...
-    </pre>
 
 
 </div>
@@ -247,12 +228,6 @@ async function loadGiftHistory() {
         );
 
 
-    const apiResponse =
-        document.getElementById(
-            "apiResponse"
-        );
-
-
     button.disabled = true;
 
     button.innerText =
@@ -295,14 +270,6 @@ async function loadGiftHistory() {
             "RECEIVED GIFTS:",
             data
         );
-
-
-        apiResponse.innerText =
-            JSON.stringify(
-                data,
-                null,
-                2
-            );
 
 
         if (!data.success) {
@@ -447,10 +414,6 @@ async function loadGiftHistory() {
 
         message.innerText =
             "❌ Server connection error";
-
-
-        apiResponse.innerText =
-            err.message;
 
 
     } finally {
