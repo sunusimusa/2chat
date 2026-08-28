@@ -1,12 +1,13 @@
-/* ==========================
-   2Chat Messenger
-   CHAT.JS
-========================== */
+/* ==========================================================
+   2CHAT MESSENGER
+   OPTIMIZED CHAT.JS
+========================================================== */
 
 const user = JSON.parse(localStorage.getItem("user"));
 
 if (!user) {
     location.href = "/login.html";
+    throw new Error("User not logged in");
 }
 
 const socket = io();
@@ -14,10 +15,14 @@ const socket = io();
 const params = new URLSearchParams(location.search);
 const receiver = params.get("user");
 
+if (!receiver) {
+    console.error("Receiver not found");
+}
 
-/* ==========================
-   GLOBAL VARIABLES
-========================== */
+
+/* ==========================================================
+   GLOBAL STATE
+========================================================== */
 
 let selectedMessage = null;
 let selectedMsg = null;
@@ -28,14 +33,10 @@ let currentBubble = null;
 let swipeMessage = null;
 let startX = 0;
 
-
-/* ==========================
-   VOICE VARIABLES
-========================== */
-
 let mediaRecorder = null;
-let audioChunks = [];
+let mediaStream = null;
 
+let audioChunks = [];
 let audioBlob = null;
 let audioUrl = null;
 
@@ -43,36 +44,25 @@ let recording = false;
 let recordSeconds = 0;
 let recordTimer = null;
 
+let loadingMessages = false;
+let chatLoaded = false;
 
-/* ==========================
+
+/* ==========================================================
    DOM
-========================== */
+========================================================== */
 
 const chat = document.getElementById("chat");
+const messageInput = document.getElementById("message");
+const imageInput = document.getElementById("image");
 
-const messageInput =
-    document.getElementById("message");
+const sendBtn = document.getElementById("sendBtn");
+const sendIcon = document.getElementById("sendIcon");
 
-const imageInput =
-    document.getElementById("image");
-
-const sendBtn =
-    document.getElementById("sendBtn");
-
-const sendIcon =
-    document.getElementById("sendIcon");
-
-const recordingBox =
-    document.getElementById("recordingBox");
-
-const recordTime =
-    document.getElementById("recordTime");
-
-const recordText =
-    document.getElementById("recordText");
-
-const recordDot =
-    document.getElementById("recordDot");
+const recordingBox = document.getElementById("recordingBox");
+const recordTime = document.getElementById("recordTime");
+const recordText = document.getElementById("recordText");
+const recordDot = document.getElementById("recordDot");
 
 const voicePreviewBox =
     document.getElementById("voicePreviewBox");
@@ -90,272 +80,343 @@ const voiceActionIcon =
     document.getElementById("voiceActionIcon");
 
 
-/* ==========================
+/* ==========================================================
+   HELPERS
+========================================================== */
+
+function escapeHTML(value) {
+
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+function isNearBottom() {
+
+    if (!chat) return true;
+
+    return (
+        chat.scrollHeight -
+        chat.scrollTop -
+        chat.clientHeight
+    ) < 120;
+}
+
+
+function scrollToBottom(smooth = false) {
+
+    if (!chat) return;
+
+    requestAnimationFrame(() => {
+
+        chat.scrollTo({
+            top: chat.scrollHeight,
+            behavior: smooth ? "smooth" : "auto"
+        });
+
+    });
+}
+
+
+function messageExists(messageId) {
+
+    if (!messageId || !chat) {
+        return false;
+    }
+
+    return !!chat.querySelector(
+        `[data-message-id="${CSS.escape(String(messageId))}"]`
+    );
+}
+
+
+/* ==========================================================
    RENDER MESSAGE
-========================== */
+========================================================== */
 
 function renderMessage(msg) {
 
     const mine =
         msg.sender === user.username;
 
-    return `
+    const messageId =
+        escapeHTML(msg._id || "");
 
-<div class="${mine ? "me" : "other"}">
+    const text =
+        escapeHTML(msg.text || "");
 
-<div
-class="${mine ? "bubble-me" : "bubble-other"}"
-data-id="${msg._id}"
+    const replyText =
+        escapeHTML(msg.replyText || "Message");
 
-oncontextmenu="showMessageMenu(event,${JSON.stringify(msg).replace(/"/g,"&quot;")})"
+    const replyUser =
+        escapeHTML(msg.replyUser || "");
 
-ontouchstart="touchStart(event,${JSON.stringify(msg).replace(/"/g,"&quot;")})"
+    const image =
+        escapeHTML(msg.image || "");
 
-ontouchmove="touchMove(event)"
+    const voice =
+        escapeHTML(msg.voice || "");
 
-ontouchend="touchEnd(event)"
->
+    let time = "";
 
+    if (msg.createdAt) {
 
-${msg.image ? `
+        time =
+            new Date(msg.createdAt)
+                .toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                });
 
-<div class="message-image">
+    }
 
-<img
-src="${msg.image}"
-onclick="openImage('${msg.image}')">
 
-</div>
+    let content = "";
 
-` : ""}
 
+    /* IMAGE */
 
-${msg.replyTo ? `
+    if (msg.image) {
 
-<div class="reply-bubble">
+        content += `
+            <div class="message-image">
+                <img
+                    src="${image}"
+                    alt="Image"
+                    loading="lazy"
+                    onclick="openImage(this.src)"
+                >
+            </div>
+        `;
 
-<div class="reply-user">
-↩ ${msg.replyUser || ""}
-</div>
+    }
 
-<div class="reply-message">
-${msg.replyText || "Message"}
-</div>
 
-</div>
+    /* REPLY */
 
-` : ""}
+    if (msg.replyTo) {
 
+        content += `
+            <div class="reply-bubble">
+                <div class="reply-user">
+                    ↩ ${replyUser}
+                </div>
 
-${msg.deletedForEveryone ?
+                <div class="reply-message">
+                    ${replyText}
+                </div>
+            </div>
+        `;
 
-`
+    }
 
-<div class="deleted-message">
 
-<i class="fa-solid fa-ban"></i>
+    /* DELETED */
 
-This message was deleted
+    if (msg.deletedForEveryone) {
 
-</div>
+        content += `
+            <div class="deleted-message">
+                <i class="fa-solid fa-ban"></i>
+                This message was deleted
+            </div>
+        `;
 
-`
+    }
 
-:
+    /* VOICE */
 
-msg.voice ?
+    else if (msg.voice) {
 
-`
+        content += `
+            <div class="voice-player">
 
-<div class="voice-player">
+                <button
+                    class="voice-play"
+                    type="button"
+                    onclick="toggleMessageVoice(this)"
+                >
+                    <i class="fa-solid fa-play"></i>
+                </button>
 
-<button
-class="voice-play"
-onclick="playMessageVoice(this)">
+                <div class="voice-wave">
+                    <div class="voice-progress"></div>
+                </div>
 
-<i class="fa-solid fa-play"></i>
+                <span class="voice-time">
+                    0:00
+                </span>
 
-</button>
+                <audio
+                    class="voice-audio"
+                    preload="none"
+                    src="${voice}"
+                ></audio>
 
-<div class="voice-wave">
+            </div>
+        `;
 
-<div class="voice-progress"></div>
+    }
 
-</div>
+    /* TEXT */
 
-<span class="voice-time">
-0:00
-</span>
+    else if (msg.text) {
 
-<audio
-class="voice-audio"
-preload="metadata"
-src="${msg.voice}">
-</audio>
+        content += `
+            <div class="message-text">
+                ${text}
+            </div>
+        `;
 
-</div>
+    }
 
-`
 
-:
+    /* REACTIONS */
 
-`
+    if (
+        Array.isArray(msg.reactions) &&
+        msg.reactions.length
+    ) {
 
-${msg.text || ""}
+        content += `
+            <div class="message-reactions">
+                ${msg.reactions.map(r => `
+                    <span class="reaction">
+                        ${escapeHTML(r.emoji)}
+                    </span>
+                `).join("")}
+            </div>
+        `;
 
-`
+    }
 
-}
 
+    /* STATUS */
 
-${msg.reactions && msg.reactions.length ? `
+    let status = "";
 
-<div class="message-reactions">
+    if (mine) {
 
-${msg.reactions.map(r => `
+        if (msg.seen) {
 
-<span class="reaction">
-${r.emoji}
-</span>
+            status =
+                '<i class="fa-solid fa-check-double seen-status"></i>';
 
-`).join("")}
+        }
 
-</div>
+        else if (msg.delivered) {
 
-` : ""}
+            status =
+                '<i class="fa-solid fa-check-double"></i>';
 
+        }
 
-<div class="message-time">
+        else {
 
-${msg.createdAt ?
-
-new Date(msg.createdAt).toLocaleTimeString([], {
-
-hour: "2-digit",
-minute: "2-digit"
-
-})
-
-: ""}
-
-</div>
-
-
-${mine ?
-
-`
-
-<small class="message-status">
-
-${
-
-msg.seen
-
-?
-
-'<i class="fa-solid fa-check-double" style="color:#00b7ff"></i>'
-
-:
-
-msg.delivered
-
-?
-
-'<i class="fa-solid fa-check-double"></i>'
-
-:
-
-'<i class="fa-solid fa-check"></i>'
-
-}
-
-</small>
-
-`
-
-: ""}
-
-
-</div>
-
-</div>
-
-`;
-
-}
-
-
-/* ==========================================================
-   PLAY MESSAGE VOICE
-========================================================== */
-
-function playMessageVoice(button) {
-
-    const player =
-        button
-            .closest(".voice-player")
-            ?.querySelector(".voice-audio");
-
-    const icon =
-        button.querySelector("i");
-
-    if (!player) return;
-
-    if (player.paused) {
-
-        player.play()
-            .then(() => {
-
-                if (icon) {
-                    icon.className =
-                        "fa-solid fa-pause";
-                }
-
-            })
-            .catch(err => {
-
-                console.error(
-                    "Voice Play Error:",
-                    err
-                );
-
-                alert(
-                    "Voice cannot be played."
-                );
-
-            });
-
-    } else {
-
-        player.pause();
-
-        if (icon) {
-
-            icon.className =
-                "fa-solid fa-play";
+            status =
+                '<i class="fa-solid fa-check"></i>';
 
         }
 
     }
 
 
-    player.onended = function() {
+    return `
+        <div
+            class="${mine ? "me" : "other"}"
+            data-message-row="${messageId}"
+        >
 
-        if (icon) {
+            <div
+                class="${mine ? "bubble-me" : "bubble-other"}"
+                data-id="${messageId}"
+                data-message-id="${messageId}"
+                data-sender="${escapeHTML(msg.sender || "")}"
+                data-message='${escapeHTML(JSON.stringify(msg))}'
+                oncontextmenu="showMessageMenu(event, this)"
+                ontouchstart="touchStart(event, this)"
+                ontouchmove="touchMove(event)"
+                ontouchend="touchEnd(event)"
+            >
 
-            icon.className =
-                "fa-solid fa-play";
+                ${content}
 
-        }
+                <div class="message-meta">
 
-    };
+                    <span class="message-time">
+                        ${time}
+                    </span>
 
+                    ${
+                        mine
+                            ? `
+                                <small class="message-status">
+                                    ${status}
+                                </small>
+                            `
+                            : ""
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
 }
 
 
-/* ==========================
+/* ==========================================================
+   APPEND MESSAGE
+========================================================== */
+
+function appendMessage(msg, scroll = true) {
+
+    if (!msg || !chat) {
+        return;
+    }
+
+    if (
+        msg._id &&
+        messageExists(msg._id)
+    ) {
+        return;
+    }
+
+    const shouldScroll =
+        scroll &&
+        (
+            isNearBottom() ||
+            msg.sender === user.username
+        );
+
+
+    chat.insertAdjacentHTML(
+        "beforeend",
+        renderMessage(msg)
+    );
+
+
+    if (shouldScroll) {
+        scrollToBottom(false);
+    }
+
+
+    markIncomingMessageSeen(msg);
+}
+
+
+/* ==========================================================
    LOAD CHAT USER
-========================== */
+========================================================== */
 
 async function loadChatUser() {
 
@@ -365,16 +426,19 @@ async function loadChatUser() {
 
         const res =
             await fetch(
-                `/api/users/profile/${receiver}`
+                `/api/users/profile/${encodeURIComponent(receiver)}`
             );
+
+        if (!res.ok) return;
 
         const data =
             await res.json();
 
-        if (!data.success) return;
+        if (!data.success || !data.user) {
+            return;
+        }
 
-        const chatUser =
-            data.user;
+        const chatUser = data.user;
 
         const name =
             document.getElementById("chatName");
@@ -385,34 +449,36 @@ async function loadChatUser() {
         const status =
             document.getElementById("status");
 
+
         if (name) {
-            name.innerText =
-                chatUser.username;
+
+            name.textContent =
+                chatUser.username || receiver;
+
         }
 
+
         if (avatar) {
+
             avatar.src =
                 chatUser.avatar ||
                 "/images/default.png";
+
         }
+
 
         if (status) {
 
-            if (chatUser.online) {
-
-                status.innerHTML =
-                    '<i class="fa-solid fa-circle online-dot"></i> Online';
-
-            } else {
-
-                status.innerHTML =
-                    '<i class="fa-regular fa-clock"></i> Offline';
-
-            }
+            status.innerHTML =
+                chatUser.online
+                    ? '<i class="fa-solid fa-circle online-dot"></i> Online'
+                    : '<i class="fa-regular fa-clock"></i> Offline';
 
         }
 
-    } catch (err) {
+    }
+
+    catch (err) {
 
         console.error(
             "Load Chat User Error:",
@@ -424,25 +490,43 @@ async function loadChatUser() {
 }
 
 
-/* ==========================
+/* ==========================================================
    LOAD MESSAGES
-========================== */
+   FULL LOAD ONLY WHEN CHAT OPENS
+========================================================== */
 
 async function loadMessages(
     autoScroll = true
 ) {
 
-    if (!receiver) return;
+    if (
+        !receiver ||
+        loadingMessages ||
+        !chat
+    ) {
+        return;
+    }
+
+    loadingMessages = true;
+
 
     try {
 
         const res =
             await fetch(
-                `/api/messages/chat?sender=${user.username}&receiver=${receiver}`
+                `/api/messages/chat?sender=${encodeURIComponent(user.username)}&receiver=${encodeURIComponent(receiver)}`
             );
+
+        if (!res.ok) {
+            throw new Error(
+                `HTTP ${res.status}`
+            );
+        }
+
 
         const data =
             await res.json();
+
 
         if (!data.success) {
 
@@ -452,17 +536,43 @@ async function loadMessages(
 
         }
 
-        const messages =
-            data.messages || [];
 
-        chat.innerHTML = "";
+        const messages =
+            Array.isArray(data.messages)
+                ? data.messages
+                : [];
+
+
+        /*
+           Build HTML once.
+           Wannan ya fi insertAdjacentHTML
+           sau da yawa sauri.
+        */
+
+        const html =
+            messages
+                .map(renderMessage)
+                .join("");
+
+
+        chat.innerHTML = html;
+
+
+        chatLoaded = true;
+
+
+        if (autoScroll) {
+
+            scrollToBottom(false);
+
+        }
+
+
+        /*
+           Mark incoming messages as seen.
+        */
 
         messages.forEach(msg => {
-
-            chat.insertAdjacentHTML(
-                "beforeend",
-                renderMessage(msg)
-            );
 
             if (
                 msg.receiver === user.username &&
@@ -481,19 +591,9 @@ async function loadMessages(
 
         });
 
+    }
 
-        if (autoScroll) {
-
-            requestAnimationFrame(() => {
-
-                chat.scrollTop =
-                    chat.scrollHeight;
-
-            });
-
-        }
-
-    } catch (err) {
+    catch (err) {
 
         console.error(
             "Load Messages Error:",
@@ -502,28 +602,90 @@ async function loadMessages(
 
     }
 
+    finally {
+
+        loadingMessages = false;
+
+    }
+
 }
 
 
-/* ==========================
-   APPEND MESSAGE
-========================== */
+/* ==========================================================
+   MARK INCOMING MESSAGE SEEN
+========================================================== */
 
-function appendMessage(msg) {
+function markIncomingMessageSeen(msg) {
 
     if (!msg) return;
 
-    chat.insertAdjacentHTML(
-        "beforeend",
-        renderMessage(msg)
-    );
+    if (
+        msg.receiver === user.username &&
+        !msg.seen
+    ) {
 
-    requestAnimationFrame(() => {
+        socket.emit(
+            "messageSeen",
+            {
+                sender: msg.sender,
+                messageId: msg._id
+            }
+        );
 
-        chat.scrollTop =
-            chat.scrollHeight;
+    }
 
-    });
+}
+
+
+/* ==========================================================
+   UPDATE MESSAGE STATUS
+========================================================== */
+
+function updateMessageStatus(
+    messageId,
+    type
+) {
+
+    if (!messageId || !chat) {
+        return;
+    }
+
+
+    const bubble =
+        chat.querySelector(
+            `[data-message-id="${CSS.escape(String(messageId))}"]`
+        );
+
+
+    if (!bubble) {
+        return;
+    }
+
+
+    const status =
+        bubble.querySelector(
+            ".message-status"
+        );
+
+
+    if (!status) {
+        return;
+    }
+
+
+    if (type === "seen") {
+
+        status.innerHTML =
+            '<i class="fa-solid fa-check-double seen-status"></i>';
+
+    }
+
+    else if (type === "delivered") {
+
+        status.innerHTML =
+            '<i class="fa-solid fa-check-double"></i>';
+
+    }
 
 }
 
@@ -534,16 +696,18 @@ function appendMessage(msg) {
 
 async function sendMessage() {
 
+    if (!receiver) return;
+
     const text =
         messageInput.value.trim();
 
-   const image =
-    imageInput.files &&
-    imageInput.files.length > 0
-        ? imageInput.files[0]
-        : null;
+    const image =
+        imageInput.files &&
+        imageInput.files.length
+            ? imageInput.files[0]
+            : null;
 
-    
+
     if (
         text === "" &&
         !image &&
@@ -555,6 +719,7 @@ async function sendMessage() {
 
     const formData =
         new FormData();
+
 
     formData.append(
         "sender",
@@ -631,7 +796,7 @@ async function sendMessage() {
             await res.json();
 
 
-        if (!data.success) {
+        if (!res.ok || !data.success) {
 
             alert(
                 data.message ||
@@ -643,8 +808,14 @@ async function sendMessage() {
         }
 
 
+        /*
+           Append locally.
+           receiveMessage zai duba duplicate.
+        */
+
         appendMessage(
-            data.message
+            data.message,
+            true
         );
 
 
@@ -662,36 +833,15 @@ async function sendMessage() {
         replyMessage = null;
 
 
-        const preview =
-            document.getElementById(
-                "replyPreview"
-            );
-
-        if (preview) {
-
-            preview.style.display =
-                "none";
-
-        }
-
-
-        const previewBox =
-            document.getElementById(
-                "previewBox"
-            );
-
-        if (previewBox) {
-
-            previewBox.style.display =
-                "none";
-
-        }
+        hideElement("replyPreview");
+        hideElement("previewBox");
 
 
         updateSendButton();
 
+    }
 
-    } catch (err) {
+    catch (err) {
 
         console.error(
             "Send Message Error:",
@@ -702,7 +852,9 @@ async function sendMessage() {
             "Network Error"
         );
 
-    } finally {
+    }
+
+    finally {
 
         sendBtn.disabled = false;
 
@@ -712,7 +864,7 @@ async function sendMessage() {
 
 
 /* ==========================================================
-   SINGLE SEND BUTTON
+   SEND ACTION
 ========================================================== */
 
 function handleSendAction() {
@@ -722,80 +874,93 @@ function handleSendAction() {
 
     const image =
         imageInput.files &&
-        imageInput.files.length > 0
+        imageInput.files.length
             ? imageInput.files[0]
             : null;
 
 
-    // ==========================
-    // TEXT → SEND
-    // ==========================
-
-    if (text !== "") {
+    if (text || image) {
 
         sendMessage();
 
         return;
+
     }
 
-
-    // ==========================
-    // IMAGE → SEND
-    // ==========================
-
-    if (image) {
-
-        sendMessage();
-
-        return;
-    }
-
-
-    // ==========================
-    // NOTHING → VOICE
-    // ==========================
 
     startRecording();
+
 }
 
-/* ==========================
-   UPDATE SEND ICON
-========================== */
+
+/* ==========================================================
+   UPDATE SEND BUTTON
+========================================================== */
 
 function updateSendButton() {
 
     if (!sendIcon) return;
 
+
     const hasText =
         messageInput.value.trim() !== "";
 
     const hasImage =
+        imageInput.files &&
         imageInput.files.length > 0;
 
 
-    if (
-        hasText ||
-        hasImage
-    ) {
-
-        sendIcon.className =
-            "fa-solid fa-paper-plane";
-
-    } else {
-
-        sendIcon.className =
-            "fa-solid fa-microphone";
-
-    }
+    sendIcon.className =
+        hasText || hasImage
+            ? "fa-solid fa-paper-plane"
+            : "fa-solid fa-microphone";
 
 }
 
 
-/* ==========================
-   ENTER TO SEND
-========================== */
+/* ==========================================================
+   TEXT INPUT
+========================================================== */
 
-messageInput.addEventListener(
+messageInput?.addEventListener(
+    "input",
+    function() {
+
+        updateSendButton();
+
+
+        socket.emit(
+            "typing",
+            {
+                sender: user.username,
+                receiver
+            }
+        );
+
+
+        clearTimeout(
+            window.typingTimeout
+        );
+
+
+        window.typingTimeout =
+            setTimeout(() => {
+
+                socket.emit(
+                    "stopTyping",
+                    {
+                        sender: user.username,
+                        receiver
+                    }
+                );
+
+            }, 900);
+
+    }
+);
+
+
+messageInput?.addEventListener(
     "keydown",
     function(e) {
 
@@ -814,59 +979,21 @@ messageInput.addEventListener(
 );
 
 
-/* ==========================
-   INPUT CHANGE
-========================== */
+/* ==========================================================
+   IMAGE INPUT
+========================================================== */
 
-messageInput.addEventListener(
-    "input",
-    function() {
-
-        updateSendButton();
-
-        socket.emit(
-            "typing",
-            {
-                sender: user.username,
-                receiver: receiver
-            }
-        );
-
-
-        clearTimeout(
-            window.typingTimeout
-        );
-
-
-        window.typingTimeout =
-            setTimeout(() => {
-
-                socket.emit(
-                    "stopTyping",
-                    {
-                        sender: user.username,
-                        receiver: receiver
-                    }
-                );
-
-            }, 1000);
-
-    }
-);
-
-
-/* ==========================
-   IMAGE CHANGE
-========================== */
-
-imageInput.addEventListener(
+imageInput?.addEventListener(
     "change",
     function() {
 
         const file =
-            imageInput.files[0];
+            imageInput.files?.[0];
 
-        if (!file) return;
+        if (!file) {
+            updateSendButton();
+            return;
+        }
 
 
         const reader =
@@ -888,18 +1015,14 @@ imageInput.addEventListener(
 
 
                 if (img) {
-
                     img.src =
                         e.target.result;
-
                 }
 
 
                 if (box) {
-
                     box.style.display =
                         "block";
-
                 }
 
 
@@ -914,25 +1037,31 @@ imageInput.addEventListener(
 );
 
 
-/* ==========================
+/* ==========================================================
    REMOVE IMAGE
-========================== */
+========================================================== */
 
 function removeImage() {
 
-    imageInput.value = "";
+    if (imageInput) {
+        imageInput.value = "";
+    }
 
-    const box =
+
+    hideElement(
+        "previewBox"
+    );
+
+
+    const img =
         document.getElementById(
-            "previewBox"
+            "previewImage"
         );
 
-    if (box) {
-
-        box.style.display =
-            "none";
-
+    if (img) {
+        img.removeAttribute("src");
     }
+
 
     updateSendButton();
 
@@ -945,24 +1074,70 @@ function removeImage() {
 
 async function startRecording() {
 
-    if (recording) return;
+    if (recording) {
+        return;
+    }
+
+
+    if (
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia
+    ) {
+
+        alert(
+            "Microphone is not supported on this device."
+        );
+
+        return;
+
+    }
 
 
     try {
 
-        const stream =
-            await navigator.mediaDevices
-                .getUserMedia({
-                    audio: true
-                });
+        mediaStream =
+            await navigator.mediaDevices.getUserMedia({
+                audio: true
+            });
+
+
+        let mimeType = "";
+
+        if (
+            MediaRecorder.isTypeSupported(
+                "audio/webm;codecs=opus"
+            )
+        ) {
+
+            mimeType =
+                "audio/webm;codecs=opus";
+
+        }
+
+        else if (
+            MediaRecorder.isTypeSupported(
+                "audio/webm"
+            )
+        ) {
+
+            mimeType =
+                "audio/webm";
+
+        }
 
 
         mediaRecorder =
-            new MediaRecorder(stream);
+            mimeType
+                ? new MediaRecorder(
+                    mediaStream,
+                    { mimeType }
+                )
+                : new MediaRecorder(
+                    mediaStream
+                );
 
 
         audioChunks = [];
-
         audioBlob = null;
 
 
@@ -986,6 +1161,15 @@ async function startRecording() {
         mediaRecorder.onstop =
             function() {
 
+                if (!audioChunks.length) {
+
+                    cleanupRecording();
+
+                    return;
+
+                }
+
+
                 audioBlob =
                     new Blob(
                         audioChunks,
@@ -1003,82 +1187,60 @@ async function startRecording() {
                     );
 
 
-                voicePreview.src =
-                    audioUrl;
+                if (voicePreview) {
 
+                    voicePreview.src =
+                        audioUrl;
 
-                voicePreview.load();
+                    voicePreview.load();
 
+                }
 
-                /*
-                   Recording ya kare
-                   ya zama Preview
-                */
 
                 recording = false;
-
-
-                if (recordDot) {
-
-                    recordDot.style.display =
-                        "none";
-
-                }
-
-
-                if (recordText) {
-
-                    recordText.innerText =
-                        "Voice message";
-
-                }
-
-
-                if (voicePreviewBox) {
-
-                    voicePreviewBox.style.display =
-                        "flex";
-
-                }
-
-
-                /*
-                   STOP → SEND
-                */
-
-                if (voiceActionIcon) {
-
-                    voiceActionIcon.className =
-                        "fa-solid fa-paper-plane";
-
-                }
-
-
-                /*
-                   Enable send
-                */
-
-                if (voiceActionBtn) {
-
-                    voiceActionBtn.disabled =
-                        false;
-
-                }
 
 
                 stopTimer();
 
 
-                /*
-                   Microphone permission
-                   stream ya tsaya
-                */
+                if (recordDot) {
+                    recordDot.style.display =
+                        "none";
+                }
 
-                stream
-                    .getTracks()
-                    .forEach(track =>
-                        track.stop()
-                    );
+
+                if (recordText) {
+                    recordText.textContent =
+                        "Voice message";
+                }
+
+
+                if (voicePreviewBox) {
+                    voicePreviewBox.style.display =
+                        "flex";
+                }
+
+
+                if (voiceActionIcon) {
+                    voiceActionIcon.className =
+                        "fa-solid fa-paper-plane";
+                }
+
+
+                stopMediaStream();
+
+            };
+
+
+        mediaRecorder.onerror =
+            function(error) {
+
+                console.error(
+                    "MediaRecorder Error:",
+                    error
+                );
+
+                cleanupRecording();
 
             };
 
@@ -1092,56 +1254,48 @@ async function startRecording() {
 
 
         if (recordingBox) {
-
             recordingBox.style.display =
                 "flex";
-
         }
 
 
         if (voicePreviewBox) {
-
             voicePreviewBox.style.display =
                 "none";
-
         }
 
 
         if (recordDot) {
-
             recordDot.style.display =
                 "inline-block";
-
         }
 
 
         if (recordText) {
-
-            recordText.innerText =
+            recordText.textContent =
                 "Recording...";
-
         }
 
 
         if (voiceActionIcon) {
-
             voiceActionIcon.className =
                 "fa-solid fa-stop";
-
         }
 
 
         updateRecordTime();
-
         startTimer();
 
+    }
 
-    } catch (err) {
+    catch (err) {
 
         console.error(
             "Microphone Error:",
             err
         );
+
+        stopMediaStream();
 
         alert(
             "Microphone permission is required."
@@ -1152,15 +1306,41 @@ async function startRecording() {
 }
 
 
-/* ==========================
-   RECORD TIMER
-========================== */
+/* ==========================================================
+   STOP MEDIA STREAM
+========================================================== */
+
+function stopMediaStream() {
+
+    if (!mediaStream) {
+        return;
+    }
+
+
+    mediaStream
+        .getTracks()
+        .forEach(track => {
+
+            try {
+                track.stop();
+            }
+            catch {}
+
+        });
+
+
+    mediaStream = null;
+
+}
+
+
+/* ==========================================================
+   TIMER
+========================================================== */
 
 function startTimer() {
 
-    clearInterval(
-        recordTimer
-    );
+    stopTimer();
 
 
     recordTimer =
@@ -1175,9 +1355,20 @@ function startTimer() {
 }
 
 
-/* ==========================
-   UPDATE TIMER
-========================== */
+function stopTimer() {
+
+    if (recordTimer) {
+
+        clearInterval(
+            recordTimer
+        );
+
+        recordTimer = null;
+
+    }
+
+}
+
 
 function updateRecordTime() {
 
@@ -1193,25 +1384,10 @@ function updateRecordTime() {
         recordSeconds % 60;
 
 
-    recordTime.innerText =
+    recordTime.textContent =
         String(minutes).padStart(2, "0") +
         ":" +
         String(seconds).padStart(2, "0");
-
-}
-
-
-/* ==========================
-   STOP TIMER
-========================== */
-
-function stopTimer() {
-
-    clearInterval(
-        recordTimer
-    );
-
-    recordTimer = null;
 
 }
 
@@ -1222,11 +1398,6 @@ function stopTimer() {
 
 function handleVoiceAction() {
 
-    /*
-       Recording
-       → STOP
-    */
-
     if (recording) {
 
         stopRecording();
@@ -1235,11 +1406,6 @@ function handleVoiceAction() {
 
     }
 
-
-    /*
-       Preview
-       → SEND
-    */
 
     if (audioBlob) {
 
@@ -1250,9 +1416,9 @@ function handleVoiceAction() {
 }
 
 
-/* ==========================
+/* ==========================================================
    STOP RECORDING
-========================== */
+========================================================== */
 
 function stopRecording() {
 
@@ -1260,15 +1426,13 @@ function stopRecording() {
         !mediaRecorder ||
         mediaRecorder.state !== "recording"
     ) {
-
         return;
-
     }
 
 
-    mediaRecorder.stop();
-
     stopTimer();
+
+    mediaRecorder.stop();
 
 }
 
@@ -1279,25 +1443,26 @@ function stopRecording() {
 
 function cancelRecording() {
 
-    /*
-       Idan recording yana gudana
-       → dakatar
-    */
+    stopTimer();
+
 
     if (
         mediaRecorder &&
         mediaRecorder.state === "recording"
     ) {
 
-        mediaRecorder.stop();
+        try {
+            mediaRecorder.stop();
+        }
+        catch {}
 
     }
 
 
+    stopMediaStream();
+
+
     recording = false;
-
-    stopTimer();
-
 
     audioChunks = [];
 
@@ -1329,176 +1494,196 @@ function cancelRecording() {
 
 
     if (recordingBox) {
-
         recordingBox.style.display =
             "none";
-
     }
 
 
     if (voicePreviewBox) {
-
         voicePreviewBox.style.display =
             "none";
-
     }
 
 
     if (recordTime) {
-
-        recordTime.innerText =
+        recordTime.textContent =
             "00:00";
-
     }
 
 
     if (recordText) {
-
-        recordText.innerText =
+        recordText.textContent =
             "Recording...";
-
     }
 
 
     if (recordDot) {
-
         recordDot.style.display =
             "inline-block";
-
     }
 
 
     if (voiceActionIcon) {
-
         voiceActionIcon.className =
             "fa-solid fa-stop";
-
     }
 
 }
 
 
 /* ==========================================================
-   VOICE PREVIEW PLAY / PAUSE
+   CLEANUP RECORDING
+========================================================== */
+
+function cleanupRecording() {
+
+    stopTimer();
+    stopMediaStream();
+
+    recording = false;
+
+    audioChunks = [];
+    audioBlob = null;
+
+}
+
+
+/* ==========================================================
+   VOICE PREVIEW
 ========================================================== */
 
 function toggleVoicePreview() {
 
-    if (!voicePreview) return;
+    if (!voicePreview) {
+        return;
+    }
 
-    if (
-        voicePreview.paused
-    ) {
 
-        voicePreview.play();
+    if (voicePreview.paused) {
 
-    } else {
+        voicePreview
+            .play()
+            .then(() => {
+
+                if (voicePlayIcon) {
+
+                    voicePlayIcon.className =
+                        "fa-solid fa-pause";
+
+                }
+
+            })
+            .catch(err => {
+
+                console.error(
+                    "Voice Preview Error:",
+                    err
+                );
+
+            });
+
+    }
+
+    else {
 
         voicePreview.pause();
+
+        if (voicePlayIcon) {
+
+            voicePlayIcon.className =
+                "fa-solid fa-play";
+
+        }
 
     }
 
 }
 
 
-/* ==========================================================
-   VOICE PLAYER EVENTS
-========================================================== */
-/* ==========================================================
-   VOICE PLAYER EVENTS
-========================================================== */
+voicePreview?.addEventListener(
+    "ended",
+    function() {
 
-document.addEventListener("click", function(e) {
+        if (voicePlayIcon) {
 
-    const button =
-        e.target.closest(".voice-play");
-
-    if (!button) return;
-
-
-    const voicePlayer =
-        button.closest(".voice-player");
-
-    if (!voicePlayer) return;
-
-
-    const player =
-        voicePlayer.querySelector(".voice-audio");
-
-    if (!player) return;
-
-
-    const progress =
-        voicePlayer.querySelector(".voice-progress");
-
-    const time =
-        voicePlayer.querySelector(".voice-time");
-
-
-    const icon =
-        button.querySelector("i");
-
-
-    /* ======================================================
-       IDAN WANNAN VOICE YANA PLAYING
-       → PAUSE / STOP
-    ====================================================== */
-
-    if (!player.paused) {
-
-        player.pause();
-
-        if (icon) {
-
-            icon.className =
+            voicePlayIcon.className =
                 "fa-solid fa-play";
 
         }
 
-        return;
+    }
+);
+
+
+voicePreview?.addEventListener(
+    "pause",
+    function() {
+
+        if (voicePlayIcon) {
+
+            voicePlayIcon.className =
+                "fa-solid fa-play";
+
+        }
 
     }
+);
 
 
-    /* ======================================================
-       IDAN ZA A KUNNA WANNAN VOICE
-       → TSAYA DUK WATA VOICE
-    ====================================================== */
+/* ==========================================================
+   MESSAGE VOICE
+   ONLY ONE VOICE CAN PLAY
+========================================================== */
 
-    document
+function stopAllMessageVoices(except = null) {
+
+    if (!chat) return;
+
+
+    chat
         .querySelectorAll(".voice-audio")
-        .forEach(function(otherPlayer) {
+        .forEach(player => {
 
-            if (otherPlayer !== player) {
+            if (player !== except) {
 
-                otherPlayer.pause();
+                player.pause();
 
-                otherPlayer.currentTime = 0;
-
-
-                const otherButton =
-                    otherPlayer
-                        .closest(".voice-player")
-                        ?.querySelector(".voice-play i");
+                player.currentTime = 0;
 
 
-                if (otherButton) {
+                const playerBox =
+                    player.closest(
+                        ".voice-player"
+                    );
 
-                    otherButton.className =
+
+                if (!playerBox) {
+                    return;
+                }
+
+
+                const icon =
+                    playerBox.querySelector(
+                        ".voice-play i"
+                    );
+
+                const progress =
+                    playerBox.querySelector(
+                        ".voice-progress"
+                    );
+
+
+                if (icon) {
+
+                    icon.className =
                         "fa-solid fa-play";
 
                 }
 
 
-                const otherProgress =
-                    otherPlayer
-                        .closest(".voice-player")
-                        ?.querySelector(".voice-progress");
+                if (progress) {
 
-
-                if (otherProgress) {
-
-                    otherProgress.style.width =
+                    progress.style.width =
                         "0%";
 
                 }
@@ -1507,196 +1692,269 @@ document.addEventListener("click", function(e) {
 
         });
 
-
-    /* ======================================================
-       PLAY VOICE
-    ====================================================== */
-
-    player.volume = 1.0;
+}
 
 
-    const playPromise =
-        player.play();
+function toggleMessageVoice(button) {
+
+    if (!button) return;
 
 
-    if (playPromise !== undefined) {
+    const box =
+        button.closest(
+            ".voice-player"
+        );
 
-        playPromise
-            .then(function() {
 
-                if (icon) {
+    if (!box) return;
 
-                    icon.className =
-                        "fa-solid fa-pause";
 
-                }
+    const player =
+        box.querySelector(
+            ".voice-audio"
+        );
 
-            })
-            .catch(function(error) {
 
-                console.error(
-                    "Voice Play Error:",
-                    error
-                );
+    const icon =
+        box.querySelector(
+            ".voice-play i"
+        );
 
-            });
+
+    if (!player) return;
+
+
+    if (!player.paused) {
+
+        player.pause();
+
+        return;
 
     }
 
 
-    /* ======================================================
-       EVENTS - SAU DAYA
-    ====================================================== */
-
-    if (
-        player.dataset.eventsAttached !== "true"
-    ) {
-
-        player.dataset.eventsAttached =
-            "true";
+    stopAllMessageVoices(
+        player
+    );
 
 
-        /* ==========================
-           TIME UPDATE
-        ========================== */
-
-        player.addEventListener(
-            "timeupdate",
-            function() {
-
-                if (!player.duration) return;
+    player.volume = 1;
 
 
-                const percent =
-                    (
-                        player.currentTime /
-                        player.duration
-                    ) * 100;
+    player
+        .play()
+        .catch(err => {
+
+            console.error(
+                "Voice Play Error:",
+                err
+            );
+
+        });
+
+}
 
 
-                if (progress) {
+/* ==========================================================
+   VOICE EVENTS
+========================================================== */
 
-                    progress.style.width =
-                        percent + "%";
+document.addEventListener(
+    "timeupdate",
+    function(e) {
 
-                }
+        const player =
+            e.target.closest?.(
+                ".voice-audio"
+            );
 
-
-                const seconds =
-                    Math.floor(
-                        player.currentTime
-                    );
-
-
-                const minutes =
-                    Math.floor(
-                        seconds / 60
-                    );
+        if (!player) return;
 
 
-                const remainingSeconds =
-                    seconds % 60;
+        const box =
+            player.closest(
+                ".voice-player"
+            );
+
+        if (!box) return;
 
 
-                if (time) {
+        const progress =
+            box.querySelector(
+                ".voice-progress"
+            );
 
-                    time.innerText =
-                        minutes +
-                        ":" +
-                        String(
-                            remainingSeconds
-                        ).padStart(2, "0");
-
-                }
-
-            }
-        );
+        const time =
+            box.querySelector(
+                ".voice-time"
+            );
 
 
-        /* ==========================
-           PLAY
-        ========================== */
+        if (
+            progress &&
+            Number.isFinite(player.duration) &&
+            player.duration > 0
+        ) {
 
-        player.addEventListener(
-            "play",
-            function() {
+            const percent =
+                (
+                    player.currentTime /
+                    player.duration
+                ) * 100;
 
-                if (icon) {
+            progress.style.width =
+                percent + "%";
 
-                    icon.className =
-                        "fa-solid fa-pause";
-
-                }
-
-            }
-        );
-
-
-        /* ==========================
-           PAUSE
-        ========================== */
-
-        player.addEventListener(
-            "pause",
-            function() {
-
-                if (icon) {
-
-                    icon.className =
-                        "fa-solid fa-play";
-
-                }
-
-            }
-        );
+        }
 
 
-        /* ==========================
-           ENDED
-        ========================== */
+        if (time) {
 
-        player.addEventListener(
-            "ended",
-            function() {
-
-                if (icon) {
-
-                    icon.className =
-                        "fa-solid fa-play";
-
-                }
-
-
-                if (progress) {
-
-                    progress.style.width =
-                        "0%";
-
-                }
-
-            }
-        );
-
-
-        /* ==========================
-           ERROR
-        ========================== */
-
-        player.addEventListener(
-            "error",
-            function() {
-
-                console.error(
-                    "Voice Audio Error:",
-                    player.error
+            const totalSeconds =
+                Math.floor(
+                    player.currentTime
                 );
 
-            }
-        );
+            const minutes =
+                Math.floor(
+                    totalSeconds / 60
+                );
 
-    }
+            const seconds =
+                totalSeconds % 60;
 
-});
+            time.textContent =
+                minutes +
+                ":" +
+                String(seconds)
+                    .padStart(2, "0");
+
+        }
+
+    },
+    true
+);
+
+
+document.addEventListener(
+    "play",
+    function(e) {
+
+        const player =
+            e.target.closest?.(
+                ".voice-audio"
+            );
+
+        if (!player) return;
+
+
+        const box =
+            player.closest(
+                ".voice-player"
+            );
+
+
+        const icon =
+            box?.querySelector(
+                ".voice-play i"
+            );
+
+
+        if (icon) {
+
+            icon.className =
+                "fa-solid fa-pause";
+
+        }
+
+    },
+    true
+);
+
+
+document.addEventListener(
+    "pause",
+    function(e) {
+
+        const player =
+            e.target.closest?.(
+                ".voice-audio"
+            );
+
+        if (!player) return;
+
+
+        const box =
+            player.closest(
+                ".voice-player"
+            );
+
+
+        const icon =
+            box?.querySelector(
+                ".voice-play i"
+            );
+
+
+        if (icon) {
+
+            icon.className =
+                "fa-solid fa-play";
+
+        }
+
+    },
+    true
+);
+
+
+document.addEventListener(
+    "ended",
+    function(e) {
+
+        const player =
+            e.target.closest?.(
+                ".voice-audio"
+            );
+
+        if (!player) return;
+
+
+        const box =
+            player.closest(
+                ".voice-player"
+            );
+
+
+        const icon =
+            box?.querySelector(
+                ".voice-play i"
+            );
+
+        const progress =
+            box?.querySelector(
+                ".voice-progress"
+            );
+
+
+        if (icon) {
+
+            icon.className =
+                "fa-solid fa-play";
+
+        }
+
+
+        if (progress) {
+
+            progress.style.width =
+                "0%";
+
+        }
+
+    },
+    true
+);
 
 
 /* ==========================================================
@@ -1705,12 +1963,20 @@ document.addEventListener("click", function(e) {
 
 async function sendVoice() {
 
-    if (!audioBlob) {
+    if (
+        !audioBlob ||
+        !receiver
+    ) {
         return;
     }
 
 
     try {
+
+        if (voiceActionBtn) {
+            voiceActionBtn.disabled = true;
+        }
+
 
         const formData =
             new FormData();
@@ -1721,22 +1987,16 @@ async function sendVoice() {
             user.username
         );
 
-
         formData.append(
             "receiver",
             receiver
         );
-
 
         formData.append(
             "text",
             ""
         );
 
-
-        // ==========================
-        // VOICE FILE
-        // ==========================
 
         const voiceFile =
             new File(
@@ -1751,14 +2011,10 @@ async function sendVoice() {
 
 
         formData.append(
-         "voice",
-         voiceFile
+            "voice",
+            voiceFile
         );
 
-
-        // ==========================
-        // REPLY
-        // ==========================
 
         if (replyMessage) {
 
@@ -1786,11 +2042,7 @@ async function sendVoice() {
                 "replyVoice",
                 replyMessage.voice || ""
             );
-        }
 
-
-        if (voiceActionBtn) {
-            voiceActionBtn.disabled = true;
         }
 
 
@@ -1808,12 +2060,6 @@ async function sendVoice() {
             await res.json();
 
 
-        console.log(
-            "VOICE SEND RESPONSE:",
-            data
-        );
-
-
         if (!res.ok || !data.success) {
 
             alert(
@@ -1822,15 +2068,13 @@ async function sendVoice() {
             );
 
             return;
+
         }
 
 
-        // ==========================
-        // ADD MESSAGE
-        // ==========================
-
         appendMessage(
-            data.message
+            data.message,
+            true
         );
 
 
@@ -1840,14 +2084,18 @@ async function sendVoice() {
         );
 
 
-        // ==========================
-        // RESET
-        // ==========================
+        replyMessage = null;
+
+        hideElement(
+            "replyPreview"
+        );
+
 
         resetVoiceComposer();
 
+    }
 
-    } catch (err) {
+    catch (err) {
 
         console.error(
             "Send Voice Error:",
@@ -1858,27 +2106,30 @@ async function sendVoice() {
             "Voice message failed to send"
         );
 
+    }
 
-    } finally {
+    finally {
 
         if (voiceActionBtn) {
             voiceActionBtn.disabled = false;
         }
 
     }
+
 }
 
 
-/* ==========================
+/* ==========================================================
    RESET VOICE
-========================== */
+========================================================== */
 
 function resetVoiceComposer() {
 
-    recording = false;
-
     stopTimer();
+    stopMediaStream();
 
+
+    recording = false;
 
     audioChunks = [];
 
@@ -1927,7 +2178,7 @@ function resetVoiceComposer() {
 
     if (recordTime) {
 
-        recordTime.innerText =
+        recordTime.textContent =
             "00:00";
 
     }
@@ -1935,8 +2186,16 @@ function resetVoiceComposer() {
 
     if (recordText) {
 
-        recordText.innerText =
+        recordText.textContent =
             "Recording...";
+
+    }
+
+
+    if (recordDot) {
+
+        recordDot.style.display =
+            "inline-block";
 
     }
 
@@ -1967,6 +2226,7 @@ function startReply(msg) {
 
     if (!msg) return;
 
+
     replyMessage = msg;
 
 
@@ -1981,18 +2241,12 @@ function startReply(msg) {
         );
 
 
-    if (
-        !preview ||
-        !replyText
-    ) {
-
+    if (!preview || !replyText) {
         return;
-
     }
 
 
-    let text =
-        "Message";
+    let text = "Message";
 
 
     if (msg.text) {
@@ -2000,12 +2254,16 @@ function startReply(msg) {
         text =
             msg.text;
 
-    } else if (msg.image) {
+    }
+
+    else if (msg.image) {
 
         text =
             "📷 Photo";
 
-    } else if (msg.voice) {
+    }
+
+    else if (msg.voice) {
 
         text =
             "🎤 Voice message";
@@ -2013,12 +2271,15 @@ function startReply(msg) {
     }
 
 
-    replyText.innerText =
+    replyText.textContent =
         text;
 
 
     preview.style.display =
         "flex";
+
+
+    messageInput?.focus();
 
 }
 
@@ -2027,19 +2288,9 @@ function cancelReply() {
 
     replyMessage = null;
 
-
-    const preview =
-        document.getElementById(
-            "replyPreview"
-        );
-
-
-    if (preview) {
-
-        preview.style.display =
-            "none";
-
-    }
+    hideElement(
+        "replyPreview"
+    );
 
 }
 
@@ -2048,26 +2299,50 @@ function cancelReply() {
    SWIPE REPLY
 ========================================================== */
 
-function touchStart(e, msg) {
+function touchStart(e, bubble) {
+
+    if (!e.touches?.length) {
+        return;
+    }
+
 
     startX =
         e.touches[0].clientX;
 
 
     currentBubble =
-        e.target.closest(
-            ".bubble-me,.bubble-other"
-        );
+        bubble;
 
 
-    swipeMessage =
-        msg;
+    const raw =
+        bubble?.dataset.message;
+
+
+    if (raw) {
+
+        try {
+
+            swipeMessage =
+                JSON.parse(
+                    raw
+                );
+
+        }
+
+        catch {
+
+            swipeMessage =
+                null;
+
+        }
+
+    }
 
 
     if (currentBubble) {
 
         currentBubble.style.transition =
-            "";
+            "none";
 
     }
 
@@ -2076,7 +2351,12 @@ function touchStart(e, msg) {
 
 function touchMove(e) {
 
-    if (!currentBubble) return;
+    if (
+        !currentBubble ||
+        !e.touches?.length
+    ) {
+        return;
+    }
 
 
     const moveX =
@@ -2098,48 +2378,45 @@ function touchMove(e) {
 
 
     currentBubble.style.transform =
-        `translateX(${diff}px)`;
+        `translate3d(${diff}px,0,0)`;
 
 }
 
 
 function touchEnd() {
 
-    if (!currentBubble) return;
-
-
-    const style =
-        currentBubble.style.transform;
-
-
-    let moved = 0;
-
-
-    const match =
-        style.match(
-            /translateX\(([\d.]+)px\)/
-        );
-
-
-    if (match) {
-
-        moved =
-            parseFloat(
-                match[1]
-            );
-
+    if (!currentBubble) {
+        return;
     }
 
 
-    currentBubble.style.transition =
-        ".2s";
+    const transform =
+        currentBubble.style.transform;
 
+
+    const match =
+        transform.match(
+            /translate3d\(([\d.]+)px/
+        );
+
+
+    const moved =
+        match
+            ? parseFloat(match[1])
+            : 0;
+
+
+    currentBubble.style.transition =
+        "transform .18s ease";
 
     currentBubble.style.transform =
-        "translateX(0px)";
+        "translate3d(0,0,0)";
 
 
-    if (moved >= 35) {
+    if (
+        moved >= 35 &&
+        swipeMessage
+    ) {
 
         navigator.vibrate?.(30);
 
@@ -2159,19 +2436,46 @@ function touchEnd() {
 
         }
 
-    }, 200);
+    }, 180);
+
+
+    currentBubble = null;
+    swipeMessage = null;
 
 }
+
 
 /* ==========================================================
    MESSAGE MENU
 ========================================================== */
 
-function showMessageMenu(e, msg) {
+function showMessageMenu(e, bubble) {
 
     e.preventDefault();
 
-    selectedMsg = msg;
+
+    selectedMsg = null;
+
+
+    if (bubble?.dataset.message) {
+
+        try {
+
+            selectedMsg =
+                JSON.parse(
+                    bubble.dataset.message
+                );
+
+        }
+
+        catch {}
+
+    }
+
+
+    if (!selectedMsg) {
+        return;
+    }
 
 
     const menu =
@@ -2189,28 +2493,45 @@ function showMessageMenu(e, msg) {
 
     const x =
         e.pageX ||
-        (
-            e.touches
-            ? e.touches[0].pageX
-            : 0
-        );
-
+        e.clientX ||
+        0;
 
     const y =
         e.pageY ||
-        (
-            e.touches
-            ? e.touches[0].pageY
-            : 0
+        e.clientY ||
+        0;
+
+
+    const menuWidth =
+        menu.offsetWidth || 210;
+
+    const menuHeight =
+        menu.offsetHeight || 200;
+
+
+    const left =
+        Math.min(
+            x,
+            window.innerWidth -
+            menuWidth -
+            10
+        );
+
+
+    const top =
+        Math.min(
+            y,
+            window.innerHeight -
+            menuHeight -
+            10
         );
 
 
     menu.style.left =
-        x + "px";
-
+        Math.max(10, left) + "px";
 
     menu.style.top =
-        y + "px";
+        Math.max(10, top) + "px";
 
 
     const deleteMe =
@@ -2218,35 +2539,29 @@ function showMessageMenu(e, msg) {
             "deleteMeOption"
         );
 
-
     const deleteAll =
         document.getElementById(
             "deleteAllOption"
         );
 
 
-    if (
-        msg.sender ===
-        user.username
-    ) {
+    const mine =
+        selectedMsg.sender ===
+        user.username;
 
-        if (deleteMe)
-            deleteMe.style.display =
-                "flex";
 
-        if (deleteAll)
-            deleteAll.style.display =
-                "flex";
+    if (deleteMe) {
 
-    } else {
+        deleteMe.style.display =
+            mine ? "flex" : "none";
 
-        if (deleteMe)
-            deleteMe.style.display =
-                "none";
+    }
 
-        if (deleteAll)
-            deleteAll.style.display =
-                "none";
+
+    if (deleteAll) {
+
+        deleteAll.style.display =
+            mine ? "flex" : "none";
 
     }
 
@@ -2261,19 +2576,9 @@ function replySelected() {
         selectedMsg
     );
 
-
-    const menu =
-        document.getElementById(
-            "messageMenu"
-        );
-
-
-    if (menu) {
-
-        menu.style.display =
-            "none";
-
-    }
+    hideElement(
+        "messageMenu"
+    );
 
 }
 
@@ -2283,18 +2588,9 @@ function reactSelected() {
     if (!selectedMsg) return;
 
 
-    const menu =
-        document.getElementById(
-            "messageMenu"
-        );
-
-
-    if (menu) {
-
-        menu.style.display =
-            "none";
-
-    }
+    hideElement(
+        "messageMenu"
+    );
 
 
     selectedMessage =
@@ -2313,14 +2609,11 @@ function reactSelected() {
     popup.style.display =
         "flex";
 
-
     popup.style.left =
         "50%";
 
-
     popup.style.top =
         "50%";
-
 
     popup.style.transform =
         "translate(-50%,-50%)";
@@ -2330,18 +2623,9 @@ function reactSelected() {
 
 function deleteSelected() {
 
-    const menu =
-        document.getElementById(
-            "messageMenu"
-        );
-
-
-    if (menu) {
-
-        menu.style.display =
-            "none";
-
-    }
+    hideElement(
+        "messageMenu"
+    );
 
 
     if (!selectedMsg) return;
@@ -2356,18 +2640,9 @@ function deleteSelected() {
 
 function deleteEveryoneSelected() {
 
-    const menu =
-        document.getElementById(
-            "messageMenu"
-        );
-
-
-    if (menu) {
-
-        menu.style.display =
-            "none";
-
-    }
+    hideElement(
+        "messageMenu"
+    );
 
 
     if (!selectedMsg) return;
@@ -2377,7 +2652,8 @@ function deleteEveryoneSelected() {
         selectedMsg._id
     );
 
-}
+   }
+
 
 
 /* ==========================================================
@@ -2409,14 +2685,16 @@ async function clearChat() {
         !confirm(
             "Delete all messages?"
         )
-    ) return;
+    ) {
+        return;
+    }
 
 
     try {
 
         const res =
             await fetch(
-                `/api/messages/clear/${user.username}/${receiver}`,
+                `/api/messages/clear/${encodeURIComponent(user.username)}/${encodeURIComponent(receiver)}`,
                 {
                     method: "DELETE"
                 }
@@ -2431,17 +2709,25 @@ async function clearChat() {
 
             chat.innerHTML = "";
 
-        } else {
+        }
+
+        else {
 
             alert(
-                data.message
+                data.message ||
+                "Failed to clear chat"
             );
 
         }
 
-    } catch (err) {
+    }
 
-        console.error(err);
+    catch (err) {
+
+        console.error(
+            "Clear Chat Error:",
+            err
+        );
 
     }
 
@@ -2449,7 +2735,7 @@ async function clearChat() {
 
 
 /* ==========================================================
-   DELETE MESSAGE
+   DELETE FOR ME
 ========================================================== */
 
 async function deleteMessage(
@@ -2460,14 +2746,16 @@ async function deleteMessage(
         !confirm(
             "Delete this message for yourself?"
         )
-    ) return;
+    ) {
+        return;
+    }
 
 
     try {
 
         const res =
             await fetch(
-                `/api/messages/delete/${messageId}`,
+                `/api/messages/delete/${encodeURIComponent(messageId)}`,
                 {
                     method: "DELETE",
 
@@ -2489,22 +2777,30 @@ async function deleteMessage(
             await res.json();
 
 
-        if (data.success) {
-
-            loadMessages(false);
-
-        } else {
+        if (!res.ok || !data.success) {
 
             alert(
                 data.message ||
                 "Delete failed"
             );
 
+            return;
+
         }
 
-    } catch (err) {
 
-        console.error(err);
+        removeMessageFromDOM(
+            messageId
+        );
+
+    }
+
+    catch (err) {
+
+        console.error(
+            "Delete Error:",
+            err
+        );
 
     }
 
@@ -2512,7 +2808,7 @@ async function deleteMessage(
 
 
 /* ==========================================================
-   DELETE FOR EVERYONE
+   DELETE EVERYONE
 ========================================================== */
 
 async function deleteForEveryone(
@@ -2523,14 +2819,16 @@ async function deleteForEveryone(
         !confirm(
             "Delete this message for everyone?"
         )
-    ) return;
+    ) {
+        return;
+    }
 
 
     try {
 
         const res =
             await fetch(
-                `/api/messages/delete-everyone/${messageId}`,
+                `/api/messages/delete-everyone/${encodeURIComponent(messageId)}`,
                 {
                     method: "PUT",
 
@@ -2552,31 +2850,36 @@ async function deleteForEveryone(
             await res.json();
 
 
-        if (data.success) {
-
-            loadMessages(false);
-
-
-            socket.emit(
-                "messageDeleted",
-                {
-                    messageId
-                }
-            );
-
-        } else {
+        if (!res.ok || !data.success) {
 
             alert(
                 data.message ||
                 "Delete failed"
             );
 
+            return;
+
         }
 
-    } catch (err) {
+
+        updateDeletedMessage(
+            messageId
+        );
+
+
+        socket.emit(
+            "messageDeleted",
+            {
+                messageId
+            }
+        );
+
+    }
+
+    catch (err) {
 
         console.error(
-            "Delete For Everyone Error:",
+            "Delete Everyone Error:",
             err
         );
 
@@ -2586,35 +2889,132 @@ async function deleteForEveryone(
 
 
 /* ==========================================================
-   REACTIONS
+   REMOVE MESSAGE DOM
+========================================================== */
+
+function removeMessageFromDOM(
+    messageId
+) {
+
+    if (!chat) return;
+
+
+    const bubble =
+        chat.querySelector(
+            `[data-message-id="${CSS.escape(String(messageId))}"]`
+        );
+
+
+    const row =
+        bubble?.closest(
+            "[data-message-row]"
+        );
+
+
+    if (row) {
+
+        row.remove();
+
+    }
+
+}
+
+
+/* ==========================================================
+   UPDATE DELETED MESSAGE
+========================================================== */
+
+function updateDeletedMessage(
+    messageId
+) {
+
+    if (!chat) return;
+
+
+    const bubble =
+        chat.querySelector(
+            `[data-message-id="${CSS.escape(String(messageId))}"]`
+        );
+
+
+    if (!bubble) return;
+
+
+    const voice =
+        bubble.querySelector(
+            ".voice-player"
+        );
+
+    const image =
+        bubble.querySelector(
+            ".message-image"
+        );
+
+    const text =
+        bubble.querySelector(
+            ".message-text"
+        );
+
+
+    if (voice) {
+        voice.remove();
+    }
+
+    if (image) {
+        image.remove();
+    }
+
+    if (text) {
+        text.remove();
+    }
+
+
+    const deleted =
+        bubble.querySelector(
+            ".deleted-message"
+        );
+
+
+    if (!deleted) {
+
+        bubble.insertAdjacentHTML(
+            "afterbegin",
+            `
+            <div class="deleted-message">
+                <i class="fa-solid fa-ban"></i>
+                This message was deleted
+            </div>
+            `
+        );
+
+    }
+
+}
+
+
+/* ==========================================================
+   REACTION
 ========================================================== */
 
 async function selectReaction(
     emoji
 ) {
 
-    if (!selectedMessage) return;
-
-
-    const popup =
-        document.getElementById(
-            "reactionPopup"
-        );
-
-
-    if (popup) {
-
-        popup.style.display =
-            "none";
-
+    if (!selectedMessage) {
+        return;
     }
+
+
+    hideElement(
+        "reactionPopup"
+    );
 
 
     try {
 
         const res =
             await fetch(
-                `/api/messages/react/${selectedMessage}`,
+                `/api/messages/react/${encodeURIComponent(selectedMessage)}`,
                 {
                     method: "PUT",
 
@@ -2628,8 +3028,7 @@ async function selectReaction(
                             username:
                                 user.username,
 
-                            emoji:
-                                emoji
+                            emoji
                         })
                 }
             );
@@ -2639,17 +3038,114 @@ async function selectReaction(
             await res.json();
 
 
-        if (data.success) {
+        if (!res.ok || !data.success) {
 
-            loadMessages(false);
+            alert(
+                data.message ||
+                "Reaction failed"
+            );
+
+            return;
 
         }
 
-    } catch (err) {
+
+        /*
+           Update only this message.
+        */
+
+        updateMessageReaction(
+            selectedMessage,
+            data.message ||
+            data.updatedMessage ||
+            data.data
+        );
+
+    }
+
+    catch (err) {
 
         console.error(
             "Reaction Error:",
             err
+        );
+
+    }
+
+}
+
+
+/* ==========================================================
+   UPDATE REACTION
+========================================================== */
+
+function updateMessageReaction(
+    messageId,
+    updatedMessage
+) {
+
+    if (
+        !updatedMessage ||
+        !chat
+    ) {
+        /*
+           API ba dawo da message ba.
+           A wannan yanayin ba za mu
+           reload duk chat ba.
+        */
+        return;
+    }
+
+
+    const bubble =
+        chat.querySelector(
+            `[data-message-id="${CSS.escape(String(messageId))}"]`
+        );
+
+
+    if (!bubble) return;
+
+
+    const old =
+        bubble.querySelector(
+            ".message-reactions"
+        );
+
+
+    const reactions =
+        Array.isArray(
+            updatedMessage.reactions
+        )
+            ? updatedMessage.reactions
+            : [];
+
+
+    const html =
+        reactions.length
+            ? `
+                <div class="message-reactions">
+                    ${reactions.map(r => `
+                        <span class="reaction">
+                            ${escapeHTML(r.emoji)}
+                        </span>
+                    `).join("")}
+                </div>
+            `
+            : "";
+
+
+    if (old) {
+
+        old.outerHTML =
+            html;
+
+    }
+
+    else if (html) {
+
+        bubble.insertAdjacentHTML(
+            "beforeend",
+            html
         );
 
     }
@@ -2668,15 +3164,15 @@ function openImage(src) {
             "imageViewer"
         );
 
-
     const img =
         document.getElementById(
             "fullImage"
         );
 
 
-    if (!viewer || !img)
+    if (!viewer || !img) {
         return;
+    }
 
 
     img.src =
@@ -2691,32 +3187,23 @@ function openImage(src) {
 
 function closeImage() {
 
-    const viewer =
-        document.getElementById(
-            "imageViewer"
-        );
-
-
-    if (viewer) {
-
-        viewer.style.display =
-            "none";
-
-    }
+    hideElement(
+        "imageViewer"
+    );
 
 }
 
 
 /* ==========================================================
-   SOCKET
+   SOCKET CONNECT
 ========================================================== */
 
 socket.on(
     "connect",
-    () => {
+    function() {
 
         console.log(
-            "Socket Connected"
+            "2Chat Socket Connected"
         );
 
 
@@ -2731,37 +3218,88 @@ socket.on(
 
 socket.on(
     "disconnect",
-    () => {
+    function() {
 
         console.log(
-            "Socket Disconnected"
+            "2Chat Socket Disconnected"
         );
 
     }
 );
 
 
+/* ==========================================================
+   RECEIVE MESSAGE
+========================================================== */
+
 socket.on(
     "receiveMessage",
-    (msg) => {
+    function(msg) {
 
-        if (
+        if (!msg) return;
 
+
+        const isThisChat =
             (
                 msg.sender === receiver &&
                 msg.receiver === user.username
             )
-
             ||
-
             (
                 msg.sender === user.username &&
                 msg.receiver === receiver
-            )
+            );
 
+
+        if (!isThisChat) {
+            return;
+        }
+
+
+        /*
+           Duplicate protection.
+        */
+
+        if (
+            msg._id &&
+            messageExists(msg._id)
         ) {
+            return;
+        }
 
-            appendMessage(msg);
+
+        appendMessage(
+            msg,
+            true
+        );
+
+    }
+);
+
+
+/* ==========================================================
+   DELIVERED
+========================================================== */
+
+socket.on(
+    "messageDelivered",
+    function(data) {
+
+        if (!data) return;
+
+
+        const messageId =
+            data.messageId ||
+            data._id ||
+            data.id;
+
+
+        if (messageId) {
+
+            updateMessageStatus(
+                messageId,
+                "delivered"
+            );
 
         }
 
@@ -2769,31 +3307,61 @@ socket.on(
 );
 
 
-socket.on(
-    "messageDelivered",
-    () => {
-
-        loadMessages(false);
-
-    }
-);
-
+/* ==========================================================
+   SEEN
+========================================================== */
 
 socket.on(
     "messageSeen",
-    () => {
+    function(data) {
 
-        loadMessages(false);
+        if (!data) return;
+
+
+        const messageId =
+            data.messageId ||
+            data._id ||
+            data.id;
+
+
+        if (messageId) {
+
+            updateMessageStatus(
+                messageId,
+                "seen"
+            );
+
+        }
 
     }
 );
 
 
+/* ==========================================================
+   MESSAGE DELETED
+========================================================== */
+
 socket.on(
     "messageDeleted",
-    () => {
+    function(data) {
 
-        loadMessages(false);
+        if (!data) return;
+
+
+        const messageId =
+            data.messageId ||
+            data._id ||
+            data.id;
+
+
+        if (!messageId) {
+            return;
+        }
+
+
+        updateDeletedMessage(
+            messageId
+        );
 
     }
 );
@@ -2805,11 +3373,14 @@ socket.on(
 
 socket.on(
     "typing",
-    (data) => {
+    function(data) {
 
         if (
+            !data ||
             data.sender !== receiver
-        ) return;
+        ) {
+            return;
+        }
 
 
         const status =
@@ -2831,7 +3402,16 @@ socket.on(
 
 socket.on(
     "stopTyping",
-    () => {
+    function(data) {
+
+        if (
+            data &&
+            data.sender &&
+            data.sender !== receiver
+        ) {
+            return;
+        }
+
 
         const status =
             document.getElementById(
@@ -2851,16 +3431,18 @@ socket.on(
 
 
 /* ==========================================================
-   ONLINE / OFFLINE
+   ONLINE
 ========================================================== */
 
 socket.on(
     "userOnline",
-    (username) => {
+    function(username) {
 
         if (
             username !== receiver
-        ) return;
+        ) {
+            return;
+        }
 
 
         const status =
@@ -2880,13 +3462,19 @@ socket.on(
 );
 
 
+/* ==========================================================
+   OFFLINE
+========================================================== */
+
 socket.on(
     "userOffline",
-    (username) => {
+    function(username) {
 
         if (
             username !== receiver
-        ) return;
+        ) {
+            return;
+        }
 
 
         const status =
@@ -2912,7 +3500,7 @@ socket.on(
 
 document.addEventListener(
     "click",
-    (e) => {
+    function(e) {
 
         const messageMenu =
             document.getElementById(
@@ -2986,53 +3574,19 @@ document.addEventListener(
 
 document.addEventListener(
     "keydown",
-    (e) => {
+    function(e) {
 
         if (
             e.key !== "Escape"
-        ) return;
-
-
-        const popup =
-            document.getElementById(
-                "reactionPopup"
-            );
-
-
-        const menu =
-            document.getElementById(
-                "messageMenu"
-            );
-
-
-        const viewer =
-            document.getElementById(
-                "imageViewer"
-            );
-
-
-        if (popup) {
-
-            popup.style.display =
-                "none";
-
+        ) {
+            return;
         }
 
 
-        if (menu) {
-
-            menu.style.display =
-                "none";
-
-        }
-
-
-        if (viewer) {
-
-            viewer.style.display =
-                "none";
-
-        }
+        hideElement("messageMenu");
+        hideElement("chatMenu");
+        hideElement("reactionPopup");
+        hideElement("imageViewer");
 
     }
 );
@@ -3046,7 +3600,7 @@ document
     .getElementById("imageViewer")
     ?.addEventListener(
         "click",
-        (e) => {
+        function(e) {
 
             if (
                 e.target.id ===
@@ -3062,79 +3616,70 @@ document
 
 
 /* ==========================================================
-   AUTO SCROLL
+   ONLINE / OFFLINE
 ========================================================== */
 
-const observer =
-    new MutationObserver(
-        () => {
+window.addEventListener(
+    "online",
+    function() {
 
-            if (!chat) return;
+        console.log(
+            "2Chat Online"
+        );
 
-            chat.scrollTop =
-                chat.scrollHeight;
-
+        if (chatLoaded) {
+            loadMessages(false);
         }
-    );
+
+    }
+);
 
 
-if (chat) {
+window.addEventListener(
+    "offline",
+    function() {
 
-    observer.observe(
-        chat,
-        {
-            childList: true
-        }
-    );
+        console.log(
+            "2Chat Offline"
+        );
+
+    }
+);
+
+
+/* ==========================================================
+   UTILITY
+========================================================== */
+
+function hideElement(id) {
+
+    const element =
+        document.getElementById(id);
+
+
+    if (element) {
+
+        element.style.display =
+            "none";
+
+    }
 
 }
 
 
 /* ==========================================================
-   NETWORK
+   INITIAL LOAD
 ========================================================== */
 
-window.addEventListener(
-    "offline",
-    () => {
-
-        console.log(
-            "Offline"
-        );
-
-    }
-);
-
-
-window.addEventListener(
-    "online",
-    () => {
-
-        console.log(
-            "Online"
-        );
-
-        loadMessages(false);
-
-    }
-);
-
-
-/* ==========================================================
-   LOAD
-========================================================== */
-
-window.addEventListener(
-    "load",
-    () => {
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
 
         loadChatUser();
 
-        loadMessages();
+        loadMessages(true);
 
         updateSendButton();
-
-        messageInput?.focus();
 
     }
 );
@@ -3145,5 +3690,6 @@ window.addEventListener(
 ========================================================== */
 
 console.log(
-    "2Chat Messenger Loaded Successfully"
+    "2Chat Optimized Messenger Loaded Successfully"
 );
+                   
