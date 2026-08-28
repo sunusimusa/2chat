@@ -17,61 +17,56 @@
             box-sizing: border-box;
         }
 
+        html,
         body {
-
             margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+        }
 
-            padding: 20px;
+        body {
 
             font-family: Arial, sans-serif;
 
             background: #f5f5f5;
 
+            color: #222;
+
+            padding: 20px;
+
         }
+
 
         .container {
 
+            width: 100%;
+
             max-width: 600px;
 
-            margin: auto;
+            margin: 0 auto;
 
         }
+
+
+        /* ==========================
+           HEADER
+        ========================== */
 
         h1 {
 
             text-align: center;
 
-            margin-bottom: 20px;
+            margin: 5px 0 20px;
+
+            font-size: 26px;
 
         }
 
-        button {
 
-            width: 100%;
-
-            padding: 14px;
-
-            border: none;
-
-            border-radius: 10px;
-
-            background: #ff0874;
-
-            color: white;
-
-            font-size: 16px;
-
-            font-weight: bold;
-
-            cursor: pointer;
-
-        }
-
-        button:disabled {
-
-            opacity: .6;
-
-        }
+        /* ==========================
+           MESSAGE
+        ========================== */
 
         #message {
 
@@ -79,11 +74,31 @@
 
             margin: 15px 0;
 
+            font-size: 14px;
+
+            color: #666;
+
         }
+
+
+        /* ==========================
+           GIFT LIST
+        ========================== */
+
+        #giftList {
+
+            width: 100%;
+
+        }
+
+
+        /* ==========================
+           GIFT CARD
+        ========================== */
 
         .gift {
 
-            background: white;
+            background: #fff;
 
             padding: 16px;
 
@@ -93,9 +108,14 @@
 
             box-shadow:
                 0 3px 12px
-                rgba(0,0,0,.08);
+                rgba(0, 0, 0, .08);
 
         }
+
+
+        /* ==========================
+           TOP
+        ========================== */
 
         .gift-top {
 
@@ -105,15 +125,21 @@
 
             align-items: center;
 
+            gap: 10px;
+
         }
+
 
         .gift-type {
 
-            font-size: 20px;
+            font-size: 18px;
 
             font-weight: bold;
 
+            color: #222;
+
         }
+
 
         .coins {
 
@@ -121,7 +147,14 @@
 
             font-weight: bold;
 
+            white-space: nowrap;
+
         }
+
+
+        /* ==========================
+           INFO
+        ========================== */
 
         .info {
 
@@ -129,37 +162,112 @@
 
             color: #555;
 
-            line-height: 1.6;
+            line-height: 1.7;
+
+            font-size: 14px;
 
         }
+
+
+        .info strong {
+
+            color: #222;
+
+        }
+
+
+        /* ==========================
+           EMPTY
+        ========================== */
 
         .empty {
 
             text-align: center;
 
-            padding: 30px;
+            padding: 35px 20px;
 
             color: #777;
 
-            background: white;
+            background: #fff;
 
             border-radius: 14px;
 
+            box-shadow:
+                0 3px 12px
+                rgba(0, 0, 0, .06);
+
         }
 
-        pre {
 
-            background: #111;
+        /* ==========================
+           ERROR
+        ========================== */
 
-            color: #00ff88;
+        .error {
 
-            padding: 15px;
+            text-align: center;
 
-            border-radius: 10px;
+            padding: 30px 20px;
 
-            overflow-x: auto;
+            background: #fff;
 
-            font-size: 12px;
+            border-radius: 14px;
+
+            color: #d32f2f;
+
+        }
+
+
+        /* ==========================
+           LOADING
+        ========================== */
+
+        .loading {
+
+            text-align: center;
+
+            padding: 30px 20px;
+
+            color: #777;
+
+        }
+
+
+        /* ==========================
+           MOBILE
+        ========================== */
+
+        @media (max-width: 480px) {
+
+            body {
+
+                padding: 15px;
+
+            }
+
+            h1 {
+
+                font-size: 23px;
+
+            }
+
+            .gift {
+
+                padding: 14px;
+
+            }
+
+            .gift-type {
+
+                font-size: 17px;
+
+            }
+
+            .coins {
+
+                font-size: 14px;
+
+            }
 
         }
 
@@ -173,12 +281,14 @@
 
 <div class="container">
 
+
     <h1>
         🎁 Gift History
     </h1>
 
+
     <div id="message">
-        Loading...
+        Loading gift history...
     </div>
 
 
@@ -188,11 +298,36 @@
 </div>
 
 
+
 <script>
 
+/* ==========================================================
+   LOAD GIFT HISTORY
+========================================================== */
 
 async function loadGiftHistory() {
 
+    const message =
+        document.getElementById("message");
+
+    const giftList =
+        document.getElementById("giftList");
+
+
+    if (!message || !giftList) {
+
+        console.error(
+            "Gift History elements not found."
+        );
+
+        return;
+
+    }
+
+
+    /* ==========================
+       TOKEN
+    ========================== */
 
     const token =
         localStorage.getItem("token");
@@ -200,49 +335,40 @@ async function loadGiftHistory() {
 
     if (!token) {
 
-        document.getElementById(
-            "message"
-        ).innerText =
+        message.innerText =
             "❌ Login required";
+
+        giftList.innerHTML = `
+            <div class="error">
+                🔐 Please login to view your gift history.
+            </div>
+        `;
 
         return;
 
     }
 
 
-    const button =
-        document.getElementById(
-            "loadBtn"
-        );
-
-
-    const message =
-        document.getElementById(
-            "message"
-        );
-
-
-    const giftList =
-        document.getElementById(
-            "giftList"
-        );
-
-
-    button.disabled = true;
-
-    button.innerText =
-        "Loading...";
-
+    /* ==========================
+       LOADING
+    ========================== */
 
     message.innerText =
-        "Connecting to Gift API...";
+        "Loading gift history...";
 
-
-    giftList.innerHTML = "";
+    giftList.innerHTML = `
+        <div class="loading">
+            ⏳ Please wait...
+        </div>
+    `;
 
 
     try {
 
+
+        /* ==========================
+           API REQUEST
+        ========================== */
 
         const res =
             await fetch(
@@ -254,13 +380,20 @@ async function loadGiftHistory() {
                     headers: {
 
                         "Authorization":
-                            "Bearer " + token
+                            "Bearer " + token,
+
+                        "Content-Type":
+                            "application/json"
 
                     }
 
                 }
             );
 
+
+        /* ==========================
+           RESPONSE
+        ========================== */
 
         const data =
             await res.json();
@@ -272,32 +405,19 @@ async function loadGiftHistory() {
         );
 
 
-        if (!data.success) {
+        if (!res.ok || !data.success) {
 
             message.innerText =
-                "❌ " +
-                (
-                    data.message ||
-                    "Failed to load gifts"
-                );
-
-            return;
-
-        }
-
-
-        const gifts =
-            data.gifts || [];
-
-
-        if (gifts.length === 0) {
-
-            message.innerText =
-                "No gifts received yet.";
+                "❌ Failed to load gift history.";
 
             giftList.innerHTML = `
-                <div class="empty">
-                    🎁 No gifts found
+                <div class="error">
+                    ❌ ${
+                        escapeHTML(
+                            data.message ||
+                            "Unable to load gifts."
+                        )
+                    }
                 </div>
             `;
 
@@ -306,15 +426,76 @@ async function loadGiftHistory() {
         }
 
 
-        message.innerText =
-            "✅ Gift history loaded successfully";
+        /* ==========================
+           GIFTS
+        ========================== */
 
+        const gifts =
+            Array.isArray(data.gifts)
+                ? data.gifts
+                : [];
+
+
+        /* ==========================
+           EMPTY
+        ========================== */
+
+        if (gifts.length === 0) {
+
+            message.innerText =
+                "No gifts received yet.";
+
+            giftList.innerHTML = `
+                <div class="empty">
+
+                    <div
+                        style="
+                            font-size:42px;
+                            margin-bottom:10px;
+                        "
+                    >
+                        🎁
+                    </div>
+
+                    <div>
+                        No gifts received yet.
+                    </div>
+
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        /* ==========================
+           SUCCESS
+        ========================== */
+
+        message.innerText =
+            `${gifts.length} gift${
+                gifts.length === 1
+                    ? ""
+                    : "s"
+            } received`;
+
+
+        giftList.innerHTML = "";
+
+
+        /* ==========================
+           RENDER GIFTS
+        ========================== */
 
         gifts.forEach(gift => {
 
 
             const sender =
-                gift.senderId || {};
+                gift.senderId &&
+                typeof gift.senderId === "object"
+                    ? gift.senderId
+                    : {};
 
 
             const senderName =
@@ -323,15 +504,61 @@ async function loadGiftHistory() {
                 "Unknown User";
 
 
-            const date =
-                gift.createdAt
-                    ? new Date(
-                        gift.createdAt
-                    ).toLocaleString(
-                        "en-NG"
-                    )
-                    : "Unknown date";
+            const giftType =
+                gift.giftType ||
+                "Gift";
 
+
+            const coins =
+                Number(
+                    gift.coins || 0
+                );
+
+
+            const creatorEarning =
+                Number(
+                    gift.creatorEarning || 0
+                );
+
+
+            let date =
+                "Unknown date";
+
+
+            if (gift.createdAt) {
+
+                const parsedDate =
+                    new Date(
+                        gift.createdAt
+                    );
+
+
+                if (
+                    !isNaN(
+                        parsedDate.getTime()
+                    )
+                ) {
+
+                    date =
+                        parsedDate.toLocaleString(
+                            "en-NG",
+                            {
+                                dateStyle:
+                                    "medium",
+
+                                timeStyle:
+                                    "short"
+                            }
+                        );
+
+                }
+
+            }
+
+
+            /* ==========================
+               CARD
+            ========================== */
 
             const item =
                 document.createElement(
@@ -349,18 +576,18 @@ async function loadGiftHistory() {
 
                     <div class="gift-type">
 
-                        🎁 ${escapeHTML(
-                            gift.giftType ||
-                            "Gift"
+                        🎁
+                        ${escapeHTML(
+                            giftType
                         )}
 
                     </div>
 
+
                     <div class="coins">
 
-                        ${Number(
-                            gift.coins || 0
-                        )} coins
+                        ${coins}
+                        coins
 
                     </div>
 
@@ -381,15 +608,17 @@ async function loadGiftHistory() {
 
                     💰 Creator earning:
                     <strong>
-                        ${Number(
-                            gift.creatorEarning || 0
-                        )} coins
+                        ${creatorEarning}
+                        coins
                     </strong>
 
                     <br>
 
 
-                    📅 ${escapeHTML(date)}
+                    📅
+                    ${escapeHTML(
+                        date
+                    )}
 
                 </div>
 
@@ -405,7 +634,6 @@ async function loadGiftHistory() {
 
     } catch (err) {
 
-
         console.error(
             "GIFT HISTORY ERROR:",
             err
@@ -416,50 +644,78 @@ async function loadGiftHistory() {
             "❌ Server connection error";
 
 
-    } finally {
+        giftList.innerHTML = `
+            <div class="error">
 
+                ❌ Unable to connect
+                to the server.
 
-        button.disabled = false;
+                <br><br>
 
-        button.innerText =
-            "🔄 Load Gift History";
+                Please try again later.
+
+            </div>
+        `;
 
     }
 
 }
 
 
-/* ============================
+
+/* ==========================================================
    SAFE HTML
-============================ */
+========================================================== */
 
 function escapeHTML(value) {
 
     return String(value)
 
-        .replaceAll("&", "&amp;")
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
 
-        .replaceAll("<", "&lt;")
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
 
-        .replaceAll(">", "&gt;")
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
 
-        .replaceAll('"', "&quot;")
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
 
-        .replaceAll("'", "&#039;");
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
 
 }
 
 
-/* ============================
+
+/* ==========================================================
    AUTO LOAD
-============================ */
+========================================================== */
 
-loadGiftHistory();
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
 
+        loadGiftHistory();
+
+    }
+);
 
 </script>
 
 
 </body>
 
-</html>
+    </html>
