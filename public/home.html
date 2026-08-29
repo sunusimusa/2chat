@@ -306,9 +306,7 @@ onclick="logout(); return false;">
      CREATE POST
 ===================================================== -->
 
-     <section
-class="create-post"
-id="createPostSection">
+     <section class="create-post" id="createPostSection">
 
     <div class="create-user-row">
 
@@ -321,61 +319,58 @@ id="createPostSection">
 
         <textarea
             id="postText"
-            placeholder="What's happening?">
-        </textarea>
+            placeholder="What's happening?"></textarea>
 
     </div>
 
-     </section>
-
     <!-- PHOTO -->
     <input
-    type="file"
-    id="postImage"
-    accept="image/*"
-    hidden>
+        type="file"
+        id="postImage"
+        accept="image/*"
+        hidden>
 
     <!-- VIDEO -->
     <input
-    type="file"
-    id="postVideo"
-    accept="video/*"
-    hidden>
+        type="file"
+        id="postVideo"
+        accept="video/*"
+        hidden>
 
     <!-- PREVIEW -->
     <div
-id="postPreview"
-class="post-preview"
-style="display:none;">
+        id="postPreview"
+        class="post-preview"
+        style="display:none;">
 
-    <img
-    id="postPreviewImage"
-    style="display:none;">
+        <img
+            id="postPreviewImage"
+            style="display:none;">
 
-    <video
-    id="postPreviewVideo"
-    controls
-    playsinline
-    style="display:none;">
-    </video>
+        <video
+            id="postPreviewVideo"
+            controls
+            playsinline
+            style="display:none;">
+        </video>
 
-    <button
-    type="button"
-    onclick="removePostMedia()">
+        <button
+            type="button"
+            onclick="removePostMedia()">
 
-        <i class="fa-solid fa-trash"></i>
-        Remove
+            <i class="fa-solid fa-trash"></i>
+            Remove
 
-    </button>
+        </button>
 
-</div>
-    
+    </div>
+
     <!-- ACTIONS -->
     <div class="post-actions">
 
         <label
-        for="postImage"
-        class="image-btn">
+            for="postImage"
+            class="image-btn">
 
             <i class="fa-solid fa-image"></i>
             Photo
@@ -383,8 +378,8 @@ style="display:none;">
         </label>
 
         <label
-        for="postVideo"
-        class="video-btn">
+            for="postVideo"
+            class="video-btn">
 
             <i class="fa-solid fa-video"></i>
             Video
@@ -392,9 +387,9 @@ style="display:none;">
         </label>
 
         <button
-        id="postBtn"
-        type="button"
-        onclick="createPost()">
+            id="postBtn"
+            type="button"
+            onclick="createPost()">
 
             <i class="fa-solid fa-paper-plane"></i>
             Post
