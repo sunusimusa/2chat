@@ -1356,3 +1356,81 @@ CREATE POST USER AVATAR
     display:block;
    }
 
+/* =====================================================
+   FIX HOME PHOTO + VIDEO BUTTONS
+===================================================== */
+
+#createPostSection .post-actions{
+    position:relative;
+    z-index:20;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+#createPostSection .post-actions label{
+    position:relative;
+    z-index:21;
+
+    flex:1;
+
+    min-height:44px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+
+    padding:10px 12px;
+
+    border:none;
+    border-radius:22px;
+
+    background:#f0f2f5;
+
+    color:#333;
+
+    font-size:14px;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    user-select:none;
+
+    -webkit-tap-highlight-color:transparent;
+}
+
+#createPostSection .post-actions label i{
+    pointer-events:none;
+}
+
+#createPostSection .post-actions label:hover{
+    background:#e4e6eb;
+}
+
+#createPostSection .post-actions label:active{
+    transform:scale(.97);
+}
+
+/* PHOTO */
+#createPostSection .post-actions .image-btn{
+    color:#31a24c;
+}
+
+/* VIDEO */
+#createPostSection .post-actions .video-btn{
+    color:#1877f2;
+}
+
+/* REAL FILE INPUT */
+#postImage,
+#postVideo{
+    position:absolute;
+
+    width:1px;
+    height:1px;
+
+    opacity:0;
+
+    pointer-events:none;
+   }
