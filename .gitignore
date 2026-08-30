@@ -1,0 +1,17 @@
+.env
+.envo
+node_modules/
+
+# Android SDK
+android-sdk/
+
+# Gradle
+.gradle/
+**/build/
+
+# Local Android settings
+local.properties
+
+# APK/AAB
+*.apk
+*.aab
