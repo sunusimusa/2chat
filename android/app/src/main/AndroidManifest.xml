@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
+        android:theme="@style/AppTheme"
         android:allowBackup="true"
         android:label="2Chat"
         android:supportsRtl="true"
