@@ -1290,19 +1290,31 @@ async function startRecording() {
 
     catch (err) {
 
-        console.error(
-            "Microphone Error:",
-            err
-        );
+    console.error(
+        "MICROPHONE ERROR:",
+        err
+    );
 
-        stopMediaStream();
+    console.error(
+        "ERROR NAME:",
+        err?.name
+    );
 
-        alert(
-            "Microphone permission is required."
-        );
+    console.error(
+        "ERROR MESSAGE:",
+        err?.message
+    );
 
-    }
+    stopMediaStream();
 
+    alert(
+        "Voice Error\n\n" +
+        "Name: " + (err?.name || "Unknown") +
+        "\nMessage: " + (err?.message || "Unknown")
+    );
+
+}
+   
 }
 
 
