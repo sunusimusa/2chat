@@ -245,6 +245,7 @@ public class MainActivity extends Activity {
                                             cameraGranted)
                             ) {
 
+                                android.util.Log.d("2CHAT_VOICE", "GRANTING WEBVIEW RESOURCES: " + java.util.Arrays.toString(resources));
                                 request.grant(resources);
 
                                 return;
