@@ -1096,14 +1096,10 @@ async function startRecording() {
     try {
 
         mediaStream =
-    await navigator.mediaDevices.getUserMedia({
-        audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true
-        }
-    });
-
+            await navigator.mediaDevices.getUserMedia({
+                audio: true
+            });
+       
         let mimeType = "";
 
         if (
