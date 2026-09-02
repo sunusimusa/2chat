@@ -2,6 +2,8 @@ plugins {
     id 'com.android.application'
 }
 
+def keystoreProperties = new Properties()
+
 android {
     namespace 'com.sunusimusa.twochat'
     compileSdk 35
@@ -13,4 +15,26 @@ android {
         versionCode 1
         versionName '1.0'
     }
+
+    signingConfigs {
+        release {
+            def keystoreFile = file("${rootProject.projectDir}/2chat-upload-key.jks")
+
+            if (keystoreFile.exists()) {
+                storeFile keystoreFile
+                storePassword System.getenv("KEYSTORE_PASSWORD")
+                keyAlias System.getenv("KEY_ALIAS")
+                keyPassword System.getenv("KEY_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
 }
+

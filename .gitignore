@@ -15,3 +15,10 @@ local.properties
 # APK/AAB
 *.apk
 *.aab
+
+2chat-upload-key.jks
+2chat-keystore-base64.txt
+
+# Backup files
+*.backup
+*.backup2
