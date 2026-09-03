@@ -973,6 +973,215 @@ function checkReturnedGift() {
 
 }
 
+// ================= REPORT =================
+
+let reportContentType = null;
+let reportContentId = null;
+let reportReportedUsername = null;
+
+function openReportModal(contentType, contentId, username){
+
+    reportContentType = contentType;
+    reportContentId = contentId;
+    reportReportedUsername = username || "";
+
+    const modal =
+        document.getElementById("reportModal");
+
+    if(!modal){
+        console.error("Report modal not found");
+        return;
+    }
+
+    const reason =
+        document.getElementById("reportReason");
+
+    const description =
+        document.getElementById("reportDescription");
+
+    if(reason){
+        reason.value = "";
+    }
+
+    if(description){
+        description.value = "";
+    }
+
+    modal.classList.add("active");
+
+}
+
+function closeReportModal(){
+
+    const modal =
+        document.getElementById("reportModal");
+
+    if(!modal){
+        return;
+    }
+
+    modal.classList.remove("active");
+
+    reportContentType = null;
+    reportContentId = null;
+    reportReportedUsername = null;
+
+}
+
+async function submitReport(){
+
+    const reason =
+        document.getElementById("reportReason")?.value;
+
+    const description =
+        document.getElementById("reportDescription")?.value.trim();
+
+    if(!reportContentType || !reportContentId){
+
+        alert("Report information is missing.");
+
+        return;
+
+    }
+
+    if(!reason){
+
+        alert("Please select a reason.");
+
+        return;
+
+    }
+
+    const childSafetyReasons = [
+        "child_safety",
+        "csam",
+        "grooming",
+        "sexual_exploitation",
+        "sexualization_of_minors"
+    ];
+
+    if(
+        childSafetyReasons.includes(reason) &&
+        !description
+    ){
+
+        alert(
+            "Please describe the child safety concern."
+        );
+
+        return;
+
+    }
+
+    const submitButton =
+        document.querySelector(".submit-report-btn");
+
+    if(submitButton){
+
+        submitButton.disabled = true;
+        submitButton.innerText = "Submitting...";
+
+    }
+
+    try{
+
+        let reportedUser = null;
+
+        /*
+         * Shorts suna dauke da username ne.
+         * Backend kuma yana bukatar User ObjectId.
+         * Don haka muna dauko creator daga cache.
+         */
+
+        if(reportReportedUsername){
+
+            const creator =
+                creatorCache[reportReportedUsername];
+
+            if(creator && creator._id){
+
+                reportedUser = creator._id;
+
+            }
+
+        }
+
+        const res = await fetch(
+            "/api/reports",
+            {
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json",
+
+                    "Authorization":
+                        "Bearer " +
+                        (
+                            localStorage.getItem("token") ||
+                            localStorage.getItem("accessToken") ||
+                            ""
+                        )
+                },
+
+                body:JSON.stringify({
+
+                    reportedUser,
+
+                    contentType:reportContentType,
+
+                    contentId:reportContentId,
+
+                    reason,
+
+                    description:description || ""
+
+                })
+            }
+        );
+
+        const data = await res.json();
+
+        if(data.success){
+
+            alert(
+                "✅ Report submitted successfully."
+            );
+
+            closeReportModal();
+
+        }else{
+
+            alert(
+                data.message ||
+                "Failed to submit report."
+            );
+
+        }
+
+    }catch(err){
+
+        console.error(
+            "Submit report error:",
+            err
+        );
+
+        alert(
+            "Failed to submit report. Please try again."
+        );
+
+    }finally{
+
+        if(submitButton){
+
+            submitButton.disabled = false;
+            submitButton.innerText = "Submit Report";
+
+        }
+
+    }
+
+ }
+
 // ================= LOAD =================
 
 loadVideos();
