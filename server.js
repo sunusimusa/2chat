@@ -75,6 +75,9 @@ const coinPackageRoutes =
 const coinPurchaseRoutes =
     require("./routes/coinPurchaseRoutes");
 
+const reportRoutes =
+    require("./routes/reportRoutes");
+
 
 // =====================================================
 // MODELS
@@ -383,6 +386,11 @@ app.use(
 app.use(
     "/api/coin-purchases",
     coinPurchaseRoutes
+);
+
+app.use(
+    "/api/reports",
+    reportRoutes
 );
 
 
