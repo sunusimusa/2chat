@@ -39,7 +39,7 @@ jobs:
             exit 1
           fi
 
-          echo "$KEYSTORE_BASE64" | base64 --decode > android/2chat-upload-key.jks
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > android/2chat-upload-key.jks
 
           if [ ! -s android/2chat-upload-key.jks ]; then
             echo "Keystore file was not created"
