@@ -172,6 +172,100 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 </div>
 
 
+     <!-- ==================================================
+     REPORT POPUP
+================================================== -->
+
+<div
+    id="reportModal"
+    class="report-modal">
+
+    <div class="report-box">
+
+        <div class="report-header">
+
+            <h3>
+                🚩 Report
+            </h3>
+
+            <button
+                type="button"
+                onclick="closeReportModal()">
+
+                ✖
+
+            </button>
+
+        </div>
+
+        <p class="report-description">
+            Tell us what is wrong with this content.
+        </p>
+
+        <select id="reportReason">
+
+            <option value="">
+                Select a reason
+            </option>
+
+            <option value="child_safety">
+                Child safety concern
+            </option>
+
+            <option value="csam">
+                Child sexual abuse material
+            </option>
+
+            <option value="grooming">
+                Grooming
+            </option>
+
+            <option value="sexual_exploitation">
+                Sexual exploitation of a minor
+            </option>
+
+            <option value="sexualization_of_minors">
+                Sexualization of minors
+            </option>
+
+            <option value="threats">
+                Threats
+            </option>
+
+            <option value="harassment">
+                Harassment
+            </option>
+
+            <option value="spam">
+                Spam
+            </option>
+
+            <option value="other">
+                Other
+            </option>
+
+        </select>
+
+        <textarea
+            id="reportDescription"
+            maxlength="2000"
+            placeholder="Describe the problem...">
+        </textarea>
+
+        <button
+            type="button"
+            class="submit-report-btn"
+            onclick="submitReport()">
+
+            Submit Report
+
+        </button>
+
+    </div>
+
+</div>
+
+
 
 <!-- ==================================================
      MENU SCRIPT
