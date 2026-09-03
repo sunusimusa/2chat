@@ -1115,12 +1115,7 @@ async function submitReport(){
                     "Content-Type":"application/json",
 
                     "Authorization":
-                        "Bearer " +
-                        (
-                            localStorage.getItem("token") ||
-                            localStorage.getItem("accessToken") ||
-                            ""
-                        )
+    "Bearer " + localStorage.getItem("token")
                 },
 
                 body:JSON.stringify({
