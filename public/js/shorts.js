@@ -219,6 +219,13 @@ ${video.shares || 0}
 </span>
 
 <button
+    type="button"
+    onclick="openReportModal('short', '${video._id}', '${video.username}')">
+    🚩
+</button>
+<span>Report</span>
+
+<button
     class="gift-short-btn"
     onclick="openShortGift('${video.username}', '${video._id}')">
     🎁
