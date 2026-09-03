@@ -1134,8 +1134,25 @@ async function submitReport(){
             }
         );
 
-        const data = await res.json();
 
+        const responseText = await res.text();
+
+console.log("REPORT STATUS:", res.status);
+console.log("REPORT RESPONSE:", responseText);
+
+let data;
+
+try {
+    data = JSON.parse(responseText);
+} catch (err) {
+    console.error("REPORT JSON ERROR:", err);
+    alert(
+        "Server returned an invalid response. Status: " +
+        res.status
+    );
+    return;
+}
+        
         if(data.success){
 
             alert(
