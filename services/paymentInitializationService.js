@@ -692,9 +692,9 @@ async function createFlutterwaveCustomer({
     if (!response.ok) {
 
         console.error(
-            "FLUTTERWAVE CUSTOMER ERROR:",
-            data
-        );
+    "FLUTTERWAVE CUSTOMER ERROR:",
+    JSON.stringify(data, null, 2)
+);
 
         throw new Error(
             data?.message ||
