@@ -1026,16 +1026,42 @@ function validateCard() {
 
 
     if (
-        !/^\d{2,4}$/.test(
-            expiryYear
-        )
-    ) {
+    !/^\d{4}$/.test(
+        expiryYear
+    )
+) {
 
-        throw new Error(
-            "Please enter a valid expiry year."
-        );
+    throw new Error(
+        "Please enter expiry year as YYYY."
+    );
 
-    }
+}
+
+
+const year =
+    Number(
+        expiryYear
+    );
+
+
+const currentDate =
+    new Date();
+
+
+const currentYear =
+    currentDate.getFullYear();
+
+
+if (
+    year < currentYear ||
+    year > currentYear + 20
+) {
+
+    throw new Error(
+        "Please enter a valid future expiry year."
+    );
+
+}
 
 
     if (
