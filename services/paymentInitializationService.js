@@ -593,61 +593,103 @@ async function createFlutterwaveCustomer({
 
 
     const email =
-        String(
-            user.email || ""
-        ).trim();
+    String(
+        user.email || ""
+    ).trim();
 
 
-    if (!email) {
+if (!email) {
 
-        throw new Error(
-            "User email is required."
-        );
+    throw new Error(
+        "User email is required."
+    );
 
-    }
-
-
-    const username =
-        String(
-            user.username ||
-            "2Chat User"
-        ).trim();
+}
 
 
-    const parts =
-        username
-            .split(/\s+/)
-            .filter(Boolean);
+const username =
+    String(
+        user.username || ""
+    ).trim();
 
 
-    const firstName =
-        parts[0] ||
-        "2Chat";
+const parts =
+    username
+        .split(/\s+/)
+        .filter(Boolean);
 
 
-    const lastName =
-        parts
-            .slice(1)
-            .join(" ") ||
-        "User";
+let firstName =
+    parts[0] ||
+    "2Chat";
 
 
-    const payload = {
+let lastName =
+    parts
+        .slice(1)
+        .join(" ") ||
+    "User";
 
-        name: {
 
-            first:
-                firstName,
+// Flutterwave requires valid names
+firstName =
+    firstName
+        .replace(
+            /[^A-Za-zÀ-ÖØ-öø-ÿ\s,.'-]/g,
+            ""
+        )
+        .trim();
 
-            last:
-                lastName
 
-        },
+lastName =
+    lastName
+        .replace(
+            /[^A-Za-zÀ-ÖØ-öø-ÿ\s,.'-]/g,
+            ""
+        )
+        .trim();
 
-        email
 
-    };
+// First name must be at least 2 characters
+if (firstName.length < 2) {
 
+    firstName = "2Chat";
+
+}
+
+
+// Last name must also be valid
+if (lastName.length < 2) {
+
+    lastName = "User";
+
+}
+
+
+// Maximum 50 characters
+firstName =
+    firstName.slice(0, 50);
+
+lastName =
+    lastName.slice(0, 50);
+
+
+const payload = {
+
+    name: {
+
+        first:
+            firstName,
+
+        last:
+            lastName
+
+    },
+
+    email
+
+};
+    
 
     const response =
         await fetch(
