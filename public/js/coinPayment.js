@@ -4,9 +4,14 @@
 // =====================================================
 //
 // IMPORTANT:
-// - Ba ya ƙara coins daga frontend.
-// - Backend ne kawai zai tabbatar da payment.
-// - Webhook + verification ne za su credit coins.
+// - Frontend ba ya ƙara coins.
+// - Backend + Flutterwave verification + webhook
+//   ne kawai suke credit coins.
+// - Wannan file yana sarrafa:
+//      1. Payment initialization
+//      2. Flutterwave redirect
+//      3. Check Payment
+//      4. Automatic payment status refresh
 // =====================================================
 
 
@@ -35,7 +40,6 @@ function getAuthToken() {
     }
 
     return token;
-
 }
 
 
@@ -100,6 +104,357 @@ async function apiRequest(
 
 
     return data;
+}
+
+
+// =====================================================
+// GET PURCHASE
+// =====================================================
+//
+// Wannan shi ne source of truth.
+// Backend ne yake gaya mana payment status.
+// =====================================================
+
+async function getCoinPurchase(
+    purchaseId
+) {
+
+    if (!purchaseId) {
+
+        throw new Error(
+            "Purchase ID is required."
+        );
+
+    }
+
+
+    return await apiRequest(
+
+        `/api/coin-purchases/${purchaseId}`,
+
+        {
+            method: "GET"
+        }
+
+    );
+}
+
+
+// =====================================================
+// CHECK PAYMENT STATUS
+// =====================================================
+//
+// Ba ya credit coins.
+// Yana karanta status ne kawai daga backend.
+// =====================================================
+
+async function checkPaymentStatus(
+    purchaseId,
+    silent = false
+) {
+
+    try {
+
+        if (!purchaseId) {
+
+            throw new Error(
+                "Purchase ID is required."
+            );
+
+        }
+
+
+        if (!silent) {
+
+            showPaymentMessage(
+                "Checking payment..."
+            );
+
+        }
+
+
+        const result =
+            await getCoinPurchase(
+                purchaseId
+            );
+
+
+        if (
+            !result ||
+            !result.success ||
+            !result.purchase
+        ) {
+
+            throw new Error(
+
+                result?.message ||
+                "Unable to check payment status."
+
+            );
+
+        }
+
+
+        const purchase =
+            result.purchase;
+
+
+        // =========================================
+        // PAYMENT PAID
+        // =========================================
+
+        if (
+            purchase.status === "paid" ||
+            purchase.coinsCredited === true
+        ) {
+
+            showPaymentSuccess(
+                "✅ Payment successful. Your coins have been credited."
+            );
+
+
+            stopPaymentPolling();
+
+
+            return {
+
+                paid: true,
+
+                purchase
+
+            };
+
+        }
+
+
+        // =========================================
+        // PAYMENT FAILED
+        // =========================================
+
+        if (
+            purchase.status === "failed"
+        ) {
+
+            showPaymentError(
+                "❌ Payment failed. Please try again."
+            );
+
+
+            stopPaymentPolling();
+
+
+            return {
+
+                paid: false,
+
+                failed: true,
+
+                purchase
+
+            };
+
+        }
+
+
+        // =========================================
+        // PAYMENT CANCELLED
+        // =========================================
+
+        if (
+            purchase.status === "cancelled"
+        ) {
+
+            showPaymentError(
+                "❌ Payment was cancelled."
+            );
+
+
+            stopPaymentPolling();
+
+
+            return {
+
+                paid: false,
+
+                cancelled: true,
+
+                purchase
+
+            };
+
+        }
+
+
+        // =========================================
+        // PAYMENT STILL PENDING
+        // =========================================
+
+        if (!silent) {
+
+            showPaymentMessage(
+                "⏳ Payment is still being confirmed..."
+            );
+
+        }
+
+
+        return {
+
+            paid: false,
+
+            pending: true,
+
+            purchase
+
+        };
+
+
+    } catch (error) {
+
+        console.error(
+            "CHECK PAYMENT ERROR:",
+            error
+        );
+
+
+        if (!silent) {
+
+            showPaymentError(
+
+                error.message ||
+                "Unable to check payment status."
+
+            );
+
+        }
+
+
+        throw error;
+
+    }
+
+}
+
+
+// =====================================================
+// PAYMENT POLLING
+// =====================================================
+
+let paymentPollingTimer = null;
+
+let paymentPollingActive = false;
+
+
+// =====================================================
+// START PAYMENT POLLING
+// =====================================================
+
+function startPaymentPolling(
+    purchaseId
+) {
+
+    if (!purchaseId) {
+
+        console.error(
+            "Cannot start payment polling without purchase ID."
+        );
+
+        return;
+
+    }
+
+
+    stopPaymentPolling();
+
+
+    paymentPollingActive = true;
+
+
+    // Check immediately.
+
+    checkPaymentStatus(
+        purchaseId,
+        false
+    )
+    .catch(
+        () => {}
+    );
+
+
+    // Then check every 5 seconds.
+
+    paymentPollingTimer =
+        setInterval(
+            async () => {
+
+                if (
+                    !paymentPollingActive
+                ) {
+
+                    return;
+
+                }
+
+
+                try {
+
+                    const result =
+                        await checkPaymentStatus(
+                            purchaseId,
+                            true
+                        );
+
+
+                    if (
+                        result.paid ||
+                        result.failed ||
+                        result.cancelled
+                    ) {
+
+                        stopPaymentPolling();
+
+                    }
+
+                } catch (error) {
+
+                    console.error(
+                        "PAYMENT POLLING ERROR:",
+                        error
+                    );
+
+                }
+
+            },
+
+            5000
+
+        );
+
+}
+
+
+// =====================================================
+// STOP PAYMENT POLLING
+// =====================================================
+
+function stopPaymentPolling() {
+
+    paymentPollingActive =
+        false;
+
+
+    if (
+        paymentPollingTimer
+    ) {
+
+        clearInterval(
+            paymentPollingTimer
+        );
+
+        paymentPollingTimer =
+            null;
+
+    }
 
 }
 
@@ -108,11 +463,11 @@ async function apiRequest(
 // CREATE PAYMENT METHOD
 // =====================================================
 //
-// Wannan endpoint yana aika payment method
-// zuwa backend.
+// NOTE:
+// Wannan function na wannan file yana aiki
+// idan an riga an samu paymentMethodId.
 //
-// PAYMENT METHOD ID ne ake amfani da shi,
-// ba raw card data ba.
+// Raw card data ba ya shiga nan.
 // =====================================================
 
 async function createPaymentMethod(
@@ -171,7 +526,6 @@ async function createPaymentMethod(
 
 
     return data;
-
 }
 
 
@@ -263,6 +617,14 @@ async function initializeCoinPayment(
             );
 
 
+            // Start polling before leaving
+            // the current page.
+
+            startPaymentPolling(
+                purchaseId
+            );
+
+
             window.location.href =
                 checkoutUrl;
 
@@ -293,6 +655,11 @@ async function initializeCoinPayment(
 
                 showPaymentMessage(
                     "Opening Flutterwave..."
+                );
+
+
+                startPaymentPolling(
+                    purchaseId
                 );
 
 
@@ -327,8 +694,10 @@ async function initializeCoinPayment(
 
 
         showPaymentError(
+
             error.message ||
             "Unable to initialize payment."
+
         );
 
 
@@ -341,16 +710,6 @@ async function initializeCoinPayment(
 
 // =====================================================
 // START PAYMENT FROM PURCHASE
-// =====================================================
-//
-// Wannan function za ka iya kira daga
-// checkout page:
-//
-// startCoinPayment(
-//     purchaseId,
-//     paymentMethodId
-// );
-//
 // =====================================================
 
 async function startCoinPayment(
@@ -406,6 +765,141 @@ async function startCoinPayment(
 
 
 // =====================================================
+// MANUAL CHECK PAYMENT
+// =====================================================
+//
+// Ana iya haɗa wannan function da button:
+//
+// onclick="coinPayment.checkPayment('PURCHASE_ID')"
+// =====================================================
+
+async function checkPayment(
+    purchaseId
+) {
+
+    try {
+
+        showPaymentMessage(
+            "🔄 Checking payment..."
+        );
+
+
+        const result =
+            await checkPaymentStatus(
+                purchaseId,
+                false
+            );
+
+
+        if (
+            result.paid
+        ) {
+
+            return result;
+
+        }
+
+
+        if (
+            result.failed
+        ) {
+
+            return result;
+
+        }
+
+
+        showPaymentMessage(
+            "⏳ Payment is not confirmed yet. Please wait a moment and check again."
+        );
+
+
+        return result;
+
+
+    } catch (error) {
+
+        console.error(
+            "MANUAL CHECK PAYMENT ERROR:",
+            error
+        );
+
+
+        showPaymentError(
+
+            error.message ||
+            "Unable to check payment."
+
+        );
+
+
+        throw error;
+
+    }
+
+}
+
+
+// =====================================================
+// RESUME PAYMENT CHECK
+// =====================================================
+//
+// Wannan yana da amfani idan user ya dawo
+// daga Flutterwave ko ya koma payment page.
+// =====================================================
+
+async function resumePaymentCheck(
+    purchaseId
+) {
+
+    if (!purchaseId) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const result =
+            await checkPaymentStatus(
+                purchaseId,
+                false
+            );
+
+
+        if (
+            result.paid ||
+            result.failed ||
+            result.cancelled
+        ) {
+
+            return result;
+
+        }
+
+
+        startPaymentPolling(
+            purchaseId
+        );
+
+
+        return result;
+
+
+    } catch (error) {
+
+        console.error(
+            "RESUME PAYMENT CHECK ERROR:",
+            error
+        );
+
+    }
+
+}
+
+
+// =====================================================
 // PAYMENT MESSAGE
 // =====================================================
 
@@ -434,6 +928,41 @@ function showPaymentMessage(
 
     console.log(
         "PAYMENT:",
+        message
+    );
+
+}
+
+
+// =====================================================
+// PAYMENT SUCCESS
+// =====================================================
+
+function showPaymentSuccess(
+    message
+) {
+
+    const element =
+        document.getElementById(
+            "paymentMessage"
+        );
+
+
+    if (element) {
+
+        element.style.display =
+            "block";
+
+        element.innerText =
+            message;
+
+        return;
+
+    }
+
+
+    console.log(
+        "PAYMENT SUCCESS:",
         message
     );
 
@@ -475,11 +1004,88 @@ function showPaymentError(
 
 
 // =====================================================
-// EXPORT FOR BROWSER
+// PAGE VISIBILITY
 // =====================================================
 //
-// Ba mu amfani da module.exports saboda
-// wannan file frontend ne.
+// Idan user ya dawo daga Flutterwave,
+// za mu sake duba payment.
+// =====================================================
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+
+        if (
+            document.visibilityState ===
+            "visible"
+        ) {
+
+            const purchaseId =
+                new URLSearchParams(
+                    window.location.search
+                ).get(
+                    "purchaseId"
+                );
+
+
+            if (purchaseId) {
+
+                resumePaymentCheck(
+                    purchaseId
+                );
+
+            }
+
+        }
+
+    }
+);
+
+
+// =====================================================
+// BROWSER BACK / PAGE SHOW
+// =====================================================
+
+window.addEventListener(
+    "pageshow",
+    () => {
+
+        const purchaseId =
+            new URLSearchParams(
+                window.location.search
+            ).get(
+                "purchaseId"
+            );
+
+
+        if (purchaseId) {
+
+            resumePaymentCheck(
+                purchaseId
+            );
+
+        }
+
+    }
+);
+
+
+// =====================================================
+// CLEANUP
+// =====================================================
+
+window.addEventListener(
+    "beforeunload",
+    () => {
+
+        stopPaymentPolling();
+
+    }
+);
+
+
+// =====================================================
+// EXPORT FOR BROWSER
 // =====================================================
 
 window.coinPayment = {
@@ -488,6 +1094,16 @@ window.coinPayment = {
 
     startCoinPayment,
 
-    createPaymentMethod
+    createPaymentMethod,
+
+    checkPayment,
+
+    checkPaymentStatus,
+
+    startPaymentPolling,
+
+    stopPaymentPolling,
+
+    resumePaymentCheck
 
 };
