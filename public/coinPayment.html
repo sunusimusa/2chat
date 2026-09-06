@@ -960,11 +960,15 @@ function validateCard() {
         getCleanCardNumber();
 
 
-    const expiryMonth =
-        String(
-            expiryMonthInput.value ||
-            ""
-        ).trim();
+    let expiryYear =
+    String(
+        expiryYearInput.value ||
+        ""
+    ).trim();
+
+if (/^\d{2}$/.test(expiryYear)) {
+    expiryYear = `20${expiryYear}`;
+}
 
 
     const expiryYear =
