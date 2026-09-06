@@ -629,12 +629,15 @@ async (
 
 
         purchase.paymentReference =
-            payment.reference;
+    payment.reference;
 
+if (payment.paymentUrl) {
+    purchase.paymentUrl =
+        payment.paymentUrl;
+}
 
-        purchase.paymentInitializedAt =
-            new Date();
-
+purchase.paymentInitializedAt =
+    new Date();
 
         if (
             payment.customerId
