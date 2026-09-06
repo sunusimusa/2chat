@@ -1110,6 +1110,14 @@ async function createPaymentMethod() {
     const card =
         validateCard();
 
+    console.log(
+    "PAYMENT CARD FORMAT:",
+    {
+        expiryMonth: card.expiryMonth,
+        expiryYear: card.expiryYear
+    }
+);
+
 
     paymentMessage.innerText =
         "Securing your card information...";
