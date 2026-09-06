@@ -569,6 +569,10 @@ async function encryptCard(
 // CREATE CUSTOMER
 // =====================================================
 
+// =====================================================
+// CREATE OR GET FLUTTERWAVE CUSTOMER
+// =====================================================
+
 async function createFlutterwaveCustomer({
     accessToken,
     user
@@ -593,103 +597,202 @@ async function createFlutterwaveCustomer({
 
 
     const email =
-    String(
-        user.email || ""
-    ).trim();
+        String(
+            user.email || ""
+        ).trim();
 
 
-if (!email) {
+    if (!email) {
 
-    throw new Error(
-        "User email is required."
-    );
+        throw new Error(
+            "User email is required."
+        );
 
-}
-
-
-const username =
-    String(
-        user.username || ""
-    ).trim();
+    }
 
 
-const parts =
-    username
-        .split(/\s+/)
-        .filter(Boolean);
+    // =================================================
+    // 1. SEARCH EXISTING CUSTOMER BY EMAIL
+    // =================================================
+
+    const searchResponse =
+        await fetch(
+
+            `${FLUTTERWAVE_BASE_URL}/customers/search?page=1&size=10`,
+
+            {
+
+                method:
+                    "POST",
+
+                headers: {
+
+                    "Authorization":
+                        `Bearer ${accessToken}`,
+
+                    "Content-Type":
+                        "application/json",
+
+                    "X-Trace-Id":
+                        generateTraceId()
+
+                },
+
+                body:
+                    JSON.stringify({
+
+                        email
+
+                    })
+
+            }
+
+        );
 
 
-let firstName =
-    parts[0] ||
-    "2Chat";
+    const searchData =
+        await searchResponse.json();
 
 
-let lastName =
-    parts
-        .slice(1)
-        .join(" ") ||
-    "User";
+    // =================================================
+    // 2. USE EXISTING CUSTOMER IF FOUND
+    // =================================================
+
+    if (searchResponse.ok) {
+
+        const customers =
+            Array.isArray(
+                searchData?.data
+            )
+                ? searchData.data
+                : [];
 
 
-// Flutterwave requires valid names
-firstName =
-    firstName
-        .replace(
-            /[^A-Za-zÀ-ÖØ-öø-ÿ\s,.'-]/g,
-            ""
-        )
-        .trim();
+        const existingCustomer =
+            customers.find(
+                customer =>
+                    String(
+                        customer?.email || ""
+                    ).toLowerCase() ===
+                    email.toLowerCase()
+            );
 
 
-lastName =
-    lastName
-        .replace(
-            /[^A-Za-zÀ-ÖØ-öø-ÿ\s,.'-]/g,
-            ""
-        )
-        .trim();
+        if (existingCustomer?.id) {
+
+            console.log(
+                "✅ EXISTING FLUTTERWAVE CUSTOMER:",
+                existingCustomer.id
+            );
 
 
-// First name must be at least 2 characters
-if (firstName.length < 2) {
+            return {
 
-    firstName = "2Chat";
+                id:
+                    existingCustomer.id,
 
-}
+                raw:
+                    searchData
 
+            };
 
-// Last name must also be valid
-if (lastName.length < 2) {
+        }
 
-    lastName = "User";
-
-}
-
-
-// Maximum 50 characters
-firstName =
-    firstName.slice(0, 50);
-
-lastName =
-    lastName.slice(0, 50);
+    }
 
 
-const payload = {
+    // =================================================
+    // 3. CUSTOMER DOES NOT EXIST → CREATE NEW ONE
+    // =================================================
 
-    name: {
+    const username =
+        String(
+            user.username || ""
+        ).trim();
 
-        first:
-            firstName,
 
-        last:
-            lastName
+    const parts =
+        username
+            .split(/\s+/)
+            .filter(Boolean);
 
-    },
 
-    email
+    let firstName =
+        parts[0] ||
+        "2Chat";
 
-};
-    
+
+    let lastName =
+        parts
+            .slice(1)
+            .join(" ") ||
+        "User";
+
+
+    firstName =
+        firstName
+            .replace(
+                /[^A-Za-zÀ-ÖØ-öø-ÿ\s,.'-]/g,
+                ""
+            )
+            .trim();
+
+
+    lastName =
+        lastName
+            .replace(
+                /[^A-Za-zÀ-ÖØ-öø-ÿ\s,.'-]/g,
+                ""
+            )
+            .trim();
+
+
+    if (firstName.length < 2) {
+
+        firstName =
+            "2Chat";
+
+    }
+
+
+    if (lastName.length < 2) {
+
+        lastName =
+            "User";
+
+    }
+
+
+    firstName =
+        firstName.slice(
+            0,
+            50
+        );
+
+
+    lastName =
+        lastName.slice(
+            0,
+            50
+        );
+
+
+    const payload = {
+
+        name: {
+
+            first:
+                firstName,
+
+            last:
+                lastName
+
+        },
+
+        email
+
+    };
+
 
     const response =
         await fetch(
@@ -731,12 +834,115 @@ const payload = {
         await response.json();
 
 
+    // =================================================
+    // 4. HANDLE RACE CONDITION
+    // =================================================
+
     if (!response.ok) {
 
+        const errorType =
+            data?.error?.type;
+
+
+        const errorCode =
+            data?.error?.code;
+
+
+        if (
+            errorType ===
+                "CUSTOMER_ALREADY_EXISTS" ||
+            String(errorCode) ===
+                "1203409"
+        ) {
+
+            console.log(
+                "ℹ️ CUSTOMER ALREADY EXISTS. SEARCHING AGAIN..."
+            );
+
+
+            const retryResponse =
+                await fetch(
+
+                    `${FLUTTERWAVE_BASE_URL}/customers/search?page=1&size=10`,
+
+                    {
+
+                        method:
+                            "POST",
+
+                        headers: {
+
+                            "Authorization":
+                                `Bearer ${accessToken}`,
+
+                            "Content-Type":
+                                "application/json",
+
+                            "X-Trace-Id":
+                                generateTraceId()
+
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                email
+
+                            })
+
+                    }
+
+                );
+
+
+            const retryData =
+                await retryResponse.json();
+
+
+            const retryCustomers =
+                Array.isArray(
+                    retryData?.data
+                )
+                    ? retryData.data
+                    : [];
+
+
+            const retryCustomer =
+                retryCustomers.find(
+                    customer =>
+                        String(
+                            customer?.email || ""
+                        ).toLowerCase() ===
+                        email.toLowerCase()
+                );
+
+
+            if (retryCustomer?.id) {
+
+                return {
+
+                    id:
+                        retryCustomer.id,
+
+                    raw:
+                        retryData
+
+                };
+
+            }
+
+        }
+
+
         console.error(
-    "FLUTTERWAVE CUSTOMER ERROR:",
-    JSON.stringify(data, null, 2)
-);
+            "FLUTTERWAVE CUSTOMER ERROR:",
+            JSON.stringify(
+                data,
+                null,
+                2
+            )
+        );
+
 
         throw new Error(
             data?.message ||
@@ -759,6 +965,12 @@ const payload = {
         );
 
     }
+
+
+    console.log(
+        "✅ NEW FLUTTERWAVE CUSTOMER:",
+        customer.id
+    );
 
 
     return {
