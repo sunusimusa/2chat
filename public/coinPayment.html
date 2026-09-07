@@ -24,6 +24,7 @@
 
 </head>
 
+
 <body>
 
 
@@ -124,141 +125,29 @@
 
 
         <!-- =====================================
-             PAYMENT METHOD
+             PAYSTACK PAYMENT
         ====================================== -->
 
         <section class="payment-card">
 
             <h3>
 
-                <i class="fa-solid fa-credit-card"></i>
+                <i class="fa-solid fa-shield-halved"></i>
 
-                Card Payment
+                Secure Payment
 
             </h3>
 
 
-            <!-- =================================
-                 CARD NUMBER
-            ================================== -->
-
-            <div class="form-group">
-
-                <label for="cardNumber">
-
-                    Card Number
-
-                </label>
-
-
-                <div class="input-wrapper">
-
-                    <i class="fa-solid fa-credit-card"></i>
-
-                    <input
-                        id="cardNumber"
-                        type="text"
-                        inputmode="numeric"
-                        autocomplete="cc-number"
-                        maxlength="19"
-                        placeholder="1234 5678 9012 3456"
-                    >
-
-                </div>
-
-            </div>
-
-
-
-            <!-- =================================
-                 EXPIRY + CVV
-            ================================== -->
-
-            <div class="card-row">
-
-
-                <div class="form-group">
-
-                    <label for="expiryMonth">
-
-                        Expiry Month
-
-                    </label>
-
-
-                    <input
-                        id="expiryMonth"
-                        type="text"
-                        inputmode="numeric"
-                        autocomplete="cc-exp-month"
-                        maxlength="2"
-                        placeholder="MM"
-                    >
-
-                </div>
-
-
-
-                <div class="form-group">
-
-                    <label for="expiryYear">
-
-                        Expiry Year
-
-                    </label>
-
-
-                    <input
-                        id="expiryYear"
-                        type="text"
-                        inputmode="numeric"
-                        autocomplete="cc-exp-year"
-                        maxlength="4"
-                        placeholder="YYYY"
-                    >
-
-                </div>
-
-
-
-                <div class="form-group">
-
-                    <label for="cvv">
-
-                        CVV
-
-                    </label>
-
-
-                    <input
-                        id="cvv"
-                        type="password"
-                        inputmode="numeric"
-                        autocomplete="cc-csc"
-                        maxlength="4"
-                        placeholder="CVV"
-                    >
-
-                </div>
-
-
-            </div>
-
-
-
-            <!-- =================================
-                 PAYMENT MESSAGE
-            ================================== -->
-
             <div
-                id="paymentMessage"
                 class="payment-message"
+                id="paymentMessage"
             >
 
-                Enter your card details to continue.
+                You will be redirected to Paystack
+                to complete your payment securely.
 
             </div>
-
 
 
             <!-- =================================
@@ -278,6 +167,23 @@
             </button>
 
 
+            <!-- =================================
+                 CHECK PAYMENT
+            ================================== -->
+
+            <button
+                id="checkPaymentButton"
+                class="continue-btn"
+                type="button"
+                style="display:none;"
+            >
+
+                <i class="fa-solid fa-rotate"></i>
+
+                Check Payment
+
+            </button>
+
 
             <!-- =================================
                  SECURITY
@@ -288,7 +194,7 @@
                 <i class="fa-solid fa-shield-halved"></i>
 
                 Your payment is processed securely
-                through Flutterwave.
+                through Paystack.
 
             </p>
 
@@ -361,27 +267,9 @@ const continueButton =
     );
 
 
-const cardNumberInput =
+const checkPaymentButton =
     document.getElementById(
-        "cardNumber"
-    );
-
-
-const expiryMonthInput =
-    document.getElementById(
-        "expiryMonth"
-    );
-
-
-const expiryYearInput =
-    document.getElementById(
-        "expiryYear"
-    );
-
-
-const cvvInput =
-    document.getElementById(
-        "cvv"
+        "checkPaymentButton"
     );
 
 
@@ -752,7 +640,7 @@ async function loadPurchase() {
 
 
         // =============================================
-        // SAVE ID
+        // SAVE PURCHASE ID
         // =============================================
 
         purchaseId =
@@ -776,6 +664,33 @@ async function loadPurchase() {
         // =============================================
         // CHECK STATUS
         // =============================================
+
+        if (
+            purchase.status ===
+            "paid"
+        ) {
+
+            renderPurchase();
+
+            loading.style.display =
+                "none";
+
+            paymentContent.style.display =
+                "block";
+
+            paymentMessage.innerText =
+                "✅ This payment has already been completed.";
+
+            continueButton.style.display =
+                "none";
+
+            checkPaymentButton.style.display =
+                "none";
+
+            return;
+
+        }
+
 
         if (
             purchase.status !==
@@ -812,7 +727,7 @@ async function loadPurchase() {
         ) {
 
             paymentMessage.innerText =
-                "Enter your card details to continue.";
+                "You will be redirected to Paystack to complete your payment securely.";
 
         }
 
@@ -932,317 +847,26 @@ function renderPurchase() {
 
 
 // =====================================================
-// CLEAN CARD NUMBER
+// INITIALIZE PAYSTACK PAYMENT
 // =====================================================
 
-function getCleanCardNumber() {
-
-    return String(
-        cardNumberInput.value ||
-        ""
-    )
-    .replace(
-        /\s+/g,
-        ""
-    )
-    .trim();
-
-}
-
-
-// =====================================================
-// VALIDATE CARD
-// =====================================================
-
-function validateCard() {
-
-    const cardNumber =
-        getCleanCardNumber();
-
-
-    const expiryMonth =
-        String(
-            expiryMonthInput.value ||
-            ""
-        ).trim();
-
-
-    let expiryYear =
-        String(
-            expiryYearInput.value ||
-            ""
-        ).trim();
-
-
-    if (/^\d{2}$/.test(expiryYear)) {
-
-        expiryYear =
-            `20${expiryYear}`;
-
-    }
-
-
-    const cvv =
-        String(
-            cvvInput.value ||
-            ""
-        ).trim();
-
-
-    // =============================================
-    // CARD NUMBER
-    // =============================================
-
-    if (
-        !/^\d{12,19}$/.test(
-            cardNumber
-        )
-    ) {
-
-        throw new Error(
-            "Please enter a valid card number."
-        );
-
-    }
-
-
-    // =============================================
-    // EXPIRY MONTH
-    // =============================================
-
-    if (
-        !/^\d{1,2}$/.test(
-            expiryMonth
-        )
-    ) {
-
-        throw new Error(
-            "Please enter a valid expiry month."
-        );
-
-    }
-
-
-    const month =
-        Number(
-            expiryMonth
-        );
-
-
-    if (
-        month < 1 ||
-        month > 12
-    ) {
-
-        throw new Error(
-            "Expiry month must be between 01 and 12."
-        );
-
-    }
-
-
-    // =============================================
-    // EXPIRY YEAR
-    // =============================================
-
-    if (
-        !/^\d{4}$/.test(
-            expiryYear
-        )
-    ) {
-
-        throw new Error(
-            "Please enter expiry year as YYYY."
-        );
-
-    }
-
-
-    const year =
-        Number(
-            expiryYear
-        );
-
-
-    const currentDate =
-        new Date();
-
-
-    const currentYear =
-        currentDate.getFullYear();
-
-
-    if (
-        year < currentYear ||
-        year > currentYear + 20
-    ) {
-
-        throw new Error(
-            "Please enter a valid future expiry year."
-        );
-
-    }
-
-
-    // =============================================
-    // CVV
-    // =============================================
-
-    if (
-        !/^\d{3,4}$/.test(
-            cvv
-        )
-    ) {
-
-        throw new Error(
-            "Please enter a valid CVV."
-        );
-
-    }
-
-
-    // =============================================
-    // RETURN CARD
-    // =============================================
-
-    return {
-
-        number:
-            cardNumber,
-
-        expiryMonth:
-            expiryMonth.padStart(
-                2,
-                "0"
-            ),
-
-        expiryYear,
-
-        cvv
-
-    };
-
-}
-
-// =====================================================
-// CREATE PAYMENT METHOD
-// =====================================================
-
-async function createPaymentMethod() {
+async function initializePaystackPayment() {
 
     const token =
         getToken();
 
 
-    const card =
-        validateCard();
-
-    console.log(
-    "PAYMENT CARD FORMAT:",
-    {
-        expiryMonth: card.expiryMonth,
-        expiryYear: card.expiryYear
-    }
-);
-
-
-    paymentMessage.innerText =
-        "Securing your card information...";
-
-
-    const response =
-        await fetch(
-
-            `/api/coin-purchases/${encodeURIComponent(
-                purchaseId
-            )}/payment-method`,
-
-            {
-
-                method:
-                    "POST",
-
-                headers: {
-
-                    "Content-Type":
-                        "application/json",
-
-                    "Authorization":
-                        `Bearer ${token}`
-
-                },
-
-                body:
-                    JSON.stringify({
-
-                        card
-
-                    })
-
-            }
-
-        );
-
-
-    const data =
-        await response.json();
-
-
-    if (
-        !response.ok ||
-        !data.success
-    ) {
+    if (!purchaseId) {
 
         throw new Error(
-
-            data.message ||
-            "Failed to create Flutterwave payment method."
-
-        );
-
-    }
-
-
-    if (
-        !data.paymentMethod ||
-        !data.paymentMethod.id
-    ) {
-
-        throw new Error(
-            "Flutterwave payment method ID was not returned."
-        );
-
-    }
-
-
-    return data.paymentMethod;
-
-}
-
-
-// =====================================================
-// INITIALIZE PAYMENT
-// =====================================================
-
-async function initializePayment(
-    paymentMethodId
-) {
-
-    const token =
-        getToken();
-
-
-    if (!paymentMethodId) {
-
-        throw new Error(
-            "Payment method ID is missing."
+            "Purchase ID is missing."
         );
 
     }
 
 
     paymentMessage.innerText =
-        "Preparing Flutterwave payment...";
+        "Connecting securely to Paystack...";
 
 
     const response =
@@ -1265,14 +889,7 @@ async function initializePayment(
                     "Authorization":
                         `Bearer ${token}`
 
-                },
-
-                body:
-                    JSON.stringify({
-
-                        paymentMethodId
-
-                    })
+                }
 
             }
 
@@ -1291,143 +908,65 @@ async function initializePayment(
         throw new Error(
 
             data.message ||
-            "Failed to initialize Flutterwave payment."
+            "Unable to initialize Paystack payment."
 
         );
 
     }
 
 
-    if (!data.payment) {
+    /*
+     * Our backend should return:
+     *
+     * data.payment.authorization_url
+     *
+     * or directly:
+     *
+     * data.authorization_url
+     *
+     */
+
+    const payment =
+        data.payment ||
+        data;
+
+
+    const authorizationUrl =
+        payment.authorization_url;
+
+
+    if (!authorizationUrl) {
 
         throw new Error(
-            "Flutterwave payment response is missing."
+            "Paystack did not return an authorization URL."
         );
 
     }
 
 
-    return data.payment;
+    paymentMessage.innerText =
+        "Opening secure Paystack payment...";
+
+
+    // =============================================
+    // REDIRECT TO PAYSTACK
+    // =============================================
+
+    window.location.href =
+        authorizationUrl;
 
 }
 
 
 // =====================================================
-// OPEN FLUTTERWAVE AUTHORIZATION
-// =====================================================
-
-function openFlutterwaveAuthorization(
-    payment
-) {
-
-    const checkoutUrl =
-        payment.checkoutUrl ||
-        payment.paymentUrl ||
-        payment.link;
-
-
-    // =============================================
-    // REDIRECT AUTHORIZATION
-    // =============================================
-
-    if (checkoutUrl) {
-
-        paymentMessage.innerText =
-            "Opening Flutterwave authorization...";
-
-
-        window.location.href =
-            checkoutUrl;
-
-
-        return true;
-
-    }
-
-
-    // =============================================
-    // NEXT ACTION REDIRECT
-    // =============================================
-
-    const nextAction =
-        payment.nextAction;
-
-
-    if (
-        nextAction &&
-        nextAction.type ===
-        "redirect_url"
-    ) {
-
-        const redirectUrl =
-            nextAction
-                ?.redirect_url
-                ?.url;
-
-
-        if (redirectUrl) {
-
-            paymentMessage.innerText =
-                "Opening Flutterwave authorization...";
-
-
-            window.location.href =
-                redirectUrl;
-
-
-            return true;
-
-        }
-
-    }
-
-
-    // =============================================
-    // AUTHORIZATION REQUIRED
-    // =============================================
-
-    if (
-        nextAction &&
-        nextAction.type ===
-        "authorize"
-    ) {
-
-        const authType =
-            nextAction
-                ?.authorization
-                ?.type ||
-            "authorization";
-
-
-        paymentMessage.innerText =
-            `Flutterwave requires ${authType} authorization. Please follow the authorization instructions.`;
-
-
-        throw new Error(
-
-            `Flutterwave requires ${authType} authorization. Please continue with the authorization step.`
-
-        );
-
-    }
-
-
-    return false;
-
-}
-
-
-// =====================================================
-// CONTINUE PAYMENT
+// PAY BUTTON
 // =====================================================
 
 continueButton.addEventListener(
     "click",
     async function () {
 
-        if (
-            processingPayment
-        ) {
+        if (processingPayment) {
 
             return;
 
@@ -1448,76 +987,12 @@ continueButton.addEventListener(
 
                 <i class="fa-solid fa-spinner fa-spin"></i>
 
-                Processing...
+                Opening Paystack...
 
             `;
 
 
-            // =========================================
-            // CHECK PURCHASE
-            // =========================================
-
-            if (!purchaseId) {
-
-                throw new Error(
-                    "Purchase order is not available."
-                );
-
-            }
-
-
-            if (
-                !purchase ||
-                purchase.status !==
-                "pending"
-            ) {
-
-                throw new Error(
-                    "This purchase is no longer pending."
-                );
-
-            }
-
-
-            // =========================================
-            // CREATE PAYMENT METHOD
-            // =========================================
-
-            const paymentMethod =
-                await createPaymentMethod();
-
-
-            // =========================================
-            // INITIALIZE CHARGE
-            // =========================================
-
-            const payment =
-                await initializePayment(
-
-                    paymentMethod.id
-
-                );
-
-
-            // =========================================
-            // OPEN FLUTTERWAVE
-            // =========================================
-
-            const opened =
-                openFlutterwaveAuthorization(
-                    payment
-                );
-
-
-            if (!opened) {
-
-                throw new Error(
-
-                    "Flutterwave did not return an authorization URL."
-
-                );
-
-            }
+            await initializePaystackPayment();
 
 
         } catch (error) {
@@ -1559,96 +1034,153 @@ continueButton.addEventListener(
 
 
 // =====================================================
-// CARD NUMBER FORMAT
+// CHECK PAYMENT
 // =====================================================
 
-cardNumberInput.addEventListener(
-    "input",
-    function () {
+checkPaymentButton.addEventListener(
+    "click",
+    async function () {
 
-        let value =
-            this.value
-                .replace(
-                    /\D/g,
-                    ""
-                )
-                .substring(
-                    0,
-                    19
+        try {
+
+            const token =
+                getToken();
+
+
+            if (!purchaseId) {
+
+                throw new Error(
+                    "Purchase ID is missing."
+                );
+
+            }
+
+
+            checkPaymentButton.disabled =
+                true;
+
+
+            checkPaymentButton.innerHTML = `
+
+                <i class="fa-solid fa-spinner fa-spin"></i>
+
+                Checking...
+
+            `;
+
+
+            const response =
+                await fetch(
+
+                    `/api/coin-purchases/${encodeURIComponent(
+                        purchaseId
+                    )}`,
+
+                    {
+
+                        method:
+                            "GET",
+
+                        headers: {
+
+                            "Authorization":
+                                `Bearer ${token}`
+
+                        }
+
+                    }
+
                 );
 
 
-        const groups =
-            value.match(
-                /.{1,4}/g
+            const data =
+                await response.json();
+
+
+            if (
+                !response.ok ||
+                !data.success
+            ) {
+
+                throw new Error(
+
+                    data.message ||
+                    "Unable to check payment."
+
+                );
+
+            }
+
+
+            purchase =
+                data.purchase;
+
+
+            renderPurchase();
+
+
+            if (
+                purchase.status ===
+                "paid"
+            ) {
+
+                paymentMessage.innerText =
+                    "✅ Payment confirmed. Your coins have been credited.";
+
+                continueButton.style.display =
+                    "none";
+
+                checkPaymentButton.style.display =
+                    "none";
+
+                return;
+
+            }
+
+
+            paymentMessage.innerText =
+                "Payment has not been confirmed yet. If you just paid, please wait a moment and check again.";
+
+
+            checkPaymentButton.disabled =
+                false;
+
+
+            checkPaymentButton.innerHTML = `
+
+                <i class="fa-solid fa-rotate"></i>
+
+                Check Payment
+
+            `;
+
+
+        } catch (error) {
+
+            console.error(
+                "CHECK PAYMENT ERROR:",
+                error
             );
 
 
-        this.value =
-            groups
-                ? groups.join(" ")
-                : "";
-
-    }
-);
+            paymentMessage.innerText =
+                error.message ||
+                "Unable to check payment.";
 
 
-// =====================================================
-// ONLY NUMBERS
-// =====================================================
-
-expiryMonthInput.addEventListener(
-    "input",
-    function () {
-
-        this.value =
-            this.value
-                .replace(
-                    /\D/g,
-                    ""
-                )
-                .substring(
-                    0,
-                    2
-                );
-
-    }
-);
+            checkPaymentButton.disabled =
+                false;
 
 
-expiryYearInput.addEventListener(
-    "input",
-    function () {
+            checkPaymentButton.innerHTML = `
 
-        this.value =
-            this.value
-                .replace(
-                    /\D/g,
-                    ""
-                )
-                .substring(
-                    0,
-                    4
-                );
+                <i class="fa-solid fa-rotate"></i>
 
-    }
-);
+                Check Payment
 
+            `;
 
-cvvInput.addEventListener(
-    "input",
-    function () {
-
-        this.value =
-            this.value
-                .replace(
-                    /\D/g,
-                    ""
-                )
-                .substring(
-                    0,
-                    4
-                );
+        }
 
     }
 );
@@ -1777,88 +1309,6 @@ function escapeHtml(
     );
 
 }
-
-const checkPaymentButton =
-    document.getElementById(
-        "checkPaymentButton"
-    );
-
-
-if (checkPaymentButton) {
-
-    checkPaymentButton.addEventListener(
-        "click",
-        async () => {
-
-            try {
-
-                const purchaseId =
-                    getPurchaseIdFromUrl();
-
-
-                if (!purchaseId) {
-
-                    throw new Error(
-                        "Purchase ID is missing."
-                    );
-
-                }
-
-
-                checkPaymentButton.disabled =
-                    true;
-
-                checkPaymentButton.innerText =
-                    "Checking...";
-
-
-                const result =
-                    await window.coinPayment
-                        .checkPayment(
-                            purchaseId
-                        );
-
-
-                if (
-                    result &&
-                    result.paid
-                ) {
-
-                    checkPaymentButton.innerText =
-                        "✅ Payment Confirmed";
-
-                    return;
-
-                }
-
-
-                checkPaymentButton.disabled =
-                    false;
-
-                checkPaymentButton.innerText =
-                    "Check Payment";
-
-
-            } catch (error) {
-
-                console.error(
-                    "CHECK PAYMENT BUTTON ERROR:",
-                    error
-                );
-
-
-                checkPaymentButton.disabled =
-                    false;
-
-                checkPaymentButton.innerText =
-                    "Check Payment";
-
-            }
-
-        }
-    );
-
-}    
 
 
 // =====================================================
