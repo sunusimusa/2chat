@@ -311,21 +311,20 @@ async (
 
 
         if (
-            purchase.status !==
-            "pending"
-        ) {
+    purchase.status !== "pending" &&
+    purchase.status !== "processing"
+) {
 
-            return res.status(400).json({
+    return res.status(400).json({
 
-                success: false,
+        success: false,
 
-                message:
-                    `Payment cannot be initialized because order status is "${purchase.status}".`
+        message:
+            `Payment cannot be initialized because order status is "${purchase.status}".`
 
-            });
+    });
 
-        }
-
+}
 
         const user =
             await User.findById(
