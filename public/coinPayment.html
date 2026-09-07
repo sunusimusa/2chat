@@ -691,18 +691,101 @@ async function loadPurchase() {
 
         }
 
-        if (
-    purchase.status !==
+        // =============================================
+// CHECK PAYMENT STATUS
+// =============================================
+
+if (
+    purchase.status ===
+    "paid"
+) {
+
+    renderPurchase();
+
+    loading.style.display =
+        "none";
+
+    paymentContent.style.display =
+        "block";
+
+    paymentMessage.innerText =
+        "✅ This payment has already been completed.";
+
+    continueButton.style.display =
+        "none";
+
+    checkPaymentButton.style.display =
+        "none";
+
+    return;
+
+}
+
+
+// =============================================
+// PENDING PAYMENT
+// =============================================
+
+if (
+    purchase.status ===
     "pending"
 ) {
 
     paymentMessage.innerText =
+        "You will be redirected to Paystack to complete your payment securely.";
+
+    continueButton.style.display =
+        "block";
+
+    continueButton.disabled =
+        false;
+
+    checkPaymentButton.style.display =
+        "block";
+
+}
+
+
+// =============================================
+// PROCESSING PAYMENT
+// =============================================
+
+else if (
+    purchase.status ===
+    "processing"
+) {
+
+    paymentMessage.innerText =
+        "Your payment is being checked. You can verify the payment now.";
+
+    continueButton.style.display =
+        "none";
+
+    checkPaymentButton.style.display =
+        "block";
+
+}
+
+
+// =============================================
+// OTHER STATUS
+// =============================================
+
+else {
+
+    paymentMessage.innerText =
         `This purchase is already ${purchase.status}.`;
+
+    continueButton.style.display =
+        "none";
 
     continueButton.disabled =
         true;
 
-        }
+    checkPaymentButton.style.display =
+        "none";
+
+    }
 
 
         // =============================================
