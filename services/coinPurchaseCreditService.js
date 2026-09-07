@@ -6,7 +6,7 @@
  *
  * Wannan service:
  *
- * - yana tabbatar da payment result
+ * - yana tabbatar da Paystack payment result
  * - yana hana double credit
  * - yana ƙirƙirar Wallet ga legacy user idan babu
  * - yana ƙara coins
@@ -57,23 +57,31 @@ async function creditCoinPurchase(
 ) {
 
     if (!purchaseId) {
+
         throw new Error(
             "Purchase ID is required."
         );
+
     }
 
+
     if (!verifiedPayment) {
+
         throw new Error(
             "Verified payment is required."
         );
+
     }
+
 
     const session =
         await mongoose.startSession();
 
+
     try {
 
         let result = null;
+
 
         await session.withTransaction(
             async () => {
@@ -91,10 +99,13 @@ async function creditCoinPurchase(
                             session
                         );
 
+
                 if (!purchase) {
+
                     throw new Error(
                         "Coin purchase order not found."
                     );
+
                 }
 
 
@@ -116,9 +127,11 @@ async function creditCoinPurchase(
 
                         wallet:
                             null
+
                     };
 
                     return;
+
                 }
 
 
@@ -132,11 +145,13 @@ async function creditCoinPurchase(
                         ""
                     ).trim();
 
+
                 const purchaseReference =
                     String(
                         purchase.reference ||
                         ""
                     ).trim();
+
 
                 if (
                     providerReference !==
@@ -146,22 +161,39 @@ async function creditCoinPurchase(
                     throw new Error(
                         "Payment reference does not match purchase."
                     );
+
                 }
 
 
                 // =====================================
                 // AMOUNT
                 // =====================================
+                //
+                // CoinPurchase amount:
+                // ₦100
+                //
+                // Paystack amount:
+                // 10000 kobo
+                //
+                // Therefore:
+                //
+                // purchase.amount * 100
+                //
+                // =====================================
 
                 const expectedAmount =
-                    Number(
-                        purchase.amount
+                    Math.round(
+                        Number(
+                            purchase.amount
+                        ) * 100
                     );
+
 
                 const paidAmount =
                     Number(
                         verifiedPayment.amount
                     );
+
 
                 if (
                     !Number.isFinite(
@@ -174,6 +206,7 @@ async function creditCoinPurchase(
                     throw new Error(
                         "Payment amount does not match purchase amount."
                     );
+
                 }
 
 
@@ -185,13 +218,19 @@ async function creditCoinPurchase(
                     String(
                         purchase.currency ||
                         "NGN"
-                    ).toUpperCase();
+                    )
+                        .trim()
+                        .toUpperCase();
+
 
                 const paidCurrency =
                     String(
                         verifiedPayment.currency ||
                         ""
-                    ).toUpperCase();
+                    )
+                        .trim()
+                        .toUpperCase();
+
 
                 if (
                     paidCurrency !==
@@ -201,6 +240,7 @@ async function creditCoinPurchase(
                     throw new Error(
                         "Payment currency does not match purchase currency."
                     );
+
                 }
 
 
@@ -212,7 +252,10 @@ async function creditCoinPurchase(
                     String(
                         verifiedPayment.status ||
                         ""
-                    ).toLowerCase();
+                    )
+                        .trim()
+                        .toLowerCase();
+
 
                 if (
                     !SUCCESS_STATUSES.includes(
@@ -223,6 +266,7 @@ async function creditCoinPurchase(
                     throw new Error(
                         `Payment is not successful. Current status: ${providerStatus || "unknown"}`
                     );
+
                 }
 
 
@@ -251,6 +295,7 @@ async function creditCoinPurchase(
                         await Wallet.create(
                             [
                                 {
+
                                     userId:
                                         purchase.userId,
 
@@ -283,6 +328,7 @@ async function creditCoinPurchase(
 
                                     giftsReceived:
                                         0
+
                                 }
                             ],
                             {
@@ -290,8 +336,10 @@ async function creditCoinPurchase(
                             }
                         );
 
+
                     wallet =
                         created[0];
+
                 }
 
 
@@ -321,6 +369,10 @@ async function creditCoinPurchase(
                     );
 
 
+                // =====================================
+                // SAVE WALLET
+                // =====================================
+
                 await wallet.save({
                     session
                 });
@@ -333,46 +385,71 @@ async function creditCoinPurchase(
                 purchase.status =
                     "paid";
 
+
                 purchase.providerStatus =
                     providerStatus;
+
 
                 purchase.paymentCompletedAt =
                     purchase.paymentCompletedAt ||
                     new Date();
 
+
                 purchase.paymentVerifiedAt =
                     new Date();
+
 
                 purchase.coinsCredited =
                     true;
 
+
                 purchase.coinsCreditedAt =
                     new Date();
 
+
+                // =====================================
+                // WEBHOOK RECEIVED
+                // =====================================
+
                 purchase.webhookReceived =
-                    purchase.webhookReceived ||
-                    false;
+                    true;
+
+
+                // =====================================
+                // PAYSTACK TRANSACTION ID
+                // =====================================
 
                 if (
                     verifiedPayment.id
                 ) {
 
-                    purchase.flutterwaveChargeId =
+                    purchase.paystackTransactionId =
                         String(
                             verifiedPayment.id
                         );
+
                 }
+
+
+                // =====================================
+                // PAYSTACK ACCESS CODE
+                // =====================================
 
                 if (
-                    verifiedPayment.customerId
+                    verifiedPayment.access_code
                 ) {
 
-                    purchase.flutterwaveCustomerId =
+                    purchase.paystackAccessCode =
                         String(
-                            verifiedPayment.customerId
+                            verifiedPayment.access_code
                         );
+
                 }
 
+
+                // =====================================
+                // SAVE PURCHASE
+                // =====================================
 
                 await purchase.save({
                     session
@@ -391,18 +468,22 @@ async function creditCoinPurchase(
                     purchase,
 
                     wallet
+
                 };
+
             }
         );
 
 
         return result;
 
+
     } finally {
 
         await session.endSession();
 
     }
+
 }
 
 
