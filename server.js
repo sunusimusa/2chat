@@ -207,6 +207,10 @@ app.post(
 
     (req, res, next) => {
 
+        console.log(
+    "📩 PAYSTACK WEBHOOK REQUEST RECEIVED"
+);
+
         req.rawBody =
             req.body;
 
