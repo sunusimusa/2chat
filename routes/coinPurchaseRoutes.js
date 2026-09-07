@@ -1,25 +1,19 @@
-const express =
-    require("express");
+const express = require("express");
+const router = express.Router();
 
-const router =
-    express.Router();
-
-const protect =
-    require("../middleware/auth");
+const protect = require("../middleware/auth");
 
 const {
     createCoinPurchase,
     initializeCoinPurchasePayment,
-    createCoinPaymentMethod,
     getCoinPurchase
-} =
-    require("../controllers/coinPurchaseController");
+} = require("../controllers/coinPurchaseController");
 
 
-// =====================================================
-// CREATE PURCHASE
-// =====================================================
-
+// ========================================
+// CREATE COIN PURCHASE
+// POST /api/coin-purchases
+// ========================================
 router.post(
     "/",
     protect,
@@ -27,10 +21,10 @@ router.post(
 );
 
 
-// =====================================================
-// GET PURCHASE
-// =====================================================
-
+// ========================================
+// GET COIN PURCHASE
+// GET /api/coin-purchases/:id
+// ========================================
 router.get(
     "/:id",
     protect,
@@ -38,21 +32,10 @@ router.get(
 );
 
 
-// =====================================================
-// CREATE PAYMENT METHOD
-// =====================================================
-
-router.post(
-    "/:id/payment-method",
-    protect,
-    createCoinPaymentMethod
-);
-
-
-// =====================================================
-// INITIALIZE PAYMENT
-// =====================================================
-
+// ========================================
+// INITIALIZE PAYSTACK PAYMENT
+// POST /api/coin-purchases/:id/initialize-payment
+// ========================================
 router.post(
     "/:id/initialize-payment",
     protect,
@@ -60,5 +43,4 @@ router.post(
 );
 
 
-module.exports =
-    router;
+module.exports = router;
