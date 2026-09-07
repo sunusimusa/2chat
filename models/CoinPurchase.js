@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 // =====================================================
 // 2CHAT
-// COIN PURCHASE MODEL
+// COIN PURCHASE MODEL — PAYSTACK
 // =====================================================
 //
 // FLOW:
@@ -12,11 +12,11 @@ const mongoose = require("mongoose");
 //      ↓
 // CoinPurchase
 //      ↓
-// Flutterwave Payment Method
+// Paystack Initialize
 //      ↓
-// Flutterwave Charge
+// Paystack Checkout
 //      ↓
-// Webhook / Verification
+// Paystack Webhook / Verification
 //      ↓
 // Payment Verified
 //      ↓
@@ -79,10 +79,6 @@ const coinPurchaseSchema = new mongoose.Schema(
     // =================================================
     // COINS SNAPSHOT
     // =================================================
-    //
-    // Package ɗin da aka saya.
-    // Ana adana value ɗin a lokacin order.
-    //
 
     coins: {
 
@@ -140,6 +136,14 @@ const coinPurchaseSchema = new mongoose.Schema(
     // =================================================
     // 2CHAT PURCHASE REFERENCE
     // =================================================
+    //
+    // Wannan shine unique reference na 2CHAT.
+    //
+    // Misali:
+    // 2CHAT-1750000000000-A1B2C3D4
+    //
+    // Za mu kuma amfani da shi a Paystack.
+    // =================================================
 
     reference: {
 
@@ -172,12 +176,12 @@ const coinPurchaseSchema = new mongoose.Schema(
 
       enum: [
 
-        "flutterwave"
+        "paystack"
 
       ],
 
       default:
-        "flutterwave",
+        "paystack",
 
       index:
         true
@@ -186,11 +190,12 @@ const coinPurchaseSchema = new mongoose.Schema(
 
 
     // =================================================
-    // FLUTTERWAVE PAYMENT REFERENCE
+    // PAYSTACK PAYMENT REFERENCE
     // =================================================
     //
-    // Wannan zai iya zama provider reference.
+    // Paystack transaction reference.
     //
+    // =================================================
 
     paymentReference: {
 
@@ -201,16 +206,24 @@ const coinPurchaseSchema = new mongoose.Schema(
         null,
 
       index:
+        true,
+
+      trim:
         true
 
     },
 
 
     // =================================================
-    // FLUTTERWAVE CUSTOMER ID
+    // PAYSTACK ACCESS CODE
+    // =================================================
+    //
+    // Paystack yana iya dawo da access_code
+    // bayan initialize transaction.
+    //
     // =================================================
 
-    flutterwaveCustomerId: {
+    paystackAccessCode: {
 
       type:
         String,
@@ -225,32 +238,14 @@ const coinPurchaseSchema = new mongoose.Schema(
 
 
     // =================================================
-    // FLUTTERWAVE PAYMENT METHOD ID
+    // PAYSTACK TRANSACTION ID
     // =================================================
     //
-    // Za a adana shi idan payment-method flow
-    // ya samar da shi.
+    // ID ɗin transaction daga Paystack.
     //
-
-    flutterwavePaymentMethodId: {
-
-      type:
-        String,
-
-      default:
-        null,
-
-      trim:
-        true
-
-    },
-
-
-    // =================================================
-    // FLUTTERWAVE CHARGE ID
     // =================================================
 
-    flutterwaveChargeId: {
+    paystackTransactionId: {
 
       type:
         String,
@@ -271,8 +266,11 @@ const coinPurchaseSchema = new mongoose.Schema(
     // PAYMENT URL
     // =================================================
     //
-    // Flutterwave checkout / redirect URL.
+    // Paystack authorization URL.
     //
+    // User zai shiga wannan URL domin biyan kuɗi.
+    //
+    // =================================================
 
     paymentUrl: {
 
@@ -280,7 +278,10 @@ const coinPurchaseSchema = new mongoose.Schema(
         String,
 
       default:
-        null
+        null,
+
+      trim:
+        true
 
     },
 
@@ -341,6 +342,7 @@ const coinPurchaseSchema = new mongoose.Schema(
     // cancelled
     // expired
     //
+    // =================================================
 
     status: {
 
@@ -373,15 +375,17 @@ const coinPurchaseSchema = new mongoose.Schema(
 
 
     // =================================================
-    // FLUTTERWAVE PROVIDER STATUS
+    // PAYSTACK PROVIDER STATUS
     // =================================================
     //
     // Misali:
     //
+    // initialized
     // pending
-    // succeeded
+    // success
     // failed
     //
+    // =================================================
 
     providerStatus: {
 
@@ -477,6 +481,7 @@ const coinPurchaseSchema = new mongoose.Schema(
     //
     // daga ƙara coins sau biyu.
     //
+    // =================================================
 
     coinsCredited: {
 
@@ -523,6 +528,7 @@ const coinPurchaseSchema = new mongoose.Schema(
 
 
 // User purchases
+
 coinPurchaseSchema.index({
 
   userId:
@@ -535,6 +541,7 @@ coinPurchaseSchema.index({
 
 
 // Purchase status
+
 coinPurchaseSchema.index({
 
   status:
@@ -546,16 +553,18 @@ coinPurchaseSchema.index({
 });
 
 
-// Flutterwave charge lookup
+// Paystack transaction lookup
+
 coinPurchaseSchema.index({
 
-  flutterwaveChargeId:
+  paystackTransactionId:
     1
 
 });
 
 
 // Payment reference lookup
+
 coinPurchaseSchema.index({
 
   paymentReference:
