@@ -691,17 +691,16 @@ async function loadPurchase() {
 
         }
 
-
         if (
-            purchase.status !==
-            "pending"
-        ) {
+    purchase.status !==
+    "pending"
+) {
 
-            paymentMessage.innerText =
-                `This purchase is already ${purchase.status}.`;
+    paymentMessage.innerText =
+        `This purchase is already ${purchase.status}.`;
 
-            continueButton.disabled =
-                true;
+    continueButton.disabled =
+        true;
 
         }
 
@@ -1064,9 +1063,13 @@ checkPaymentButton.addEventListener(
 
                 <i class="fa-solid fa-spinner fa-spin"></i>
 
-                Checking...
+                Checking Paystack...
 
             `;
+
+
+            paymentMessage.innerText =
+                "Verifying your payment securely with Paystack...";
 
 
             const response =
@@ -1074,14 +1077,17 @@ checkPaymentButton.addEventListener(
 
                     `/api/coin-purchases/${encodeURIComponent(
                         purchaseId
-                    )}`,
+                    )}/verify-payment`,
 
                     {
 
                         method:
-                            "GET",
+                            "POST",
 
                         headers: {
+
+                            "Content-Type":
+                                "application/json",
 
                             "Authorization":
                                 `Bearer ${token}`
@@ -1105,41 +1111,54 @@ checkPaymentButton.addEventListener(
                 throw new Error(
 
                     data.message ||
-                    "Unable to check payment."
+                    "Unable to verify payment."
 
                 );
 
             }
 
 
-            purchase =
-                data.purchase;
-
-
-            renderPurchase();
-
+            // =============================================
+            // PAYMENT SUCCESS
+            // =============================================
 
             if (
-                purchase.status ===
-                "paid"
+                data.paid === true &&
+                data.coinsCredited === true
             ) {
 
+                purchase.status =
+                    "paid";
+
+
+                renderPurchase();
+
+
                 paymentMessage.innerText =
-                    "✅ Payment confirmed. Your coins have been credited.";
+                    `✅ Payment confirmed. ${formatNumber(
+                        data.coins || purchase.coins
+                    )} coins have been credited to your wallet.`;
+
 
                 continueButton.style.display =
                     "none";
 
+
                 checkPaymentButton.style.display =
                     "none";
+
 
                 return;
 
             }
 
 
+            // =============================================
+            // PAYMENT NOT CONFIRMED YET
+            // =============================================
+
             paymentMessage.innerText =
-                "Payment has not been confirmed yet. If you just paid, please wait a moment and check again.";
+                "Payment has not been confirmed yet. Please wait a moment and check again.";
 
 
             checkPaymentButton.disabled =
@@ -1165,7 +1184,7 @@ checkPaymentButton.addEventListener(
 
             paymentMessage.innerText =
                 error.message ||
-                "Unable to check payment.";
+                "Unable to verify payment.";
 
 
             checkPaymentButton.disabled =
