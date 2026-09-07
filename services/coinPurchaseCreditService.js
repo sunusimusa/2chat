@@ -412,8 +412,11 @@ async function creditCoinPurchase(
                 // =====================================
 
                 purchase.webhookReceived =
-                    true;
+    true;
 
+purchase.webhookReceivedAt =
+    purchase.webhookReceivedAt ||
+    new Date();
 
                 // =====================================
                 // PAYSTACK TRANSACTION ID
