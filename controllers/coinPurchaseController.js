@@ -481,8 +481,12 @@ if (
         purchase.paymentUrl =
             payment.authorization_url;
 
-        purchase.paymentInitializedAt =
-            new Date();
+        if (!purchase.paymentInitializedAt) {
+
+    purchase.paymentInitializedAt =
+        new Date();
+
+        }
 
         purchase.providerStatus =
             payment.status ||
