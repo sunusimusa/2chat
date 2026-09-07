@@ -1778,6 +1778,88 @@ function escapeHtml(
 
 }
 
+const checkPaymentButton =
+    document.getElementById(
+        "checkPaymentButton"
+    );
+
+
+if (checkPaymentButton) {
+
+    checkPaymentButton.addEventListener(
+        "click",
+        async () => {
+
+            try {
+
+                const purchaseId =
+                    getPurchaseIdFromUrl();
+
+
+                if (!purchaseId) {
+
+                    throw new Error(
+                        "Purchase ID is missing."
+                    );
+
+                }
+
+
+                checkPaymentButton.disabled =
+                    true;
+
+                checkPaymentButton.innerText =
+                    "Checking...";
+
+
+                const result =
+                    await window.coinPayment
+                        .checkPayment(
+                            purchaseId
+                        );
+
+
+                if (
+                    result &&
+                    result.paid
+                ) {
+
+                    checkPaymentButton.innerText =
+                        "✅ Payment Confirmed";
+
+                    return;
+
+                }
+
+
+                checkPaymentButton.disabled =
+                    false;
+
+                checkPaymentButton.innerText =
+                    "Check Payment";
+
+
+            } catch (error) {
+
+                console.error(
+                    "CHECK PAYMENT BUTTON ERROR:",
+                    error
+                );
+
+
+                checkPaymentButton.disabled =
+                    false;
+
+                checkPaymentButton.innerText =
+                    "Check Payment";
+
+            }
+
+        }
+    );
+
+}    
+
 
 // =====================================================
 // START
