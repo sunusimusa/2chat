@@ -10,10 +10,10 @@ const CoinPurchase =
     require("../models/CoinPurchase");
 
 const {
-    initializePaystackTransaction
+    initializePaystackTransaction,
+    verifyPaystackTransaction
 } =
     require("../services/paystackService");
-
 
 // =====================================================
 // CREATE COIN PURCHASE
@@ -710,6 +710,344 @@ async (
 
             message:
                 "Failed to load coin purchase."
+
+        });
+
+    }
+
+};
+
+// =====================================================
+// VERIFY PAYSTACK PAYMENT
+// =====================================================
+
+exports.verifyCoinPurchasePayment =
+async (
+    req,
+    res
+) => {
+
+    try {
+
+        const {
+            id
+        } = req.params;
+
+
+        if (!id) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Purchase ID is required."
+
+            });
+
+        }
+
+
+        const purchase =
+            await CoinPurchase.findById(id);
+
+
+        if (!purchase) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Coin purchase order not found."
+
+            });
+
+        }
+
+
+        if (
+            String(
+                purchase.userId
+            ) !==
+            String(
+                req.user._id
+            )
+        ) {
+
+            return res.status(403).json({
+
+                success: false,
+
+                message:
+                    "You are not allowed to access this purchase."
+
+            });
+
+        }
+
+
+        // =================================================
+        // ALREADY CREDITED
+        // =================================================
+
+        if (
+            purchase.coinsCredited === true
+        ) {
+
+            return res.json({
+
+                success: true,
+
+                paid: true,
+
+                coinsCredited: true,
+
+                message:
+                    "Payment already verified and coins already credited."
+
+            });
+
+        }
+
+
+        const reference =
+            purchase.paymentReference ||
+            purchase.reference;
+
+
+        if (!reference) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Paystack payment reference not found."
+
+            });
+
+        }
+
+
+        // =================================================
+        // VERIFY WITH PAYSTACK
+        // =================================================
+
+        const payment =
+            await verifyPaystackTransaction(
+                reference
+            );
+
+
+        if (!payment) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Paystack payment verification failed."
+
+            });
+
+        }
+
+
+        // =================================================
+        // CHECK PAYMENT STATUS
+        // =================================================
+
+        if (
+            String(
+                payment.status || ""
+            ).toLowerCase() !==
+            "success"
+        ) {
+
+            purchase.providerStatus =
+                payment.status || null;
+
+            purchase.status =
+                "processing";
+
+            purchase.verificationAttempts =
+                Number(
+                    purchase.verificationAttempts || 0
+                ) + 1;
+
+            await purchase.save();
+
+
+            return res.json({
+
+                success: true,
+
+                paid: false,
+
+                coinsCredited: false,
+
+                status:
+                    payment.status || "unknown",
+
+                message:
+                    "Payment has not been confirmed yet."
+
+            });
+
+        }
+
+
+        // =================================================
+        // CHECK AMOUNT
+        // =================================================
+
+        const expectedAmount =
+            Math.round(
+                Number(
+                    purchase.amount
+                ) * 100
+            );
+
+        const paidAmount =
+            Number(
+                payment.amount
+            );
+
+
+        if (
+            paidAmount !==
+            expectedAmount
+        ) {
+
+            console.error(
+                "❌ PAYSTACK VERIFY AMOUNT MISMATCH:",
+                {
+                    reference,
+                    expectedAmount,
+                    paidAmount
+                }
+            );
+
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Payment amount mismatch."
+
+            });
+
+        }
+
+
+        // =================================================
+        // CHECK CURRENCY
+        // =================================================
+
+        const expectedCurrency =
+            String(
+                purchase.currency ||
+                "NGN"
+            )
+            .trim()
+            .toUpperCase();
+
+
+        const paidCurrency =
+            String(
+                payment.currency ||
+                ""
+            )
+            .trim()
+            .toUpperCase();
+
+
+        if (
+            paidCurrency !==
+            expectedCurrency
+        ) {
+
+            console.error(
+                "❌ PAYSTACK VERIFY CURRENCY MISMATCH:",
+                {
+                    reference,
+                    expectedCurrency,
+                    paidCurrency
+                }
+            );
+
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Payment currency mismatch."
+
+            });
+
+        }
+
+
+        // =================================================
+        // CREDIT COINS
+        // =================================================
+
+        const {
+            creditCoinPurchase
+        } =
+            require(
+                "../services/coinPurchaseCreditService"
+            );
+
+
+        await creditCoinPurchase(
+            purchase._id,
+            payment
+        );
+
+
+        console.log(
+            "✅ PAYSTACK PAYMENT VERIFIED:",
+            reference,
+            purchase.coins
+        );
+
+
+        return res.json({
+
+            success: true,
+
+            paid: true,
+
+            coinsCredited: true,
+
+            coins:
+                purchase.coins,
+
+            message:
+                "Payment verified and coins credited successfully."
+
+        });
+
+
+    } catch (err) {
+
+        console.error(
+            "VERIFY PAYSTACK PAYMENT ERROR:",
+            err
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                err.message ||
+                "Failed to verify Paystack payment."
 
         });
 
