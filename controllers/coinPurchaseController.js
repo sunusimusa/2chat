@@ -10,10 +10,9 @@ const CoinPurchase =
     require("../models/CoinPurchase");
 
 const {
-    initializePayment,
-    createPaymentMethod
+    initializePaystackTransaction
 } =
-    require("../services/paymentInitializationService");
+    require("../services/paystackService");
 
 
 // =====================================================
@@ -170,7 +169,7 @@ exports.createCoinPurchase = async (
                     "pending",
 
                 paymentProvider:
-                    "flutterwave",
+                    "paystack",
 
                 coinsCredited:
                     false
@@ -242,240 +241,7 @@ exports.createCoinPurchase = async (
 
 
 // =====================================================
-// CREATE PAYMENT METHOD
-// =====================================================
-
-exports.createCoinPaymentMethod =
-async (
-    req,
-    res
-) => {
-
-    try {
-
-        const {
-            id
-        } = req.params;
-
-
-        if (!id) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Purchase ID is required."
-
-            });
-
-        }
-
-
-        const {
-            card
-        } = req.body || {};
-
-
-        if (!card) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Card payment data is required."
-
-            });
-
-        }
-
-
-        const purchase =
-            await CoinPurchase.findById(id);
-
-
-        if (!purchase) {
-
-            return res.status(404).json({
-
-                success: false,
-
-                message:
-                    "Coin purchase order not found."
-
-            });
-
-        }
-
-
-        if (
-            String(
-                purchase.userId
-            ) !==
-            String(
-                req.user._id
-            )
-        ) {
-
-            return res.status(403).json({
-
-                success: false,
-
-                message:
-                    "You are not allowed to access this purchase."
-
-            });
-
-        }
-
-
-        if (
-            purchase.status !==
-            "pending"
-        ) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    `Payment cannot continue because order status is "${purchase.status}".`
-
-            });
-
-        }
-
-
-        const user =
-            await User.findById(
-                req.user._id
-            )
-            .select(
-                "username email"
-            );
-
-
-        if (!user) {
-
-            return res.status(404).json({
-
-                success: false,
-
-                message:
-                    "User not found."
-
-            });
-
-        }
-
-
-        if (!user.email) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "User email is required for payment."
-
-            });
-
-        }
-
-
-        const paymentMethod =
-            await createPaymentMethod({
-
-                user,
-
-                card
-
-            });
-
-
-        if (
-            paymentMethod.customerId
-        ) {
-
-            purchase.flutterwaveCustomerId =
-                String(
-                    paymentMethod.customerId
-                );
-
-        }
-
-
-        if (
-            paymentMethod.id
-        ) {
-
-            purchase.flutterwavePaymentMethodId =
-                String(
-                    paymentMethod.id
-                );
-
-        }
-
-
-        purchase.paymentProvider =
-            "flutterwave";
-
-
-        await purchase.save();
-
-
-        return res.json({
-
-            success: true,
-
-            message:
-                "Flutterwave payment method created successfully.",
-
-            paymentMethod: {
-
-                id:
-                    paymentMethod.id,
-
-                type:
-                    paymentMethod.type,
-
-                card:
-                    paymentMethod.card,
-
-                customerId:
-                    paymentMethod.customerId
-
-            }
-
-        });
-
-
-    } catch (err) {
-
-        console.error(
-            "CREATE COIN PAYMENT METHOD ERROR:",
-            err
-        );
-
-
-        return res.status(500).json({
-
-            success: false,
-
-            message:
-                err.message ||
-                "Failed to create payment method."
-
-        });
-
-    }
-
-};
-
-
-// =====================================================
-// INITIALIZE PAYMENT
+// INITIALIZE PAYSTACK PAYMENT
 // =====================================================
 
 exports.initializeCoinPurchasePayment =
@@ -598,86 +364,129 @@ async (
         }
 
 
-        const paymentMethodId =
-            purchase.flutterwavePaymentMethodId;
-
-
-        if (!paymentMethodId) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Payment method has not been created. Please enter your card details first."
-
-            });
-
-        }
-
+        // =================================================
+        // INITIALIZE PAYSTACK TRANSACTION
+        // =================================================
 
         const payment =
-            await initializePayment({
+            await initializePaystackTransaction({
 
-                purchase,
+                email:
+                    user.email,
 
-                user,
+                amount:
+                    purchase.amount,
 
-                paymentMethodId
+                currency:
+                    purchase.currency,
+
+                reference:
+                    purchase.reference,
+
+                metadata: {
+
+                    purchaseId:
+                        String(
+                            purchase._id
+                        ),
+
+                    userId:
+                        String(
+                            purchase.userId
+                        ),
+
+                    packageId:
+                        String(
+                            purchase.packageId
+                        ),
+
+                    coins:
+                        purchase.coins,
+
+                    username:
+                        user.username || ""
+
+                }
 
             });
 
 
+        if (
+            !payment ||
+            !payment.authorization_url
+        ) {
+
+            throw new Error(
+                "Paystack did not return an authorization URL."
+            );
+
+        }
+
+
+        // =================================================
+        // SAVE PAYSTACK DATA
+        // =================================================
+
+        purchase.paymentProvider =
+            "paystack";
+
         purchase.paymentReference =
-    payment.reference;
+            payment.reference ||
+            purchase.reference;
 
-if (payment.paymentUrl) {
-    purchase.paymentUrl =
-        payment.paymentUrl;
-}
+        purchase.paystackAccessCode =
+            payment.access_code ||
+            null;
 
-purchase.paymentInitializedAt =
-    new Date();
+        purchase.paymentUrl =
+            payment.authorization_url;
 
-        if (
-            payment.customerId
-        ) {
-
-            purchase.flutterwaveCustomerId =
-                String(
-                    payment.customerId
-                );
-
-        }
-
-
-        if (
-            payment.chargeId
-        ) {
-
-            purchase.flutterwaveChargeId =
-                String(
-                    payment.chargeId
-                );
-
-        }
-
+        purchase.paymentInitializedAt =
+            new Date();
 
         purchase.providerStatus =
-            payment.status;
+            payment.status ||
+            "initialized";
 
 
         await purchase.save();
 
+
+        // =================================================
+        // RESPONSE
+        // =================================================
 
         return res.json({
 
             success: true,
 
             message:
-                "Flutterwave payment initialized successfully.",
+                "Paystack payment initialized successfully.",
 
-            payment
+            payment: {
+
+                provider:
+                    "paystack",
+
+                reference:
+                    purchase.paymentReference,
+
+                authorization_url:
+                    purchase.paymentUrl,
+
+                access_code:
+                    purchase.paystackAccessCode,
+
+                amount:
+                    purchase.amount,
+
+                currency:
+                    purchase.currency,
+
+                status:
+                    purchase.providerStatus
+
+            }
 
         });
 
@@ -685,7 +494,7 @@ purchase.paymentInitializedAt =
     } catch (err) {
 
         console.error(
-            "INITIALIZE COIN PAYMENT ERROR:",
+            "INITIALIZE PAYSTACK PAYMENT ERROR:",
             err
         );
 
@@ -696,7 +505,7 @@ purchase.paymentInitializedAt =
 
             message:
                 err.message ||
-                "Failed to initialize Flutterwave payment."
+                "Failed to initialize Paystack payment."
 
         });
 
@@ -804,6 +613,12 @@ async (
 
                 paymentReference:
                     purchase.paymentReference,
+
+                paystackAccessCode:
+                    purchase.paystackAccessCode,
+
+                paystackTransactionId:
+                    purchase.paystackTransactionId,
 
                 paymentUrl:
                     purchase.paymentUrl,
