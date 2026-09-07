@@ -367,47 +367,88 @@ async (
         // INITIALIZE PAYSTACK TRANSACTION
         // =================================================
 
-        const payment =
-            await initializePaystackTransaction({
+        // =================================================
+// REOPEN EXISTING PAYSTACK PAYMENT
+// =================================================
 
-                email:
-                    user.email,
+let payment;
 
-                amount:
-                    purchase.amount,
+// Idan an riga an initialize Paystack payment,
+// kada mu sake aika wannan reference zuwa Paystack.
+// Sai mu dawo da existing checkout URL.
 
-                currency:
-                    purchase.currency,
+if (
+    purchase.paymentProvider === "paystack" &&
+    purchase.paymentUrl
+) {
 
-                reference:
-                    purchase.reference,
+    payment = {
 
-                metadata: {
+        authorization_url:
+            purchase.paymentUrl,
 
-                    purchaseId:
-                        String(
-                            purchase._id
-                        ),
+        access_code:
+            purchase.paystackAccessCode,
 
-                    userId:
-                        String(
-                            purchase.userId
-                        ),
+        reference:
+            purchase.paymentReference ||
+            purchase.reference,
 
-                    packageId:
-                        String(
-                            purchase.packageId
-                        ),
+        status:
+            purchase.providerStatus ||
+            "initialized"
 
-                    coins:
-                        purchase.coins,
+    };
 
-                    username:
-                        user.username || ""
+} else {
 
-                }
+    // =================================================
+    // INITIALIZE NEW PAYSTACK TRANSACTION
+    // =================================================
 
-            });
+    payment =
+        await initializePaystackTransaction({
+
+            email:
+                user.email,
+
+            amount:
+                purchase.amount,
+
+            currency:
+                purchase.currency,
+
+            reference:
+                purchase.reference,
+
+            metadata: {
+
+                purchaseId:
+                    String(
+                        purchase._id
+                    ),
+
+                userId:
+                    String(
+                        purchase.userId
+                    ),
+
+                packageId:
+                    String(
+                        purchase.packageId
+                    ),
+
+                coins:
+                    purchase.coins,
+
+                username:
+                    user.username || ""
+
+            }
+
+        });
+
+}
 
 
         if (
