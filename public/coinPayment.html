@@ -658,40 +658,9 @@ async function loadPurchase() {
                 )
             );
 
-        }
+        }   
 
-
-        // =============================================
-        // CHECK STATUS
-        // =============================================
-
-        if (
-            purchase.status ===
-            "paid"
-        ) {
-
-            renderPurchase();
-
-            loading.style.display =
-                "none";
-
-            paymentContent.style.display =
-                "block";
-
-            paymentMessage.innerText =
-                "✅ This payment has already been completed.";
-
-            continueButton.style.display =
-                "none";
-
-            checkPaymentButton.style.display =
-                "none";
-
-            return;
-
-        }
-
-        // =============================================
+// =============================================
 // CHECK PAYMENT STATUS
 // =============================================
 
