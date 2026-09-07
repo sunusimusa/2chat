@@ -13,9 +13,8 @@ require("dotenv").config();
 // =====================================================
 
 const {
-    flutterwaveWebhook
-} = require("./controllers/flutterwaveWebhookController");
-
+    paystackWebhook
+} = require("./controllers/paystackWebhookController");
 
 // =====================================================
 // ROUTES
@@ -191,17 +190,16 @@ app.get(
 
 
 // =====================================================
-// FLUTTERWAVE WEBHOOK
+// PAYSTACK WEBHOOK
 // =====================================================
 //
 // IMPORTANT:
-//
-// Webhook yana buƙatar raw body kafin
-// express.json() ya parse body.
+// Paystack signature verification yana buƙatar
+// raw request body kafin express.json() ya parse body.
 // =====================================================
 
 app.post(
-    "/api/payments/flutterwave/webhook",
+    "/api/payments/paystack/webhook",
 
     express.raw({
         type: "application/json"
@@ -212,45 +210,34 @@ app.post(
         req.rawBody =
             req.body;
 
-
         try {
 
             req.body =
                 JSON.parse(
-                    req.body.toString(
-                        "utf8"
-                    )
+                    req.body.toString("utf8")
                 );
-
 
         } catch (err) {
 
             console.error(
-                "FLUTTERWAVE WEBHOOK JSON ERROR:",
+                "PAYSTACK WEBHOOK JSON ERROR:",
                 err
             );
-
 
             return res
                 .status(400)
                 .json({
-
-                    success:
-                        false,
-
-                    message:
-                        "Invalid webhook JSON."
-
+                    success: false,
+                    message: "Invalid webhook JSON."
                 });
 
         }
-
 
         next();
 
     },
 
-    flutterwaveWebhook
+    paystackWebhook
 );
 
 
