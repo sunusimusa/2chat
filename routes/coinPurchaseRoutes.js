@@ -6,7 +6,8 @@ const protect = require("../middleware/auth");
 const {
     createCoinPurchase,
     initializeCoinPurchasePayment,
-    getCoinPurchase
+    getCoinPurchase,
+    verifyCoinPurchasePayment
 } = require("../controllers/coinPurchaseController");
 
 
@@ -42,5 +43,11 @@ router.post(
     initializeCoinPurchasePayment
 );
 
+
+router.post(
+    "/:id/verify-payment",
+    protect,
+    verifyCoinPurchasePayment
+);
 
 module.exports = router;
