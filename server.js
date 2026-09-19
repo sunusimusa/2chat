@@ -1064,212 +1064,214 @@ io.on(
 // AUTO SEED COIN PACKAGES
 // =====================================================
 
+// =====================================================
+// AUTO SEED COIN PACKAGES
+// =====================================================
+
 async function seedCoinPackages() {
 
     const packages = [
 
+        // =====================================================
+        // 🇳🇬 NGN PACKAGES
+        // $1 = ₦1,300
+        // =====================================================
+
         {
-            name:
-                "100 Coins",
-
-            coins:
-                100,
-
-            price:
-                100,
-
-            currency:
-                "NGN",
-
-            sortOrder:
-                1
+            name: "100 Coins",
+            coins: 100,
+            price: 1300,
+            currency: "NGN",
+            sortOrder: 1
         },
 
         {
-            name:
-                "200 Coins",
-
-            coins:
-                200,
-
-            price:
-                200,
-
-            currency:
-                "NGN",
-
-            sortOrder:
-                2
+            name: "200 Coins",
+            coins: 200,
+            price: 2600,
+            currency: "NGN",
+            sortOrder: 2
         },
 
         {
-            name:
-                "300 Coins",
-
-            coins:
-                300,
-
-            price:
-                300,
-
-            currency:
-                "NGN",
-
-            sortOrder:
-                3
+            name: "300 Coins",
+            coins: 300,
+            price: 3900,
+            currency: "NGN",
+            sortOrder: 3
         },
 
         {
-            name:
-                "500 Coins",
-
-            coins:
-                500,
-
-            price:
-                500,
-
-            currency:
-                "NGN",
-
-            sortOrder:
-                4
+            name: "500 Coins",
+            coins: 500,
+            price: 6500,
+            currency: "NGN",
+            sortOrder: 4
         },
 
         {
-            name:
-                "1,000 Coins",
-
-            coins:
-                1000,
-
-            price:
-                1000,
-
-            currency:
-                "NGN",
-
-            sortOrder:
-                5
+            name: "1,000 Coins",
+            coins: 1000,
+            price: 13000,
+            currency: "NGN",
+            sortOrder: 5
         },
 
         {
-            name:
-                "1,500 Coins",
-
-            coins:
-                1500,
-
-            price:
-                1500,
-
-            currency:
-                "NGN",
-
-            sortOrder:
-                6
+            name: "1,500 Coins",
+            coins: 1500,
+            price: 19500,
+            currency: "NGN",
+            sortOrder: 6
         },
 
         {
-            name:
-                "2,000 Coins",
-
-            coins:
-                2000,
-
-            price:
-                2000,
-
-            currency:
-                "NGN",
-
-            sortOrder:
-                7
+            name: "2,000 Coins",
+            coins: 2000,
+            price: 26000,
+            currency: "NGN",
+            sortOrder: 7
         },
 
         {
-            name:
-                "3,000 Coins",
-
-            coins:
-                3000,
-
-            price:
-                3000,
-
-            currency:
-                "NGN",
-
-            sortOrder:
-                8
+            name: "3,000 Coins",
+            coins: 3000,
+            price: 39000,
+            currency: "NGN",
+            sortOrder: 8
         },
 
         {
-            name:
-                "4,000 Coins",
-
-            coins:
-                4000,
-
-            price:
-                4000,
-
-            currency:
-                "NGN",
-
-            sortOrder:
-                9
+            name: "4,000 Coins",
+            coins: 4000,
+            price: 52000,
+            currency: "NGN",
+            sortOrder: 9
         },
 
         {
-            name:
-                "5,000 Coins",
-
-            coins:
-                5000,
-
-            price:
-                5000,
-
-            currency:
-                "NGN",
-
-            sortOrder:
-                10
+            name: "5,000 Coins",
+            coins: 5000,
+            price: 65000,
+            currency: "NGN",
+            sortOrder: 10
         },
 
         {
-            name:
-                "10,000 Coins",
-
-            coins:
-                10000,
-
-            price:
-                10000,
-
-            currency:
-                "NGN",
-
-            sortOrder:
-                11
+            name: "10,000 Coins",
+            coins: 10000,
+            price: 130000,
+            currency: "NGN",
+            sortOrder: 11
         },
 
         {
-            name:
-                "20,000 Coins",
+            name: "20,000 Coins",
+            coins: 20000,
+            price: 260000,
+            currency: "NGN",
+            sortOrder: 12
+        },
 
-            coins:
-                20000,
 
-            price:
-                20000,
+        // =====================================================
+        // 🇺🇸 USD PACKAGES
+        // =====================================================
 
-            currency:
-                "NGN",
+        {
+            name: "100 Coins",
+            coins: 100,
+            price: 1,
+            currency: "USD",
+            sortOrder: 101
+        },
 
-            sortOrder:
-                12
+        {
+            name: "200 Coins",
+            coins: 200,
+            price: 2,
+            currency: "USD",
+            sortOrder: 102
+        },
+
+        {
+            name: "300 Coins",
+            coins: 300,
+            price: 3,
+            currency: "USD",
+            sortOrder: 103
+        },
+
+        {
+            name: "500 Coins",
+            coins: 500,
+            price: 5,
+            currency: "USD",
+            sortOrder: 104
+        },
+
+        {
+            name: "1,000 Coins",
+            coins: 1000,
+            price: 10,
+            currency: "USD",
+            sortOrder: 105
+        },
+
+        {
+            name: "1,500 Coins",
+            coins: 1500,
+            price: 15,
+            currency: "USD",
+            sortOrder: 106
+        },
+
+        {
+            name: "2,000 Coins",
+            coins: 2000,
+            price: 20,
+            currency: "USD",
+            sortOrder: 107
+        },
+
+        {
+            name: "3,000 Coins",
+            coins: 3000,
+            price: 30,
+            currency: "USD",
+            sortOrder: 108
+        },
+
+        {
+            name: "4,000 Coins",
+            coins: 4000,
+            price: 40,
+            currency: "USD",
+            sortOrder: 109
+        },
+
+        {
+            name: "5,000 Coins",
+            coins: 5000,
+            price: 50,
+            currency: "USD",
+            sortOrder: 110
+        },
+
+        {
+            name: "10,000 Coins",
+            coins: 10000,
+            price: 100,
+            currency: "USD",
+            sortOrder: 111
+        },
+
+        {
+            name: "20,000 Coins",
+            coins: 20000,
+            price: 200,
+            currency: "USD",
+            sortOrder: 112
         }
 
     ];
@@ -1280,15 +1282,16 @@ async function seedCoinPackages() {
     ) {
 
         const existing =
-    await CoinPackage.findOne({
+            await CoinPackage.findOne({
 
-        coins:
-            item.coins,
+                coins:
+                    item.coins,
 
-        currency:
-            item.currency
+                currency:
+                    item.currency
 
-    });
+            });
+
 
         if (!existing) {
 
@@ -1296,15 +1299,31 @@ async function seedCoinPackages() {
                 item
             );
 
-
             console.log(
-                `🪙 Created coin package: ${item.name}`
+                `🪙 Created coin package: ${item.name} - ${item.currency}`
             );
 
         } else {
 
+            await CoinPackage.updateOne(
+
+                {
+                    coins:
+                        item.coins,
+
+                    currency:
+                        item.currency
+                },
+
+                {
+                    $set:
+                        item
+                }
+
+            );
+
             console.log(
-                `🪙 Coin package exists: ${item.name}`
+                `🔄 Updated coin package: ${item.name} - ${item.currency}`
             );
 
         }
