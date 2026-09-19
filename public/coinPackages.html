@@ -151,9 +151,9 @@
 
             <p class="payment-info">
 
-    You will be redirected to Flutterwave
-    to complete your payment securely.
-
+    You will be redirected to Paystack
+to complete your payment securely.
+                
 </p>       
 
             <button
@@ -372,7 +372,7 @@
                         </strong>
 
                         <span>
-                            1 Coin = ₦1
+                            Exchange rate: $1 = ₦1,300
                         </span>
 
                     </div>
@@ -776,22 +776,22 @@ continueButton.addEventListener(
         }
 
 
-        function currencySymbol(
-            currency
-        ) {
+        function currencySymbol(currency) {
 
-            if (
-                currency ===
-                "NGN"
-            ) {
+    const normalizedCurrency =
+        String(currency || "NGN")
+            .trim()
+            .toUpperCase();
 
-                return "₦";
+    if (normalizedCurrency === "NGN") {
+        return "₦";
+    }
 
-            }
+    if (normalizedCurrency === "USD") {
+        return "$";
+    }
 
-
-            return currency + " ";
-
+    return normalizedCurrency + " ";
         }
 
 
