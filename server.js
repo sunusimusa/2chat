@@ -1280,13 +1280,15 @@ async function seedCoinPackages() {
     ) {
 
         const existing =
-            await CoinPackage.findOne({
+    await CoinPackage.findOne({
 
-                coins:
-                    item.coins
+        coins:
+            item.coins,
 
-            });
+        currency:
+            item.currency
 
+    });
 
         if (!existing) {
 
