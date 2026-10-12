@@ -1,1 +1,654 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101018">
+<title>2Chat AI Studio</title>
+
+<style>
+:root {
+  --bg: #101018;
+  --panel: #1b1b27;
+  --panel2: #242435;
+  --pink: #ff1688;
+  --purple: #8b5cf6;
+  --text: #ffffff;
+  --muted: #a7a7ba;
+  --border: #343447;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--text);
+  background:
+    radial-gradient(ellipse at top right, #351443 0, transparent 38%),
+    var(--bg);
+}
+
+button, textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app {
+  width: 100%;
+  max-width: 560px;
+  min-height: 100vh;
+  margin: auto;
+  padding: 20px 16px 105px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 28px;
+}
+
+.back {
+  width: 43px;
+  height: 43px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--panel);
+  color: white;
+  font-size: 24px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 15px;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  font-size: 23px;
+  font-weight: bold;
+}
+
+.header-text h1 {
+  font-size: 21px;
+  margin-bottom: 5px;
+}
+
+.header-text p {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.hero {
+  margin-bottom: 23px;
+}
+
+.hero h2 {
+  font-size: 29px;
+  line-height: 1.25;
+  margin-bottom: 10px;
+}
+
+.hero h2 span {
+  color: var(--pink);
+}
+
+.hero p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.card {
+  padding: 18px;
+  margin-bottom: 17px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: rgba(27, 27, 39, 0.95);
+}
+
+.card-heading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 15px;
+}
+
+.card-heading .emoji {
+  font-size: 20px;
+}
+
+.card-heading h3 {
+  font-size: 16px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  padding: 14px;
+  color: white;
+  background: #11111a;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  outline: none;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+textarea:focus {
+  border-color: var(--pink);
+}
+
+.counter {
+  text-align: right;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.chip {
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #14141f;
+  color: #d5d5e3;
+  font-size: 13px;
+  transition: 0.2s;
+}
+
+.chip.active {
+  border-color: var(--pink);
+  background: rgba(255, 22, 136, 0.15);
+  color: white;
+  box-shadow: inset 0 0 0 1px rgba(255,22,136,0.12);
+}
+
+.ratio-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.ratio {
+  min-height: 98px;
+  padding: 12px 5px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: #14141f;
+  color: white;
+}
+
+.ratio.active {
+  border-color: var(--pink);
+  background: rgba(255, 22, 136, 0.12);
+}
+
+.shape {
+  margin: 0 auto 10px;
+  border: 2px solid #c5c5d8;
+  border-radius: 4px;
+}
+
+.shape.vertical {
+  width: 25px;
+  height: 39px;
+}
+
+.shape.wide {
+  width: 43px;
+  height: 25px;
+}
+
+.shape.square {
+  width: 31px;
+  height: 31px;
+}
+
+.ratio.active .shape {
+  border-color: var(--pink);
+}
+
+.ratio strong {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+.ratio small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.duration-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.duration {
+  padding: 15px 5px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: white;
+  background: #14141f;
+  font-weight: bold;
+}
+
+.duration.active {
+  border-color: var(--pink);
+  background: rgba(255, 22, 136, 0.13);
+}
+
+.duration small {
+  display: block;
+  color: var(--muted);
+  font-weight: normal;
+  margin-top: 6px;
+  font-size: 11px;
+}
+
+.generate {
+  width: 100%;
+  min-height: 55px;
+  border: none;
+  border-radius: 16px;
+  color: white;
+  background: linear-gradient(110deg, var(--pink), var(--purple));
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 8px 24px rgba(255, 22, 136, 0.2);
+}
+
+.generate:active {
+  transform: scale(0.99);
+}
+
+.notice {
+  display: flex;
+  gap: 11px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid #41334f;
+  border-radius: 14px;
+  background: rgba(139, 92, 246, 0.08);
+}
+
+.notice .info {
+  font-size: 19px;
+}
+
+.notice p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.notice strong {
+  color: white;
+}
+
+.preview {
+  overflow: hidden;
+  position: relative;
+  min-height: 205px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  background:
+    radial-gradient(circle at 50% 45%, #522b72 0, #252039 30%, #13131e 72%);
+}
+
+.preview-content {
+  padding: 25px;
+}
+
+.preview-icon {
+  font-size: 44px;
+  margin-bottom: 12px;
+}
+
+.preview h4 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.preview p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.preview-badge {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 7px 11px;
+  border-radius: 20px;
+  color: #ff83c0;
+  background: rgba(255, 22, 136, 0.13);
+  font-size: 11px;
+}
+
+.bottom-nav {
+  position: fixed;
+  z-index: 10;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 560px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: 12px 5px calc(12px + env(safe-area-inset-bottom));
+  background: rgba(17, 17, 27, 0.96);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(15px);
+}
+
+.nav-item {
+  text-align: center;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 10px;
+}
+
+.nav-item span {
+  display: block;
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+
+.nav-item.active {
+  color: var(--pink);
+}
+
+.toast {
+  position: fixed;
+  z-index: 30;
+  bottom: 95px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 32px);
+  padding: 14px 18px;
+  border: 1px solid #57405f;
+  border-radius: 13px;
+  color: white;
+  background: #282033;
+  font-size: 13px;
+  line-height: 1.5;
+  display: none;
+}
+
+.toast.show {
+  display: block;
+}
+
+@media (min-width: 480px) {
+  .app {
+    padding: 26px 22px 110px;
+  }
+}
+</style>
+</head>
+
+<body>
+<main class="app">
+
+  <header class="header">
+    <button class="back" id="backButton" aria-label="Go back">‹</button>
+
+    <div class="logo">2</div>
+
+    <div class="header-text">
+      <h1>2Chat AI Studio</h1>
+      <p>Create something amazing</p>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h2>Turn your ideas into <span>AI videos.</span></h2>
+    <p>Describe your imagination, choose a style, and prepare your video settings.</p>
+  </section>
+
+  <section class="card">
+    <div class="card-heading">
+      <span class="emoji">✍️</span>
+      <h3>Describe your video</h3>
+    </div>
+
+    <textarea
+      id="prompt"
+      maxlength="1000"
+      placeholder="Example: A mysterious alien egg glows in deep space, cracks open, and releases a beautiful purple light..."
+    ></textarea>
+
+    <div class="counter"><span id="charCount">0</span>/1000</div>
+  </section>
+
+  <section class="card">
+    <div class="card-heading">
+      <span class="emoji">🎨</span>
+      <h3>Choose a style</h3>
+    </div>
+
+    <div class="chips" id="styleOptions">
+      <button class="chip active" data-value="Cinematic">🎬 Cinematic</button>
+      <button class="chip" data-value="Sci-Fi">🚀 Sci-Fi</button>
+      <button class="chip" data-value="Animation">🎭 Animation</button>
+      <button class="chip" data-value="Fantasy">🪄 Fantasy</button>
+      <button class="chip" data-value="Nature">🌿 Nature</button>
+      <button class="chip" data-value="Social Media">📱 Social Media</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-heading">
+      <span class="emoji">📐</span>
+      <h3>Aspect ratio</h3>
+    </div>
+
+    <div class="ratio-grid" id="ratioOptions">
+      <button class="ratio active" data-value="9:16">
+        <div class="shape vertical"></div>
+        <strong>9:16</strong>
+        <small>Shorts</small>
+      </button>
+
+      <button class="ratio" data-value="16:9">
+        <div class="shape wide"></div>
+        <strong>16:9</strong>
+        <small>Landscape</small>
+      </button>
+
+      <button class="ratio" data-value="1:1">
+        <div class="shape square"></div>
+        <strong>1:1</strong>
+        <small>Square</small>
+      </button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-heading">
+      <span class="emoji">⏱️</span>
+      <h3>Video duration</h3>
+    </div>
+
+    <div class="duration-grid" id="durationOptions">
+      <button class="duration active" data-value="5">
+        5 sec
+        <small>Quick clip</small>
+      </button>
+
+      <button class="duration" data-value="10">
+        10 sec
+        <small>Standard</small>
+      </button>
+
+      <button class="duration" data-value="15">
+        15 sec
+        <small>Longer clip</small>
+      </button>
+    </div>
+  </section>
+
+  <button class="generate" id="generateButton">
+    ✨ Generate AI Video
+  </button>
+
+  <div class="notice">
+    <span class="info">ℹ️</span>
+    <p>
+      <strong>AI generation coming soon</strong><br>
+      This is the design preview. Video generation will be connected after the 2Chat launch.
+    </p>
+  </div>
+
+  <section class="card" style="margin-top:20px">
+    <div class="card-heading">
+      <span class="emoji">🎞️</span>
+      <h3>Video preview</h3>
+    </div>
+
+    <div class="preview">
+      <div class="preview-content">
+        <div class="preview-icon">🌌</div>
+        <h4>Your next creation starts here</h4>
+        <p>Write a prompt and choose your preferred settings.</p>
+        <span class="preview-badge">AI Studio Preview</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<nav class="bottom-nav">
+  <a class="nav-item" href="/home.html">
+    <span>⌂</span>Home
+  </a>
+
+  <a class="nav-item" href="/shorts.html">
+    <span>▶</span>Shorts
+  </a>
+
+  <a class="nav-item active" href="/ai-video-generator.html">
+    <span>✦</span>AI Studio
+  </a>
+
+  <a class="nav-item" href="/chat.html">
+    <span>▣</span>Chat
+  </a>
+
+  <a class="nav-item" href="/profile.html">
+    <span>♙</span>Profile
+  </a>
+</nav>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const promptInput = document.getElementById("prompt");
+const charCount = document.getElementById("charCount");
+const toast = document.getElementById("toast");
+
+let selectedStyle = "Cinematic";
+let selectedRatio = "9:16";
+let selectedDuration = "5";
+
+promptInput.addEventListener("input", function () {
+  charCount.textContent = this.value.length;
+});
+
+function setupSelection(containerId, className, callback) {
+  const container = document.getElementById(containerId);
+
+  container.querySelectorAll("button").forEach(button => {
+    button.addEventListener("click", () => {
+      container.querySelectorAll("button").forEach(item => {
+        item.classList.remove("active");
+      });
+
+      button.classList.add("active");
+      callback(button.dataset.value);
+    });
+  });
+}
+
+setupSelection("styleOptions", "chip", value => {
+  selectedStyle = value;
+});
+
+setupSelection("ratioOptions", "ratio", value => {
+  selectedRatio = value;
+});
+
+setupSelection("durationOptions", "duration", value => {
+  selectedDuration = value;
+});
+
+let toastTimer;
+
+function showToast(message) {
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  clearTimeout(toastTimer);
+
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3500);
+}
+
+document.getElementById("generateButton").addEventListener("click", () => {
+  const prompt = promptInput.value.trim();
+
+  if (!prompt) {
+    showToast("Please describe the video you want to create.");
+    promptInput.focus();
+    return;
+  }
+
+  showToast(
+    "Your settings are ready. AI video generation will be added after launch."
+  );
+
+  console.log("2Chat AI Studio prototype settings:", {
+    prompt,
+    style: selectedStyle,
+    aspectRatio: selectedRatio,
+    durationSeconds: Number(selectedDuration)
+  });
+});
+
+document.getElementById("backButton").addEventListener("click", () => {
+  if (window.history.length > 1) {
+    window.history.back();
+  } else {
+    window.location.href = "/home.html";
+  }
+});
+</script>
+
+</body>
+  </html>
+  
