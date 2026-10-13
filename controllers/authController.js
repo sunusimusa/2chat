@@ -320,7 +320,7 @@ exports.login = async (req, res) => {
 
       token,
 
-      user
+      user: toPublicUser(user)
 
     });
 
