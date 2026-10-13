@@ -9,6 +9,14 @@ const Wallet = require("../models/Wallet");
 // WALLET DEFAULT DATA
 // =====================================================
 
+// Return user data safe for API responses. Never expose the stored password hash.
+const toPublicUser = (user) => {
+  if (!user) return user;
+  const data = typeof user.toObject === "function" ? user.toObject() : { ...user };
+  delete data.password;
+  return data;
+};
+
 const createWalletIfMissing = async (userId) => {
 
   if (!userId) {
@@ -144,7 +152,7 @@ exports.register = async (req, res) => {
 
       token,
 
-      user
+      user: toPublicUser(user)
 
     });
 
@@ -312,7 +320,7 @@ exports.login = async (req, res) => {
 
       token,
 
-      user
+      user: toPublicUser(user)
 
     });
 
@@ -424,7 +432,7 @@ exports.updateProfile = async (
 
       success: true,
 
-      user
+      user: toPublicUser(user)
 
     });
 
