@@ -41,6 +41,7 @@ let audioBlob = null;
 let audioUrl = null;
 
 let recording = false;
+let isStartingRecording = false;
 let recordSeconds = 0;
 let recordTimer = null;
 
@@ -1074,7 +1075,7 @@ function removeImage() {
 
 async function startRecording() {
 
-    if (recording) {
+    if (recording || isStartingRecording) {
         return;
     }
 
@@ -1092,6 +1093,8 @@ async function startRecording() {
 
     }
 
+
+        isStartingRecording = true;
 
     try {
 
@@ -1244,10 +1247,10 @@ async function startRecording() {
             };
 
 
-        mediaRecorder.start();
-
+                mediaRecorder.start();
 
         recording = true;
+        isStartingRecording = false;
 
         recordSeconds = 0;
 
@@ -1287,7 +1290,9 @@ async function startRecording() {
 
     }
 
-    catch (err) {
+        catch (err) {
+
+    isStartingRecording = false;
 
     console.error(
         "MICROPHONE ERROR:",
