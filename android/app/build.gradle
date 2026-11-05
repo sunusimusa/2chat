@@ -2,8 +2,6 @@ plugins {
     id 'com.android.application'
 }
 
-def keystoreProperties = new Properties()
-
 android {
     namespace 'com.sunusimusa.twochat'
     compileSdk 36
@@ -29,16 +27,15 @@ android {
         }
     }
 
-buildTypes {
-    debug {
-        applicationIdSuffix ".debug"
-    }
+    buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+        }
 
-    release {
-        signingConfig signingConfigs.release
-        minifyEnabled false
-        shrinkResources false
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            shrinkResources false
+        }
     }
-   
 }
-
