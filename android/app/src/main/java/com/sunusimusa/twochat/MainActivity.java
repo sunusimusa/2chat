@@ -1,3 +1,4 @@
+
 package com.sunusimusa.twochat;
 
 import android.Manifest;
@@ -14,10 +15,12 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends Activity {
 
     private WebView webView;
-
     private ValueCallback<Uri[]> filePathCallback;
 
     private static final int FILE_CHOOSER_REQUEST = 1001;
@@ -25,317 +28,161 @@ public class MainActivity extends Activity {
 
     private PermissionRequest pendingPermissionRequest;
 
-
-    // =========================================================
-    // ON CREATE
-    // =========================================================
+    private String[] pendingAndroidPermissions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 
         webView = new WebView(this);
 
         WebSettings settings = webView.getSettings();
 
-        // JavaScript
         settings.setJavaScriptEnabled(true);
-
-        // Local storage
         settings.setDomStorageEnabled(true);
-
-        // File access
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
-
-        // Media
         settings.setMediaPlaybackRequiresUserGesture(false);
-
-        // Zoom
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
-
-        // Database / storage
         settings.setDatabaseEnabled(true);
 
+        webView.setWebViewClient(new WebViewClient() {
 
-        // =====================================================
-        // WEBVIEW CLIENT
-        // =====================================================
+            @Override
+            public boolean shouldOverrideUrlLoading(
+                    WebView view,
+                    WebResourceRequest request
+            ) {
+                view.loadUrl(request.getUrl().toString());
+                return true;
+            }
+        });
 
-        webView.setWebViewClient(
-                new WebViewClient() {
+        webView.setWebChromeClient(new WebChromeClient() {
 
-                    @Override
-                    public boolean shouldOverrideUrlLoading(
-                            WebView view,
-                            WebResourceRequest request
-                    ) {
-
-                        view.loadUrl(
-                                request.getUrl().toString()
-                        );
-
-                        return true;
-                    }
+            @Override
+            public boolean onShowFileChooser(
+                    WebView view,
+                    ValueCallback<Uri[]> callback,
+                    FileChooserParams params
+            ) {
+                if (filePathCallback != null) {
+                    filePathCallback.onReceiveValue(null);
                 }
-        );
 
+                filePathCallback = callback;
 
-        // =====================================================
-        // WEB CHROME CLIENT
-        // =====================================================
+                try {
+                    Intent intent = params.createIntent();
 
-        webView.setWebChromeClient(
-                new WebChromeClient() {
+                    startActivityForResult(
+                            intent,
+                            FILE_CHOOSER_REQUEST
+                    );
 
-                    // =========================================
-                    // PHOTO / VIDEO FILE UPLOAD
-                    // =========================================
-
-                    @Override
-                    public boolean onShowFileChooser(
-                            WebView webView,
-                            ValueCallback<Uri[]> callback,
-                            FileChooserParams fileChooserParams
-                    ) {
-
-                        // Cancel old callback
-                        if (
-                                MainActivity.this.filePathCallback
-                                        != null
-                        ) {
-
-                            MainActivity.this
-                                    .filePathCallback
-                                    .onReceiveValue(null);
-                        }
-
-
-                        MainActivity.this.filePathCallback =
-                                callback;
-
-
-                        try {
-
-                            Intent intent =
-                                    fileChooserParams
-                                            .createIntent();
-
-
-                            startActivityForResult(
-                                    intent,
-                                    FILE_CHOOSER_REQUEST
-                            );
-
-                        }
-
-                        catch (Exception e) {
-
-                            if (
-                                    MainActivity.this
-                                            .filePathCallback
-                                            != null
-                            ) {
-
-                                MainActivity.this
-                                        .filePathCallback
-                                        .onReceiveValue(null);
-
-                                MainActivity.this
-                                        .filePathCallback = null;
-                            }
-                        }
-
-
-                        return true;
-                    }
-
-
-                    // =========================================
-                    // MICROPHONE / CAMERA
-                    // =========================================
-
-                    @Override
-                    public void onPermissionRequest(
-                            final PermissionRequest request
-                    ) {
-
-                        runOnUiThread(() -> {
-
-                            String[] resources =
-                                    request.getResources();
-
-
-                            boolean needMicrophone =
-                                    false;
-
-                            boolean needCamera =
-                                    false;
-
-
-                            // ---------------------------------
-                            // CHECK REQUESTED RESOURCES
-                            // ---------------------------------
-
-                            for (
-                                    String resource :
-                                    resources
-                            ) {
-
-                                if (
-                                        PermissionRequest
-                                                .RESOURCE_AUDIO_CAPTURE
-                                                .equals(resource)
-                                ) {
-
-                                    needMicrophone = true;
-                                }
-
-
-                                if (
-                                        PermissionRequest
-                                                .RESOURCE_VIDEO_CAPTURE
-                                                .equals(resource)
-                                ) {
-
-                                    needCamera = true;
-                                }
-                            }
-
-
-                            // ---------------------------------
-                            // ANDROID MICROPHONE PERMISSION
-                            // ---------------------------------
-
-                            boolean microphoneGranted =
-                                    checkSelfPermission(
-                                            Manifest.permission
-                                                    .RECORD_AUDIO
-                                    )
-                                            ==
-                                    PackageManager
-                                            .PERMISSION_GRANTED;
-
-
-                            // ---------------------------------
-                            // ANDROID CAMERA PERMISSION
-                            // ---------------------------------
-
-                            boolean cameraGranted =
-                                    checkSelfPermission(
-                                            Manifest.permission
-                                                    .CAMERA
-                                    )
-                                            ==
-                                    PackageManager
-                                            .PERMISSION_GRANTED;
-
-
-                            // =================================
-                            // EVERYTHING ALREADY GRANTED
-                            // =================================
-
-                            if (
-                                    (!needMicrophone ||
-                                            microphoneGranted)
-                                    &&
-                                    (!needCamera ||
-                                            cameraGranted)
-                            ) {
-
-                                android.util.Log.d("2CHAT_VOICE", "GRANTING WEBVIEW RESOURCES: " + java.util.Arrays.toString(resources));
-                                request.grant(resources);
-
-                                return;
-                            }
-
-
-                            // =================================
-                            // SAVE WEBVIEW REQUEST
-                            // =================================
-
-                            pendingPermissionRequest =
-                                    request;
-
-
-                            // =================================
-                            // REQUEST MICROPHONE
-                            // =================================
-
-                            if (
-                                    needMicrophone
-                                    &&
-                                    !microphoneGranted
-                            ) {
-
-                                requestPermissions(
-                                        new String[]{
-                                                Manifest.permission
-                                                        .RECORD_AUDIO
-                                        },
-                                        PERMISSION_REQUEST
-                                );
-
-                                return;
-                            }
-
-
-                            // =================================
-                            // REQUEST CAMERA
-                            // =================================
-
-                            if (
-                                    needCamera
-                                    &&
-                                    !cameraGranted
-                            ) {
-
-                                requestPermissions(
-                                        new String[]{
-                                                Manifest.permission
-                                                        .CAMERA
-                                        },
-                                        PERMISSION_REQUEST
-                                );
-
-                                return;
-                            }
-
-
-                            // =================================
-                            // DENY IF NOTHING MATCHES
-                            // =================================
-
-                            request.deny();
-
-                        });
-                    }
+                } catch (Exception e) {
+                    filePathCallback.onReceiveValue(null);
+                    filePathCallback = null;
                 }
-        );
 
+                return true;
+            }
 
-        // =====================================================
-        // SET WEBVIEW
-        // =====================================================
+            @Override
+            public void onPermissionRequest(
+                    final PermissionRequest request
+            ) {
+                runOnUiThread(() -> handleWebPermission(request));
+            }
+
+            @Override
+            public void onPermissionRequestCanceled(
+                    PermissionRequest request
+            ) {
+                if (pendingPermissionRequest == request) {
+                    pendingPermissionRequest = null;
+                    pendingAndroidPermissions = null;
+                }
+            }
+        });
 
         setContentView(webView);
-
-
-        // =====================================================
-        // LOAD 2CHAT
-        // =====================================================
 
         webView.loadUrl(
                 "https://twochat-vg3s.onrender.com"
         );
     }
 
+    private void handleWebPermission(PermissionRequest request) {
 
-    // =========================================================
-    // ANDROID PERMISSION RESULT
-    // =========================================================
+        if (isFinishing() || isDestroyed()) {
+            request.deny();
+            return;
+        }
+
+        if (pendingPermissionRequest != null) {
+            request.deny();
+            return;
+        }
+
+        List<String> androidPermissions = new ArrayList<>();
+        List<String> allowedResources = new ArrayList<>();
+
+        for (String resource : request.getResources()) {
+
+            if (PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(resource)) {
+
+                allowedResources.add(resource);
+
+                if (checkSelfPermission(
+                        Manifest.permission.RECORD_AUDIO
+                ) != PackageManager.PERMISSION_GRANTED) {
+
+                    androidPermissions.add(
+                            Manifest.permission.RECORD_AUDIO
+                    );
+                }
+
+            } else if (
+                    PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource)
+            ) {
+
+                allowedResources.add(resource);
+
+                if (checkSelfPermission(
+                        Manifest.permission.CAMERA
+                ) != PackageManager.PERMISSION_GRANTED) {
+
+                    androidPermissions.add(
+                            Manifest.permission.CAMERA
+                    );
+                }
+            }
+        }
+
+        if (allowedResources.isEmpty()) {
+            request.deny();
+            return;
+        }
+
+        String[] resourcesToGrant =
+                allowedResources.toArray(new String[0]);
+
+        if (androidPermissions.isEmpty()) {
+            request.grant(resourcesToGrant);
+            return;
+        }
+
+        pendingPermissionRequest = request;
+        pendingAndroidPermissions =
+                androidPermissions.toArray(new String[0]);
+
+        requestPermissions(
+                pendingAndroidPermissions,
+                PERMISSION_REQUEST
+        );
+    }
 
     @Override
     public void onRequestPermissionsResult(
@@ -343,96 +190,75 @@ public class MainActivity extends Activity {
             String[] permissions,
             int[] grantResults
     ) {
-
         super.onRequestPermissionsResult(
                 requestCode,
                 permissions,
                 grantResults
         );
 
-
-        // ---------------------------------------------
-        // WRONG REQUEST
-        // ---------------------------------------------
-
-        if (
-                requestCode != PERMISSION_REQUEST
-        ) {
-
+        if (requestCode != PERMISSION_REQUEST) {
             return;
         }
 
-
-        // ---------------------------------------------
-        // NO WEBVIEW REQUEST
-        // ---------------------------------------------
-
-        if (
-                pendingPermissionRequest == null
-        ) {
-
-            return;
-        }
-
-
-        PermissionRequest request =
-                pendingPermissionRequest;
-
+        PermissionRequest request = pendingPermissionRequest;
 
         pendingPermissionRequest = null;
+        pendingAndroidPermissions = null;
 
+        if (request == null) {
+            return;
+        }
 
-        // ---------------------------------------------
-        // CHECK RESULT
-        // ---------------------------------------------
+        boolean allGranted =
+                permissions != null &&
+                grantResults != null &&
+                permissions.length == grantResults.length &&
+                grantResults.length > 0;
 
-        boolean granted = true;
-
-
-        for (
-                int result :
-                grantResults
-        ) {
-
-            if (
-                    result !=
-                    PackageManager
-                            .PERMISSION_GRANTED
-            ) {
-
-                granted = false;
-
-                break;
+        if (allGranted) {
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allGranted = false;
+                    break;
+                }
             }
         }
 
+        if (allGranted) {
 
-        // ---------------------------------------------
-        // GRANT WEBVIEW
-        // ---------------------------------------------
+            List<String> resourcesToGrant = new ArrayList<>();
 
-        if (granted) {
+            for (String resource : request.getResources()) {
 
-            request.grant(
-                    request.getResources()
-            );
+                if (PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(resource)
+                        && checkSelfPermission(
+                        Manifest.permission.RECORD_AUDIO
+                ) == PackageManager.PERMISSION_GRANTED) {
 
-        }
+                    resourcesToGrant.add(resource);
 
-        // ---------------------------------------------
-        // DENY WEBVIEW
-        // ---------------------------------------------
+                } else if (
+                        PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource)
+                        && checkSelfPermission(
+                        Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED) {
 
-        else {
+                    resourcesToGrant.add(resource);
+                }
+            }
 
+            if (!resourcesToGrant.isEmpty()) {
+                request.grant(
+                        resourcesToGrant.toArray(new String[0])
+                );
+            } else {
+                request.deny();
+            }
+
+        } else {
             request.deny();
         }
     }
-
-
-    // =========================================================
-    // FILE CHOOSER RESULT
-    // =========================================================
 
     @Override
     protected void onActivityResult(
@@ -440,157 +266,78 @@ public class MainActivity extends Activity {
             int resultCode,
             Intent data
     ) {
-
         super.onActivityResult(
                 requestCode,
                 resultCode,
                 data
         );
 
-
-        // ---------------------------------------------
-        // NOT OUR REQUEST
-        // ---------------------------------------------
-
-        if (
-                requestCode != FILE_CHOOSER_REQUEST
-        ) {
-
+        if (requestCode != FILE_CHOOSER_REQUEST) {
             return;
         }
 
-
-        // ---------------------------------------------
-        // NO CALLBACK
-        // ---------------------------------------------
-
-        if (
-                filePathCallback == null
-        ) {
-
+        if (filePathCallback == null) {
             return;
         }
-
 
         Uri[] results = null;
 
+        if (resultCode == RESULT_OK && data != null) {
 
-        // =================================================
-        // FILE SELECTED
-        // =================================================
+            if (data.getDataString() != null) {
 
-        if (
-                resultCode == RESULT_OK
-                &&
-                data != null
-        ) {
+                results = new Uri[]{
+                        Uri.parse(data.getDataString())
+                };
 
-            // ---------------------------------------------
-            // SINGLE FILE
-            // ---------------------------------------------
+            } else if (data.getClipData() != null) {
 
-            String dataString =
-                    data.getDataString();
+                int count = data.getClipData().getItemCount();
 
+                results = new Uri[count];
 
-            if (
-                    dataString != null
-            ) {
-
-                results =
-                        new Uri[]{
-                                Uri.parse(dataString)
-                        };
-            }
-
-
-            // ---------------------------------------------
-            // MULTIPLE FILES
-            // ---------------------------------------------
-
-            else if (
-                    data.getClipData() != null
-            ) {
-
-                int count =
-                        data.getClipData()
-                                .getItemCount();
-
-
-                results =
-                        new Uri[count];
-
-
-                for (
-                        int i = 0;
-                        i < count;
-                        i++
-                ) {
-
-                    results[i] =
-                            data.getClipData()
-                                    .getItemAt(i)
-                                    .getUri();
+                for (int i = 0; i < count; i++) {
+                    results[i] = data.getClipData()
+                            .getItemAt(i)
+                            .getUri();
                 }
             }
         }
 
-
-        // =================================================
-        // RETURN FILES TO WEBVIEW
-        // =================================================
-
-        filePathCallback
-                .onReceiveValue(results);
-
-
+        filePathCallback.onReceiveValue(results);
         filePathCallback = null;
     }
-
-
-    // =========================================================
-    // BACK BUTTON
-    // =========================================================
 
     @Override
     public void onBackPressed() {
 
-        if (
-                webView != null
-                &&
-                webView.canGoBack()
-        ) {
-
+        if (webView != null && webView.canGoBack()) {
             webView.goBack();
-
-        }
-
-        else {
-
+        } else {
             super.onBackPressed();
         }
     }
 
-
-    // =========================================================
-    // CLEANUP
-    // =========================================================
-
     @Override
     protected void onDestroy() {
 
-        if (
-                webView != null
-        ) {
+        if (pendingPermissionRequest != null) {
+            pendingPermissionRequest.deny();
+            pendingPermissionRequest = null;
+        }
 
+        if (filePathCallback != null) {
+            filePathCallback.onReceiveValue(null);
+            filePathCallback = null;
+        }
+
+        if (webView != null) {
             webView.stopLoading();
-
             webView.destroy();
-
             webView = null;
         }
 
-
         super.onDestroy();
     }
-}
+            }
+        
