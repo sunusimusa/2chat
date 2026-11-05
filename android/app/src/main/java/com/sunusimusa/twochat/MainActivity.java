@@ -1,4 +1,3 @@
-
 package com.sunusimusa.twochat;
 
 import android.Manifest;
