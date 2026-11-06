@@ -13,6 +13,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +27,6 @@ public class MainActivity extends Activity {
     private static final int PERMISSION_REQUEST = 1002;
 
     private PermissionRequest pendingPermissionRequest;
-
-    private String[] pendingAndroidPermissions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +100,6 @@ public class MainActivity extends Activity {
             ) {
                 if (pendingPermissionRequest == request) {
                     pendingPermissionRequest = null;
-                    pendingAndroidPermissions = null;
                 }
             }
         });
@@ -113,6 +111,14 @@ public class MainActivity extends Activity {
         );
     }
 
+    private void showMessage(String message) {
+        Toast.makeText(
+                this,
+                message,
+                Toast.LENGTH_LONG
+        ).show();
+    }
+
     private void handleWebPermission(PermissionRequest request) {
 
         if (isFinishing() || isDestroyed()) {
@@ -120,7 +126,21 @@ public class MainActivity extends Activity {
             return;
         }
 
+        Uri origin = request.getOrigin();
+
+        if (origin == null ||
+                !"https".equals(origin.getScheme()) ||
+                !"twochat-vg3s.onrender.com".equals(origin.getHost())) {
+
+            showMessage("BLOCKED: Untrusted website origin");
+            request.deny();
+            return;
+        }
+
+        showMessage("TEST 1: WebView requested permission");
+
         if (pendingPermissionRequest != null) {
+            showMessage("Another permission request is pending");
             request.deny();
             return;
         }
@@ -161,26 +181,49 @@ public class MainActivity extends Activity {
         }
 
         if (allowedResources.isEmpty()) {
+            showMessage("ERROR: No supported capture resource");
             request.deny();
             return;
         }
 
-        String[] resourcesToGrant =
-                allowedResources.toArray(new String[0]);
-
         if (androidPermissions.isEmpty()) {
-            request.grant(resourcesToGrant);
+
+            showMessage("TEST 2: Android permission already granted");
+
+            grantWebPermission(request, allowedResources);
+
             return;
         }
 
         pendingPermissionRequest = request;
-        pendingAndroidPermissions =
-                androidPermissions.toArray(new String[0]);
+
+        showMessage("TEST 2: Requesting Android permission");
 
         requestPermissions(
-                pendingAndroidPermissions,
+                androidPermissions.toArray(new String[0]),
                 PERMISSION_REQUEST
         );
+    }
+
+    private void grantWebPermission(
+            PermissionRequest request,
+            List<String> resources
+    ) {
+
+        try {
+
+            request.grant(resources.toArray(new String[0]));
+
+            showMessage("TEST 3: Permission grant sent to WebView");
+
+        } catch (Exception e) {
+
+            showMessage(
+                    "ERROR granting WebView permission: " +
+                    e.getClass().getSimpleName()
+            );
+
+        }
     }
 
     @Override
@@ -202,59 +245,49 @@ public class MainActivity extends Activity {
         PermissionRequest request = pendingPermissionRequest;
 
         pendingPermissionRequest = null;
-        pendingAndroidPermissions = null;
 
         if (request == null) {
+            showMessage("ERROR: Permission request no longer exists");
             return;
         }
 
-        boolean allGranted =
-                permissions != null &&
-                grantResults != null &&
-                permissions.length == grantResults.length &&
-                grantResults.length > 0;
+        if (permissions == null || grantResults == null) {
+            request.deny();
+            showMessage("ERROR: Android returned no permission result");
+            return;
+        }
 
-        if (allGranted) {
-            for (int result : grantResults) {
-                if (result != PackageManager.PERMISSION_GRANTED) {
-                    allGranted = false;
-                    break;
-                }
+        List<String> resourcesToGrant = new ArrayList<>();
+
+        for (String resource : request.getResources()) {
+
+            if (PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(resource)
+                    && checkSelfPermission(
+                    Manifest.permission.RECORD_AUDIO
+            ) == PackageManager.PERMISSION_GRANTED) {
+
+                resourcesToGrant.add(resource);
+
+            } else if (
+                    PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource)
+                            && checkSelfPermission(
+                            Manifest.permission.CAMERA
+                    ) == PackageManager.PERMISSION_GRANTED) {
+
+                resourcesToGrant.add(resource);
             }
         }
 
-        if (allGranted) {
+        if (!resourcesToGrant.isEmpty()) {
 
-            List<String> resourcesToGrant = new ArrayList<>();
+            showMessage("TEST 2: Android permission granted");
 
-            for (String resource : request.getResources()) {
-
-                if (PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(resource)
-                        && checkSelfPermission(
-                        Manifest.permission.RECORD_AUDIO
-                ) == PackageManager.PERMISSION_GRANTED) {
-
-                    resourcesToGrant.add(resource);
-
-                } else if (
-                        PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource)
-                        && checkSelfPermission(
-                        Manifest.permission.CAMERA
-                ) == PackageManager.PERMISSION_GRANTED) {
-
-                    resourcesToGrant.add(resource);
-                }
-            }
-
-            if (!resourcesToGrant.isEmpty()) {
-                request.grant(
-                        resourcesToGrant.toArray(new String[0])
-                );
-            } else {
-                request.deny();
-            }
+            grantWebPermission(request, resourcesToGrant);
 
         } else {
+
+            showMessage("ERROR: Android permission denied");
+
             request.deny();
         }
     }
@@ -338,5 +371,5 @@ public class MainActivity extends Activity {
 
         super.onDestroy();
     }
-    }
-        
+            }
+                                                                
