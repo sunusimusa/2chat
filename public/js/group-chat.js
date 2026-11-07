@@ -1387,20 +1387,28 @@ async function sendMessage(){
     // VOICE
     // ==========================
 
-    if(recordedVoice){
+    
+if(recordedVoice){
 
-        formData.append(
-            "voice",
-            recordedVoice,
-            "voice.webm"
-        );
+    const voiceMime =
+        recordedVoice.type || "audio/webm";
 
-        formData.append(
-            "voiceDuration",
-            recordTime
-        );
+    const voiceExtension =
+        voiceMime.includes("mp4") ? "m4a" : "webm";
 
-    }
+    formData.append(
+        "voice",
+        recordedVoice,
+        "voice." + voiceExtension
+    );
+
+    formData.append(
+        "voiceDuration",
+        recordTime
+    );
+
+}
+
 
     // ==========================
     // SEND
@@ -1668,63 +1676,187 @@ imageViewer.onclick = function(e){
 
 };
 
+
 /* ==========================
-VOICE RECORD
+GROUP VOICE RECORDING
+NATIVE ANDROID + BROWSER
 ========================== */
 
-recordBtn.addEventListener("mousedown", startRecording);
+let usingNativeVoiceRecorder = false;
+let isStartingNativeRecording = false;
+let nativeStopRequested = false;
+let nativeRecordTimer = null;
 
+// ==========================
+// RECORD BUTTON
+// ==========================
+
+recordBtn.addEventListener("mousedown", startRecording);
 recordBtn.addEventListener("mouseup", stopRecording);
 
-recordBtn.addEventListener("touchstart",(e)=>{
-
+recordBtn.addEventListener("touchstart", (e) => {
     e.preventDefault();
-
     startRecording();
-
 });
 
-recordBtn.addEventListener("touchend",(e)=>{
-
+recordBtn.addEventListener("touchend", (e) => {
     e.preventDefault();
-
     stopRecording();
-
 });
 
-async function startRecording(){
+// ==========================
+// NATIVE RECORDING CALLBACKS
+// ==========================
 
-    if(isRecording) return;
+window.onNativeVoiceRecordingStarted = function(){
+
+    isStartingNativeRecording = false;
+    isRecording = true;
+    recordTime = 0;
+
+    recordBtn.style.background = "red";
+
+    clearInterval(nativeRecordTimer);
+
+    nativeRecordTimer = setInterval(() => {
+        recordTime++;
+    }, 1000);
+
+    // Idan an saki button kafin recorder ya fara
+    if(nativeStopRequested){
+        nativeStopRequested = false;
+        stopRecording();
+    }
+
+};
+
+window.onNativeVoiceRecordingStopped = function(base64Audio){
+
+    clearInterval(nativeRecordTimer);
+    nativeRecordTimer = null;
+
+    isRecording = false;
+    isStartingNativeRecording = false;
+    usingNativeVoiceRecorder = false;
+    nativeStopRequested = false;
+
+    recordBtn.style.background = "";
 
     try{
 
+        const binary = atob(base64Audio);
+        const bytes = new Uint8Array(binary.length);
+
+        for(let i = 0; i < binary.length; i++){
+            bytes[i] = binary.charCodeAt(i);
+        }
+
+        recordedVoice = new Blob(
+            [bytes],
+            { type: "audio/mp4" }
+        );
+
+        voicePlayer.src = URL.createObjectURL(recordedVoice);
+        voicePlayer.load();
+
+        voicePreview.style.display = "flex";
+
+    }catch(err){
+
+        console.error("GROUP NATIVE VOICE ERROR:", err);
+
+        recordedVoice = null;
+
+        alert("Could not prepare voice preview.");
+
+    }
+
+};
+
+window.onNativeVoiceRecordingError = function(message){
+
+    clearInterval(nativeRecordTimer);
+    nativeRecordTimer = null;
+
+    isRecording = false;
+    isStartingNativeRecording = false;
+    usingNativeVoiceRecorder = false;
+    nativeStopRequested = false;
+
+    recordBtn.style.background = "";
+
+    console.error("GROUP NATIVE VOICE ERROR:", message);
+
+    alert("Voice Recording Error: " + message);
+
+};
+
+// ==========================
+// START RECORDING
+// ==========================
+
+async function startRecording(){
+
+    if(isRecording || isStartingNativeRecording){
+        return;
+    }
+
+    // ANDROID NATIVE RECORDER
+    if(
+        window.AndroidVoiceRecorder &&
+        typeof window.AndroidVoiceRecorder.startRecording === "function"
+    ){
+
+        try{
+
+            isStartingNativeRecording = true;
+            usingNativeVoiceRecorder = true;
+            nativeStopRequested = false;
+
+            recordTime = 0;
+            recordedVoice = null;
+
+            window.AndroidVoiceRecorder.startRecording();
+
+            return;
+
+        }catch(err){
+
+            isStartingNativeRecording = false;
+            usingNativeVoiceRecorder = false;
+
+            console.error("NATIVE START ERROR:", err);
+
+            alert("Could not start voice recording.");
+
+            return;
+
+        }
+
+    }
+
+    // BROWSER RECORDER
+    try{
+
         const stream =
-        await navigator.mediaDevices.getUserMedia({
+            await navigator.mediaDevices.getUserMedia({
+                audio: true
+            });
 
-            audio:true
-
-        });
-
-        mediaRecorder =
-        new MediaRecorder(stream);
+        mediaRecorder = new MediaRecorder(stream);
 
         audioChunks = [];
-
         recordTime = 0;
 
         mediaRecorder.ondataavailable = (e)=>{
-
             audioChunks.push(e.data);
-
         };
 
         mediaRecorder.onstart = ()=>{
 
             mediaRecorder.timer = setInterval(()=>{
-
                 recordTime++;
-
-            },1000);
+            }, 1000);
 
         };
 
@@ -1732,24 +1864,20 @@ async function startRecording(){
 
             clearInterval(mediaRecorder.timer);
 
-            recordedVoice =
-            new Blob(audioChunks,{
-
-                type:"audio/webm"
-
+            recordedVoice = new Blob(audioChunks,{
+                type: mediaRecorder.mimeType || "audio/webm"
             });
 
-            voicePlayer.src =
-            URL.createObjectURL(recordedVoice);
-
+            voicePlayer.src = URL.createObjectURL(recordedVoice);
             voicePreview.style.display = "flex";
+
+            stream.getTracks().forEach(track => track.stop());
 
         };
 
         mediaRecorder.start();
 
         isRecording = true;
-
         recordBtn.style.background = "red";
 
     }catch(err){
@@ -1762,25 +1890,75 @@ async function startRecording(){
 
 }
 
+// ==========================
+// STOP RECORDING
+// ==========================
+
 function stopRecording(){
 
-    if(!isRecording) return;
+    // NATIVE ANDROID
+    if(usingNativeVoiceRecorder){
 
-    mediaRecorder.stop();
+        if(isStartingNativeRecording){
+            nativeStopRequested = true;
+            return;
+        }
+
+        if(!isRecording){
+            return;
+        }
+
+        try{
+
+            window.AndroidVoiceRecorder.stopRecording();
+
+            clearInterval(nativeRecordTimer);
+            nativeRecordTimer = null;
+
+            isRecording = false;
+            recordBtn.style.background = "";
+
+        }catch(err){
+
+            console.error("NATIVE STOP ERROR:", err);
+
+            alert("Could not stop voice recording.");
+
+        }
+
+        return;
+
+    }
+
+    // BROWSER
+    if(!isRecording){
+        return;
+    }
+
+    if(mediaRecorder && mediaRecorder.state !== "inactive"){
+        mediaRecorder.stop();
+    }
 
     isRecording = false;
-
     recordBtn.style.background = "";
 
 }
+
+// ==========================
+// DELETE VOICE PREVIEW
+// ==========================
 
 deleteVoice.onclick = ()=>{
 
     recordedVoice = null;
 
-    voicePlayer.src = "";
+    voicePlayer.pause();
+    voicePlayer.removeAttribute("src");
+    voicePlayer.load();
 
     voicePreview.style.display = "none";
+
+    recordTime = 0;
 
 };
 
