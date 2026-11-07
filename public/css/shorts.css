@@ -1467,3 +1467,348 @@ body{
         height:46px;
     }
    }
+
+
+/* =========================================================
+   2CHAT SHORTS — FACEBOOK REELS INSPIRED LIGHT DESIGN
+   Theme: LIGHT + BLACK + BRIGHT BLUE
+========================================================= */
+
+:root {
+    --shorts-bg: #f5f7fb;
+    --shorts-black: #151922;
+    --shorts-blue: #168bff;
+    --shorts-blue-dark: #0874df;
+    --shorts-white: #ffffff;
+}
+
+/* PAGE BACKGROUND */
+
+html,
+body,
+#shortsContainer {
+    background: var(--shorts-bg);
+    color: var(--shorts-black);
+}
+
+/* VIDEO */
+
+.short {
+    background: #e9edf3;
+}
+
+.short video {
+    background: #e9edf3;
+}
+
+/* TOP SEARCH AND MENU */
+
+.youtube-top {
+    top: 18px;
+    right: 14px;
+    gap: 10px;
+}
+
+.top-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(20, 25, 35, .82);
+    color: #fff;
+    font-size: 23px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.20);
+}
+
+.top-icon:hover,
+.top-icon:focus {
+    background: var(--shorts-blue);
+}
+
+/* LIGHT MENU */
+
+.shorts-menu {
+    background: rgba(255,255,255,.98);
+    border: 1px solid #e5eaf1;
+    box-shadow: 0 8px 28px rgba(20,35,55,.18);
+}
+
+.shorts-menu button {
+    color: #171b23;
+}
+
+.shorts-menu button:hover {
+    background: #edf6ff;
+    color: var(--shorts-blue-dark);
+}
+
+.shorts-menu button:active {
+    background: #dceeff;
+}
+
+/* RIGHT SIDE ACTIONS */
+
+.actions {
+    right: 12px;
+    bottom: 112px;
+    gap: 5px;
+}
+
+.actions button {
+    width: 49px;
+    height: 49px;
+    background: rgba(22,27,35,.82);
+    color: #fff;
+    font-size: 25px;
+    border: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 3px 12px rgba(0,0,0,.22);
+}
+
+.actions button:active {
+    transform: scale(.90);
+    background: var(--shorts-blue);
+}
+
+/* ACTIVE LIKE / SAVE */
+
+.actions button.liked {
+    background: var(--shorts-blue);
+    color: #fff;
+    box-shadow: 0 0 15px rgba(22,139,255,.45);
+}
+
+/* GIFT BUTTON */
+
+.gift-short-btn,
+.actions button.gift-short-btn {
+    width: 49px;
+    height: 49px;
+    margin-top: 3px;
+    background: rgba(22,27,35,.88);
+    color: #fff;
+    font-size: 24px;
+    border: 1px solid rgba(255,255,255,.15);
+}
+
+.gift-short-btn:hover,
+.actions button.gift-short-btn:focus {
+    background: var(--shorts-blue);
+    color: #fff;
+}
+
+/* ACTION LABELS */
+
+.actions span {
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    text-shadow: 0 2px 5px rgba(0,0,0,.95);
+}
+
+/* BOTTOM CREATOR INFORMATION */
+
+.overlay {
+    left: 14px;
+    right: 82px;
+    bottom: 105px;
+    color: #fff;
+}
+
+.user-info h3 {
+    color: #fff;
+    font-size: 16px;
+}
+
+/* CREATOR AVATAR */
+
+.short-avatar {
+    width: 43px;
+    height: 43px;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 9px rgba(0,0,0,.35);
+}
+
+/* UPLOAD BUTTON */
+
+.uploadBtn {
+    width: 43px;
+    height: 43px;
+    background: var(--shorts-blue);
+    color: #fff;
+    box-shadow: 0 3px 12px rgba(0,0,0,.25);
+}
+
+.uploadBtn:active {
+    background: var(--shorts-blue-dark);
+}
+
+/* FOLLOW BUTTON */
+
+.follow-btn {
+    background: var(--shorts-blue);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.25);
+    box-shadow: 0 3px 12px rgba(0,0,0,.22);
+}
+
+.follow-btn:active {
+    background: var(--shorts-blue-dark);
+}
+
+.follow-btn.following {
+    background: #fff;
+    color: var(--shorts-blue-dark);
+    border: 1px solid var(--shorts-blue);
+}
+
+/* CAPTION */
+
+.overlay p {
+    color: #fff;
+    text-shadow: 0 2px 6px rgba(0,0,0,.95);
+    font-size: 14px;
+}
+
+/* COMMENT BUTTON PANEL STATE */
+
+.comment-modal.show {
+    display: flex;
+}
+
+/* GIFT CONFIRMATION */
+
+.gift-confirmation {
+    background: rgba(255,255,255,.97);
+    color: #151922;
+    border: 1px solid #e5eaf1;
+    box-shadow: 0 8px 30px rgba(0,0,0,.2);
+}
+
+.gift-confirmation span {
+    color: #4b5563;
+}
+
+/* COMMENT PANEL */
+
+.comment-box,
+.comment-header,
+.comment-input {
+    background: #fff;
+}
+
+.comment-header h3 {
+    color: #151922;
+}
+
+.comment-list {
+    background: #f7f9fc;
+}
+
+.comment-item b {
+    color: var(--shorts-blue-dark);
+}
+
+.comment-input button {
+    background: var(--shorts-blue);
+}
+
+.comment-input button:hover {
+    background: var(--shorts-blue-dark);
+}
+
+/* REPORT BUTTON */
+
+.submit-report-btn {
+    background: var(--shorts-blue);
+}
+
+.submit-report-btn:active {
+    background: var(--shorts-blue-dark);
+}
+
+/* MOBILE RESPONSIVE */
+
+@media (max-width: 600px) {
+
+    .youtube-top {
+        top: 12px;
+        right: 10px;
+    }
+
+    .top-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 22px;
+    }
+
+    .actions {
+        right: 9px;
+        bottom: 112px;
+        gap: 4px;
+    }
+
+    .actions button,
+    .actions button.gift-short-btn {
+        width: 47px;
+        height: 47px;
+        font-size: 23px;
+    }
+
+    .actions span {
+        font-size: 12px;
+    }
+
+    .overlay {
+        left: 12px;
+        right: 76px;
+        bottom: 105px;
+    }
+
+    .short-avatar {
+        width: 40px;
+        height: 40px;
+    }
+
+    .uploadBtn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .follow-btn {
+        padding: 8px 13px;
+        font-size: 13px;
+    }
+}
+
+/* SMALL HEIGHT PHONES */
+
+@media (max-height: 700px) {
+
+    .actions {
+        bottom: 100px;
+        gap: 2px;
+    }
+
+    .actions button,
+    .actions button.gift-short-btn {
+        width: 43px;
+        height: 43px;
+        font-size: 21px;
+    }
+
+    .overlay {
+        bottom: 92px;
+    }
+}
+
+/* ANDROID SAFE AREA */
+
+@supports (padding: env(safe-area-inset-bottom)) {
+
+    .actions {
+        bottom: calc(112px + env(safe-area-inset-bottom));
+    }
+
+    .overlay {
+        bottom: calc(105px + env(safe-area-inset-bottom));
+    }
+   }
+   
