@@ -44,6 +44,14 @@ let mediaRecorder;
 let audioChunks = [];
 
 let recordedVoice = null;
+
+// ==========================
+// NATIVE GROUP VOICE
+// ==========================
+
+let usingNativeGroupVoice = false;
+
+let groupVoiceTimer = null;
 const voicePreview =
 document.getElementById("voicePreview");
 
@@ -1795,13 +1803,15 @@ window.onNativeVoiceRecordingError = function(message){
 // START RECORDING
 // ==========================
 
+
 async function startRecording(){
 
-    if(isRecording || isStartingNativeRecording){
-        return;
-    }
+    if(isRecording) return;
 
+    // ==========================
     // ANDROID NATIVE RECORDER
+    // ==========================
+
     if(
         window.AndroidVoiceRecorder &&
         typeof window.AndroidVoiceRecorder.startRecording === "function"
@@ -1809,54 +1819,58 @@ async function startRecording(){
 
         try{
 
-            isStartingNativeRecording = true;
-            usingNativeVoiceRecorder = true;
-            nativeStopRequested = false;
+            usingNativeGroupVoice = true;
 
-            recordTime = 0;
+            audioChunks = [];
             recordedVoice = null;
+            recordTime = 0;
 
             window.AndroidVoiceRecorder.startRecording();
 
-            return;
-
         }catch(err){
 
-            isStartingNativeRecording = false;
-            usingNativeVoiceRecorder = false;
+            usingNativeGroupVoice = false;
 
-            console.error("NATIVE START ERROR:", err);
+            console.error("NATIVE GROUP VOICE ERROR:", err);
 
             alert("Could not start voice recording.");
 
-            return;
-
         }
 
+        return;
     }
 
+    // ==========================
     // BROWSER RECORDER
+    // ==========================
+
     try{
 
         const stream =
             await navigator.mediaDevices.getUserMedia({
-                audio: true
+                audio:true
             });
 
-        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder =
+            new MediaRecorder(stream);
 
         audioChunks = [];
+
         recordTime = 0;
 
         mediaRecorder.ondataavailable = (e)=>{
+
             audioChunks.push(e.data);
+
         };
 
         mediaRecorder.onstart = ()=>{
 
             mediaRecorder.timer = setInterval(()=>{
+
                 recordTime++;
-            }, 1000);
+
+            },1000);
 
         };
 
@@ -1864,20 +1878,24 @@ async function startRecording(){
 
             clearInterval(mediaRecorder.timer);
 
-            recordedVoice = new Blob(audioChunks,{
-                type: mediaRecorder.mimeType || "audio/webm"
-            });
+            stream.getTracks().forEach(track=>track.stop());
 
-            voicePlayer.src = URL.createObjectURL(recordedVoice);
+            recordedVoice =
+                new Blob(audioChunks,{
+                    type:"audio/webm"
+                });
+
+            voicePlayer.src =
+                URL.createObjectURL(recordedVoice);
+
             voicePreview.style.display = "flex";
-
-            stream.getTracks().forEach(track => track.stop());
 
         };
 
         mediaRecorder.start();
 
         isRecording = true;
+
         recordBtn.style.background = "red";
 
     }catch(err){
@@ -1890,59 +1908,39 @@ async function startRecording(){
 
 }
 
+
 // ==========================
 // STOP RECORDING
 // ==========================
 
 function stopRecording(){
 
-    // NATIVE ANDROID
-    if(usingNativeVoiceRecorder){
+    // ANDROID NATIVE
+    if(usingNativeGroupVoice){
 
-        if(isStartingNativeRecording){
-            nativeStopRequested = true;
-            return;
-        }
-
-        if(!isRecording){
-            return;
-        }
-
-        try{
+        if(
+            window.AndroidVoiceRecorder &&
+            typeof window.AndroidVoiceRecorder.stopRecording === "function"
+        ){
 
             window.AndroidVoiceRecorder.stopRecording();
 
-            clearInterval(nativeRecordTimer);
-            nativeRecordTimer = null;
-
-            isRecording = false;
-            recordBtn.style.background = "";
-
-        }catch(err){
-
-            console.error("NATIVE STOP ERROR:", err);
-
-            alert("Could not stop voice recording.");
-
         }
 
         return;
-
     }
 
     // BROWSER
-    if(!isRecording){
-        return;
-    }
+    if(!isRecording) return;
 
-    if(mediaRecorder && mediaRecorder.state !== "inactive"){
-        mediaRecorder.stop();
-    }
+    mediaRecorder.stop();
 
     isRecording = false;
+
     recordBtn.style.background = "";
 
 }
+
 
 // ==========================
 // DELETE VOICE PREVIEW
