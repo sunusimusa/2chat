@@ -1136,7 +1136,7 @@ window.onNativeVoiceRecordingStopped = function (base64Audio) {
         stopTimer();
 
         if (recordingBox) {
-            recordingBox.style.display = "none";
+            recordingBox.style.display = "flex";
         }
 
         if (recordDot) {
