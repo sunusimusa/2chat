@@ -1068,259 +1068,319 @@ function removeImage() {
 
 }
 
+/* ==========================================================
+   NATIVE ANDROID VOICE CALLBACKS
+========================================================== */
+
+window.onNativeVoiceRecordingStarted = function () {
+
+    isStartingRecording = false;
+    usingNativeVoiceRecorder = true;
+
+    recording = true;
+    audioChunks = [];
+    audioBlob = null;
+    recordSeconds = 0;
+
+    if (recordingBox) {
+        recordingBox.style.display = "flex";
+    }
+
+    if (voicePreviewBox) {
+        voicePreviewBox.style.display = "none";
+    }
+
+    if (recordDot) {
+        recordDot.style.display = "inline-block";
+    }
+
+    if (recordText) {
+        recordText.textContent = "Recording...";
+    }
+
+    if (voiceActionIcon) {
+        voiceActionIcon.className = "fa-solid fa-stop";
+    }
+
+    updateRecordTime();
+    startTimer();
+};
+
+
+window.onNativeVoiceRecordingStopped = function (base64Audio) {
+
+    try {
+
+        const binary = atob(base64Audio);
+        const bytes = new Uint8Array(binary.length);
+
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+
+        audioBlob = new Blob(
+            [bytes],
+            { type: "audio/mp4" }
+        );
+
+        audioUrl = URL.createObjectURL(audioBlob);
+
+        if (voicePreview) {
+            voicePreview.src = audioUrl;
+            voicePreview.load();
+        }
+
+        recording = false;
+        isStartingRecording = false;
+
+        stopTimer();
+
+        if (recordingBox) {
+            recordingBox.style.display = "none";
+        }
+
+        if (recordDot) {
+            recordDot.style.display = "none";
+        }
+
+        if (recordText) {
+            recordText.textContent = "Voice message";
+        }
+
+        if (voicePreviewBox) {
+            voicePreviewBox.style.display = "flex";
+        }
+
+        if (voiceActionIcon) {
+            voiceActionIcon.className = "fa-solid fa-paper-plane";
+        }
+
+    } catch (error) {
+
+        console.error("Native Voice Conversion Error:", error);
+
+        cleanupRecording();
+
+        alert("Could not prepare voice preview.");
+
+    }
+};
+
+
+window.onNativeVoiceRecordingCancelled = function () {
+
+    usingNativeVoiceRecorder = false;
+    isStartingRecording = false;
+    recording = false;
+
+};
+
+
+window.onNativeVoiceRecordingError = function (message) {
+
+    usingNativeVoiceRecorder = false;
+    isStartingRecording = false;
+
+    cleanupRecording();
+
+    if (recordingBox) {
+        recordingBox.style.display = "none";
+    }
+
+    if (voicePreviewBox) {
+        voicePreviewBox.style.display = "none";
+    }
+
+    alert("Native Voice Error:\n" + message);
+
+};
+
 
 /* ==========================================================
    VOICE RECORDING
 ========================================================== */
-
 async function startRecording() {
 
     if (recording || isStartingRecording) {
         return;
     }
 
+    /* ANDROID NATIVE RECORDER */
+
+    if (
+        window.AndroidVoiceRecorder &&
+        typeof window.AndroidVoiceRecorder.startRecording === "function"
+    ) {
+
+        isStartingRecording = true;
+        usingNativeVoiceRecorder = true;
+
+        audioChunks = [];
+        audioBlob = null;
+
+        try {
+
+            window.AndroidVoiceRecorder.startRecording();
+
+        } catch (error) {
+
+            usingNativeVoiceRecorder = false;
+            isStartingRecording = false;
+
+            console.error("Native Recorder Start Error:", error);
+
+            alert("Could not start native voice recorder.");
+
+        }
+
+        return;
+    }
+
+
+    /* EXISTING BROWSER RECORDER */
 
     if (
         !navigator.mediaDevices ||
         !navigator.mediaDevices.getUserMedia
     ) {
 
-        alert(
-            "Microphone is not supported on this device."
-        );
+        alert("Microphone is not supported on this device.");
 
         return;
-
     }
 
-
-        isStartingRecording = true;
+    isStartingRecording = true;
 
     try {
 
-        mediaStream =
-            await navigator.mediaDevices.getUserMedia({
-                audio: true
-            });
-       
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+            audio: true
+        });
+
         let mimeType = "";
 
-        if (
-            MediaRecorder.isTypeSupported(
-                "audio/webm;codecs=opus"
-            )
-        ) {
-
-            mimeType =
-                "audio/webm;codecs=opus";
-
+        if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) {
+            mimeType = "audio/webm;codecs=opus";
+        } else if (MediaRecorder.isTypeSupported("audio/webm")) {
+            mimeType = "audio/webm";
         }
 
-        else if (
-            MediaRecorder.isTypeSupported(
-                "audio/webm"
-            )
-        ) {
-
-            mimeType =
-                "audio/webm";
-
-        }
-
-
-        mediaRecorder =
-            mimeType
-                ? new MediaRecorder(
-                    mediaStream,
-                    { mimeType }
-                )
-                : new MediaRecorder(
-                    mediaStream
-                );
-
+        mediaRecorder = mimeType
+            ? new MediaRecorder(mediaStream, { mimeType })
+            : new MediaRecorder(mediaStream);
 
         audioChunks = [];
         audioBlob = null;
 
+        mediaRecorder.ondataavailable = function(event) {
 
-        mediaRecorder.ondataavailable =
-            function(event) {
+            if (event.data && event.data.size > 0) {
+                audioChunks.push(event.data);
+            }
 
-                if (
-                    event.data &&
-                    event.data.size > 0
-                ) {
+        };
 
-                    audioChunks.push(
-                        event.data
-                    );
+        mediaRecorder.onstop = function() {
 
-                }
-
-            };
-
-
-        mediaRecorder.onstop =
-            function() {
-
-                if (!audioChunks.length) {
-
-                    cleanupRecording();
-
-                    return;
-
-                }
-
-
-                audioBlob =
-                    new Blob(
-                        audioChunks,
-                        {
-                            type:
-                                mediaRecorder.mimeType ||
-                                "audio/webm"
-                        }
-                    );
-
-
-                audioUrl =
-                    URL.createObjectURL(
-                        audioBlob
-                    );
-
-
-                if (voicePreview) {
-
-                    voicePreview.src =
-                        audioUrl;
-
-                    voicePreview.load();
-
-                }
-
-
-                recording = false;
-
-
-                stopTimer();
-
-
-                if (recordDot) {
-                    recordDot.style.display =
-                        "none";
-                }
-
-
-                if (recordText) {
-                    recordText.textContent =
-                        "Voice message";
-                }
-
-
-                if (voicePreviewBox) {
-                    voicePreviewBox.style.display =
-                        "flex";
-                }
-
-
-                if (voiceActionIcon) {
-                    voiceActionIcon.className =
-                        "fa-solid fa-paper-plane";
-                }
-
-
-                stopMediaStream();
-
-            };
-
-
-        mediaRecorder.onerror =
-            function(error) {
-
-                console.error(
-                    "MediaRecorder Error:",
-                    error
-                );
-
+            if (!audioChunks.length) {
                 cleanupRecording();
+                return;
+            }
 
-            };
+            audioBlob = new Blob(audioChunks, {
+                type: mediaRecorder.mimeType || "audio/webm"
+            });
 
+            audioUrl = URL.createObjectURL(audioBlob);
 
-                mediaRecorder.start();
+            if (voicePreview) {
+                voicePreview.src = audioUrl;
+                voicePreview.load();
+            }
+
+            recording = false;
+
+            stopTimer();
+
+            if (recordingBox) {
+                recordingBox.style.display = "none";
+            }
+
+            if (recordDot) {
+                recordDot.style.display = "none";
+            }
+
+            if (recordText) {
+                recordText.textContent = "Voice message";
+            }
+
+            if (voicePreviewBox) {
+                voicePreviewBox.style.display = "flex";
+            }
+
+            if (voiceActionIcon) {
+                voiceActionIcon.className = "fa-solid fa-paper-plane";
+            }
+
+            stopMediaStream();
+
+        };
+
+        mediaRecorder.onerror = function(error) {
+
+            console.error("MediaRecorder Error:", error);
+
+            cleanupRecording();
+
+        };
+
+        mediaRecorder.start();
 
         recording = true;
         isStartingRecording = false;
 
         recordSeconds = 0;
 
-
         if (recordingBox) {
-            recordingBox.style.display =
-                "flex";
+            recordingBox.style.display = "flex";
         }
-
 
         if (voicePreviewBox) {
-            voicePreviewBox.style.display =
-                "none";
+            voicePreviewBox.style.display = "none";
         }
-
 
         if (recordDot) {
-            recordDot.style.display =
-                "inline-block";
+            recordDot.style.display = "inline-block";
         }
-
 
         if (recordText) {
-            recordText.textContent =
-                "Recording...";
+            recordText.textContent = "Recording...";
         }
-
 
         if (voiceActionIcon) {
-            voiceActionIcon.className =
-                "fa-solid fa-stop";
+            voiceActionIcon.className = "fa-solid fa-stop";
         }
-
 
         updateRecordTime();
         startTimer();
 
+    } catch (err) {
+
+        isStartingRecording = false;
+
+        console.error("MICROPHONE ERROR:", err);
+
+        stopMediaStream();
+
+        alert(
+            "Voice Error\n\n" +
+            "Name: " + (err?.name || "Unknown") +
+            "\nMessage: " + (err?.message || "Unknown")
+        );
+
     }
 
-        catch (err) {
-
-    isStartingRecording = false;
-
-    console.error(
-        "MICROPHONE ERROR:",
-        err
-    );
-
-    console.error(
-        "ERROR NAME:",
-        err?.name
-    );
-
-    console.error(
-        "ERROR MESSAGE:",
-        err?.message
-    );
-
-    stopMediaStream();
-
-    alert(
-        "Voice Error\n\n" +
-        "Name: " + (err?.name || "Unknown") +
-        "\nMessage: " + (err?.message || "Unknown")
-    );
-
 }
-   
-}
-
 
 /* ==========================================================
    STOP MEDIA STREAM
@@ -1438,13 +1498,31 @@ function handleVoiceAction() {
 
 function stopRecording() {
 
+    if (usingNativeVoiceRecorder) {
+
+        if (
+            window.AndroidVoiceRecorder &&
+            typeof window.AndroidVoiceRecorder.stopRecording === "function"
+        ) {
+
+            stopTimer();
+
+            window.AndroidVoiceRecorder.stopRecording();
+
+        }
+
+        return;
+    }
+
+
+    /* EXISTING BROWSER RECORDER */
+
     if (
         !mediaRecorder ||
         mediaRecorder.state !== "recording"
     ) {
         return;
     }
-
 
     stopTimer();
 
@@ -1461,87 +1539,77 @@ function cancelRecording() {
 
     stopTimer();
 
+    if (usingNativeVoiceRecorder) {
 
-    if (
+        try {
+
+            if (
+                window.AndroidVoiceRecorder &&
+                typeof window.AndroidVoiceRecorder.cancelRecording === "function"
+            ) {
+                window.AndroidVoiceRecorder.cancelRecording();
+            }
+
+        } catch (error) {
+
+            console.error("Native Cancel Error:", error);
+
+        }
+
+    } else if (
         mediaRecorder &&
         mediaRecorder.state === "recording"
     ) {
 
         try {
             mediaRecorder.stop();
-        }
-        catch {}
+        } catch {}
 
     }
 
+    usingNativeVoiceRecorder = false;
+    isStartingRecording = false;
 
     stopMediaStream();
-
 
     recording = false;
 
     audioChunks = [];
-
     audioBlob = null;
 
-
     if (audioUrl) {
-
-        URL.revokeObjectURL(
-            audioUrl
-        );
-
+        URL.revokeObjectURL(audioUrl);
         audioUrl = null;
-
     }
-
 
     if (voicePreview) {
-
         voicePreview.pause();
-
-        voicePreview.removeAttribute(
-            "src"
-        );
-
+        voicePreview.removeAttribute("src");
         voicePreview.load();
-
     }
-
 
     if (recordingBox) {
-        recordingBox.style.display =
-            "none";
+        recordingBox.style.display = "none";
     }
-
 
     if (voicePreviewBox) {
-        voicePreviewBox.style.display =
-            "none";
+        voicePreviewBox.style.display = "none";
     }
-
 
     if (recordTime) {
-        recordTime.textContent =
-            "00:00";
+        recordTime.textContent = "00:00";
     }
-
 
     if (recordText) {
-        recordText.textContent =
-            "Recording...";
+        recordText.textContent = "Recording...";
     }
-
 
     if (recordDot) {
-        recordDot.style.display =
-            "inline-block";
+        recordDot.style.display = "inline-block";
     }
 
-
     if (voiceActionIcon) {
-        voiceActionIcon.className =
-            "fa-solid fa-stop";
+        voiceActionIcon.className = "fa-solid fa-stop";
     }
 
 }
@@ -1972,7 +2040,6 @@ document.addEventListener(
     true
 );
 
-
 /* ==========================================================
    SEND VOICE
 ========================================================== */
@@ -1986,95 +2053,61 @@ async function sendVoice() {
         return;
     }
 
-
     try {
 
         if (voiceActionBtn) {
             voiceActionBtn.disabled = true;
         }
 
+        const formData = new FormData();
 
-        const formData =
-            new FormData();
+        formData.append("sender", user.username);
+        formData.append("receiver", receiver);
+        formData.append("text", "");
 
+        // Detect native M4A or browser WebM
+        const isNativeM4A =
+            audioBlob.type === "audio/mp4";
 
-        formData.append(
-            "sender",
-            user.username
+        const voiceFile = new File(
+            [audioBlob],
+            isNativeM4A
+                ? "voice-message.m4a"
+                : "voice-message.webm",
+            {
+                type: isNativeM4A
+                    ? "audio/mp4"
+                    : (audioBlob.type || "audio/webm")
+            }
         );
 
+        formData.append("voice", voiceFile);
+
+        // Send recording duration
         formData.append(
-            "receiver",
-            receiver
+            "duration",
+            String(recordSeconds || 0)
         );
-
-        formData.append(
-            "text",
-            ""
-        );
-
-
-        const voiceFile =
-            new File(
-                [audioBlob],
-                "voice-message.webm",
-                {
-                    type:
-                        audioBlob.type ||
-                        "audio/webm"
-                }
-            );
-
-
-        formData.append(
-            "voice",
-            voiceFile
-        );
-
 
         if (replyMessage) {
 
-            formData.append(
-                "replyTo",
-                replyMessage._id || ""
-            );
-
-            formData.append(
-                "replyUser",
-                replyMessage.sender || ""
-            );
-
-            formData.append(
-                "replyText",
-                replyMessage.text || ""
-            );
-
-            formData.append(
-                "replyImage",
-                replyMessage.image || ""
-            );
-
-            formData.append(
-                "replyVoice",
-                replyMessage.voice || ""
-            );
+            formData.append("replyTo", replyMessage._id || "");
+            formData.append("replyUser", replyMessage.sender || "");
+            formData.append("replyText", replyMessage.text || "");
+            formData.append("replyImage", replyMessage.image || "");
+            formData.append("replyVoice", replyMessage.voice || "");
 
         }
 
+        const res = await fetch(
+            "/api/messages/voice",
+            {
+                method: "POST",
+                body: formData
+            }
+        );
 
-        const res =
-            await fetch(
-                "/api/messages/voice",
-                {
-                    method: "POST",
-                    body: formData
-                }
-            );
-
-
-        const data =
-            await res.json();
-
+        const data = await res.json();
 
         if (!res.ok || !data.success) {
 
@@ -2084,28 +2117,15 @@ async function sendVoice() {
             );
 
             return;
-
         }
 
+        appendMessage(data.message, true);
 
-        appendMessage(
-            data.message,
-            true
-        );
-
-
-        socket.emit(
-            "newMessage",
-            data.message
-        );
-
+        socket.emit("newMessage", data.message);
 
         replyMessage = null;
 
-        hideElement(
-            "replyPreview"
-        );
-
+        hideElement("replyPreview");
 
         resetVoiceComposer();
 
@@ -2113,14 +2133,9 @@ async function sendVoice() {
 
     catch (err) {
 
-        console.error(
-            "Send Voice Error:",
-            err
-        );
+        console.error("Send Voice Error:", err);
 
-        alert(
-            "Voice message failed to send"
-        );
+        alert("Voice message failed to send");
 
     }
 
@@ -2132,107 +2147,70 @@ async function sendVoice() {
 
     }
 
-}
-
-
+   }
+           
 /* ==========================================================
    RESET VOICE
 ========================================================== */
+
 
 function resetVoiceComposer() {
 
     stopTimer();
     stopMediaStream();
 
-
+    // Reset native and browser recording states
+    usingNativeVoiceRecorder = false;
+    isStartingRecording = false;
     recording = false;
 
     audioChunks = [];
-
     audioBlob = null;
-
 
     if (audioUrl) {
 
-        URL.revokeObjectURL(
-            audioUrl
-        );
-
+        URL.revokeObjectURL(audioUrl);
         audioUrl = null;
 
     }
 
-
     if (voicePreview) {
 
         voicePreview.pause();
-
-        voicePreview.removeAttribute(
-            "src"
-        );
-
+        voicePreview.removeAttribute("src");
         voicePreview.load();
 
     }
 
-
     if (recordingBox) {
-
-        recordingBox.style.display =
-            "none";
-
+        recordingBox.style.display = "none";
     }
-
 
     if (voicePreviewBox) {
-
-        voicePreviewBox.style.display =
-            "none";
-
+        voicePreviewBox.style.display = "none";
     }
-
 
     if (recordTime) {
-
-        recordTime.textContent =
-            "00:00";
-
+        recordTime.textContent = "00:00";
     }
-
 
     if (recordText) {
-
-        recordText.textContent =
-            "Recording...";
-
+        recordText.textContent = "Recording...";
     }
-
 
     if (recordDot) {
-
-        recordDot.style.display =
-            "inline-block";
-
+        recordDot.style.display = "inline-block";
     }
-
 
     if (voiceActionIcon) {
-
-        voiceActionIcon.className =
-            "fa-solid fa-stop";
-
+        voiceActionIcon.className = "fa-solid fa-stop";
     }
 
-
     if (voicePlayIcon) {
-
-        voicePlayIcon.className =
-            "fa-solid fa-play";
-
+        voicePlayIcon.className = "fa-solid fa-play";
     }
 
 }
-
 
 /* ==========================================================
    REPLY
