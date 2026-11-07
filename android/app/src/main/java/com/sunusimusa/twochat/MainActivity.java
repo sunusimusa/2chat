@@ -134,7 +134,7 @@ public class MainActivity extends Activity {
 
         setContentView(webView);
 
-        webView.loadUrl(APP_URL);
+        webView.loadUrl(APP_URL + "/home.html");
     }
 
     private static final String APP_URL_HOST =
