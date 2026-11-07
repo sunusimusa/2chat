@@ -52,6 +52,114 @@ let recordedVoice = null;
 let usingNativeGroupVoice = false;
 
 let groupVoiceTimer = null;
+
+/* ==========================
+   NATIVE GROUP VOICE CALLBACKS
+========================== */
+
+// Android ya fara recording
+window.onNativeVoiceRecordingStarted = function(){
+
+    isRecording = true;
+
+    recordTime = 0;
+
+    if(groupVoiceTimer){
+        clearInterval(groupVoiceTimer);
+    }
+
+    groupVoiceTimer = setInterval(()=>{
+
+        recordTime++;
+
+    },1000);
+
+    recordBtn.style.background = "red";
+
+};
+
+
+// Android ya gama recording
+window.onNativeVoiceRecordingStopped = function(base64Audio){
+
+    try{
+
+        if(groupVoiceTimer){
+            clearInterval(groupVoiceTimer);
+            groupVoiceTimer = null;
+        }
+
+        const binary = atob(base64Audio);
+
+        const bytes = new Uint8Array(binary.length);
+
+        for(let i = 0; i < binary.length; i++){
+
+            bytes[i] = binary.charCodeAt(i);
+
+        }
+
+        recordedVoice = new Blob(
+            [bytes],
+            {type:"audio/mp4"}
+        );
+
+        voicePlayer.src =
+            URL.createObjectURL(recordedVoice);
+
+        voicePlayer.load();
+
+        voicePreview.style.display = "flex";
+
+        isRecording = false;
+
+        usingNativeGroupVoice = false;
+
+        recordBtn.style.background = "";
+
+    }catch(err){
+
+        console.error(
+            "NATIVE GROUP VOICE PREVIEW ERROR:",
+            err
+        );
+
+        isRecording = false;
+
+        usingNativeGroupVoice = false;
+
+        recordBtn.style.background = "";
+
+        alert("Could not prepare voice preview.");
+
+    }
+
+};
+
+
+// Android ya samu kuskuren recording
+window.onNativeVoiceRecordingError = function(message){
+
+    if(groupVoiceTimer){
+
+        clearInterval(groupVoiceTimer);
+
+        groupVoiceTimer = null;
+
+    }
+
+    isRecording = false;
+
+    usingNativeGroupVoice = false;
+
+    recordBtn.style.background = "";
+
+    console.error("NATIVE GROUP VOICE ERROR:",message);
+
+    alert("Voice Recording Error:\n" + message);
+
+};
+
 const voicePreview =
 document.getElementById("voicePreview");
 
@@ -1394,7 +1502,6 @@ async function sendMessage(){
     // ==========================
     // VOICE
     // ==========================
-
     
 if(recordedVoice){
 
