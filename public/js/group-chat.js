@@ -1806,18 +1806,23 @@ let nativeRecordTimer = null;
 // RECORD BUTTON
 // ==========================
 
-recordBtn.addEventListener("mousedown", startRecording);
-recordBtn.addEventListener("mouseup", stopRecording);
+// TAP TO START / TAP TO STOP
 
-recordBtn.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    startRecording();
-});
+recordBtn.addEventListener("click", toggleVoiceRecording);
 
-recordBtn.addEventListener("touchend", (e) => {
-    e.preventDefault();
-    stopRecording();
-});
+function toggleVoiceRecording(){
+
+    if(isRecording || isStartingNativeRecording){
+
+        stopRecording();
+
+    }else{
+
+        startRecording();
+
+    }
+
+}
 
 // ==========================
 // NATIVE RECORDING CALLBACKS
@@ -1928,12 +1933,14 @@ async function startRecording(){
 
             usingNativeGroupVoice = true;
 
-            audioChunks = [];
-            recordedVoice = null;
-            recordTime = 0;
+isStartingNativeRecording = true;
+nativeStopRequested = false;
 
-            window.AndroidVoiceRecorder.startRecording();
+audioChunks = [];
+recordedVoice = null;
+recordTime = 0;
 
+window.AndroidVoiceRecorder.startRecording();
         }catch(err){
 
             usingNativeGroupVoice = false;
@@ -2025,14 +2032,19 @@ function stopRecording(){
     // ANDROID NATIVE
     if(usingNativeGroupVoice){
 
-        if(
-            window.AndroidVoiceRecorder &&
-            typeof window.AndroidVoiceRecorder.stopRecording === "function"
-        ){
+        // Idan Android bai gama fara recording ba
+        if(isStartingNativeRecording){
 
-            window.AndroidVoiceRecorder.stopRecording();
+            nativeStopRequested = true;
+            return;
 
         }
+
+        if(!isRecording) return;
+
+        nativeStopRequested = false;
+
+        window.AndroidVoiceRecorder.stopRecording();
 
         return;
     }
