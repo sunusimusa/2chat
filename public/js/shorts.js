@@ -3,10 +3,83 @@ const user = JSON.parse(localStorage.getItem("user"));
 const container = document.getElementById("shortsContainer");
 
 let currentVideoId = null;
+let currentVisibleVideoId = null;
 let currentTab = "foryou";
 let watchStart = {};
 
 const creatorCache = {};
+
+// ================= SHORTS MENU ACTIONS =================
+
+function setupShortsMenuActions() {
+
+    const menu = document.getElementById("shortsMenu");
+
+    if (!menu || document.getElementById("shortReportMenuBtn")) {
+        return;
+    }
+
+    const reportBtn = document.createElement("button");
+
+    reportBtn.id = "shortReportMenuBtn";
+    reportBtn.type = "button";
+    reportBtn.innerHTML = `
+        <i class="fa-solid fa-flag"></i>
+        <span>Report this Short</span>
+    `;
+
+    reportBtn.addEventListener("click", function () {
+
+        const video = window.videos?.find(
+            item => item._id === currentVisibleVideoId
+        );
+
+        if (!video) return;
+
+        menu.classList.remove("show");
+
+        openReportModal(
+            "short",
+            video._id,
+            video.username
+        );
+
+    });
+
+    const viewsBtn = document.createElement("button");
+
+    viewsBtn.id = "shortViewsMenuBtn";
+    viewsBtn.type = "button";
+
+    viewsBtn.innerHTML = `
+        <i class="fa-solid fa-eye"></i>
+        <span id="shortMenuViewsText">Views</span>
+    `;
+
+    viewsBtn.addEventListener("click", function () {
+
+        const video = window.videos?.find(
+            item => item._id === currentVisibleVideoId
+        );
+
+        if (!video) return;
+
+        const viewsText = document.getElementById(
+            "shortMenuViewsText"
+        );
+
+        if (viewsText) {
+            viewsText.innerText =
+                "Views: " + video.views;
+        }
+
+    });
+
+    menu.appendChild(reportBtn);
+    menu.appendChild(viewsBtn);
+}
+
+setupShortsMenuActions();
 
 async function getCreator(username){
 
@@ -38,6 +111,26 @@ async function getCreator(username){
     }
 
     return null;
+}
+
+function isVideoLikedByUser(video) {
+
+    if (!Array.isArray(video.likes)) {
+        return false;
+    }
+
+    return video.likes.some(like => {
+
+        if (typeof like === "string") {
+            return like === user.username ||
+                   like === user._id;
+        }
+
+        return like?.username === user.username ||
+               like?.user?.username === user.username ||
+               like?.user === user._id;
+
+    });
 }
 
 
@@ -200,53 +293,55 @@ onclick="togglePlay('${video._id}')">
 
 <div class="actions">
 
-<button
-id="likeBtn-${video._id}"
-onclick="likeVideo('${video._id}')">
-❤️
-</button>
-<span id="likes-${video._id}">${video.likes.length}</span>
+    <!-- LIKE -->
+    <button
+        id="likeBtn-${video._id}"
+        class="like-action ${isVideoLikedByUser(video) ? "liked" : ""}"
+        aria-label="Like"
+        onclick="likeVideo('${video._id}')">
+        <i class="fa-solid fa-thumbs-up"></i>
+    </button>
+    <span id="likes-${video._id}">${video.likes.length}</span>
 
-<button onclick="commentVideo('${video._id}')">💬</button>
+    <!-- COMMENT -->
+    <button
+        id="commentBtn-${video._id}"
+        class="comment-action"
+        aria-label="Comment"
+        onclick="commentVideo('${video._id}')">
+        <i class="fa-regular fa-comment"></i>
+    </button>
+    <span id="comments-${video._id}">${video.comments.length}</span>
 
-<span id="comments-${video._id}">
-    ${video.comments.length}
-</span>
+    <!-- SHARE -->
+    <button
+        id="shareBtn-${video._id}"
+        class="share-action"
+        aria-label="Share"
+        onclick="shareVideo('${video._id}')">
+        <i class="fa-solid fa-share"></i>
+    </button>
+    <span id="shares-${video._id}">${video.shares || 0}</span>
 
-<button onclick="shareVideo('${video._id}')">📤</button>
-<span id="shares-${video._id}">
-${video.shares || 0}
-</span>
+    <!-- GIFT -->
+    <button
+        id="giftBtn-${video._id}"
+        class="gift-short-btn"
+        aria-label="Gift"
+        onclick="openShortGift('${video.username}', '${video._id}')">
+        <i class="fa-solid fa-gift"></i>
+    </button>
+    <span>Gift</span>
 
-<button
-    type="button"
-    onclick="openReportModal('short', '${video._id}', '${video.username}')">
-    🚩
-</button>
-<span>Report</span>
-
-<button
-    class="gift-short-btn"
-    onclick="openShortGift('${video.username}', '${video._id}')">
-    🎁
-</button>
-
-<span>Gift</span>
-
-<button
-id="saveBtn-${video._id}"
-class="${savedVideos.includes(video._id) ? "liked" : ""}"
-onclick="saveVideo('${video._id}')">
-
-${savedVideos.includes(String(video._id)) ? "✅" : "🔖"}
-
-</button>
-<span>Save</span>
-
-<button disabled>👁️</button>
-<span id="views-${video._id}">${video.views}</span>
-
-</div>
+    <!-- SAVE -->
+    <button
+        id="saveBtn-${video._id}"
+        class="save-action ${savedVideos.includes(String(video._id)) ? "liked" : ""}"
+        aria-label="Save"
+        onclick="saveVideo('${video._id}')">
+        <i class="fa-solid fa-bookmark"></i>
+    </button>
+    <span>Save</span>
 
 </div>
 
@@ -330,51 +425,67 @@ if (giftData) {
 
 function autoPlayVideos() {
 
-    const videos = document.querySelectorAll("video");
+    const videos = document.querySelectorAll(
+        "#shortsContainer video"
+    );
 
     const observer = new IntersectionObserver(entries => {
 
         entries.forEach(entry => {
 
+            const videoElement = entry.target;
+
+            const id = videoElement.id.replace("video-", "");
+
             if (entry.isIntersecting) {
 
-    entry.target.play();
+                // Ajiye ID na Short da ake kallo
+                currentVisibleVideoId = id;
 
-    const id = entry.target.id.replace("video-", "");
+                // Kunna video
+                videoElement.play().catch(err => {
+                    console.log("Video autoplay error:", err);
+                });
 
-   watchStart[id] = Date.now();
-                
-    addView(id);
+                // Fara lissafin lokacin kallo
+                if (!watchStart[id]) {
+                    watchStart[id] = Date.now();
+                }
 
-} else {
+                // Ƙara view
+                addView(id);
 
-    entry.target.pause();
+            } else {
 
-    const id = entry.target.id.replace("video-", "");
+                // Tsayar da video
+                videoElement.pause();
 
-    const seconds = Math.floor(
-    (Date.now() - (watchStart[id] || Date.now())) / 1000
-);
+                // Lissafa lokacin da aka kalla
+                const seconds = Math.floor(
+                    (Date.now() - (watchStart[id] || Date.now())) / 1000
+                );
 
-    if(seconds > 0){
+                if (seconds > 0) {
+                    addWatchTime(id, seconds);
+                }
 
-        addWatchTime(id, seconds);
+                // Share lokacin kallon da ya gabata
+                delete watchStart[id];
 
-    }
-
-}
+            }
 
         });
 
     }, {
-
         threshold: 0.8
-
     });
 
-    videos.forEach(video => observer.observe(video));
+    videos.forEach(video => {
+        observer.observe(video);
+    });
 
 }
+
 
 // ================= PLAY / PAUSE =================
 
@@ -403,28 +514,25 @@ async function likeVideo(id) {
         const btn = document.getElementById("likeBtn-" + id);
 
         const res = await fetch("/api/shorts/like", {
-
             method: "PUT",
-
             headers: {
                 "Content-Type": "application/json"
             },
-
             body: JSON.stringify({
-
                 videoId: id,
-
                 username: user.username
-
             })
-
         });
 
         const data = await res.json();
 
         if (data.success) {
 
-            btn.classList.toggle("liked");
+            if (typeof data.liked === "boolean") {
+                btn.classList.toggle("liked", data.liked);
+            } else {
+                btn.classList.toggle("liked");
+            }
 
             document.getElementById("likes-" + id).innerText =
                 data.likes;
@@ -432,11 +540,8 @@ async function likeVideo(id) {
         }
 
     } catch (err) {
-
-        console.log(err);
-
+        console.log("Like error:", err);
     }
-
 }
 
 // ================= COMMENT =================
@@ -445,87 +550,136 @@ function commentVideo(id) {
 
     currentVideoId = id;
 
-    document
-        .getElementById("commentModal")
-        .classList
-        .add("show");
+    document.querySelectorAll(".comment-action.active")
+        .forEach(btn => btn.classList.remove("active"));
+
+    const btn = document.getElementById("commentBtn-" + id);
+
+    if (btn) {
+        btn.classList.add("active");
+    }
+
+    document.getElementById("commentModal")
+        .classList.add("show");
 
     loadComments(id);
+}
+
+function closeComments() {
+
+    document.getElementById("commentModal")
+        .classList.remove("show");
+
+    document.querySelectorAll(".comment-action.active")
+        .forEach(btn => btn.classList.remove("active"));
 
 }
 
 // ================= SHARE =================
-async function shareVideo(id){
+async function shareVideo(id) {
 
-    try{
+    try {
 
-        const res = await fetch("/api/shorts/share/" + id,{
-            method:"PUT"
+        const res = await fetch("/api/shorts/share/" + id, {
+            method: "PUT"
         });
 
         const data = await res.json();
 
-        if(data.success){
+        if (!data.success) return;
 
-            document.getElementById(
-                "shares-" + id
-            ).innerText = data.shares;
-
-        }
+        document.getElementById("shares-" + id).innerText =
+            data.shares;
 
         const url =
-            window.location.origin +
-            "/shorts.html?video=" + id;
+            window.location.origin + "/shorts.html?video=" + id;
 
-        if(navigator.share){
+        if (navigator.share) {
 
             await navigator.share({
-                title:"2Chat Shorts",
-                text:"Watch this Short on 2Chat!",
+                title: "2Chat Shorts",
+                text: "Watch this Short on 2Chat!",
                 url
             });
 
-        }else{
+        } else {
 
             await navigator.clipboard.writeText(url);
 
-            alert("📋 Link copied successfully.");
+            alert("Link copied successfully.");
 
         }
 
-    }catch(err){
+        const btn = document.getElementById("shareBtn-" + id);
 
-        console.log(err);
+        if (btn) {
+            btn.classList.add("active");
+        }
+
+    } catch (err) {
+
+        if (err.name !== "AbortError") {
+            console.log("Share error:", err);
+        }
+
+    }
+}
+
+async function addView(id) {
+
+    try {
+
+        const res = await fetch(
+            "/api/shorts/view/" + id,
+            {
+                method: "PUT"
+            }
+        );
+
+        const data = await res.json();
+
+        if (!data.success) {
+            return;
+        }
+
+        // Sabunta Views a videos memory
+        const video = window.videos?.find(
+            item => String(item._id) === String(id)
+        );
+
+        if (video) {
+            video.views = data.views;
+        }
+
+        // Sabunta Views a gefen dama
+        const viewsElement = document.getElementById(
+            "views-" + id
+        );
+
+        if (viewsElement) {
+            viewsElement.innerText = data.views;
+        }
+
+        // Sabunta Views a cikin menu
+        if (currentVisibleVideoId === id) {
+
+            const viewsText = document.getElementById(
+                "shortMenuViewsText"
+            );
+
+            if (viewsText) {
+                viewsText.innerText = "Views: " + data.views;
+            }
+
+        }
+
+    } catch (err) {
+
+        console.log("Add view error:", err);
 
     }
 
 }
-
-async function addView(id){
-
-    try{
-
-        const res = await fetch("/api/shorts/view/" + id,{
-            method:"PUT"
-        });
-
-        const data = await res.json();
-
-        if(data.success){
-
-            document.getElementById(
-                "views-" + id
-            ).innerText = data.views;
-
-        }
-
-    }catch(err){
-
-        console.log(err);
-
-    }
-
-}   
 
 function closeComments() {
 
@@ -744,57 +898,34 @@ async function followUser(targetUsername){
 
 // ================= SAVE VIDEO =================
 
-async function saveVideo(id){
+async function saveVideo(id) {
 
-    try{
+    try {
 
-        const btn =
-        document.getElementById("saveBtn-" + id);
+        const btn = document.getElementById("saveBtn-" + id);
 
-        const res = await fetch("/api/shorts/save",{
-
-            method:"PUT",
-
-            headers:{
-                "Content-Type":"application/json"
+        const res = await fetch("/api/shorts/save", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
             },
-
-            body:JSON.stringify({
-
-                username:user.username,
-
-                videoId:id
-
+            body: JSON.stringify({
+                username: user.username,
+                videoId: id
             })
-
         });
 
         const data = await res.json();
 
-        if(data.success){
+        if (data.success) {
 
-            if(data.saved){
-
-                btn.innerText="✅";
-
-                btn.classList.add("liked");
-
-            }else{
-
-                btn.innerText="🔖";
-
-                btn.classList.remove("liked");
-
-            }
+            btn.classList.toggle("liked", data.saved);
 
         }
 
-    }catch(err){
-
-        console.log(err);
-
+    } catch (err) {
+        console.log("Save error:", err);
     }
-
 }
 
 function showForYou(){
@@ -899,8 +1030,16 @@ function showGiftConfirmation(gift) {
 
         if (!video) return;
 
-        const short = video.closest(".short");
+const giftButton = document.getElementById(
+    "giftBtn-" + videoId
+);
 
+if (giftButton) {
+    giftButton.classList.add("active");
+}
+
+const short = video.closest(".short");
+        
         if (!short) return;
 
         const animation =
