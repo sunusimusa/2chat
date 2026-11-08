@@ -2,6 +2,8 @@ const user = JSON.parse(localStorage.getItem("user"));
 
 const container = document.getElementById("shortsContainer");
 
+const viewedVideos = new Set();
+
 let currentVideoId = null;
 let currentVisibleVideoId = null;
 let currentTab = "foryou";
@@ -372,7 +374,7 @@ if(videoId){
 
         autoPlayVideos();
 
-        // =====================================
+// =====================================
 // GIFT CONFIRMATION FROM GIFTS PAGE
 // =====================================
 
@@ -453,12 +455,18 @@ function autoPlayVideos() {
                 }
 
                 // Ƙara view
+                if (!viewedVideos.has(id)) {
+               viewedVideos.add(id);
                 addView(id);
+                }
 
             } else {
 
                 // Tsayar da video
                 videoElement.pause();
+                if (currentVisibleVideoId === id) {
+                currentVisibleVideoId = null;
+                }
 
                 // Lissafa lokacin da aka kalla
                 const seconds = Math.floor(
@@ -567,11 +575,15 @@ function commentVideo(id) {
 
 function closeComments() {
 
-    document.getElementById("commentModal")
-        .classList.remove("show");
+    document
+        .getElementById("commentModal")
+        .classList
+        .remove("show");
 
     document.querySelectorAll(".comment-action.active")
         .forEach(btn => btn.classList.remove("active"));
+
+    currentVideoId = null;
 
 }
 
