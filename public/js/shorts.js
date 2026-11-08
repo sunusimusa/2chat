@@ -1345,6 +1345,107 @@ try {
 
  }
 
+// =====================================
+// BOTTOM SHORT COMMENT BAR
+// =====================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const commentInput = document.getElementById(
+        "shortCommentText"
+    );
+
+    const sendButton = document.getElementById(
+        "shortCommentSend"
+    );
+
+    const avatar = document.getElementById(
+        "shortCommentAvatar"
+    );
+
+    if (!commentInput || !sendButton) {
+        return;
+    }
+
+    // Nuna hoton mai amfani
+    if (avatar && user) {
+
+        avatar.src = user.avatar || "/images/default.png";
+
+        avatar.onerror = function () {
+            this.src = "/images/default.png";
+        };
+
+    }
+
+    // Aika comment ta tsohon sendComment()
+    async function sendShortComment() {
+
+        const text = commentInput.value.trim();
+
+        if (!text) {
+            return;
+        }
+
+        if (!currentVisibleVideoId) {
+            alert("No active Short selected.");
+            return;
+        }
+
+        // Sanya Short din da ake kallo a matsayin target
+        currentVideoId = currentVisibleVideoId;
+
+        // Canja rubutun zuwa tsohon comment input
+        const oldInput = document.getElementById("commentText");
+
+        if (!oldInput) {
+            alert("Comment system is unavailable.");
+            return;
+        }
+
+        oldInput.value = text;
+
+        sendButton.disabled = true;
+
+        try {
+
+            await sendComment();
+
+            // Share akwatin rubutu idan an yi nasarar aikawa
+            if (oldInput.value === "") {
+                commentInput.value = "";
+            }
+
+        } finally {
+
+            sendButton.disabled = false;
+
+        }
+
+    }
+
+    sendButton.addEventListener(
+        "click",
+        sendShortComment
+    );
+
+    commentInput.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (event.key === "Enter") {
+
+                event.preventDefault();
+
+                sendShortComment();
+
+            }
+
+        }
+    );
+
+});
+
 // ================= LOAD =================
 
 loadVideos();
