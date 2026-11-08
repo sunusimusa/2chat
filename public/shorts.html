@@ -102,9 +102,37 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
      SHORTS CONTAINER
 ================================================== -->
 
+<!-- SHORTS CONTAINER -->
 <div id="shortsContainer"></div>
 
+<!-- BOTTOM COMMENT BAR -->
+<div id="shortCommentBar" class="short-comment-bar">
 
+    <img
+        id="shortCommentAvatar"
+        src="/images/default.png"
+        alt="Your profile"
+        class="short-comment-avatar"
+    >
+
+    <input
+        type="text"
+        id="shortCommentText"
+        placeholder="Add a comment..."
+        autocomplete="off"
+        maxlength="1000"
+    >
+
+    <button
+        type="button"
+        id="shortCommentSend"
+        class="short-comment-send"
+        aria-label="Send comment"
+    >
+        <i class="fa-solid fa-paper-plane"></i>
+    </button>
+
+</div>
 
 <!-- ==================================================
      COMMENT POPUP
