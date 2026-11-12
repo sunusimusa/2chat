@@ -853,3 +853,51 @@ exports.uploadCover = async (
   }
 
 };
+
+
+// =====================================================
+// REGISTER FCM TOKEN
+// =====================================================
+
+exports.registerFcmToken = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (
+      typeof token !== "string" ||
+      !token.trim() ||
+      token.length > 4096
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "A valid FCM token is required"
+      });
+    }
+
+    await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        $addToSet: {
+          fcmTokens: token.trim()
+        }
+      },
+      {
+        runValidators: true
+      }
+    );
+
+    return res.json({
+      success: true,
+      message: "FCM token registered successfully"
+    });
+
+  } catch (err) {
+    console.error("REGISTER FCM TOKEN ERROR:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to register FCM token"
+    });
+  }
+};
+
