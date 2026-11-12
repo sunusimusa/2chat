@@ -14,8 +14,7 @@ uploadCover,
 getUsers,
 getStatus,
 registerFcmToken
-} = require("../controllers/
-authController");
+} = require("../controllers/authController");
 
 // Test
 router.get("/", (req, res) => {
