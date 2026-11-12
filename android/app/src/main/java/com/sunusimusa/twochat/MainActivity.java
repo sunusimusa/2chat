@@ -583,6 +583,28 @@ webView.loadUrl(APP_URL + "/home.html");
                 grantResults
         );
 
+                if (requestCode == NOTIFICATION_PERMISSION_REQUEST) {
+
+            boolean granted = Build.VERSION.SDK_INT < 33
+                    || checkSelfPermission(
+                    Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED;
+
+            if (granted) {
+                android.util.Log.d(
+                        "2ChatFCM",
+                        "Notification permission granted."
+                );
+            } else {
+                android.util.Log.w(
+                        "2ChatFCM",
+                        "Notification permission denied."
+                );
+            }
+
+            return;
+        }
+
         if (requestCode == NATIVE_AUDIO_PERMISSION_REQUEST) {
 
             boolean granted =
