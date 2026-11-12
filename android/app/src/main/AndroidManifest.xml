@@ -11,6 +11,9 @@
     <!-- Camera permission for WebView media features -->
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <!-- Push Notifications for Android 13+ -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:theme="@style/AppTheme"
         android:allowBackup="true"
