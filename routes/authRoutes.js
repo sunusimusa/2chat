@@ -12,8 +12,10 @@ updateProfile,
 uploadAvatar,
 uploadCover,
 getUsers,
-getStatus
-} = require("../controllers/authController");
+getStatus,
+registerFcmToken
+} = require("../controllers/
+authController");
 
 // Test
 router.get("/", (req, res) => {
@@ -25,6 +27,13 @@ router.post("/register", register);
 
 // Login
 router.post("/login", login);
+
+// Register FCM Token
+router.post(
+  "/fcm-token",
+  protect,
+  registerFcmToken
+);
 
 // Update Profile
 router.put("/profile", protect, updateProfile);
