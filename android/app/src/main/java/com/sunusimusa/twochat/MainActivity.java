@@ -135,8 +135,34 @@ public class MainActivity extends Activity {
 
         setContentView(webView);
 
-        webView.loadUrl(APP_URL + "/home.html");
-    }
+        FirebaseMessaging.getInstance().getToken()
+        .addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                android.util.Log.e(
+                        "2ChatFCM",
+                        "Failed to get FCM token",
+                        task.getException()
+                );
+                return;
+            }
+
+            String token = task.getResult();
+
+            android.util.Log.d(
+                    "2ChatFCM",
+                    "FCM Token: " + token
+            );
+
+            webView.evaluateJavascript(
+                    "window.on2ChatFCMToken && window.on2ChatFCMToken('" +
+                    token +
+                    "');",
+                    null
+            );
+        });
+
+webView.loadUrl(APP_URL + "/home.html");
+}
 
     private static final String APP_URL_HOST =
             "twochat-vg3s.onrender.com";
