@@ -8,6 +8,7 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Build;
+import org.json.JSONObject;
 import android.util.Base64;
 import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
@@ -29,6 +30,7 @@ import java.util.List;
 public class MainActivity extends Activity {
 
     private WebView webView;
+    private String pendingFcmToken;
     private ValueCallback<Uri[]> filePathCallback;
 
     private static final int FILE_CHOOSER_REQUEST = 1001;
@@ -86,6 +88,12 @@ public class MainActivity extends Activity {
 
                 return true;
             }
+
+                        @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                deliverFcmToken();
+            }
         });
 
         webView.setWebChromeClient(new WebChromeClient() {
@@ -133,39 +141,53 @@ public class MainActivity extends Activity {
                     pendingPermissionRequest = null;
                 }
             }
+
         });
 
         setContentView(webView);
+
         requestNotificationPermission();
 
         FirebaseMessaging.getInstance().getToken()
-        .addOnCompleteListener(task -> {
-            if (!task.isSuccessful()) {
-                android.util.Log.e(
-                        "2ChatFCM",
-                        "Failed to get FCM token",
-                        task.getException()
-                );
-                return;
-            }
+                .addOnCompleteListener(task -> {
 
-            String token = task.getResult();
+                    if (!task.isSuccessful()) {
+                        android.util.Log.e(
+                                "2ChatFCM",
+                                "Failed to get FCM token",
+                                task.getException()
+                        );
+                        return;
+                    }
 
-            android.util.Log.d(
-                    "2ChatFCM",
-                    "FCM Token: " + token
-            );
+                    pendingFcmToken = task.getResult();
 
-            webView.evaluateJavascript(
-                    "window.on2ChatFCMToken && window.on2ChatFCMToken('" +
-                    token +
-                    "');",
-                    null
-            );
-        });
+                    android.util.Log.d(
+                            "2ChatFCM",
+                            "FCM token received successfully."
+                    );
 
-webView.loadUrl(APP_URL + "/home.html");
-}
+                    deliverFcmToken();
+                });
+
+        webView.loadUrl(APP_URL + "/home.html");
+    }
+
+        private void deliverFcmToken() {
+
+        if (webView == null || pendingFcmToken == null) {
+            return;
+        }
+
+        String safeToken = JSONObject.quote(pendingFcmToken);
+
+        webView.evaluateJavascript(
+                "if (typeof window.on2ChatFCMToken === 'function') {" +
+                "window.on2ChatFCMToken(" + safeToken + ");" +
+                "}",
+                null
+        );
+        }
 
     private static final String APP_URL_HOST =
             "twochat-vg3s.onrender.com";
