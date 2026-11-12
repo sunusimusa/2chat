@@ -126,6 +126,11 @@ const userSchema = new mongoose.Schema(
       default: []
     },
 
+    fcmTokens: {
+    type: [String],
+    default: []
+   },
+
 
     // =========================================
     // SAVED SHORT VIDEOS
