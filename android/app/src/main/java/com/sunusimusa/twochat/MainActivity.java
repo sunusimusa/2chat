@@ -7,12 +7,13 @@ import android.content.pm.PackageManager;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Build;
 import android.util.Base64;
 import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceRequest;
+import android.vwebkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -33,7 +34,8 @@ public class MainActivity extends Activity {
     private static final int FILE_CHOOSER_REQUEST = 1001;
     private static final int PERMISSION_REQUEST = 1002;
     private static final int NATIVE_AUDIO_PERMISSION_REQUEST = 1003;
-
+    private static final int NOTIFICATION_PERMISSION_REQUEST = 1004;
+    
     private static final String APP_URL =
             "https://twochat-vg3s.onrender.com";
 
@@ -134,6 +136,7 @@ public class MainActivity extends Activity {
         });
 
         setContentView(webView);
+        requestNotificationPermission();
 
         FirebaseMessaging.getInstance().getToken()
         .addOnCompleteListener(task -> {
@@ -166,6 +169,24 @@ webView.loadUrl(APP_URL + "/home.html");
 
     private static final String APP_URL_HOST =
             "twochat-vg3s.onrender.com";
+
+    private void requestNotificationPermission() {
+
+    if (Build.VERSION.SDK_INT >= 33) {
+
+        if (checkSelfPermission(
+                Manifest.permission.POST_NOTIFICATIONS
+        ) != PackageManager.PERMISSION_GRANTED) {
+
+            requestPermissions(
+                    new String[]{
+                            Manifest.permission.POST_NOTIFICATIONS
+                    },
+                    NOTIFICATION_PERMISSION_REQUEST
+            );
+        }
+    }
+    }
 
     private void showMessage(String message) {
         Toast.makeText(
