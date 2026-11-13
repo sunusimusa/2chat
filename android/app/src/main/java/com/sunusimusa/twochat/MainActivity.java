@@ -88,12 +88,15 @@ public class MainActivity extends Activity {
 
                 return true;
             }
+            
+        @Override
+        public void onPageFinished(WebView view, String url) {
+        super.onPageFinished(view, url);
 
-                        @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                deliverFcmToken();
-            }
+            fcmRetryCount = 0;
+            deliverFcmToken();
+        }
+            
         });
 
         webView.setWebChromeClient(new WebChromeClient() {
