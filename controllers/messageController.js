@@ -181,8 +181,10 @@ console.log(req.file);
 
 try{
 
-const { sender, receiver } = req.body;
+const { receiver } = req.body;
 
+const sender = req.user.username;
+  
 if(!sender || !receiver){
 
 return res.json({
