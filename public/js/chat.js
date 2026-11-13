@@ -786,10 +786,14 @@ async function sendMessage() {
         const res =
             await fetch(
                 "/api/messages/send",
-                {
-                    method: "POST",
-                    body: formData
-                }
+            {
+    method: "POST",
+    headers: {
+        "Authorization": "Bearer " + localStorage.getItem("token")
+    },
+    body: formData
+            }
+               
             );
 
 
@@ -2100,12 +2104,15 @@ async function sendVoice() {
         }
 
         const res = await fetch(
-            "/api/messages/voice",
-            {
-                method: "POST",
-                body: formData
-            }
-        );
+    "/api/messages/voice",
+    {
+        method: "POST",
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        },
+        body: formData
+    }
+);
 
         const data = await res.json();
 
