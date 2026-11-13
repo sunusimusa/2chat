@@ -27,10 +27,10 @@ router.post(
 
 router.post(
     "/voice",
+    protect,
     upload.single("voice"),
     sendVoice
 );
-
 
 // ================= GET =================
 
