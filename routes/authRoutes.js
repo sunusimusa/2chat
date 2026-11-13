@@ -27,9 +27,12 @@ router.post("/register", register);
 // Login
 router.post("/login", login);
 
-// Register FCM Token
 router.post(
   "/fcm-token",
+  (req, res, next) => {
+    console.log("🔥 FCM TOKEN ROUTE HIT");
+    next();
+  },
   protect,
   registerFcmToken
 );
