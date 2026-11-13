@@ -173,21 +173,58 @@ public class MainActivity extends Activity {
         webView.loadUrl(APP_URL + "/home.html");
     }
 
-        private void deliverFcmToken() {
+        
 
-        if (webView == null || pendingFcmToken == null) {
-            return;
-        }
+private int fcmRetryCount = 0;
+private static final int MAX_FCM_RETRIES = 15;
 
-        String safeToken = JSONObject.quote(pendingFcmToken);
+private void deliverFcmToken() {
 
-        webView.evaluateJavascript(
-                "if (typeof window.on2ChatFCMToken === 'function') {" +
-                "window.on2ChatFCMToken(" + safeToken + ");" +
-                "}",
-                null
-        );
-        }
+    if (webView == null || pendingFcmToken == null) {
+        return;
+    }
+
+    String safeToken = JSONObject.quote(pendingFcmToken);
+
+    webView.evaluateJavascript(
+            "(function() {" +
+            "if (typeof window.on2ChatFCMToken === 'function') {" +
+            "window.on2ChatFCMToken(" + safeToken + ");" +
+            "return true;" +
+            "}" +
+            "return false;" +
+            "})();",
+            result -> {
+
+                if ("true".equals(result)) {
+                    fcmRetryCount = 0;
+
+                    android.util.Log.d(
+                            "2ChatFCM",
+                            "FCM token delivered to JavaScript."
+                    );
+
+                } else if (fcmRetryCount < MAX_FCM_RETRIES) {
+
+                    fcmRetryCount++;
+
+                    webView.postDelayed(
+                            this::deliverFcmToken,
+                            1000
+                    );
+
+                } else {
+
+                    android.util.Log.e(
+                            "2ChatFCM",
+                            "FCM delivery stopped after maximum retries."
+                    );
+
+                }
+            }
+    );
+}
+      
 
     private static final String APP_URL_HOST =
             "twochat-vg3s.onrender.com";
