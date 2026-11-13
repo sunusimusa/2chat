@@ -10,7 +10,6 @@ exports.sendMessage = async (req, res) => {
 try{
 
 const {
-sender,
 receiver,
 text,
 replyTo,
@@ -20,6 +19,8 @@ replyVoice,
 replyUser
 } = req.body;
 
+const sender = req.user.username;
+  
 if(!sender || !receiver){
 
 return res.json({
