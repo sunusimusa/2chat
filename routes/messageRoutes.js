@@ -2,6 +2,8 @@ const router = require("express").Router();
 
 const upload = require("../middleware/upload");
 
+const protect = require("../middleware/auth");
+
 const {
     sendMessage,
     sendVoice,
@@ -18,6 +20,7 @@ const {
 
 router.post(
     "/send",
+    protect,
     upload.single("file"),
     sendMessage
 );
