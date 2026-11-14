@@ -42,6 +42,7 @@ router.get(
 
 router.get(
     "/list/:username",
+    protect,
     getChats
 );
 
