@@ -318,10 +318,17 @@ message:"Sender and receiver are required."
 
 const messages = await Message.find({
 
-$or:[
-{ sender, receiver },
-{ sender:receiver, receiver:sender }
-]
+    $and: [
+        {
+            $or: [
+                { sender, receiver },
+                { sender: receiver, receiver: sender }
+            ]
+        },
+        {
+            deletedForMe: { $ne: sender }
+        }
+    ]
 
 })
 .sort({ createdAt:1 })
