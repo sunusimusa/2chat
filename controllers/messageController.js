@@ -303,10 +303,12 @@ exports.getMessages = async (req, res) => {
 
 try{
 
-const { sender, receiver } = req.query;
+const { receiver } = req.query;
 
-if(!sender || !receiver){
+const sender = req.user.username;
 
+if(!receiver){
+  
 return res.status(400).json({
 success:false,
 message:"Sender and receiver are required."
