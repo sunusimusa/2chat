@@ -514,6 +514,18 @@ exports.reactMessage = async (req, res) => {
             });
         }
 
+
+      // Only chat participants can react
+if (
+    message.sender !== username &&
+    message.receiver !== username
+) {
+    return res.status(403).json({
+        success: false,
+        message: "You are not allowed to react to this message."
+    });
+}
+
         if (!Array.isArray(message.reactions)) {
             message.reactions = [];
         }
