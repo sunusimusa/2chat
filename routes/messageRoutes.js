@@ -58,9 +58,9 @@ router.put(
 
 // ================= DELETE =================
 
-// Delete for me
 router.delete(
     "/delete/:id",
+    protect,
     deleteMessage
 );
 
