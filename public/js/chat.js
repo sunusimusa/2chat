@@ -2060,7 +2060,6 @@ async function sendVoice() {
 
         const formData = new FormData();
 
-        formData.append("sender", user.username);
         formData.append("receiver", receiver);
         formData.append("text", "");
 
