@@ -371,8 +371,8 @@ exports.getChats = async (req, res) => {
 
 try {
 
-const { username } = req.params;
-
+const username = req.user.username;
+  
 // User
 const me = await User.findOne({ username });
 
