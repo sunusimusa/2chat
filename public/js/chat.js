@@ -2689,40 +2689,31 @@ async function clearChat() {
         return;
     }
 
-
     try {
 
-        const res =
-            await fetch(
-                `/api/messages/clear/${encodeURIComponent(user.username)}/${encodeURIComponent(receiver)}`,
-                {
-                    method: "DELETE"
+        const res = await fetch(
+            `/api/messages/clear/${encodeURIComponent(user.username)}/${encodeURIComponent(receiver)}`,
+            {
+                method: "DELETE",
+
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("token")
                 }
-            );
+            }
+        );
 
-
-        const data =
-            await res.json();
-
+        const data = await res.json();
 
         if (data.success) {
-
             chat.innerHTML = "";
-
-        }
-
-        else {
-
+        } else {
             alert(
                 data.message ||
                 "Failed to clear chat"
             );
-
         }
 
-    }
-
-    catch (err) {
+    } catch (err) {
 
         console.error(
             "Clear Chat Error:",
@@ -2731,8 +2722,7 @@ async function clearChat() {
 
     }
 
-}
-
+   }
 
 /* ==========================================================
    DELETE FOR ME
