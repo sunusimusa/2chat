@@ -737,11 +737,15 @@ exports.deleteForEveryone = async (req, res) => {
 
         message.deletedForEveryone = true;
         message.deletedBy = username;
-
+      
         message.text = "";
         message.image = "";
         message.voice = "";
 
+        message.file = "";
+        message.fileName = "";
+        message.fileSize = 0;
+      
         message.replyTo = null;
         message.replyText = "";
         message.replyImage = "";
