@@ -491,15 +491,15 @@ message: err.message
 
 
 // ================= REACTION =================
-
 exports.reactMessage = async (req, res) => {
 
     try {
 
-        const { messageId, username, emoji } = req.body;
+        const { messageId, emoji } = req.body;
+        const username = req.user.username;
 
-        if (!messageId || !username || !emoji) {
-            return res.json({
+        if (!messageId || !emoji) {
+            return res.status(400).json({
                 success: false,
                 message: "Missing required fields."
             });
@@ -508,13 +508,12 @@ exports.reactMessage = async (req, res) => {
         const message = await Message.findById(messageId);
 
         if (!message) {
-            return res.json({
+            return res.status(404).json({
                 success: false,
                 message: "Message not found."
             });
         }
 
-        // Tabbatar reactions array tana nan
         if (!Array.isArray(message.reactions)) {
             message.reactions = [];
         }
@@ -524,18 +523,12 @@ exports.reactMessage = async (req, res) => {
         );
 
         if (oldReaction) {
-
-            // Canza emoji idan ya taba react
             oldReaction.emoji = emoji;
-
         } else {
-
-            // Sabon reaction
             message.reactions.push({
                 username,
                 emoji
             });
-
         }
 
         await message.save();
@@ -557,6 +550,7 @@ exports.reactMessage = async (req, res) => {
     }
 
 };
+
 
 exports.deleteMessage = async (req, res) => {
 
