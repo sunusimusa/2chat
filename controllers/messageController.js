@@ -551,23 +551,24 @@ exports.reactMessage = async (req, res) => {
 
 };
 
-
 exports.deleteMessage = async (req, res) => {
 
     try {
 
+        const username = req.user.username;
+
         const message = await Message.findById(req.params.id);
 
         if (!message) {
-            return res.json({
+            return res.status(404).json({
                 success: false,
                 message: "Message not found."
             });
         }
 
-        // Mai message kaɗai zai iya gogewa
-        if (message.sender !== req.body.username) {
-            return res.json({
+        // Mai aika message kaɗai zai iya gogewa
+        if (message.sender !== username) {
+            return res.status(403).json({
                 success: false,
                 message: "Permission denied."
             });
@@ -592,7 +593,7 @@ exports.deleteMessage = async (req, res) => {
     }
 
 };
-  
+
 exports.clearChat = async (req, res) => {
 
     try {
