@@ -313,76 +313,71 @@ message:err.message
 
 exports.getMessages = async (req, res) => {
 
-try{
+    try {
 
-const { receiver } = req.query;
+        const { receiver } = req.query;
+        const sender = req.user.username;
 
-const sender = req.user.username;
-
-if(!receiver){
-  
-return res.status(400).json({
-success:false,
-message:"Sender and receiver are required."
-});
-
-}
-
-const messages = await Message.find({
-
-    $and: [
-        {
-            $or: [
-                { sender, receiver },
-                { sender: receiver, receiver: sender }
-            ]
-        },
-        {
-            deletedForMe: { $ne: sender }
+        if (!receiver) {
+            return res.status(400).json({
+                success: false,
+                message: "Receiver is required."
+            });
         }
-    ]
 
-})
-.sort({ createdAt:1 })
-.lean();
+        if (sender === receiver) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid receiver."
+            });
+        }
 
-await Message.updateMany(
+        const messages = await Message.find({
+            $and: [
+                {
+                    $or: [
+                        { sender, receiver },
+                        { sender: receiver, receiver: sender }
+                    ]
+                },
+                {
+                    deletedForMe: { $ne: sender }
+                }
+            ]
+        })
+        .sort({ createdAt: 1 })
+        .lean();
 
-{
-sender:receiver,
-receiver:sender,
-seen:false,
-deletedForMe: { $ne: sender }
-},
+        await Message.updateMany(
+            {
+                sender: receiver,
+                receiver: sender,
+                seen: false,
+                deletedForMe: { $ne: sender }
+            },
+            {
+                $set: {
+                    seen: true,
+                    seenAt: new Date()
+                }
+            }
+        );
 
-{
-$set:{
-seen:true,
-seenAt:new Date()
-}
-}
+        return res.json({
+            success: true,
+            messages
+        });
 
-);
+    } catch (err) {
 
-return res.json({
+        console.error(err);
 
-success:true,
-messages
+        return res.status(500).json({
+            success: false,
+            message: "Failed to load messages."
+        });
 
-});
-
-}catch(err){
-
-console.error(err);
-
-return res.status(500).json({
-
-success:false,
-message:"Failed to load messages."
-
-});
-
-  }
+    }
 
 };
   
