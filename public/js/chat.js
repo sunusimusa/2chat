@@ -723,11 +723,6 @@ async function sendMessage() {
 
 
     formData.append(
-        "sender",
-        user.username
-    );
-
-    formData.append(
         "receiver",
         receiver
     );
