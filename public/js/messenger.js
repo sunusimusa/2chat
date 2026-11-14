@@ -8,8 +8,15 @@ async function loadUsers() {
 
 try{
 
-const res = await fetch("/api/messages/list/" + me.username);
-
+const res = await fetch(
+    "/api/messages/list/" + me.username,
+    {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        }
+    }
+);
+  
 const data = await res.json();
 
 if(!data.success) return;
