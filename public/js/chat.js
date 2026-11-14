@@ -3019,17 +3019,14 @@ async function selectReaction(
                     method: "PUT",
 
                     headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+                    "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("token")
+             },
 
-                    body:
-                        JSON.stringify({
-                            username:
-                                user.username,
-
-                            emoji
-                        })
+                 body: JSON.stringify({
+                 emoji
+                 })
+                   
                 }
             );
 
