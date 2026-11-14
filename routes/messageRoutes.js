@@ -36,6 +36,7 @@ router.post(
 
 router.get(
     "/chat",
+    protect,
     getMessages
 );
 
