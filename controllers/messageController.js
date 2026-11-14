@@ -529,7 +529,6 @@ exports.reactMessage = async (req, res) => {
             });
         }
 
-
       // Only chat participants can react
 if (
     message.sender !== username &&
@@ -540,6 +539,18 @@ if (
         message: "You are not allowed to react to this message."
     });
 }
+
+// Do not allow reactions on deleted messages
+if (
+    message.deletedForEveryone ||
+    message.deletedForMe.includes(username)
+) {
+    return res.status(403).json({
+        success: false,
+        message: "You cannot react to a deleted message."
+    });
+}
+
 
         if (!Array.isArray(message.reactions)) {
             message.reactions = [];
