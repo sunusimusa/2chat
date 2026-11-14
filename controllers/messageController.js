@@ -205,6 +205,17 @@ message:"Sender or receiver missing."
 
 }
 
+  const receiverUser = await User.findOne({
+    username: receiver
+});
+
+if (!receiverUser) {
+    return res.status(404).json({
+        success: false,
+        message: "Receiver account not found."
+    });
+}  
+
 if(!req.file){
 
 return res.json({
