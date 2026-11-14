@@ -393,12 +393,19 @@ message: "User not found"
 
 // Duk messages
 const messages = await Message.find({
-$or: [
-{ sender: username },
-{ receiver: username }
-]
+    $and: [
+        {
+            $or: [
+                { sender: username },
+                { receiver: username }
+            ]
+        },
+        {
+            deletedForMe: { $ne: username }
+        }
+    ]
 }).sort({ createdAt: -1 });
-
+  
 const chats = {};
 
 for (const friend of me.friends || []) {
