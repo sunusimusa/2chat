@@ -64,9 +64,9 @@ router.delete(
     deleteMessage
 );
 
-// Delete for everyone
 router.put(
     "/delete-everyone/:id",
+    protect,
     deleteForEveryone
 );
 
