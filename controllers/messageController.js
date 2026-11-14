@@ -640,12 +640,12 @@ exports.deleteForEveryone = async (req, res) => {
     try {
 
         const { id } = req.params;
-        const { username } = req.body;
+        const username = req.user.username;
 
-        if (!id || !username) {
+        if (!id) {
             return res.status(400).json({
                 success: false,
-                message: "Missing data."
+                message: "Missing message ID."
             });
         }
 
@@ -666,7 +666,6 @@ exports.deleteForEveryone = async (req, res) => {
             });
         }
 
-        // Idan an riga an goge
         if (message.deletedForEveryone) {
             return res.json({
                 success: false,
@@ -674,7 +673,6 @@ exports.deleteForEveryone = async (req, res) => {
             });
         }
 
-        // Goge message ga kowa
         message.deletedForEveryone = true;
         message.deletedBy = username;
 
@@ -709,3 +707,4 @@ exports.deleteForEveryone = async (req, res) => {
     }
 
 };
+
