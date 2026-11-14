@@ -339,7 +339,8 @@ await Message.updateMany(
 {
 sender:receiver,
 receiver:sender,
-seen:false
+seen:false,
+deletedForMe: { $ne: sender }
 },
 
 {
