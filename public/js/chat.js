@@ -514,9 +514,14 @@ async function loadMessages(
     try {
 
         const res =
-            await fetch(
-                `/api/messages/chat?sender=${encodeURIComponent(user.username)}&receiver=${encodeURIComponent(receiver)}`
-            );
+    await fetch(
+        `/api/messages/chat?sender=${encodeURIComponent(user.username)}&receiver=${encodeURIComponent(receiver)}`,
+        {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            }
+        }
+    );
 
         if (!res.ok) {
             throw new Error(
