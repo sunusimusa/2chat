@@ -187,9 +187,6 @@ message:err.message
 // ================= SEND VOICE =================
 exports.sendVoice = async (req, res) => {
 
-console.log(req.body);
-console.log(req.file);
-
 try{
 
 const { receiver } = req.body;
@@ -234,12 +231,7 @@ folder:"2chat-voice"
 
 async(error, result)=>{
 
-  console.log("Cloudinary Error:", error);
-console.log("Cloudinary Result:", result);
-
 if(error){
-
-console.log(error);
 
 return res.status(500).json({
 success:false,
@@ -283,8 +275,6 @@ message
 });
 
 }catch(err){
-
-console.log(err);
 
 return res.status(500).json({
 
