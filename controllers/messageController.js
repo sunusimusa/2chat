@@ -622,24 +622,37 @@ exports.clearChat = async (req, res) => {
         const { user2 } = req.params;
 
         if (!user1 || !user2) {
-
             return res.status(400).json({
                 success: false,
                 message: "Missing users."
             });
-
         }
 
-        const result = await Message.deleteMany({
-            $or: [
-                { sender: user1, receiver: user2 },
-                { sender: user2, receiver: user1 }
-            ]
-        });
+        if (user1 === user2) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid chat users."
+            });
+        }
+
+        const result = await Message.updateMany(
+            {
+                $or: [
+                    { sender: user1, receiver: user2 },
+                    { sender: user2, receiver: user1 }
+                ],
+                deletedForMe: { $ne: user1 }
+            },
+            {
+                $addToSet: {
+                    deletedForMe: user1
+                }
+            }
+        );
 
         return res.json({
             success: true,
-            deletedCount: result.deletedCount,
+            deletedCount: result.modifiedCount,
             message: "Chat cleared successfully."
         });
 
@@ -649,7 +662,7 @@ exports.clearChat = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: err.message
+            message: "Failed to clear chat."
         });
 
     }
