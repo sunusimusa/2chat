@@ -3012,23 +3012,22 @@ async function selectReaction(
 
     try {
 
-        const res =
-            await fetch(
-                `/api/messages/react/${encodeURIComponent(selectedMessage)}`,
-                {
-                    method: "PUT",
+       const res = await fetch(
+    "/api/messages/react",
+    {
+        method: "PUT",
 
-                    headers: {
-                    "Content-Type": "application/json",
-                "Authorization": "Bearer " + localStorage.getItem("token")
-             },
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        },
 
-                 body: JSON.stringify({
-                 emoji
-                 })
-                   
-                }
-            );
+        body: JSON.stringify({
+            messageId: selectedMessage,
+            emoji
+        })
+    }
+);
 
 
         const data =
