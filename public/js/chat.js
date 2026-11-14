@@ -2728,9 +2728,7 @@ async function clearChat() {
    DELETE FOR ME
 ========================================================== */
 
-async function deleteMessage(
-    messageId
-) {
+async function deleteMessage(messageId) {
 
     if (
         !confirm(
@@ -2740,32 +2738,20 @@ async function deleteMessage(
         return;
     }
 
-
     try {
 
-        const res =
-            await fetch(
-                `/api/messages/delete/${encodeURIComponent(messageId)}`,
-                {
-                    method: "DELETE",
+        const res = await fetch(
+            `/api/messages/delete/${encodeURIComponent(messageId)}`,
+            {
+                method: "DELETE",
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify({
-                            username:
-                                user.username
-                        })
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("token")
                 }
-            );
+            }
+        );
 
-
-        const data =
-            await res.json();
-
+        const data = await res.json();
 
         if (!res.ok || !data.success) {
 
@@ -2775,17 +2761,11 @@ async function deleteMessage(
             );
 
             return;
-
         }
 
+        removeMessageFromDOM(messageId);
 
-        removeMessageFromDOM(
-            messageId
-        );
-
-    }
-
-    catch (err) {
+    } catch (err) {
 
         console.error(
             "Delete Error:",
@@ -2801,9 +2781,7 @@ async function deleteMessage(
    DELETE EVERYONE
 ========================================================== */
 
-async function deleteForEveryone(
-    messageId
-) {
+async function deleteForEveryone(messageId) {
 
     if (
         !confirm(
@@ -2813,32 +2791,20 @@ async function deleteForEveryone(
         return;
     }
 
-
     try {
 
-        const res =
-            await fetch(
-                `/api/messages/delete-everyone/${encodeURIComponent(messageId)}`,
-                {
-                    method: "PUT",
+        const res = await fetch(
+            `/api/messages/delete-everyone/${encodeURIComponent(messageId)}`,
+            {
+                method: "PUT",
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify({
-                            username:
-                                user.username
-                        })
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("token")
                 }
-            );
+            }
+        );
 
-
-        const data =
-            await res.json();
-
+        const data = await res.json();
 
         if (!res.ok || !data.success) {
 
@@ -2848,14 +2814,9 @@ async function deleteForEveryone(
             );
 
             return;
-
         }
 
-
-        updateDeletedMessage(
-            messageId
-        );
-
+        updateDeletedMessage(messageId);
 
         socket.emit(
             "messageDeleted",
@@ -2864,9 +2825,7 @@ async function deleteForEveryone(
             }
         );
 
-    }
-
-    catch (err) {
+    } catch (err) {
 
         console.error(
             "Delete Everyone Error:",
