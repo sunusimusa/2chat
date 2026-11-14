@@ -598,11 +598,12 @@ exports.clearChat = async (req, res) => {
 
     try {
 
-        const { user1, user2 } = req.params;
+        const user1 = req.user.username;
+        const { user2 } = req.params;
 
         if (!user1 || !user2) {
 
-            return res.json({
+            return res.status(400).json({
                 success: false,
                 message: "Missing users."
             });
