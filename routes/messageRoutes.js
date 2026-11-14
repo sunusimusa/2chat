@@ -51,6 +51,7 @@ router.get(
 
 router.put(
     "/react",
+    protect,
     reactMessage
 );
 
