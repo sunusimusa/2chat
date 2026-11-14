@@ -586,19 +586,29 @@ exports.deleteMessage = async (req, res) => {
             });
         }
 
-        // Mai aika message kaɗai zai iya gogewa
-        if (message.sender !== username) {
+        // Sender ko receiver kawai zai iya ɓoye message
+        if (
+            message.sender !== username &&
+            message.receiver !== username
+        ) {
             return res.status(403).json({
                 success: false,
                 message: "Permission denied."
             });
         }
 
-        await Message.findByIdAndDelete(req.params.id);
+        // Kada a maimaita username idan an riga an ɓoye message
+        if (!message.deletedForMe.includes(username)) {
+
+            message.deletedForMe.push(username);
+
+            await message.save();
+
+        }
 
         return res.json({
             success: true,
-            message: "Message deleted successfully."
+            message: "Message deleted for you."
         });
 
     } catch (err) {
@@ -607,7 +617,7 @@ exports.deleteMessage = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: err.message
+            message: "Failed to delete message."
         });
 
     }
