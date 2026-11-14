@@ -70,9 +70,9 @@ router.put(
     deleteForEveryone
 );
 
-// Clear chat
 router.delete(
     "/clear/:user1/:user2",
+    protect,
     clearChat
 );
 
