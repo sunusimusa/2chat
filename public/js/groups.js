@@ -228,49 +228,65 @@ if(openAdminManagement){
 JOIN GROUP
 ========================== */
 
-async function joinGroup(groupId){
+async function joinGroup(groupId) {
 
-    try{
+    const token = localStorage.getItem("token");
 
-        const res =
-        await fetch("/api/groups/join",{
+    if (!token) {
+        alert("Please login again.");
+        window.location.href = "/login.html";
+        return;
+    }
 
-            method:"PUT",
+    try {
 
-            headers:{
-                "Content-Type":"application/json"
+        const res = await fetch("/api/groups/join", {
+
+            method: "PUT",
+
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": `Bearer ${token}`
             },
 
-            body:JSON.stringify({
-
-                groupId,
-
-                username:user.username
-
+            body: JSON.stringify({
+                groupId
             })
 
         });
 
-        const data =
-        await res.json();
+        const data = await res.json();
 
-        if(data.success){
+        if (res.status === 401) {
+            localStorage.removeItem("token");
+            window.location.href = "/login.html";
+            return;
+        }
 
-            loadGroups();
+        if (data.success) {
 
-        }else{
+            await loadGroups();
 
-            alert(data.message);
+        } else {
+
+            alert(
+                data.message ||
+                "Failed to join group."
+            );
 
         }
 
-    }catch(err){
+    } catch (err) {
 
-        console.error(err);
+        console.error("JOIN GROUP ERROR:", err);
+
+        alert("Network error. Please try again.");
 
     }
 
 }
+
 
 /* ==========================
 GROUP INVITATION NOTIFICATION
@@ -284,12 +300,24 @@ async function loadInvitationNotification(){
             return;
         }
 
-        const res =
-        await fetch(
-            "/api/groups/invitations/" +
-            encodeURIComponent(user.username)
-        );
+        const token = localStorage.getItem("token");
 
+if (!token) {
+    return;
+}
+
+const res = await fetch(
+    "/api/groups/invitations/" +
+    encodeURIComponent(user.username),
+    {
+        method: "GET",
+        headers: {
+            "Accept": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    }
+);
+     
         const data =
         await res.json();
 
