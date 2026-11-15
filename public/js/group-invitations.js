@@ -36,6 +36,7 @@ const invitationsContainer =
 // LOAD INVITATIONS
 // ==================================================
 
+
 async function loadInvitations() {
 
     if (!invitationsContainer) return;
@@ -46,6 +47,13 @@ async function loadInvitations() {
             Loading invitations...
         </div>
     `;
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        window.location.href = "/login.html";
+        return;
+    }
 
     try {
 
@@ -60,43 +68,32 @@ async function loadInvitations() {
             "/api/groups/invitations/" +
             encodeURIComponent(username);
 
-        console.log(
-            "LOADING GROUP INVITATIONS:",
-            url
-        );
+        const controller = new AbortController();
 
-        // Timeout after 15 seconds
-        const controller =
-            new AbortController();
+        const timeout = setTimeout(() => {
+            controller.abort();
+        }, 15000);
 
-        const timeout =
-            setTimeout(() => {
-                controller.abort();
-            }, 15000);
+        let res;
 
-        const res =
-            await fetch(url, {
+        try {
+
+            res = await fetch(url, {
                 method: "GET",
                 headers: {
-                    "Accept": "application/json"
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${token}`
                 },
                 signal: controller.signal
             });
 
-        clearTimeout(timeout);
+        } finally {
 
-        console.log(
-            "INVITATIONS STATUS:",
-            res.status
-        );
+            clearTimeout(timeout);
 
-        const text =
-            await res.text();
+        }
 
-        console.log(
-            "INVITATIONS RESPONSE:",
-            text
-        );
+        const text = await res.text();
 
         let data;
 
@@ -114,6 +111,12 @@ async function loadInvitations() {
 
         if (!res.ok || !data.success) {
 
+            if (res.status === 401) {
+                localStorage.removeItem("token");
+                window.location.href = "/login.html";
+                return;
+            }
+
             throw new Error(
                 data.message ||
                 "Failed to load invitations."
@@ -125,7 +128,6 @@ async function loadInvitations() {
             Array.isArray(data.invitations)
                 ? data.invitations
                 : [];
-
 
         // ==========================
         // NO INVITATIONS
@@ -150,22 +152,18 @@ async function loadInvitations() {
             return;
         }
 
-
         // ==========================
         // DISPLAY
         // ==========================
 
         invitationsContainer.innerHTML = "";
 
-
         invitations.forEach(invitation => {
 
             const card =
                 document.createElement("div");
 
-            card.className =
-                "invitation-card";
-
+            card.className = "invitation-card";
 
             card.innerHTML = `
 
@@ -177,16 +175,14 @@ async function loadInvitations() {
 
                     <h3>
                         ${escapeHtml(
-                            invitation.groupName ||
-                            "Group"
+                            invitation.groupName || "Group"
                         )}
                     </h3>
 
                     <p>
                         <strong>
                             ${escapeHtml(
-                                invitation.inviter ||
-                                "Someone"
+                                invitation.inviter || "Someone"
                             )}
                         </strong>
 
@@ -199,7 +195,7 @@ async function loadInvitations() {
 
                     <button
                         class="accept-btn"
-                        data-id="${invitation._id}"
+                        data-id="${escapeHtml(invitation._id)}"
                     >
                         <i class="fa-solid fa-check"></i>
                         Accept
@@ -207,7 +203,7 @@ async function loadInvitations() {
 
                     <button
                         class="reject-btn"
-                        data-id="${invitation._id}"
+                        data-id="${escapeHtml(invitation._id)}"
                     >
                         <i class="fa-solid fa-xmark"></i>
                         Reject
@@ -221,50 +217,37 @@ async function loadInvitations() {
 
         });
 
-
         // ==========================
         // ACCEPT
         // ==========================
 
-        document
+        invitationsContainer
             .querySelectorAll(".accept-btn")
             .forEach(button => {
 
-                button.addEventListener(
-                    "click",
-                    () => {
+                button.addEventListener("click", () => {
 
-                        acceptInvitation(
-                            button.dataset.id
-                        );
+                    acceptInvitation(button.dataset.id);
 
-                    }
-                );
+                });
 
             });
-
 
         // ==========================
         // REJECT
         // ==========================
 
-        document
+        invitationsContainer
             .querySelectorAll(".reject-btn")
             .forEach(button => {
 
-                button.addEventListener(
-                    "click",
-                    () => {
+                button.addEventListener("click", () => {
 
-                        rejectInvitation(
-                            button.dataset.id
-                        );
+                    rejectInvitation(button.dataset.id);
 
-                    }
-                );
+                });
 
             });
-
 
     } catch (error) {
 
@@ -273,21 +256,16 @@ async function loadInvitations() {
             error
         );
 
-
         let message =
             error.message ||
             "Failed to load invitations.";
 
-
-        if (
-            error.name === "AbortError"
-        ) {
+        if (error.name === "AbortError") {
 
             message =
                 "Server took too long to respond.";
 
         }
-
 
         invitationsContainer.innerHTML = `
 
@@ -315,7 +293,7 @@ async function loadInvitations() {
 
     }
 
-}
+ }           
 
 // ==================================================
 // ACCEPT INVITATION
