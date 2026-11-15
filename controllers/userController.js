@@ -286,81 +286,49 @@ exports.followUser = async (req, res) => {
 // GET USER PROFILE
 // =====================================================
 
+
 exports.getUserProfile = async (req, res) => {
-
     try {
-
-        const username =
-            String(
-                req.params.username || ""
-            ).trim();
-
+        const username = String(
+            req.params.username || ""
+        ).trim();
 
         if (!username) {
-
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "Username is required."
-
+                message: "Username is required."
             });
-
         }
 
-
-        const user =
-    await User.findOne({
-        username: {
-            $regex: `^${username.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
-            $options: "i"
-        }
-    });
-
-
-        if (!user) {
-
-            return res.status(404).json({
-
-                success: false,
-
-                message:
-                    "User not found."
-
-            });
-
-        }
-
-
-        return res.json({
-
-            success: true,
-
-            user
-
-        });
-
-
-    } catch (err) {
-
-        console.error(
-            "GET USER PROFILE ERROR:",
-            err
+        const user = await User.findOne({
+            username: {
+                $regex: `^${username.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
+                $options: "i"
+            }
+        }).select(
+            "username avatar cover bio online lastSeen followers following isCreator creatorBadge"
         );
 
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found."
+            });
+        }
 
-        return res.status(500).json({
-
-            success: false,
-
-            message:
-                "Failed to load user profile."
-
+        return res.json({
+            success: true,
+            user
         });
 
-    }
+    } catch (err) {
+        console.error("GET USER PROFILE ERROR:", err);
 
+        return res.status(500).json({
+            success: false,
+            message: "Failed to load user profile."
+        });
+    }
 };
 
 
