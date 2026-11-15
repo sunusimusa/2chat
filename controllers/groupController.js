@@ -1750,175 +1750,108 @@ exports.getMyGroupInvitations = async (req, res) => {
 // ==================================================
 
 exports.acceptGroupInvitation = async (req, res) => {
-
     try {
+        const { invitationId } = req.body;
 
-        const {
-            invitationId,
-            username
-        } = req.body;
+        // GET AUTHENTICATED USER
+        const username = req.user.username;
 
-
-        // ==========================
-        // CHECK DATA
-        // ==========================
-
-        if (!invitationId || !username) {
-
+        if (!invitationId) {
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "Invitation ID and username are required."
-
+                message: "Invitation ID is required."
             });
-
         }
 
+        if (!username) {
+            return res.status(401).json({
+                success: false,
+                message: "Authentication required."
+            });
+        }
 
-        // ==========================
         // FIND INVITATION
-        // ==========================
-
         const invitation =
-            await GroupInvitation.findById(
-                invitationId
-            );
+            await GroupInvitation.findById(invitationId);
 
         if (!invitation) {
-
             return res.status(404).json({
-
                 success: false,
-
-                message:
-                    "Invitation not found."
-
+                message: "Invitation not found."
             });
-
         }
 
-
-        // ==========================
-        // SECURITY CHECK
-        // ==========================
-
-        if (invitation.invitee !== username) {
-
+        // VERIFY INVITATION OWNER
+        if (
+            String(invitation.invitee).toLowerCase() !==
+            String(username).toLowerCase()
+        ) {
             return res.status(403).json({
-
                 success: false,
-
-                message:
-                    "You cannot accept this invitation."
-
+                message: "You cannot accept this invitation."
             });
-
         }
 
-
-        // ==========================
-        // CHECK STATUS
-        // ==========================
-
+        // CHECK INVITATION STATUS
         if (invitation.status !== "pending") {
-
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "This invitation is no longer active."
-
+                message: "This invitation is no longer active."
             });
-
         }
 
-
-        // ==========================
         // FIND GROUP
-        // ==========================
-
         const group =
-            await Group.findById(
-                invitation.groupId
-            );
+            await Group.findById(invitation.groupId);
 
         if (!group) {
-
-    invitation.status = "accepted";
-    invitation.respondedAt = new Date();
-
-    await invitation.save();
-
-    return res.status(404).json({
-
-        success: false,
-
-        message:
-            "Group no longer exists."
-
-    });
-
-}
-
-
-        // ==========================
-        // ADD MEMBER
-        // ==========================
-
-        if (!group.members.includes(username)) {
-
-            group.members.push(username);
-
-            group.memberCount =
-                group.members.length;
-
-            await group.save();
-
+            return res.status(404).json({
+                success: false,
+                message: "Group no longer exists."
+            });
         }
 
+        // ENSURE MEMBERS ARRAY EXISTS
+        if (!Array.isArray(group.members)) {
+            group.members = [];
+        }
 
-        // ==========================
-        // UPDATE INVITATION
-        // ==========================
+        // ADD MEMBER IF NOT ALREADY PRESENT
+        const alreadyMember = group.members.some(
+            member =>
+                String(member).toLowerCase() ===
+                String(username).toLowerCase()
+        );
 
+        if (!alreadyMember) {
+            group.members.push(username);
+            group.memberCount = group.members.length;
+            await group.save();
+        }
+
+        // UPDATE INVITATION STATUS
         invitation.status = "accepted";
-invitation.respondedAt = new Date();
+        invitation.respondedAt = new Date();
 
-await invitation.save();
+        await invitation.save();
 
         return res.json({
-
             success: true,
-
-            message:
-                "You joined the group successfully.",
-
+            message: "You joined the group successfully.",
             group
-
         });
 
-
     } catch (error) {
-
         console.error(
             "ACCEPT GROUP INVITATION ERROR:",
             error
         );
 
         return res.status(500).json({
-
             success: false,
-
-            message:
-                "Failed to accept invitation."
-
+            message: "Failed to accept invitation."
         });
-
     }
-
 };
 
 // ==================================================
