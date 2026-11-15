@@ -804,22 +804,18 @@ async function leaveGroup() {
 
     if (!user) {
 
-        alert(
-            "Please login first."
-        );
-
-        window.location.href =
-            "/login.html";
-
+        alert("Please login first.");
+        window.location.href = "/login.html";
         return;
 
     }
 
+    if (!currentGroup) {
+        alert("Group information is not available.");
+        return;
+    }
 
-    if (
-        user.username ===
-        currentGroup.owner
-    ) {
+    if (user.username === currentGroup.owner) {
 
         alert(
             "The group owner cannot leave the group. Transfer ownership or delete the group."
@@ -829,82 +825,91 @@ async function leaveGroup() {
 
     }
 
+    const token = localStorage.getItem("token");
 
-    const confirmLeave =
-        confirm(
-            "Are you sure you want to leave this group?"
-        );
+    if (!token) {
 
+        alert("Please login again.");
+        window.location.href = "/login.html";
+        return;
+
+    }
+
+    const confirmLeave = confirm(
+        "Are you sure you want to leave this group?"
+    );
 
     if (!confirmLeave) return;
 
-
     try {
 
-        const res =
-            await fetch(
-                "/api/groups/leave",
-                {
+        leaveGroupBtn.disabled = true;
 
-                    method: "PUT",
+        const res = await fetch(
+            "/api/groups/leave",
+            {
+                method: "PUT",
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
 
-                    body: JSON.stringify({
+                body: JSON.stringify({
+                    groupId
+                })
+            }
+        );
 
-                        groupId,
+        const data = await res.json();
 
-                        username:
-                            user.username
+        if (res.status === 401) {
 
-                    })
+            localStorage.removeItem("token");
 
-                }
-            );
+            alert("Your session has expired. Please login again.");
 
+            window.location.href = "/login.html";
+            return;
 
-        const data =
-            await res.json();
+        }
 
-
-        if (data.success) {
-
-            alert(
-    "✅ You left the group."
-);
-
-/* Update local group immediately */
-currentGroup.members =
-    currentGroup.members.filter(
-        member =>
-            member !== user.username
-    );
-
-currentGroup.memberCount =
-    currentGroup.members.length;
-
-/* Remove user from admins too, if necessary */
-currentGroup.admins =
-    (currentGroup.admins || []).filter(
-        admin =>
-            admin !== user.username
-    );
-
-/* Refresh UI immediately */
-renderGroup();
-
-        } else {
+        if (!res.ok || !data.success) {
 
             alert(
                 data.message ||
                 "Unable to leave group."
             );
 
+            return;
+
         }
 
+        // ==========================
+        // UPDATE LOCAL GROUP DATA
+        // ==========================
+
+        currentGroup.members =
+            (currentGroup.members || []).filter(
+                member => member !== user.username
+            );
+
+        currentGroup.memberCount =
+            currentGroup.members.length;
+
+        currentGroup.admins =
+            (currentGroup.admins || []).filter(
+                admin => admin !== user.username
+            );
+
+        // ==========================
+        // REFRESH UI
+        // ==========================
+
+        renderGroup();
+
+        alert("You left the group successfully.");
 
     } catch (error) {
 
@@ -913,9 +918,11 @@ renderGroup();
             error
         );
 
-        alert(
-            "Network error."
-        );
+        alert("Network error. Please try again.");
+
+    } finally {
+
+        leaveGroupBtn.disabled = false;
 
     }
 
