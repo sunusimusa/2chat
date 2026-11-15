@@ -110,7 +110,8 @@ router.delete(
 );
 
 router.put(
-    "/add-member",
+    "/add-member", 
+    protect,
     addMember
 );
 
