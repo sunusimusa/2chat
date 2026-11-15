@@ -223,12 +223,12 @@ exports.login = async (req, res) => {
     // =========================================
 
     const user =
-      await User.findOne({
-        $or: [
-          { email: loginValue },
-          { username: loginValue }
-        ]
-      });
+  await User.findOne({
+    $or: [
+      { email: loginValue },
+      { username: loginValue }
+    ]
+  }).select("+password");
 
 
     if (!user) {
