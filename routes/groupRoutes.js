@@ -66,19 +66,9 @@ router.get(
     getSentGroupInvitations
 );
 
-
 router.get(
     "/invitations/:username",
-    (req, res, next) => {
-
-        console.log(
-            "🔥 INVITATIONS ROUTE HIT:",
-            req.params.username
-        );
-
-        next();
-
-    },
+    protect,
     getMyGroupInvitations
 );
     
