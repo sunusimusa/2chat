@@ -5,62 +5,69 @@ location.href = "/login.html";
 }
 
 async function loadUsers() {
+    try {
+        let page = 1;
+        let allUsers = [];
+        let hasNextPage = true;
 
-try {
+        while (hasNextPage) {
+            const res = await fetch(
+                `/api/users/all?page=${page}&limit=50`
+            );
 
-const res = await fetch("/api/users/all");
+            if (!res.ok) {
+                throw new Error("Failed to load users.");
+            }
 
-const data = await res.json();
+            const data = await res.json();
 
-const box = document.getElementById("users");
+            if (!data.success || !Array.isArray(data.users)) {
+                throw new Error("Invalid users response.");
+            }
 
-box.innerHTML = "";
+            allUsers.push(...data.users);
 
-data.users.forEach(u => {
+            hasNextPage =
+                data.pagination?.hasNextPage === true;
 
-if (u.username === user.username) return;
+            page++;
+        }
 
-box.innerHTML += `
+        const box = document.getElementById("users");
 
-<div class="user-card">
+        if (!box) return;
 
-<div class="user-info">
+        box.innerHTML = "";
 
-<img src="${u.avatar || '/images/default.png'}">
+        allUsers.forEach(u => {
+            if (u.username === user.username) return;
 
-<div>
+            box.innerHTML += `
+                <div class="user-card">
+                    <div class="user-info">
+                        <img src="${u.avatar || '/images/default.png'}">
 
-<b>${u.username}</b><br>
+                        <div>
+                            <b>${u.username}</b><br>
+                            <small>
+                                ${u.online ? "🟢 Online" : "⚫ Offline"}
+                            </small>
+                        </div>
+                    </div>
 
-<small>
-${u.online ? "🟢 Online" : "⚫ Offline"}
-</small>
+                    <button
+                        class="add-btn"
+                        onclick="sendFriendRequest('${u.username}')">
+                        ➕ Add Friend
+                    </button>
+                </div>
+            `;
+        });
 
-</div>
-
-</div>
-
-<button
-class="add-btn"
-onclick="sendFriendRequest('${u.username}')">
-
-➕ Add Friend
-
-</button>
-
-</div>
-
-`;
-
-});
-
-} catch (err) {
-
-console.log(err);
-
-}
-
-}
+    } catch (err) {
+        console.error("LOAD USERS ERROR:", err);
+    }
+  }
 
 async function sendFriendRequest(receiver){
 
