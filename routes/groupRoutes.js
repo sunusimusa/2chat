@@ -94,6 +94,7 @@ router.put(
 
 router.put(
     "/join",
+    protect,
     joinGroup
 );
 
