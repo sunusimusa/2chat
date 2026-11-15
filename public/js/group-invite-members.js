@@ -363,30 +363,29 @@ async function getAllUsersCached() {
 
             const data = await res.json();
 
-            if (
+            
+if (
+    !data.success ||
+    !Array.isArray(data.users) ||
     !data.pagination ||
     !Number.isInteger(data.pagination.totalPages) ||
     data.pagination.totalPages < 0
 ) {
-    throw new Error("Invalid pagination response.");
+    throw new Error("Invalid users pagination response.");
 }
 
 if (totalPages === null) {
     totalPages = data.pagination.totalPages;
 }
 
-if (page > totalPages) {
-    break;
+if (data.pagination.totalPages !== totalPages) {
+    throw new Error("Pagination changed while loading users.");
 }
 
+if (page > totalPages) {
+    break;
+        }
             
-            if (
-                !data.success ||
-                !Array.isArray(data.users)
-            ) {
-                throw new Error("Invalid users response.");
-            }
-
             users.push(...data.users);
 
             page++;
