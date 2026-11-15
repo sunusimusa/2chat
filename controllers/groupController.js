@@ -339,55 +339,63 @@ exports.getGroup = async (req, res) => {
 };
 
 // ================= JOIN GROUP =================
-// ================= JOIN GROUP =================
+
 exports.joinGroup = async (req, res) => {
 
     try {
 
-        const {
-            groupId,
-            username
-        } = req.body;
-
+        const { groupId } = req.body;
 
         // ==========================
-        // CHECK REQUIRED DATA
+        // AUTHENTICATED USER
         // ==========================
 
-        if (!groupId || !username) {
+        const username = req.user?.username;
 
-            return res.status(400).json({
+        if (!username) {
 
+            return res.status(401).json({
                 success: false,
-
-                message:
-                    "Group ID and username are required."
-
+                message: "Not authorized."
             });
 
         }
 
+        // ==========================
+        // CHECK GROUP ID
+        // ==========================
+
+        if (!groupId) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Group ID is required."
+            });
+
+        }
 
         // ==========================
         // FIND GROUP
         // ==========================
 
-        const group =
-            await Group.findById(groupId);
+        const group = await Group.findById(groupId);
 
         if (!group) {
 
             return res.status(404).json({
-
                 success: false,
-
-                message:
-                    "Group not found."
-
+                message: "Group not found."
             });
 
         }
 
+        // ==========================
+        // ENSURE MEMBERS ARRAY
+        // ==========================
+
+        if (!Array.isArray(group.members)) {
+            group.members = [];
+        }
 
         // ==========================
         // CHECK ALREADY MEMBER
@@ -396,18 +404,12 @@ exports.joinGroup = async (req, res) => {
         if (group.members.includes(username)) {
 
             return res.json({
-
                 success: true,
-
-                message:
-                    "You are already a member of this group.",
-
+                message: "You are already a member of this group.",
                 group
-
             });
 
         }
-
 
         // ==========================
         // PRIVATE GROUP
@@ -416,18 +418,12 @@ exports.joinGroup = async (req, res) => {
         if (group.privacy === "private") {
 
             return res.status(403).json({
-
                 success: false,
-
                 private: true,
-
-                message:
-                    "This is a private group. You need an invitation to join."
-
+                message: "This is a private group. You need an invitation to join."
             });
 
         }
-
 
         // ==========================
         // PUBLIC GROUP
@@ -435,57 +431,45 @@ exports.joinGroup = async (req, res) => {
 
         group.members.push(username);
 
-        group.memberCount =
-            group.members.length;
-        
+        group.memberCount = group.members.length;
+
         // ==========================
-// FIX OLD GROUP
-// ==========================
+        // FIX OLD GROUP INVITE CODE
+        // ==========================
 
-if (!group.inviteCode) {
+        if (!group.inviteCode) {
 
-    let inviteCode;
-    let existingGroup;
+            let inviteCode;
+            let existingGroup;
 
-    do {
+            do {
 
-        inviteCode =
-            "2chat_" +
-            crypto
-                .randomBytes(8)
-                .toString("hex");
+                inviteCode =
+                    "2chat_" +
+                    crypto.randomBytes(8).toString("hex");
 
-        existingGroup =
-            await Group.findOne({
-                inviteCode
-            });
+                existingGroup = await Group.findOne({
+                    inviteCode
+                });
 
-    } while (existingGroup);
+            } while (existingGroup);
 
-    group.inviteCode =
-        inviteCode;
-}
-        
+            group.inviteCode = inviteCode;
+
+        }
+
         await group.save();
-
 
         // ==========================
         // SUCCESS
         // ==========================
 
         return res.json({
-
             success: true,
-
             private: false,
-
-            message:
-                "You joined the group successfully.",
-
+            message: "You joined the group successfully.",
             group
-
         });
-
 
     } catch (error) {
 
@@ -494,19 +478,15 @@ if (!group.inviteCode) {
             error
         );
 
-
         return res.status(500).json({
-
             success: false,
-
-            message:
-                "Failed to join group."
-
+            message: "Failed to join group."
         });
 
     }
 
 };
+                
 
 // ================= LEAVE GROUP =================
  // ================= LEAVE GROUP =================
