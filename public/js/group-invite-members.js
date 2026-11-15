@@ -755,6 +755,14 @@ async function sendInvitation(
 
     }
 
+    const token = localStorage.getItem("token");
+
+if (!token) {
+    showMessage("Your session has expired. Please login again.", true);
+    window.location.href = "/login.html";
+    return;
+}
+
 
     try {
 
@@ -770,14 +778,10 @@ async function sendInvitation(
                     method: "POST",
 
                     headers: {
-
-                        "Content-Type":
-                            "application/json",
-
-                        "Accept":
-                            "application/json"
-
-                    },
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Authorization": `Bearer ${token}`
+},
 
                     body: JSON.stringify({
 
