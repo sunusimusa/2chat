@@ -138,15 +138,16 @@ exports.register = async (req, res) => {
     // RESPONSE
     // =========================================
 
-    return res.status(201).json({
+    const safeUser = user.toObject();
 
-      success: true,
+delete safeUser.password;
+delete safeUser.fcmTokens;
 
-      token,
-
-      user
-
-    });
+return res.status(201).json({
+  success: true,
+  token,
+  user: safeUser
+});
 
 
   } catch (err) {
@@ -306,15 +307,16 @@ exports.login = async (req, res) => {
     // RESPONSE
     // =========================================
 
-    return res.json({
+    const safeUser = user.toObject();
 
-      success: true,
+delete safeUser.password;
+delete safeUser.fcmTokens;
 
-      token,
-
-      user
-
-    });
+return res.json({
+  success: true,
+  token,
+  user: safeUser
+});
 
 
   } catch (err) {
