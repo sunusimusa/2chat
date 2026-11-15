@@ -1433,209 +1433,131 @@ await group.save();
 // ==================================================
 
 exports.sendGroupInvitation = async (req, res) => {
-
     try {
+        const { groupId, invitee } = req.body;
 
-        const {
-            groupId,
-            username,
-            invitee
-        } = req.body;
+        // GET AUTHENTICATED USER
+        const username = req.user.username;
 
+        // CHECK REQUIRED DATA
+        if (!groupId || !invitee) {
+            return res.status(400).json({
+                success: false,
+                message: "Group ID and invitee are required."
+            });
+        }
 
-        // ==========================
-        // CHECK DATA
-        // ==========================
+        if (!username) {
+            return res.status(401).json({
+                success: false,
+                message: "Authentication required."
+            });
+        }
 
-        if (!groupId || !username || !invitee) {
+        const targetUsername = String(invitee).trim();
 
-    return res.status(400).json({
+        if (!targetUsername) {
+            return res.status(400).json({
+                success: false,
+                message: "Invitee username is required."
+            });
+        }
 
-        success: false,
+        // PREVENT SELF INVITATION
+        if (
+            username.toLowerCase() ===
+            targetUsername.toLowerCase()
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "You cannot invite yourself."
+            });
+        }
 
-        message:
-            "Group ID, username and invitee are required."
-
-    });
-
-}
-
-if (username === invitee) {
-
-    return res.status(400).json({
-
-        success: false,
-
-        message:
-            "You cannot invite yourself."
-
-    });
-
-}
-          
-
-        // ==========================
         // FIND GROUP
-        // ==========================
-
-        const group =
-            await Group.findById(groupId);
+        const group = await Group.findById(groupId);
 
         if (!group) {
-
             return res.status(404).json({
-
                 success: false,
-
                 message: "Group not found."
-
             });
-
         }
 
+        // OWNER / ADMIN AUTHORIZATION
+        const isOwner = group.owner === username;
 
-        // ==========================
-        // OWNER / ADMIN ONLY
-        // ==========================
+        const isAdmin = Array.isArray(group.admins) &&
+            group.admins.includes(username);
 
-        if (
-            group.owner !== username &&
-            !group.admins.includes(username)
-        ) {
-
+        if (!isOwner && !isAdmin) {
             return res.status(403).json({
-
                 success: false,
-
-                message:
-                    "Only owner or admins can invite members."
-
+                message: "Only owner or admins can invite members."
             });
-
         }
 
-
-        // ==========================
-        // CHECK USER
-        // ==========================
-
-        const userExists =
-            await User.findOne({
-                username: invitee
-            });
+        // CHECK INVITEE EXISTS
+        const userExists = await User.findOne({
+            username: targetUsername
+        }).select("username");
 
         if (!userExists) {
-
             return res.status(404).json({
-
                 success: false,
-
                 message: "User not found."
-
             });
-
         }
 
-
-        // ==========================
         // ALREADY MEMBER
-        // ==========================
-
-        if (group.members.includes(invitee)) {
-
+        if (group.members.includes(userExists.username)) {
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "This user is already a member."
-
+                message: "This user is already a member."
             });
-
         }
 
-
-        // ==========================
-        // CHECK EXISTING INVITATION
-        // ==========================
-
-        const existingInvitation =
-            await GroupInvitation.findOne({
-
-                groupId: group._id,
-
-                invitee: invitee,
-
-                status: "pending"
-
-            });
-
-        if (existingInvitation) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "Invitation already sent."
-
-            });
-
-        }
-
-
-        // ==========================
-        // CREATE INVITATION
-        // ==========================
-
-        const invitation =
-            await GroupInvitation.create({
-
-                groupId: group._id,
-
-                groupName: group.name,
-
-                inviter: username,
-
-                invitee: invitee,
-
-                status: "pending"
-
-            });
-
-
-        return res.json({
-
-            success: true,
-
-            message:
-                "Group invitation sent successfully.",
-
-            invitation
-
+        // CHECK EXISTING PENDING INVITATION
+        const existingInvitation = await GroupInvitation.findOne({
+            groupId: group._id,
+            invitee: userExists.username,
+            status: "pending"
         });
 
+        if (existingInvitation) {
+            return res.status(400).json({
+                success: false,
+                message: "Invitation already sent."
+            });
+        }
+
+        // CREATE INVITATION
+        const invitation = await GroupInvitation.create({
+            groupId: group._id,
+            groupName: group.name,
+            inviter: username,
+            invitee: userExists.username,
+            status: "pending"
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: "Group invitation sent successfully.",
+            invitation
+        });
 
     } catch (error) {
-
         console.error(
             "SEND GROUP INVITATION ERROR:",
             error
         );
 
         return res.status(500).json({
-
             success: false,
-
-            message:
-                "Failed to send group invitation."
-
+            message: "Failed to send group invitation."
         });
-
     }
-
 };
-
 
 // ==================================================
 // GET SENT GROUP INVITATIONS
