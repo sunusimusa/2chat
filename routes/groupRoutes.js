@@ -37,6 +37,7 @@ rejectGroupInvitation
 
 router.post(
     "/create",
+    protect,
     createGroup
 );
 
