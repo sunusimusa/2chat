@@ -62,6 +62,7 @@ router.post(
 // GET INVITATIONS ALREADY SENT BY THIS USER
 router.get(
     "/invitations/sent/:username",
+    protect,
     getSentGroupInvitations
 );
 
