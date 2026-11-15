@@ -1563,43 +1563,41 @@ exports.sendGroupInvitation = async (req, res) => {
 // GET SENT GROUP INVITATIONS
 // ==================================================
 
+
 exports.getSentGroupInvitations = async (req, res) => {
 
     try {
 
-        const username =
-            String(req.params.username || "").trim();
-
-        const groupId =
-            String(req.query.groupId || "").trim();
-
-
         // ==========================
-        // CHECK DATA
+        // AUTHENTICATED USER
         // ==========================
 
-        if (!username || !groupId) {
+        const username = req.user?.username;
 
-            return res.status(400).json({
+        if (!username) {
 
+            return res.status(401).json({
                 success: false,
-
-                message:
-                    "Username and group ID are required."
-
+                message: "Not authorized."
             });
 
         }
 
+        // ==========================
+        // CHECK GROUP ID
+        // ==========================
 
-        console.log(
-            "🔥 GET SENT INVITATIONS:",
-            {
-                username,
-                groupId
-            }
-        );
+        const groupId =
+            String(req.query.groupId || "").trim();
 
+        if (!groupId) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Group ID is required."
+            });
+
+        }
 
         // ==========================
         // FIND SENT PENDING INVITATIONS
@@ -1620,25 +1618,14 @@ exports.getSentGroupInvitations = async (req, res) => {
             })
             .lean();
 
-
         // ==========================
-        // GET USERNAMES
+        // GET INVITED USERNAMES
         // ==========================
 
         const invitedUsers =
-            invitations.map(
-                invitation =>
-                    String(
-                        invitation.invitee
-                    ).trim()
+            invitations.map(invitation =>
+                String(invitation.invitee).trim()
             );
-
-
-        console.log(
-            "🔥 SENT PENDING INVITATIONS:",
-            invitations.length
-        );
-
 
         // ==========================
         // RESPONSE
@@ -1654,7 +1641,6 @@ exports.getSentGroupInvitations = async (req, res) => {
 
         });
 
-
     } catch (error) {
 
         console.error(
@@ -1662,20 +1648,17 @@ exports.getSentGroupInvitations = async (req, res) => {
             error
         );
 
-
         return res.status(500).json({
 
             success: false,
 
-            message:
-                "Failed to load sent invitations."
+            message: "Failed to load sent invitations."
 
         });
 
     }
 
 };
-
 
 // ==================================================
 // GET MY GROUP INVITATIONS
