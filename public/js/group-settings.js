@@ -833,68 +833,86 @@ if (leaveGroupBtn) {
         "click",
         async () => {
 
+            if (!currentGroup) {
+                alert("Group information is not available.");
+                return;
+            }
+
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                alert("Please login again.");
+                window.location.href = "/login.html";
+                return;
+            }
+
             if (
                 !confirm(
                     "Are you sure you want to leave this group?"
                 )
             ) return;
 
-
             try {
 
-                const res =
-                    await fetch(
-                        "/api/groups/leave",
-                        {
+                leaveGroupBtn.disabled = true;
 
-                            method: "PUT",
+                const res = await fetch(
+                    "/api/groups/leave",
+                    {
+                        method: "PUT",
 
-                            headers: {
-                                "Content-Type":
-                                    "application/json"
-                            },
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Accept": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
 
-                            body: JSON.stringify({
+                        body: JSON.stringify({
+                            groupId
+                        })
+                    }
+                );
 
-                                groupId,
+                const data = await res.json();
 
-                                username:
-                                    user.username
+                if (res.status === 401) {
 
-                            })
+                    localStorage.removeItem("token");
 
-                        }
-                    );
+                    alert("Your session has expired. Please login again.");
 
-
-                const data =
-                    await res.json();
-
-
-                if (data.success) {
-
-                    alert(
-                        "✅ You left the group."
-                    );
-
-                    location.href =
-                        "/groups.html";
-
-                } else {
-
-                    alert(
-                        data.message
-                    );
+                    window.location.href = "/login.html";
+                    return;
 
                 }
 
+                if (!res.ok || !data.success) {
+
+                    alert(
+                        data.message ||
+                        "Unable to leave group."
+                    );
+
+                    return;
+
+                }
+
+                alert("You left the group successfully.");
+
+                window.location.href = "/groups.html";
+
             } catch (err) {
 
-                console.error(err);
-
-                alert(
-                    "Network Error"
+                console.error(
+                    "LEAVE GROUP ERROR:",
+                    err
                 );
+
+                alert("Network error. Please try again.");
+
+            } finally {
+
+                leaveGroupBtn.disabled = false;
 
             }
 
