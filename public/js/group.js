@@ -444,169 +444,140 @@ joinBtn.addEventListener(
 
 async function joinGroup() {
 
-
-    /* ==========================================
-       NOT LOGGED IN
-    ========================================== */
+    // ==========================
+    // NOT LOGGED IN
+    // ==========================
 
     if (!user) {
-
-        /*
-           Save the exact group destination.
-
-           Bayan register/login za mu dawo nan.
-        */
 
         const redirectUrl =
             window.location.pathname +
             window.location.search;
-
 
         localStorage.setItem(
             "afterAuthRedirect",
             redirectUrl
         );
 
-
-        /*
-           Aika user Register
-        */
-
-        window.location.href =
-            "/register.html";
+        window.location.href = "/register.html";
 
         return;
 
     }
 
+    // ==========================
+    // CHECK GROUP
+    // ==========================
 
-    /* ==========================================
-       CHECK GROUP
-    ========================================== */
+    if (!currentGroup || !currentGroup._id) {
 
-    if (!currentGroup) {
+        alert("Group information is not available.");
+        return;
 
-        alert(
-            "Group information is not available."
+    }
+
+    // ==========================
+    // CHECK JWT TOKEN
+    // ==========================
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+
+        localStorage.setItem(
+            "afterAuthRedirect",
+            window.location.pathname +
+            window.location.search
         );
 
+        alert("Please login again.");
+
+        window.location.href = "/login.html";
+
         return;
 
     }
-
 
     try {
 
-        joinBtn.disabled =
-            true;
-
+        joinBtn.disabled = true;
 
         joinBtn.innerHTML = `
-
             <i class="fa-solid fa-spinner fa-spin"></i>
-
             Joining...
-
         `;
 
+        // ==========================
+        // JOIN GROUP REQUEST
+        // ==========================
 
-        const res =
-            await fetch(
-                "/api/groups/join",
-                {
+        const res = await fetch(
+            "/api/groups/join",
+            {
+                method: "PUT",
 
-                    method:"PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
 
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
+                body: JSON.stringify({
+                    groupId: currentGroup._id
+                })
+            }
+        );
 
-                    body:JSON.stringify({
+        const data = await res.json();
 
-                        groupId:
-                            currentGroup._id,
+        // ==========================
+        // AUTHENTICATION ERROR
+        // ==========================
 
-                        username:
-                            user.username
+        if (res.status === 401) {
 
-                    })
+            localStorage.removeItem("token");
 
-                }
+            localStorage.setItem(
+                "afterAuthRedirect",
+                window.location.pathname +
+                window.location.search
             );
 
+            alert("Your session has expired. Please login again.");
 
-        const data =
-            await res.json();
-
-
-        if (!data.success) {
-
-            /*
-               Private group
-            */
-
-            if (data.private) {
-
-                alert(
-                    data.message ||
-                    "This is a private group."
-                );
-
-            } else {
-
-                alert(
-                    data.message ||
-                    "Unable to join group."
-                );
-
-            }
-
-
-            joinBtn.disabled =
-                false;
-
-
-            joinBtn.innerHTML = `
-
-                <i class="fa-solid fa-user-plus"></i>
-
-                Join Group
-
-            `;
+            window.location.href = "/login.html";
 
             return;
 
         }
 
+        // ==========================
+        // JOIN FAILED
+        // ==========================
 
-        /* ======================================
-           SUCCESS
-        ====================================== */
+        if (!res.ok || !data.success) {
 
-        currentGroup =
-            data.group;
+            alert(
+                data.message ||
+                "Unable to join group."
+            );
 
+            return;
 
-        alert(
-            "✅ You joined the group successfully."
-        );
+        }
 
+        // ==========================
+        // SUCCESS
+        // ==========================
 
-        /*
-           Redirect zuwa group chat.
+        currentGroup = data.group;
 
-           Idan group chat page ɗinka yana da
-           wani route daban, za mu canza wannan
-           daga baya.
-        */
+        alert("You joined the group successfully.");
 
         window.location.href =
             "/group-chat.html?id=" +
-            encodeURIComponent(
-                currentGroup._id
-            );
-
+            encodeURIComponent(currentGroup._id);
 
     } catch (error) {
 
@@ -615,28 +586,20 @@ async function joinGroup() {
             error
         );
 
+        alert("Network error. Please try again.");
 
-        alert(
-            "Network error. Please try again."
-        );
+    } finally {
 
-
-        joinBtn.disabled =
-            false;
-
+        joinBtn.disabled = false;
 
         joinBtn.innerHTML = `
-
             <i class="fa-solid fa-user-plus"></i>
-
             Join Group
-
         `;
 
     }
 
 }
-
 
 /* ==================================================
    OPEN GROUP
