@@ -385,71 +385,53 @@ exports.getAllUsers = async (req, res) => {
 // SEARCH USERS
 // =====================================================
 
+
 exports.searchUsers = async (req, res) => {
-
     try {
-
-        const keyword =
-            String(
-                req.params.keyword || ""
-            ).trim();
-
+        const keyword = String(
+            req.params.keyword || ""
+        ).trim();
 
         if (!keyword) {
-
             return res.json({
-
                 success: true,
-
                 users: []
-
             });
-
         }
 
+        const safeKeyword = keyword.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            "\\$&"
+        );
 
-        const users =
-            await User.find(
-                {
-                    username: {
-                        $regex: keyword,
-                        $options: "i"
-                    }
-                },
-                "username avatar online lastSeen bio"
-            )
-            .sort({
-                username: 1
-            })
-            .limit(30);
-
+        const users = await User.find(
+            {
+                username: {
+                    $regex: safeKeyword,
+                    $options: "i"
+                }
+            },
+            "username avatar online lastSeen bio"
+        )
+        .sort({
+            username: 1
+        })
+        .limit(30);
 
         return res.json({
-
             success: true,
-
             users
-
         });
 
-
     } catch (err) {
-
         console.error(
             "SEARCH USERS ERROR:",
             err
         );
 
-
         return res.status(500).json({
-
             success: false,
-
-            message:
-                "Failed to search users."
-
+            message: "Failed to search users."
         });
-
     }
-
 };
