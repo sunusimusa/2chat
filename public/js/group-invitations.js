@@ -321,62 +321,52 @@ async function loadInvitations() {
 // ACCEPT INVITATION
 // ==================================================
 
-async function acceptInvitation(
-    invitationId
-) {
+async function acceptInvitation(invitationId) {
 
     if (!invitationId) return;
 
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        alert("Your session has expired. Please login again.");
+        window.location.href = "/login.html";
+        return;
+    }
 
     try {
 
         const res = await fetch(
             "/api/groups/invite/accept",
             {
-
                 method: "PUT",
 
                 headers: {
-                    "Content-Type":
-                        "application/json"
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${token}`
                 },
 
                 body: JSON.stringify({
-
-                    invitationId,
-
-                    username:
-                        user.username
-
+                    invitationId
                 })
-
             }
         );
 
-
-        const data =
-            await res.json();
-
+        const data = await res.json();
 
         if (!res.ok || !data.success) {
-
             alert(
                 data.message ||
                 "Failed to accept invitation."
             );
-
             return;
-
         }
-
 
         alert(
             "✅ You joined the group successfully."
         );
 
-
-        loadInvitations();
-
+        await loadInvitations();
 
     } catch (error) {
 
@@ -385,14 +375,11 @@ async function acceptInvitation(
             error
         );
 
-        alert(
-            "Network error."
-        );
+        alert("Network error.");
 
     }
 
 }
-
 
 // ==================================================
 // REJECT INVITATION
