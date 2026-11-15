@@ -689,92 +689,94 @@ exports.deleteGroup = async (req, res) => {
 };
 
 // ================= ADD MEMBER =================
+
 exports.addMember = async (req, res) => {
+    try {
+        const { groupId, member } = req.body;
 
-    try{
+        // Validate input
+        if (!groupId || !member || typeof member !== "string") {
+            return res.status(400).json({
+                success: false,
+                message: "Group ID and member username are required."
+            });
+        }
 
-        const {
-            groupId,
-            username,
-            member
-        } = req.body;
+        const memberUsername = member.trim();
+        const requester = req.user.username;
+
+        if (!memberUsername) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid member username."
+            });
+        }
 
         const group = await Group.findById(groupId);
 
-        if(!group){
-
-            return res.json({
-                success:false,
-                message:"Group not found."
+        if (!group) {
+            return res.status(404).json({
+                success: false,
+                message: "Group not found."
             });
-
         }
 
-        // Owner ko Admin ne kawai zai iya ƙara member
-        if(
-            group.owner !== username &&
-            !group.admins.includes(username)
-        ){
+        // Ensure arrays exist
+        group.members = group.members || [];
+        group.admins = group.admins || [];
 
-            return res.json({
-                success:false,
-                message:"Only owner or admins can add members."
+        // Only the actual owner or an admin can add members
+        if (
+            group.owner !== requester &&
+            !group.admins.includes(requester)
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "Only owner or admins can add members."
             });
-
         }
 
-        // Check if user exists
-const userExists = await User.findOne({
+        // Check whether the user exists
+        const userExists = await User.findOne({
+            username: memberUsername
+        });
 
-    username:member
-
-});
-
-if(!userExists){
-
-    return res.json({
-
-        success:false,
-
-        message:"User not found."
-
-    });
-
-}
-
-        if(group.members.includes(member)){
-
-            return res.json({
-                success:false,
-                message:"User is already in this group."
+        if (!userExists) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found."
             });
-
         }
 
-        group.members.push(member);
+        // Prevent duplicate members
+        if (group.members.includes(memberUsername)) {
+            return res.status(409).json({
+                success: false,
+                message: "User is already in this group."
+            });
+        }
+
+        group.members.push(memberUsername);
         group.memberCount = group.members.length;
 
         await group.save();
 
-        res.json({
-            success:true,
-            message:"Member added successfully.",
+        return res.json({
+            success: true,
+            message: "Member added successfully.",
             group
         });
 
-    }catch(err){
+    } catch (err) {
+        console.error("Add Member Error:", err);
 
-        console.error(err);
-
-        res.status(500).json({
-            success:false,
-            message:err.message
+        return res.status(500).json({
+            success: false,
+            message: "An error occurred while adding the member."
         });
-
     }
-
 };
-
+                
 // ==================================================
 // PROMOTE MEMBER TO ADMIN
 // ==================================================
