@@ -170,7 +170,16 @@ function showMessage(
 // LOAD SENT/PENDING GROUP INVITATIONS
 // ==================================================
 
+
 async function loadSentInvitations() {
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        console.error("Authentication token missing.");
+        window.location.href = "/login.html";
+        return;
+    }
 
     try {
 
@@ -180,38 +189,22 @@ async function loadSentInvitations() {
             "?groupId=" +
             encodeURIComponent(groupId);
 
-        console.log(
-            "LOADING SENT INVITATIONS:",
-            url
-        );
+        const res = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
 
-        const res =
-            await fetch(url, {
-                method: "GET",
-                headers: {
-                    "Accept": "application/json"
-                }
-            });
+        const data = await res.json();
 
-        const data =
-            await res.json();
-
-        if (
-            !res.ok ||
-            !data.success
-        ) {
-
+        if (!res.ok || !data.success) {
             throw new Error(
                 data.message ||
                 "Failed to load sent invitations."
             );
-
         }
-
-        // ==========================================
-        // IMPORTANT:
-        // Controller yana dawo da invitedUsers
-        // ==========================================
 
         const invited =
             Array.isArray(data.invitedUsers)
@@ -221,21 +214,12 @@ async function loadSentInvitations() {
         invitedUsers.clear();
 
         invited.forEach(username => {
-
             if (username) {
-
                 invitedUsers.add(
                     String(username).trim()
                 );
-
             }
-
         });
-
-        console.log(
-            "PENDING INVITED USERS:",
-            [...invitedUsers]
-        );
 
     } catch (error) {
 
