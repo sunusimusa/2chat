@@ -343,7 +343,8 @@ async function getAllUsersCached() {
         let users = [];
         let page = 1;
         let hasNextPage = true;
-
+        let totalPages = null;
+        
         while (hasNextPage) {
 
             const res = await fetch(
@@ -363,6 +364,23 @@ async function getAllUsersCached() {
             const data = await res.json();
 
             if (
+    !data.pagination ||
+    !Number.isInteger(data.pagination.totalPages) ||
+    data.pagination.totalPages < 0
+) {
+    throw new Error("Invalid pagination response.");
+}
+
+if (totalPages === null) {
+    totalPages = data.pagination.totalPages;
+}
+
+if (page > totalPages) {
+    break;
+}
+
+            
+            if (
                 !data.success ||
                 !Array.isArray(data.users)
             ) {
@@ -371,10 +389,10 @@ async function getAllUsersCached() {
 
             users.push(...data.users);
 
-            hasNextPage =
-                data.pagination?.hasNextPage === true;
-
             page++;
+
+          hasNextPage = page <= totalPages;
+            
         }
 
         allUsersCache = users;
