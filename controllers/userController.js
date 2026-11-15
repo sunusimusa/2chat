@@ -336,51 +336,56 @@ exports.getUserProfile = async (req, res) => {
 // GET ALL USERS
 // =====================================================
 
+
 exports.getAllUsers = async (req, res) => {
-
     try {
+        const page = Math.max(
+            1,
+            parseInt(req.query.page, 10) || 1
+        );
 
-        const users =
-            await User.find(
+        const limit = Math.min(
+            50,
+            Math.max(1, parseInt(req.query.limit, 10) || 20)
+        );
+
+        const skip = (page - 1) * limit;
+
+        const [users, totalUsers] = await Promise.all([
+            User.find(
                 {},
                 "username avatar online lastSeen"
             )
-            .sort({
-                username: 1
-            });
+            .sort({ username: 1 })
+            .skip(skip)
+            .limit(limit)
+            .lean(),
 
+            User.countDocuments({})
+        ]);
 
         return res.json({
-
             success: true,
-
-            users
-
+            users,
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(totalUsers / limit),
+                totalUsers,
+                hasNextPage: page * limit < totalUsers,
+                hasPreviousPage: page > 1
+            }
         });
-
 
     } catch (err) {
-
-        console.error(
-            "GET ALL USERS ERROR:",
-            err
-        );
-
+        console.error("GET ALL USERS ERROR:", err);
 
         return res.status(500).json({
-
             success: false,
-
-            message:
-                "Failed to load users."
-
+            message: "Failed to load users."
         });
-
     }
-
 };
-
-
+            
 // =====================================================
 // SEARCH USERS
 // =====================================================
