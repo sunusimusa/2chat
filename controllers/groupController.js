@@ -1668,22 +1668,24 @@ exports.getMyGroupInvitations = async (req, res) => {
 
     try {
 
-        const username =
-            String(req.params.username || "").trim();
+        // ==========================
+        // AUTHENTICATED USER
+        // ==========================
 
-        console.log(
-            "🔥 GET GROUP INVITATIONS:",
-            username
-        );
+        const username = req.user?.username;
 
         if (!username) {
 
-            return res.status(400).json({
+            return res.status(401).json({
                 success: false,
-                message: "Username is required."
+                message: "Not authorized."
             });
 
         }
+
+        // ==========================
+        // FIND PENDING INVITATIONS
+        // ==========================
 
         const invitations =
             await GroupInvitation.find({
@@ -1695,17 +1697,13 @@ exports.getMyGroupInvitations = async (req, res) => {
             })
             .lean();
 
-        console.log(
-            "🔥 INVITATIONS FOUND:",
-            invitations.length
-        );
+        // ==========================
+        // RESPONSE
+        // ==========================
 
         return res.status(200).json({
-
             success: true,
-
             invitations
-
         });
 
     } catch (error) {
@@ -1716,18 +1714,14 @@ exports.getMyGroupInvitations = async (req, res) => {
         );
 
         return res.status(500).json({
-
             success: false,
-
-            message:
-                "Failed to load group invitations."
-
+            message: "Failed to load group invitations."
         });
 
     }
 
 };
-
+        
 // ==================================================
 // ACCEPT GROUP INVITATION
 // ==================================================
