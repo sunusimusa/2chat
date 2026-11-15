@@ -85,6 +85,7 @@ router.get(
 // Accept invitation
 router.put(
     "/invite/accept",
+    protect,
     acceptGroupInvitation
 );
 
