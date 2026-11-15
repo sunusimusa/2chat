@@ -1858,74 +1858,72 @@ exports.acceptGroupInvitation = async (req, res) => {
 // REJECT GROUP INVITATION
 // ==================================================
 
+
 exports.rejectGroupInvitation = async (req, res) => {
 
     try {
 
-        const {
-            invitationId,
-            username
-        } = req.body;
+        const { invitationId } = req.body;
 
+        // ==========================
+        // AUTHENTICATED USER
+        // ==========================
+
+        const username = req.user?.username;
+
+        if (!username) {
+
+            return res.status(401).json({
+                success: false,
+                message: "Not authorized."
+            });
+
+        }
 
         // ==========================
         // CHECK DATA
         // ==========================
 
-        if (!invitationId || !username) {
+        if (!invitationId) {
 
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "Invitation ID and username are required."
-
+                message: "Invitation ID is required."
             });
 
         }
-
 
         // ==========================
         // FIND INVITATION
         // ==========================
 
         const invitation =
-            await GroupInvitation.findById(
-                invitationId
-            );
+            await GroupInvitation.findById(invitationId);
 
         if (!invitation) {
 
             return res.status(404).json({
-
                 success: false,
-
-                message:
-                    "Invitation not found."
-
+                message: "Invitation not found."
             });
 
         }
-
 
         // ==========================
         // SECURITY CHECK
         // ==========================
 
-        if (invitation.invitee !== username) {
+        if (
+            String(invitation.invitee).toLowerCase() !==
+            String(username).toLowerCase()
+        ) {
 
             return res.status(403).json({
-
                 success: false,
-
-                message:
-                    "You cannot reject this invitation."
-
+                message: "You cannot reject this invitation."
             });
 
         }
-
 
         // ==========================
         // CHECK STATUS
@@ -1934,35 +1932,25 @@ exports.rejectGroupInvitation = async (req, res) => {
         if (invitation.status !== "pending") {
 
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "This invitation is no longer active."
-
+                message: "This invitation is no longer active."
             });
 
         }
 
-
         // ==========================
-        // REJECT
+        // REJECT INVITATION
         // ==========================
 
         invitation.status = "rejected";
-invitation.respondedAt = new Date();
+        invitation.respondedAt = new Date();
 
-await invitation.save();
+        await invitation.save();
 
         return res.json({
-
             success: true,
-
-            message:
-                "Group invitation rejected."
-
+            message: "Group invitation rejected."
         });
-
 
     } catch (error) {
 
@@ -1972,15 +1960,11 @@ await invitation.save();
         );
 
         return res.status(500).json({
-
             success: false,
-
-            message:
-                "Failed to reject invitation."
-
+            message: "Failed to reject invitation."
         });
 
     }
 
 };
-
+            
