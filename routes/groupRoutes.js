@@ -100,6 +100,7 @@ router.put(
 
 router.put(
     "/leave",
+    protect,
     leaveGroup
 );
 
