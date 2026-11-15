@@ -489,56 +489,67 @@ exports.joinGroup = async (req, res) => {
                 
 
 // ================= LEAVE GROUP =================
- // ================= LEAVE GROUP =================
 
 exports.leaveGroup = async (req, res) => {
 
     try {
 
-        const {
-            groupId,
-            username
-        } = req.body;
-
+        const { groupId } = req.body;
 
         // ==========================
-        // CHECK REQUIRED DATA
+        // AUTHENTICATED USER
         // ==========================
 
-        if (!groupId || !username) {
+        const username = req.user?.username;
 
-            return res.status(400).json({
+        if (!username) {
 
+            return res.status(401).json({
                 success: false,
-
-                message:
-                    "Group ID and username are required."
-
+                message: "Not authorized."
             });
 
         }
 
+        // ==========================
+        // CHECK GROUP ID
+        // ==========================
+
+        if (!groupId) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Group ID is required."
+            });
+
+        }
 
         // ==========================
         // FIND GROUP
         // ==========================
 
-        const group =
-            await Group.findById(groupId);
+        const group = await Group.findById(groupId);
 
         if (!group) {
 
             return res.status(404).json({
-
                 success: false,
-
-                message:
-                    "Group not found."
-
+                message: "Group not found."
             });
 
         }
 
+        // ==========================
+        // ENSURE ARRAYS
+        // ==========================
+
+        if (!Array.isArray(group.members)) {
+            group.members = [];
+        }
+
+        if (!Array.isArray(group.admins)) {
+            group.admins = [];
+        }
 
         // ==========================
         // OWNER CANNOT LEAVE
@@ -547,16 +558,11 @@ exports.leaveGroup = async (req, res) => {
         if (group.owner === username) {
 
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "Group owner cannot leave. Transfer ownership or delete the group."
-
+                message: "Group owner cannot leave. Transfer ownership or delete the group."
             });
 
         }
-
 
         // ==========================
         // CHECK MEMBERSHIP
@@ -565,89 +571,56 @@ exports.leaveGroup = async (req, res) => {
         if (!group.members.includes(username)) {
 
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "You are not a member of this group."
-
+                message: "You are not a member of this group."
             });
 
         }
-
 
         // ==========================
         // REMOVE MEMBER
         // ==========================
 
-        group.members =
+        const updatedMembers =
             group.members.filter(
                 member => member !== username
             );
 
-
         // ==========================
-        // REMOVE FROM ADMINS TOO
+        // REMOVE FROM ADMINS
         // ==========================
 
-        group.admins =
+        const updatedAdmins =
             group.admins.filter(
                 admin => admin !== username
             );
 
-
         // ==========================
-        // UPDATE MEMBER COUNT
+        // UPDATE DATABASE
         // ==========================
-
-        group.memberCount =
-            group.members.length;
-
-
-        // ==================================================
-        // IMPORTANT
-        // Don't use group.save()
-        // because old groups may not have inviteCode.
-        // ==================================================
 
         await Group.updateOne(
-
             {
-                _id: group._id
+                _id: group._id,
+                members: username
             },
-
             {
                 $set: {
-
-                    members:
-                        group.members,
-
-                    admins:
-                        group.admins,
-
-                    memberCount:
-                        group.memberCount
-
+                    members: updatedMembers,
+                    admins: updatedAdmins,
+                    memberCount: updatedMembers.length
                 }
-
             }
-
         );
-
 
         // ==========================
         // SUCCESS
         // ==========================
 
         return res.json({
-
             success: true,
-
-            message:
-                "You left the group successfully."
-
+            message: "You left the group successfully."
         });
-
 
     } catch (error) {
 
@@ -656,20 +629,15 @@ exports.leaveGroup = async (req, res) => {
             error
         );
 
-
         return res.status(500).json({
-
             success: false,
-
-            message:
-                "Failed to leave group."
-
+            message: "Failed to leave group."
         });
 
     }
 
 };
-
+            
 // ================= DELETE GROUP =================
 exports.deleteGroup = async (req, res) => {
 
