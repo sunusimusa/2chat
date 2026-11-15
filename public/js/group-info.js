@@ -670,78 +670,73 @@ async function addMember() {
 
 
     if (!username) return;
+   
+try {
 
+    const token = localStorage.getItem("token");
 
-    try {
+    if (!token) {
 
-        const res =
-            await fetch(
-                "/api/groups/add-member",
-                {
+        alert("Please login again.");
 
-                    method: "PUT",
+        window.location.href = "/login.html";
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+        return;
 
-                    body: JSON.stringify({
+    }
 
-                        groupId,
+    const res = await fetch(
+        "/api/groups/add-member",
+        {
+            method: "PUT",
 
-                        username:
-                            user.username,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
 
-                        member:
-                            username
-
-                    })
-
-                }
-            );
-
-
-        const data =
-            await res.json();
-
-
-        if (data.success) {
-
-            alert(
-                "✅ Member added successfully."
-            );
-
-
-            currentGroup =
-                data.group;
-
-
-            renderGroup();
-
-
-        } else {
-
-            alert(
-                data.message ||
-                "Failed to add member."
-            );
-
+            body: JSON.stringify({
+                groupId,
+                member: username
+            })
         }
+    );
 
+    const data = await res.json();
 
-    } catch (error) {
+    if (res.status === 401) {
 
-        console.error(
-            "ADD MEMBER ERROR:",
-            error
-        );
+        alert("Your session has expired. Please login again.");
+
+        window.location.href = "/login.html";
+
+        return;
+
+    }
+
+    if (data.success) {
+
+        alert("✅ Member added successfully.");
+
+        currentGroup = data.group;
+
+        renderGroup();
+
+    } else {
 
         alert(
-            "Network error."
+            data.message ||
+            "Failed to add member."
         );
 
     }
+
+} catch (error) {
+
+    console.error("ADD MEMBER ERROR:", error);
+
+    alert("Network error.");
 
 }
 
