@@ -328,48 +328,17 @@ async function loadGroupMembers() {
 // LOAD ALL USERS
 // ==================================================
 
-async function loadUsers(
-    search = ""
-) {
+async function getAllUsersCached() {
 
-    if (!usersList) {
-
-        console.error(
-            "usersList element not found."
-        );
-
-        return;
-
+    if (allUsersCache !== null) {
+        return allUsersCache;
     }
 
+    if (usersLoadingPromise) {
+        return usersLoadingPromise;
+    }
 
-    try {
-
-        // ------------------------------------------
-        // LOADING
-        // ------------------------------------------
-
-        if (loading) {
-
-            loading.style.display =
-                "block";
-
-        }
-
-
-        usersList.innerHTML =
-            "";
-
-
-        await Promise.all([
-        loadSentInvitations(),
-       loadGroupMembers()
-    ]);
-
-        
-        // ------------------------------------------
-        // GET ALL USERS WITH PAGINATION
-        // ------------------------------------------
+    usersLoadingPromise = (async () => {
 
         let users = [];
         let page = 1;
@@ -387,15 +356,16 @@ async function loadUsers(
                 }
             );
 
-            const data = await res.json();
-
-            if (!res.ok || !data.success) {
-                throw new Error(
-                    data.message || "Failed to load users."
-                );
+            if (!res.ok) {
+                throw new Error("Failed to load users.");
             }
 
-            if (!Array.isArray(data.users)) {
+            const data = await res.json();
+
+            if (
+                !data.success ||
+                !Array.isArray(data.users)
+            ) {
                 throw new Error("Invalid users response.");
             }
 
@@ -406,73 +376,74 @@ async function loadUsers(
 
             page++;
         }
-        
 
-        // ------------------------------------------
-        // REMOVE CURRENT USER
-        // ------------------------------------------
+        allUsersCache = users;
 
-        users =
-            users.filter(
-                targetUser => {
+        return allUsersCache;
 
-                    return (
-                        targetUser &&
-                        targetUser.username &&
-                        targetUser.username !==
-                            user.username
-                    );
+    })();
 
-                }
+    try {
+        return await usersLoadingPromise;
+    } finally {
+        usersLoadingPromise = null;
+    }
+}
+
+
+async function loadUsers(search = "") {
+
+    if (!usersList) {
+        console.error("usersList element not found.");
+        return;
+    }
+
+    try {
+
+        if (loading) {
+            loading.style.display = "block";
+        }
+
+        usersList.innerHTML = "";
+
+        await Promise.all([
+            loadSentInvitations(),
+            loadGroupMembers()
+        ]);
+
+        const allUsers = await getAllUsersCached();
+
+        let users = allUsers.filter(targetUser => {
+
+            return (
+                targetUser &&
+                targetUser.username &&
+                targetUser.username !== user.username
             );
 
+        });
 
-        // ------------------------------------------
-        // SEARCH
-        // ------------------------------------------
-
-        const searchText =
-            String(search || "")
-                .trim()
-                .toLowerCase();
-
+        const searchText = String(search || "")
+            .trim()
+            .toLowerCase();
 
         if (searchText) {
 
-            users =
-                users.filter(
-                    targetUser => {
+            users = users.filter(targetUser => {
 
-                        const username =
-                            String(
-                                targetUser.username ||
-                                ""
-                            ).toLowerCase();
+                return String(targetUser.username || "")
+                    .toLowerCase()
+                    .includes(searchText);
 
-                        return username.includes(
-                            searchText
-                        );
-
-                    }
-                );
+            });
 
         }
-
-
-        // ------------------------------------------
-        // NO USERS
-        // ------------------------------------------
 
         if (!users.length) {
 
             usersList.innerHTML = `
-
                 <div class="empty-users">
-
-                    <i
-                        class="fa-solid fa-user-slash"
-                    ></i>
-
+                    <i class="fa-solid fa-user-slash"></i>
                     <p>
                         ${
                             searchText
@@ -480,73 +451,40 @@ async function loadUsers(
                                 : "No users available."
                         }
                     </p>
-
                 </div>
-
             `;
 
             return;
-
         }
 
-
-        // ------------------------------------------
-        // DISPLAY USERS
-        // ------------------------------------------
-
-        users.forEach(
-            renderUser
-        );
-
+        users.forEach(renderUser);
 
     } catch (error) {
 
-        console.error(
-            "LOAD USERS ERROR:",
-            error
-        );
-
+        console.error("LOAD USERS ERROR:", error);
 
         usersList.innerHTML = `
-
             <div class="empty-users">
-
-                <i
-                    class="fa-solid fa-circle-exclamation"
-                ></i>
-
-                <p>
-                    ${escapeHtml(
-                        error.message ||
-                        "Failed to load users."
-                    )}
-                </p>
-
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <p>${escapeHtml(
+                    error.message || "Failed to load users."
+                )}</p>
             </div>
-
         `;
 
-
         showMessage(
-            error.message ||
-            "Failed to load users.",
+            error.message || "Failed to load users.",
             true
         );
-
 
     } finally {
 
         if (loading) {
-
-            loading.style.display =
-                "none";
-
+            loading.style.display = "none";
         }
 
     }
-
 }
-
 
 // ==================================================
 // RENDER USER
