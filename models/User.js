@@ -26,11 +26,11 @@ const userSchema = new mongoose.Schema(
       index: true
     },
 
-    password: {
+      password: {
       type: String,
-      required: true
+      required: true,
+      select: false
     },
-
 
     // =========================================
     // ACCOUNT ROLE
@@ -128,7 +128,8 @@ const userSchema = new mongoose.Schema(
 
     fcmTokens: {
     type: [String],
-    default: []
+    default: [],
+    select: false
   },
 
 
