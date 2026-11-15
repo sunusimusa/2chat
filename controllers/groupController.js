@@ -5,6 +5,7 @@ const GroupInvitation =
     require("../models/GroupInvitation");
 
 // ================= CREATE GROUP =================
+
 const crypto = require("crypto");
 
 exports.createGroup = async (req, res) => {
@@ -14,29 +15,40 @@ exports.createGroup = async (req, res) => {
         const {
             name,
             description,
-            owner,
             avatar,
             privacy
         } = req.body;
 
-
         // ==========================
-        // CHECK REQUIRED DATA
+        // AUTHENTICATED USER
         // ==========================
 
-        if (!name || !owner) {
+        const owner = req.user?.username;
 
-            return res.status(400).json({
+        if (!owner) {
 
+            return res.status(401).json({
                 success: false,
-
-                message:
-                    "Group name and owner are required."
-
+                message: "Not authorized."
             });
 
         }
 
+        // ==========================
+        // CHECK GROUP NAME
+        // ==========================
+
+        if (
+            typeof name !== "string" ||
+            !name.trim()
+        ) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Group name is required."
+            });
+
+        }
 
         // ==========================
         // CHECK PRIVACY
@@ -47,118 +59,66 @@ exports.createGroup = async (req, res) => {
                 ? "private"
                 : "public";
 
-
         // ==========================
         // GENERATE UNIQUE INVITE CODE
         // ==========================
 
         let inviteCode;
-
         let existingGroup;
-
 
         do {
 
             inviteCode =
                 "2chat_" +
-                crypto
-                    .randomBytes(8)
-                    .toString("hex");
-
+                crypto.randomBytes(8).toString("hex");
 
             existingGroup =
                 await Group.findOne({
                     inviteCode
                 });
 
-
         } while (existingGroup);
-
 
         // ==========================
         // CREATE GROUP
         // ==========================
 
-        const group =
-            await Group.create({
+        const group = await Group.create({
 
-                name:
-                    name.trim(),
+            name: name.trim(),
 
+            description:
+                typeof description === "string"
+                    ? description.trim()
+                    : "",
 
-                description:
-                    description
-                        ? description.trim()
-                        : "",
+            avatar:
+                typeof avatar === "string" && avatar.trim()
+                    ? avatar.trim()
+                    : "/images/default-group.png",
 
+            cover:
+                "/images/default-group-cover.jpg",
 
-                avatar:
-                    avatar ||
-                    "/images/default-group.png",
+            owner: owner,
 
+            inviteCode,
 
-                cover:
-                    "/images/default-group-cover.jpg",
+            admins: [owner],
 
+            members: [owner],
 
-                owner:
-                    owner.trim(),
+            memberCount: 1,
 
+            privacy: groupPrivacy,
 
-                // ==========================
-                // UNIQUE GROUP LINK
-                // ==========================
+            lastMessage: "",
 
-                inviteCode,
+            lastMessageSender: "",
 
+            lastMessageTime: null
 
-                // ==========================
-                // ADMIN
-                // ==========================
-
-                admins: [
-                    owner.trim()
-                ],
-
-
-                // ==========================
-                // OWNER IS FIRST MEMBER
-                // ==========================
-
-                members: [
-                    owner.trim()
-                ],
-
-
-                memberCount:
-                    1,
-
-
-                // ==========================
-                // PUBLIC / PRIVATE
-                // ==========================
-
-                privacy:
-                    groupPrivacy,
-
-
-                // ==========================
-                // LAST MESSAGE
-                // ==========================
-
-                lastMessage:
-                    "",
-
-
-                lastMessageSender:
-                    "",
-
-
-                lastMessageTime:
-                    null
-
-            });
-
+        });
 
         // ==========================
         // SUCCESS
@@ -168,20 +128,16 @@ exports.createGroup = async (req, res) => {
 
             success: true,
 
-            message:
-                "Group created successfully.",
+            message: "Group created successfully.",
 
             group,
 
             inviteCode,
 
             groupLink:
-                `/group.html?invite=${encodeURIComponent(
-                    inviteCode
-                )}`
+                `/group.html?invite=${encodeURIComponent(inviteCode)}`
 
         });
-
 
     } catch (error) {
 
@@ -190,13 +146,11 @@ exports.createGroup = async (req, res) => {
             error
         );
 
-
         return res.status(500).json({
 
             success: false,
 
-            message:
-                "Failed to create group."
+            message: "Failed to create group."
 
         });
 
