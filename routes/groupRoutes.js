@@ -92,9 +92,9 @@ router.put(
 // Reject invitation
 router.put(
     "/invite/reject",
+    protect,
     rejectGroupInvitation
 );
-
 
 // ==================================================
 // GROUP ACTIONS
