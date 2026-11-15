@@ -385,42 +385,39 @@ async function acceptInvitation(invitationId) {
 // REJECT INVITATION
 // ==================================================
 
-async function rejectInvitation(
-    invitationId
-) {
+
+async function rejectInvitation(invitationId) {
 
     if (!invitationId) return;
 
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        alert("Please login again.");
+        window.location.href = "/login.html";
+        return;
+    }
 
     try {
 
         const res = await fetch(
             "/api/groups/invite/reject",
             {
-
                 method: "PUT",
 
                 headers: {
-                    "Content-Type":
-                        "application/json"
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${token}`
                 },
 
                 body: JSON.stringify({
-
-                    invitationId,
-
-                    username:
-                        user.username
-
+                    invitationId
                 })
-
             }
         );
 
-
-        const data =
-            await res.json();
-
+        const data = await res.json();
 
         if (!res.ok || !data.success) {
 
@@ -430,17 +427,11 @@ async function rejectInvitation(
             );
 
             return;
-
         }
 
+        alert("Invitation rejected.");
 
-        alert(
-            "Invitation rejected."
-        );
-
-
-        loadInvitations();
-
+        await loadInvitations();
 
     } catch (error) {
 
@@ -449,14 +440,10 @@ async function rejectInvitation(
             error
         );
 
-        alert(
-            "Network error."
-        );
+        alert("Network error.");
 
     }
-
-}
-
+ }
 
 // ==================================================
 // ESCAPE HTML
