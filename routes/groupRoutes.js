@@ -54,6 +54,7 @@ router.get(
 // Send invitation
 router.post(
     "/invite",
+    protect,
     sendGroupInvitation
 );
 
