@@ -355,53 +355,51 @@ async function loadUsers(
 
 
         await Promise.all([
-    loadSentInvitations(),
-    loadGroupMembers()
-]);
+        loadSentInvitations(),
+       loadGroupMembers()
+    ]);
+
+        
         // ------------------------------------------
-        // GET USERS
+        // GET ALL USERS WITH PAGINATION
         // ------------------------------------------
 
-        const res =
-            await fetch(
-                "/api/users/all",
+        let users = [];
+        let page = 1;
+        let hasNextPage = true;
+
+        while (hasNextPage) {
+
+            const res = await fetch(
+                `/api/users/all?page=${page}&limit=50`,
                 {
                     method: "GET",
-
                     headers: {
-                        "Accept":
-                            "application/json"
+                        "Accept": "application/json"
                     }
                 }
             );
 
+            const data = await res.json();
 
-        const data =
-            await res.json();
+            if (!res.ok || !data.success) {
+                throw new Error(
+                    data.message || "Failed to load users."
+                );
+            }
 
+            if (!Array.isArray(data.users)) {
+                throw new Error("Invalid users response.");
+            }
 
-        // ------------------------------------------
-        // CHECK RESPONSE
-        // ------------------------------------------
+            users.push(...data.users);
 
-        if (
-            !res.ok ||
-            !data.success
-        ) {
+            hasNextPage =
+                data.pagination?.hasNextPage === true;
 
-            throw new Error(
-                data.message ||
-                "Failed to load users."
-            );
-
+            page++;
         }
-
-
-        let users =
-            Array.isArray(data.users)
-                ? data.users
-                : [];
-
+        
 
         // ------------------------------------------
         // REMOVE CURRENT USER
