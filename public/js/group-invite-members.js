@@ -758,11 +758,23 @@ async function sendInvitation(
     const token = localStorage.getItem("token");
 
 if (!token) {
-    showMessage("Your session has expired. Please login again.", true);
+
+    if (button) {
+        button.disabled = false;
+        button.innerHTML = `
+            <i class="fa-solid fa-user-plus"></i>
+            Invite
+        `;
+    }
+
+    showMessage(
+        "Your session has expired. Please login again.",
+        true
+    );
+
     window.location.href = "/login.html";
     return;
 }
-
 
     try {
 
