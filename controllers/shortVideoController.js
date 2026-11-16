@@ -3,11 +3,11 @@ const User = require("../models/User");
 const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
 
+
 // Upload Short Video
 exports.uploadVideo = async (req, res) => {
-
     try {
-
+        // Tabbatar cewa an zaɓi video
         if (!req.file) {
             return res.status(400).json({
                 success: false,
@@ -15,71 +15,81 @@ exports.uploadVideo = async (req, res) => {
             });
         }
 
-        const uploadResult = await new Promise((resolve, reject) => {
+        // Tabbatar da authenticated user
+        if (!req.user || !req.user.username) {
+            return res.status(401).json({
+                success: false,
+                message: "Authentication required."
+            });
+        }
 
+        // Ɗauko bayanan mai upload daga database/JWT
+        const username = req.user.username;
+        const avatar = req.user.avatar || "";
+
+        // Karɓar caption da category kawai
+        const caption = typeof req.body.caption === "string"
+            ? req.body.caption.trim()
+            : "";
+
+        const category = typeof req.body.category === "string"
+            ? req.body.category.trim()
+            : "general";
+
+        // Shirya hashtags
+        let tags = [];
+
+        if (typeof req.body.hashtags === "string") {
+            tags = req.body.hashtags
+                .split(/\s+/)
+                .map(tag => tag.replace(/^#/, "").toLowerCase())
+                .filter(tag => /^[a-z0-9_]{1,30}$/.test(tag))
+                .slice(0, 20);
+        }
+
+        // Upload zuwa Cloudinary
+        const uploadResult = await new Promise((resolve, reject) => {
             const stream = cloudinary.uploader.upload_stream(
                 {
                     resource_type: "video",
                     folder: "2chat/shorts"
                 },
                 (error, result) => {
-                    if (error) reject(error);
-                    else resolve(result);
+                    if (error) return reject(error);
+                    resolve(result);
                 }
             );
 
-            streamifier.createReadStream(req.file.buffer).pipe(stream);
-
+            streamifier
+                .createReadStream(req.file.buffer)
+                .pipe(stream);
         });
 
-        
-            let tags = [];
+        // Ƙirƙirar Short da authenticated user
+        const short = await ShortVideo.create({
+            username,
+            avatar,
+            caption,
+            category: category || "general",
+            hashtags: tags,
+            video: uploadResult.secure_url
+        });
 
-if(req.body.hashtags){
-
-    tags = req.body.hashtags
-    .split(" ")
-    .map(tag =>
-        tag.replace("#","").toLowerCase()
-    )
-    .filter(tag=>tag);
-
-}
-
-
-const short = await ShortVideo.create({
-
-    username: req.body.username,
-
-    avatar: req.body.avatar || "",
-
-    caption: req.body.caption || "",
-
-    category: req.body.category || "general",
-
-    hashtags: tags,
-
-    video: uploadResult.secure_url
-
-});
-
-        res.json({
+        return res.status(201).json({
             success: true,
             video: short
         });
 
     } catch (err) {
+        console.error("SHORT VIDEO UPLOAD ERROR:", err);
 
-        console.error(err);
-
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: err.message
+            message: "Unable to upload video. Please try again."
         });
-
     }
-
 };
+                
 
 // Get Videos
 exports.getVideos = async (req, res) => {
