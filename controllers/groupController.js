@@ -971,276 +971,161 @@ exports.removeAdmin = async (req, res) => {
 // UPDATE GROUP SETTINGS
 // ==================================================
 
+
 exports.updateGroupSettings = async (req, res) => {
-
     try {
-
         const {
             groupId,
-            username,
             name,
             description,
             privacy
         } = req.body;
 
-
-        // ==========================
-        // CHECK REQUIRED DATA
-        // ==========================
-
-        if (!groupId || !username) {
-
+        // Validate group ID
+        if (!groupId) {
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "Group ID and username are required."
-
+                message: "Group ID is required."
             });
-
         }
 
-
-        // ==========================
-        // FIND GROUP
-        // ==========================
-
-        const group =
-            await Group.findById(groupId);
+        // Find group
+        const group = await Group.findById(groupId);
 
         if (!group) {
-
             return res.status(404).json({
-
                 success: false,
-
-                message:
-                    "Group not found."
-
+                message: "Group not found."
             });
-
         }
 
+        // Identify requester using verified JWT
+        const requester = req.user.username;
 
-        // ==========================
-        // OWNER ONLY
-        // ==========================
-
-        if (group.owner !== username) {
-
+        // Only actual group owner can update settings
+        if (group.owner !== requester) {
             return res.status(403).json({
-
                 success: false,
-
-                message:
-                    "Only the group owner can change settings."
-
+                message: "Only the group owner can change settings."
             });
-
         }
 
+        // Validate privacy
+        if (
+            privacy !== undefined &&
+            privacy !== "public" &&
+            privacy !== "private"
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid group privacy setting."
+            });
+        }
 
-        // ==========================
-        // UPDATE NAME
-        // ==========================
-
+        // Update name
         if (
             typeof name === "string" &&
             name.trim() !== ""
         ) {
-
-            group.name =
-                name.trim();
-
+            group.name = name.trim();
         }
 
-
-        // ==========================
-        // UPDATE DESCRIPTION
-        // ==========================
-
-        if (
-            typeof description === "string"
-        ) {
-
-            group.description =
-                description.trim();
-
+        // Update description
+        if (typeof description === "string") {
+            group.description = description.trim();
         }
 
-
-        // ==========================
-        // AVATAR UPLOAD
-        // ==========================
-
+        // Update avatar
         if (
             req.files &&
             req.files.avatar &&
             req.files.avatar[0]
         ) {
+            const file = req.files.avatar[0];
 
-            const file =
-                req.files.avatar[0];
-
-            const result =
-                await new Promise(
-                    (resolve, reject) => {
-
-                        const stream =
-                            cloudinary.uploader.upload_stream(
-
-                                {
-                                    folder:
-                                        "2chat/groups/avatars",
-
-                                    resource_type:
-                                        "image"
-                                },
-
-                                (error, result) => {
-
-                                    if(error){
-
-                                        reject(error);
-
-                                    }else{
-
-                                        resolve(result);
-
-                                    }
-
+            const result = await new Promise(
+                (resolve, reject) => {
+                    const stream =
+                        cloudinary.uploader.upload_stream(
+                            {
+                                folder: "2chat/groups/avatars",
+                                resource_type: "image"
+                            },
+                            (error, result) => {
+                                if (error) {
+                                    reject(error);
+                                } else {
+                                    resolve(result);
                                 }
-
-                            );
-
-                        stream.end(
-                            file.buffer
+                            }
                         );
 
-                    }
-                );
+                    stream.end(file.buffer);
+                }
+            );
 
-
-            group.avatar =
-                result.secure_url;
-
+            group.avatar = result.secure_url;
         }
 
-
-        // ==========================
-        // COVER UPLOAD
-        // ==========================
-
+        // Update cover
         if (
             req.files &&
             req.files.cover &&
             req.files.cover[0]
         ) {
+            const file = req.files.cover[0];
 
-            const file =
-                req.files.cover[0];
-
-            const result =
-                await new Promise(
-                    (resolve, reject) => {
-
-                        const stream =
-                            cloudinary.uploader.upload_stream(
-
-                                {
-                                    folder:
-                                        "2chat/groups/covers",
-
-                                    resource_type:
-                                        "image"
-                                },
-
-                                (error, result) => {
-
-                                    if(error){
-
-                                        reject(error);
-
-                                    }else{
-
-                                        resolve(result);
-
-                                    }
-
+            const result = await new Promise(
+                (resolve, reject) => {
+                    const stream =
+                        cloudinary.uploader.upload_stream(
+                            {
+                                folder: "2chat/groups/covers",
+                                resource_type: "image"
+                            },
+                            (error, result) => {
+                                if (error) {
+                                    reject(error);
+                                } else {
+                                    resolve(result);
                                 }
-
-                            );
-
-                        stream.end(
-                            file.buffer
+                            }
                         );
 
-                    }
-                );
+                    stream.end(file.buffer);
+                }
+            );
 
-
-            group.cover =
-                result.secure_url;
-
+            group.cover = result.secure_url;
         }
 
-        // ==========================
-// UPDATE PRIVACY
-// ==========================
+        // Update privacy
+        if (privacy !== undefined) {
+            group.privacy = privacy;
+        }
 
-if (
-    privacy === "public" ||
-    privacy === "private"
-) {
-
-    group.privacy = privacy;
-
-}
-
-
-// ==========================
-// SAVE GROUP
-// ==========================
-
-await group.save();
-
-        
-        // ==========================
-        // SUCCESS
-        // ==========================
+        // Save changes
+        await group.save();
 
         return res.json({
-
             success: true,
-
-            message:
-                "Group settings updated successfully.",
-
+            message: "Group settings updated successfully.",
             group
-
         });
 
-
     } catch (error) {
-
         console.error(
             "UPDATE GROUP SETTINGS ERROR:",
             error
         );
 
         return res.status(500).json({
-
             success: false,
-
-            message:
-                "Failed to update group settings."
-
+            message: "Failed to update group settings."
         });
-
     }
-
 };
+    
 
 // ==================================================
 // SEND GROUP INVITATION
