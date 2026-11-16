@@ -40,22 +40,28 @@ router.post(
 );
 
 // Update Profile
-router.put("/profile", protect, updateProfile);
+router.put(
+    "/profile",
+    protect,
+    updateProfile
+);
 
 // Upload Avatar
 router.post(
-  "/avatar",
-  protect,
-  upload.single("avatar"),
-  uploadAvatar
+    "/avatar",
+    protect,
+    profileUpload.single("avatar"),
+    validateProfileImage,
+    uploadAvatar
 );
 
 // Upload Cover
 router.post(
-  "/cover",
-  protect,
-  upload.single("cover"),
-  uploadCover
+    "/cover",
+    protect,
+    profileUpload.single("cover"),
+    validateProfileImage,
+    uploadCover
 );
 
 router.get(
