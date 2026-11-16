@@ -135,21 +135,13 @@ router.put(
 
 router.put(
     "/settings",
-
+    protect,
     upload.fields([
-        {
-            name: "avatar",
-            maxCount: 1
-        },
-        {
-            name: "cover",
-            maxCount: 1
-        }
+        { name: "avatar", maxCount: 1 },
+        { name: "cover", maxCount: 1 }
     ]),
-
     updateGroupSettings
 );
-
 
 // ==================================================
 // GET GROUP BY INVITE CODE
