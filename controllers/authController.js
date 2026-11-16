@@ -169,13 +169,9 @@ return res.status(201).json({
 
 
     return res.status(500).json({
-
-      success: false,
-
-      message:
-        err.message
-
-    });
+    success: false,
+    message: "Unable to create account."
+});
 
   }
 
@@ -348,13 +344,9 @@ return res.json({
 
 
     return res.status(500).json({
-
-      success: false,
-
-      message:
-        err.message
-
-    });
+    success: false,
+    message: "Unable to log in."
+});
 
   }
 
