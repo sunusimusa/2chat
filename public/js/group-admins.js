@@ -411,74 +411,64 @@ function renderMembers(group){
 // MAKE ADMIN
 // ==================================================
 
-async function makeAdmin(
-    username
-){
+async function makeAdmin(username) {
 
-    if(!username){
+    if (!username) return;
+
+    const confirmed = confirm(
+        "Make " + username + " an admin?"
+    );
+
+    if (!confirmed) return;
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+
+        alert("Please login again.");
+
+        window.location.href = "/login.html";
+
         return;
+
     }
 
+    try {
 
-    const confirmed =
-        confirm(
-            "Make " +
-            username +
-            " an admin?"
+        const res = await fetch(
+            "/api/groups/make-admin",
+            {
+                method: "PUT",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+
+                body: JSON.stringify({
+                    groupId,
+                    member: username
+                })
+            }
         );
 
+        const data = await res.json();
 
-    if(!confirmed){
-        return;
-    }
+        if (res.status === 401) {
 
+            alert("Your session has expired. Please login again.");
 
-    try{
+            window.location.href = "/login.html";
 
-        const res =
-            await fetch(
-                "/api/groups/make-admin",
-                {
+            return;
 
-                    method:"PUT",
+        }
 
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:JSON.stringify({
-
-                        groupId:
-
-                            groupId,
-
-                        username:
-
-                            user.username,
-
-                        member:
-
-                            username
-
-                    })
-
-                }
-            );
-
-
-        const data =
-            await res.json();
-
-
-        if(
-            !res.ok ||
-            !data.success
-        ){
+        if (!res.ok || !data.success) {
 
             showAdminMessage(
-                data.message ||
-                "Failed to make admin.",
+                data.message || "Failed to make admin.",
                 true
             );
 
@@ -486,23 +476,15 @@ async function makeAdmin(
 
         }
 
-
         showAdminMessage(
             "Admin added successfully."
         );
 
+        await loadGroup();
 
-        // Reload group
+    } catch (err) {
 
-        loadGroup();
-
-
-    }catch(err){
-
-        console.error(
-            "MAKE ADMIN ERROR:",
-            err
-        );
+        console.error("MAKE ADMIN ERROR:", err);
 
         showAdminMessage(
             "Failed to make admin.",
@@ -512,7 +494,6 @@ async function makeAdmin(
     }
 
 }
-
 
 // ==================================================
 // REMOVE ADMIN
