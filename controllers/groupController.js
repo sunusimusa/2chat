@@ -879,134 +879,93 @@ exports.promoteToAdmin = async (req, res) => {
 // REMOVE ADMIN
 // ==================================================
 
+
 exports.removeAdmin = async (req, res) => {
-
     try {
+        const { groupId, member } = req.body;
 
-        const {
-            groupId,
-            username,
-            member
-        } = req.body;
-
-
-        // CHECK REQUIRED
-        if (!groupId || !username || !member) {
-
+        if (
+            !groupId ||
+            !member ||
+            typeof member !== "string"
+        ) {
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "groupId, username and member are required."
-
+                message: "Group ID and member username are required."
             });
-
         }
 
+        const memberUsername = member.trim();
 
-        // FIND GROUP
-        const group =
-            await Group.findById(groupId);
+        if (!memberUsername) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid member username."
+            });
+        }
+
+        const group = await Group.findById(groupId);
 
         if (!group) {
-
             return res.status(404).json({
-
                 success: false,
-
-                message:
-                    "Group not found."
-
+                message: "Group not found."
             });
-
         }
 
+        // Identify requester using verified JWT
+        const requester = req.user.username;
 
-        // ONLY OWNER CAN REMOVE ADMIN
-        if (group.owner !== username) {
-
+        // Only the actual owner can remove admins
+        if (group.owner !== requester) {
             return res.status(403).json({
-
                 success: false,
-
-                message:
-                    "Only the group owner can remove admins."
-
+                message: "Only the group owner can remove admins."
             });
-
         }
 
+        const admins = Array.isArray(group.admins)
+            ? group.admins
+            : [];
 
-        // CANNOT REMOVE OWNER
-        if (group.owner === member) {
-
+        // Cannot remove the owner
+        if (group.owner === memberUsername) {
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "The group owner cannot be removed as admin."
-
+                message: "The group owner cannot be removed as admin."
             });
-
         }
 
-
-        // CHECK ADMIN
-        if (!group.admins.includes(member)) {
-
-            return res.status(400).json({
-
+        // Check whether target is an admin
+        if (!admins.includes(memberUsername)) {
+            return res.status(404).json({
                 success: false,
-
-                message:
-                    "This user is not an admin."
-
+                message: "This user is not an admin."
             });
-
         }
 
-
-        // REMOVE ADMIN
-        group.admins =
-            group.admins.filter(
-                admin => admin !== member
-            );
+        group.admins = admins.filter(
+            admin => admin !== memberUsername
+        );
 
         await group.save();
 
-
         return res.json({
-
             success: true,
-
-            message:
-                "Admin removed successfully.",
-
+            message: "Admin removed successfully.",
             group
-
         });
 
     } catch (err) {
-
-        console.error(
-            "REMOVE ADMIN ERROR:",
-            err
-        );
+        console.error("REMOVE ADMIN ERROR:", err);
 
         return res.status(500).json({
-
             success: false,
-
-            message:
-                err.message
-
+            message: "An error occurred while removing the admin."
         });
-
     }
-
 };
+            
 
 // ==================================================
 // UPDATE GROUP SETTINGS
