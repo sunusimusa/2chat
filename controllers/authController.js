@@ -54,40 +54,60 @@ exports.register = async (req, res) => {
       password
     } = req.body;
 
+// =========================================
+// BASIC VALIDATION
+// =========================================
 
-    // =========================================
-    // BASIC VALIDATION
-    // =========================================
-    
-    if (
+if (
     typeof username !== "string" ||
-    username.trim().length < 3 ||
-    username.trim().length > 30 ||
-    !/^[a-zA-Z0-9][a-zA-Z0-9._-]{1,28}[a-zA-Z0-9]$/.test(username.trim())
+    typeof email !== "string" ||
+    typeof password !== "string" ||
+    !username.trim() ||
+    !email.trim() ||
+    !password
+) {
+    return res.status(400).json({
+        success: false,
+        message: "Username, email and password are required"
+    });
+}
+
+const cleanUsername = username.trim();
+const cleanEmail = email.trim().toLowerCase();
+
+if (
+    cleanUsername.length < 3 ||
+    cleanUsername.length > 30 ||
+    !/^[a-zA-Z0-9][a-zA-Z0-9._-]{1,28}[a-zA-Z0-9]$/.test(cleanUsername)
 ) {
     return res.status(400).json({
         success: false,
         message: "Username must be 3-30 characters, use letters, numbers, dots, underscores or hyphens, and start and end with a letter or number."
     });
-    }
+}
 
-    if (!username || !email || !password) {
-
-      return res.status(400).json({
+if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+    return res.status(400).json({
         success: false,
-        message: "Username, email and password are required"
-      });
+        message: "Please enter a valid email address."
+    });
+}
 
-    }
+if (password.length < 8 || password.length > 128) {
+    return res.status(400).json({
+        success: false,
+        message: "Password must be between 8 and 128 characters."
+    });
+      }
 
 
     // =========================================
     // CHECK EXISTING USER
     // =========================================
 
-    const cleanUsername = username.trim();
-
-const userExists = await User.findOne({
+  
+const userExists = await
+  User.findOne({
     $or: [
         { email: email.trim().toLowerCase() },
         { username: cleanUsername }
@@ -116,13 +136,13 @@ const userExists = await User.findOne({
       );
 
 
-    // =========================================
-    // CREATE USER
-    // =========================================
+// =========================================
+// CREATE USER
+// =========================================
 
-    const user = await User.create({
+const user = await User.create({
     username: cleanUsername,
-    email: email.trim().toLowerCase(),
+    email: cleanEmail,
     password: hashedPassword
 });
 
