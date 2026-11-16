@@ -86,12 +86,13 @@ exports.register = async (req, res) => {
     // =========================================
 
     const cleanUsername = username.trim();
-      await User.findOne({
-        $or: [
-          { email },
-          { username: cleanUsername }
-        ]
-      });
+
+const userExists = await User.findOne({
+    $or: [
+        { email: email.trim().toLowerCase() },
+        { username: cleanUsername }
+    ]
+});
 
 
     if (userExists) {
@@ -119,13 +120,11 @@ exports.register = async (req, res) => {
     // CREATE USER
     // =========================================
 
-    const user =
-      await User.create({
-        username: cleanUsername
-        email,
-        password: hashedPassword
-      });
-
+    const user = await User.create({
+    username: cleanUsername,
+    email: email.trim().toLowerCase(),
+    password: hashedPassword
+});
 
     // =========================================
     // CREATE WALLET
