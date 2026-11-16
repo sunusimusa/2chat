@@ -2,8 +2,10 @@ const router = require("express").Router();
 
 const protect = require("../middleware/auth");
 
-const upload =
-require("../middleware/upload");
+const {
+    profileUpload,
+    validateProfileImage
+} = require("../middleware/profileUpload");
 
 const {
 register,
