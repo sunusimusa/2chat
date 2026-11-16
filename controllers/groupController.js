@@ -782,147 +782,98 @@ exports.addMember = async (req, res) => {
 // ==================================================
 
 exports.promoteToAdmin = async (req, res) => {
-
     try {
+        const { groupId, member } = req.body;
 
-        const {
-            groupId,
-            username,
-            member
-        } = req.body;
-
-
-        // CHECK REQUIRED
-        if (!groupId || !username || !member) {
-
+        if (
+            !groupId ||
+            !member ||
+            typeof member !== "string"
+        ) {
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "groupId, username and member are required."
-
+                message: "Group ID and member username are required."
             });
-
         }
 
+        const memberUsername = member.trim();
 
-        // FIND GROUP
-        const group =
-            await Group.findById(groupId);
+        if (!memberUsername) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid member username."
+            });
+        }
+
+        const group = await Group.findById(groupId);
 
         if (!group) {
-
             return res.status(404).json({
-
                 success: false,
-
-                message:
-                    "Group not found."
-
+                message: "Group not found."
             });
-
         }
 
+        const requester = req.user.username;
 
-        // ONLY OWNER CAN PROMOTE ADMIN
-        if (group.owner !== username) {
-
+        // Only the actual owner can promote admins
+        if (group.owner !== requester) {
             return res.status(403).json({
-
                 success: false,
-
-                message:
-                    "Only the group owner can promote admins."
-
+                message: "Only the group owner can promote admins."
             });
-
         }
 
+        const members = Array.isArray(group.members)
+            ? group.members
+            : [];
 
-        // CHECK MEMBER EXISTS IN GROUP
-        if (!group.members.includes(member)) {
+        const admins = Array.isArray(group.admins)
+            ? group.admins
+            : [];
 
+        if (!members.includes(memberUsername)) {
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "This user is not a member of the group."
-
+                message: "This user is not a member of the group."
             });
-
         }
 
-
-        // OWNER IS ALREADY OWNER
-        if (group.owner === member) {
-
+        if (group.owner === memberUsername) {
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "Group owner is already the owner."
-
+                message: "Group owner is already the owner."
             });
-
         }
 
-
-        // ALREADY ADMIN
-        if (group.admins.includes(member)) {
-
-            return res.status(400).json({
-
+        if (admins.includes(memberUsername)) {
+            return res.status(409).json({
                 success: false,
-
-                message:
-                    "This user is already an admin."
-
+                message: "This user is already an admin."
             });
-
         }
 
-
-        // ADD ADMIN
-        group.admins.push(member);
+        group.admins = admins;
+        group.admins.push(memberUsername);
 
         await group.save();
 
-
         return res.json({
-
             success: true,
-
-            message:
-                "Member promoted to admin successfully.",
-
+            message: "Member promoted to admin successfully.",
             group
-
         });
 
     } catch (err) {
-
-        console.error(
-            "PROMOTE ADMIN ERROR:",
-            err
-        );
+        console.error("PROMOTE ADMIN ERROR:", err);
 
         return res.status(500).json({
-
             success: false,
-
-            message:
-                err.message
-
+            message: "An error occurred while promoting the admin."
         });
-
     }
-
 };
-
-
+        
 
 // ==================================================
 // REMOVE ADMIN
