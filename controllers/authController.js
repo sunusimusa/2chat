@@ -422,14 +422,15 @@ exports.updateProfile = async (
     await user.save();
 
 
-    return res.json({
+    const safeUser = user.toObject();
 
-      success: true,
+delete safeUser.password;
+delete safeUser.fcmTokens;
 
-      user
-
-    });
-
+return res.json({
+    success: true,
+    user: safeUser
+});
 
   } catch (err) {
 
