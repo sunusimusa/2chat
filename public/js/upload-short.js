@@ -33,10 +33,6 @@ function uploadShort() {
 
     formData.append("video", file);
 
-    formData.append("username", user.username);
-
-    formData.append("avatar", user.avatar || "");
-
     formData.append("caption", caption);
 
     formData.append(
@@ -47,6 +43,11 @@ function uploadShort() {
     const xhr = new XMLHttpRequest();
 
     xhr.open("POST", "/api/shorts/upload", true);
+
+xhr.setRequestHeader(
+    "Authorization",
+    "Bearer " + localStorage.getItem("token")
+);  
 
     document.getElementById("progressContainer").style.display = "block";
 
