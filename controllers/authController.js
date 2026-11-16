@@ -840,13 +840,9 @@ exports.uploadCover = async (
 
 
     return res.status(500).json({
-
-      success: false,
-
-      message:
-        err.message
-
-    });
+    success: false,
+    message: "Unable to upload cover photo."
+});
 
   }
 
