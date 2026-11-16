@@ -2,6 +2,8 @@ const router = require("express").Router();
 
 const upload = require("../middleware/upload");
 
+const protect = require("../middleware/auth");
+
 const {
     uploadVideo,
     getVideos,
@@ -26,6 +28,7 @@ const {
 // Upload Short Video
 router.post(
     "/upload",
+    protect,
     upload.single("video"),
     uploadVideo
 );
