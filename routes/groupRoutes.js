@@ -32,6 +32,48 @@ const upload = multer({
 });
 
 
+const validateGroupImages = async (req, res, next) => {
+    try {
+        const { fileTypeFromBuffer } = await import("file-type");
+
+        const files = [
+            ...(req.files?.avatar || []),
+            ...(req.files?.cover || [])
+        ];
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+        ];
+
+        for (const file of files) {
+            const detectedType = await fileTypeFromBuffer(file.buffer);
+
+            if (
+                !detectedType ||
+                !allowedTypes.includes(detectedType.mime) ||
+                detectedType.mime !== file.mimetype
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid image file. Only genuine JPG, PNG and WEBP images are allowed."
+                });
+            }
+        }
+
+        next();
+
+    } catch (error) {
+        console.error("GROUP IMAGE VALIDATION ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to validate uploaded images."
+        });
+    }
+};
+    
 const {
     createGroup,
     getGroups,
@@ -164,6 +206,7 @@ router.put(
         { name: "avatar", maxCount: 1 },
         { name: "cover", maxCount: 1 }
     ]),
+    validateGroupImages,
     updateGroupSettings
 );
 
