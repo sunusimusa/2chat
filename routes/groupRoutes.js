@@ -124,6 +124,7 @@ router.put(
 
 router.put(
     "/remove-admin",
+    protect,
     removeAdmin
 );
 
