@@ -167,14 +167,6 @@ const userSchema = new mongoose.Schema(
 // =========================================
 
 userSchema.index({
-  username: 1
-});
-
-userSchema.index({
-  email: 1
-});
-
-userSchema.index({
   isCreator: 1
 });
 
