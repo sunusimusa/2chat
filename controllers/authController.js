@@ -58,6 +58,18 @@ exports.register = async (req, res) => {
     // =========================================
     // BASIC VALIDATION
     // =========================================
+    
+    if (
+    typeof username !== "string" ||
+    username.trim().length < 3 ||
+    username.trim().length > 30 ||
+    !/^[a-zA-Z0-9][a-zA-Z0-9._-]{1,28}[a-zA-Z0-9]$/.test(username.trim())
+) {
+    return res.status(400).json({
+        success: false,
+        message: "Username must be 3-30 characters, use letters, numbers, dots, underscores or hyphens, and start and end with a letter or number."
+    });
+    }
 
     if (!username || !email || !password) {
 
@@ -73,11 +85,11 @@ exports.register = async (req, res) => {
     // CHECK EXISTING USER
     // =========================================
 
-    const userExists =
+    const cleanUsername = username.trim();
       await User.findOne({
         $or: [
           { email },
-          { username }
+          { username: cleanUsername }
         ]
       });
 
@@ -109,7 +121,7 @@ exports.register = async (req, res) => {
 
     const user =
       await User.create({
-        username,
+        username: cleanUsername
         email,
         password: hashedPassword
       });
