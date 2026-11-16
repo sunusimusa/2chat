@@ -104,16 +104,14 @@ if (password.length < 8 || password.length > 128) {
     // =========================================
     // CHECK EXISTING USER
     // =========================================
-
-  
-const userExists = await
-  User.findOne({
-    $or: [
-        { email: email.trim().toLowerCase() },
-        { username: cleanUsername }
-    ]
-});
-
+    
+    const userExists = await
+    User.findOne({
+        $or: [
+            { email: cleanEmail },
+            { username: cleanUsername }
+        ]
+    });
 
     if (userExists) {
 
