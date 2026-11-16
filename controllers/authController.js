@@ -382,15 +382,15 @@ exports.updateProfile = async (req, res) => {
             const cleanUsername = username.trim();
 
             if (
-                cleanUsername.length < 3 ||
-                cleanUsername.length > 30 ||
-                !/^[a-zA-Z0-9_]+$/.test(cleanUsername)
-            ) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Username must be 3-30 characters and contain only letters, numbers and underscores."
-                });
-            }
+    cleanUsername.length < 3 ||
+    cleanUsername.length > 30 ||
+    !/^[a-zA-Z0-9][a-zA-Z0-9._-]{1,28}[a-zA-Z0-9]$/.test(cleanUsername)
+) {
+    return res.status(400).json({
+        success: false,
+        message: "Username must be 3-30 characters, use letters, numbers, dots, underscores or hyphens, and start and end with a letter or number."
+    });
+}
 
             const existingUser = await User.findOne({
                 username: cleanUsername,
