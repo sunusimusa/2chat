@@ -19,6 +19,13 @@ function uploadShort() {
 
     const file = videoInput.files[0];
 
+    const token = localStorage.getItem("token");
+
+if (!token) {
+    alert("Please login again.");
+    return;
+}
+
     const caption = document.getElementById("caption").value.trim();
 
     if (!file) {
@@ -67,8 +74,15 @@ xhr.setRequestHeader(
 
     xhr.onload = function(){
 
-        const data = JSON.parse(xhr.responseText);
+        let data;
 
+try {
+    data = JSON.parse(xhr.responseText);
+} catch (error) {
+    alert("Server returned an invalid response.");
+    return;
+}
+    
         if(data.success){
 
             document.getElementById("progressText").innerText = "✅ Upload Complete";
