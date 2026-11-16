@@ -826,68 +826,72 @@ if (deleteGroupBtn) {
         "click",
         async () => {
 
-            if (
-                !confirm(
-                    "Delete this group permanently?"
-                )
-            ) return;
+            if (!currentGroup) return;
 
+            if (currentGroup.owner !== user.username) {
+                alert("Only the group owner can delete this group.");
+                return;
+            }
+
+            if (!confirm("Delete this group permanently?")) {
+                return;
+            }
+
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                alert("Please login again.");
+                window.location.href = "/login.html";
+                return;
+            }
 
             try {
 
-                const res =
-                    await fetch(
-                        "/api/groups/delete",
-                        {
+                deleteGroupBtn.disabled = true;
 
-                            method: "DELETE",
+                const res = await fetch(
+                    "/api/groups/delete",
+                    {
+                        method: "DELETE",
 
-                            headers: {
-                                "Content-Type":
-                                    "application/json"
-                            },
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Accept": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
 
-                            body: JSON.stringify({
+                        body: JSON.stringify({
+                            groupId
+                        })
+                    }
+                );
 
-                                groupId,
+                const data = await res.json();
 
-                                username:
-                                    user.username
-
-                            })
-
-                        }
-                    );
-
-
-                const data =
-                    await res.json();
-
-
-                if (data.success) {
-
-                    alert(
-                        "🗑️ Group deleted."
-                    );
-
-                    location.href =
-                        "/groups.html";
-
-                } else {
-
-                    alert(
-                        data.message
-                    );
-
+                if (res.status === 401) {
+                    alert("Your session has expired. Please login again.");
+                    window.location.href = "/login.html";
+                    return;
                 }
+
+                if (!res.ok || !data.success) {
+                    alert(data.message || "Failed to delete group.");
+                    return;
+                }
+
+                alert("🗑️ Group deleted.");
+
+                window.location.href = "/groups.html";
 
             } catch (err) {
 
-                console.error(err);
+                console.error("DELETE GROUP ERROR:", err);
 
-                alert(
-                    "Network Error"
-                );
+                alert("Network error. Please try again.");
+
+            } finally {
+
+                deleteGroupBtn.disabled = false;
 
             }
 
@@ -895,7 +899,6 @@ if (deleteGroupBtn) {
     );
 
 }
-
 
 // ==================================================
 // START
