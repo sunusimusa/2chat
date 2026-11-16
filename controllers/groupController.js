@@ -639,53 +639,53 @@ exports.leaveGroup = async (req, res) => {
 };
             
 // ================= DELETE GROUP =================
+
 exports.deleteGroup = async (req, res) => {
+    try {
+        const { groupId } = req.body;
 
-    try{
-
-        const {
-            groupId,
-            username
-        } = req.body;
+        if (!groupId) {
+            return res.status(400).json({
+                success: false,
+                message: "Group ID is required."
+            });
+        }
 
         const group = await Group.findById(groupId);
 
-        if(!group){
-
-            return res.json({
-                success:false,
-                message:"Group not found."
+        if (!group) {
+            return res.status(404).json({
+                success: false,
+                message: "Group not found."
             });
-
         }
 
-        if(group.owner !== username){
+        // Identify the requester using the verified JWT
+        const requester = req.user.username;
 
-            return res.json({
-                success:false,
-                message:"Only the group owner can delete this group."
+        // Only the actual group owner can delete the group
+        if (group.owner !== requester) {
+            return res.status(403).json({
+                success: false,
+                message: "Only the group owner can delete this group."
             });
-
         }
 
         await Group.findByIdAndDelete(groupId);
 
-        res.json({
-            success:true,
-            message:"Group deleted successfully."
+        return res.json({
+            success: true,
+            message: "Group deleted successfully."
         });
 
-    }catch(err){
+    } catch (err) {
+        console.error("DELETE GROUP ERROR:", err);
 
-        console.error(err);
-
-        res.status(500).json({
-            success:false,
-            message:err.message
+        return res.status(500).json({
+            success: false,
+            message: "An error occurred while deleting the group."
         });
-
     }
-
 };
 
 // ================= ADD MEMBER =================
