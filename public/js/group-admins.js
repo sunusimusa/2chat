@@ -499,74 +499,65 @@ async function makeAdmin(username) {
 // REMOVE ADMIN
 // ==================================================
 
-async function removeAdmin(
-    username
-){
 
-    if(!username){
+async function removeAdmin(username) {
+
+    if (!username) return;
+
+    const confirmed = confirm(
+        "Remove admin permission from " + username + "?"
+    );
+
+    if (!confirmed) return;
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+
+        alert("Please login again.");
+
+        window.location.href = "/login.html";
+
         return;
+
     }
 
+    try {
 
-    const confirmed =
-        confirm(
-            "Remove admin permission from " +
-            username +
-            "?"
+        const res = await fetch(
+            "/api/groups/remove-admin",
+            {
+                method: "PUT",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+
+                body: JSON.stringify({
+                    groupId,
+                    member: username
+                })
+            }
         );
 
+        const data = await res.json();
 
-    if(!confirmed){
-        return;
-    }
+        if (res.status === 401) {
 
+            alert("Your session has expired. Please login again.");
 
-    try{
+            window.location.href = "/login.html";
 
-        const res =
-            await fetch(
-                "/api/groups/remove-admin",
-                {
+            return;
 
-                    method:"PUT",
+        }
 
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:JSON.stringify({
-
-                        groupId:
-
-                            groupId,
-
-                        username:
-
-                            user.username,
-
-                        member:
-
-                            username
-
-                    })
-
-                }
-            );
-
-
-        const data =
-            await res.json();
-
-
-        if(
-            !res.ok ||
-            !data.success
-        ){
+        if (!res.ok || !data.success) {
 
             showAdminMessage(
-                data.message ||
-                "Failed to remove admin.",
+                data.message || "Failed to remove admin.",
                 true
             );
 
@@ -574,33 +565,19 @@ async function removeAdmin(
 
         }
 
+        showAdminMessage("Admin removed successfully.");
 
-        showAdminMessage(
-            "Admin removed successfully."
-        );
+        await loadGroup();
 
+    } catch (err) {
 
-        // Reload group
+        console.error("REMOVE ADMIN ERROR:", err);
 
-        loadGroup();
-
-
-    }catch(err){
-
-        console.error(
-            "REMOVE ADMIN ERROR:",
-            err
-        );
-
-        showAdminMessage(
-            "Failed to remove admin.",
-            true
-        );
+        showAdminMessage("Failed to remove admin.", true);
 
     }
 
 }
-
 
 // ==================================================
 // START
