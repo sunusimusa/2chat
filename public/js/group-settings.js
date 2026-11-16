@@ -212,17 +212,17 @@ async function loadGroup() {
             );
 
 
-        if (!isOwner && !isAdmin) {
+        if (!isOwner) {
 
-            alert(
-                "Only Owner or Admin can access Group Settings."
+           alert(
+               "Only the group owner can access Group Settings."
             );
 
-            history.back();
+                history.back();
 
-            return;
+              return;
 
-        }
+          }
 
 
         // ==================================================
