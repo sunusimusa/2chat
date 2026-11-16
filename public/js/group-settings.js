@@ -540,258 +540,154 @@ if (saveSettingsBtn) {
 }
 
 
+
 async function saveSettings() {
 
     if (!currentGroup) {
-
-        showMessage(
-            "Group information is not loaded.",
-            true
-        );
-
+        showMessage("Group information is not loaded.", true);
         return;
-
     }
 
+    const name = groupNameInput
+        ? groupNameInput.value.trim()
+        : "";
 
-    const name =
-        groupNameInput
-            ? groupNameInput.value.trim()
-            : "";
+    const description = groupDescriptionInput
+        ? groupDescriptionInput.value.trim()
+        : "";
 
-    const description =
-        groupDescriptionInput
-            ? groupDescriptionInput.value.trim()
-            : "";
-
-    const selectedPrivacy =
-    document.querySelector(
+    const selectedPrivacy = document.querySelector(
         'input[name="groupPrivacy"]:checked'
     );
 
-const privacy =
-    selectedPrivacy
+    const privacy = selectedPrivacy
         ? selectedPrivacy.value
         : "public";
 
-    // ==================================================
     // VALIDATION
-    // ==================================================
-
-    if (!name) {
-
-        showMessage(
-            "Group name cannot be empty.",
-            true
-        );
-
+    if (!name || name.length < 2 || name.length > 100) {
+        showMessage("Group name must be between 2 and 100 characters.", true);
         return;
-
     }
-
-
-    if (name.length < 2) {
-
-        showMessage(
-            "Group name is too short.",
-            true
-        );
-
-        return;
-
-    }
-
-
-    if (name.length > 100) {
-
-        showMessage(
-            "Group name is too long.",
-            true
-        );
-
-        return;
-
-    }
-
 
     if (description.length > 500) {
-
-        showMessage(
-            "Description is too long.",
-            true
-        );
-
+        showMessage("Description is too long.", true);
         return;
-
     }
 
+    if (privacy !== "public" && privacy !== "private") {
+        showMessage("Invalid privacy setting.", true);
+        return;
+    }
 
-    // ==================================================
-    // BUTTON
-    // ==================================================
+    // CHECK JWT
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        alert("Please login again.");
+        window.location.href = "/login.html";
+        return;
+    }
 
     saveSettingsBtn.disabled = true;
 
     saveSettingsBtn.innerHTML =
         '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
 
-
     try {
 
-        const formData =
-            new FormData();
+        const formData = new FormData();
 
+        formData.append("groupId", groupId);
+        formData.append("name", name);
+        formData.append("description", description);
+        formData.append("privacy", privacy);
 
-        formData.append(
-            "groupId",
-            groupId
-        );
-
-        formData.append(
-            "username",
-            user.username
-        );
-
-        formData.append(
-            "name",
-            name
-        );
-
-        formData.append(
-            "description",
-            description
-        );
-
-        formData.append(
-            "privacy",
-            privacy
-        );
-
-
-        // ==================================================
         // AVATAR
-        // ==================================================
-
         if (
             avatarInput &&
             avatarInput.files &&
             avatarInput.files[0]
         ) {
-
             formData.append(
                 "avatar",
                 avatarInput.files[0]
             );
-
         }
 
-
-        // ==================================================
         // COVER
-        // ==================================================
-
         if (
             coverInput &&
             coverInput.files &&
             coverInput.files[0]
         ) {
-
             formData.append(
                 "cover",
                 coverInput.files[0]
             );
-
         }
 
+        const res = await fetch(
+            "/api/groups/settings",
+            {
+                method: "PUT",
 
-        // ==================================================
-        // SEND
-        // ==================================================
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
 
-        const res =
-            await fetch(
-                "/api/groups/settings",
-                {
+                body: formData
+            }
+        );
 
-                    method: "PUT",
+        const data = await res.json();
 
-                    body: formData
+        if (res.status === 401) {
+            alert("Your session has expired. Please login again.");
+            window.location.href = "/login.html";
+            return;
+        }
 
-                }
-            );
-
-
-        const data =
-            await res.json();
-
-
-        if (
-            !res.ok ||
-            !data.success
-        ) {
-
+        if (!res.ok || !data.success) {
             showMessage(
-                data.message ||
-                "Failed to update group.",
+                data.message || "Failed to update group.",
                 true
             );
-
             return;
-
         }
 
+        currentGroup = data.group || currentGroup;
 
-        // ==================================================
-        // UPDATE CURRENT GROUP
-        // ==================================================
+        if (groupNameInput) {
+            groupNameInput.value = currentGroup.name || "";
+        }
 
-        currentGroup =
-            data.group ||
-            currentGroup;
-
-
-        // ==================================================
-        // UPDATE UI
-        // ==================================================
+        if (groupDescriptionInput) {
+            groupDescriptionInput.value = currentGroup.description || "";
+        }
 
         if (previewGroupName) {
-
-            previewGroupName.textContent =
-                currentGroup.name;
-
+            previewGroupName.textContent = currentGroup.name || "Group";
         }
 
         if (groupAvatar) {
-
             groupAvatar.src =
-                currentGroup.avatar;
-
+                currentGroup.avatar || "/images/default-group.png";
         }
 
         if (groupCover) {
-
             groupCover.src =
-                currentGroup.cover;
-
+                currentGroup.cover || "/images/default-group-cover.jpg";
         }
 
-
-        showMessage(
-            "✅ Group settings updated successfully."
-        );
-
+        showMessage("✅ Group settings updated successfully.");
 
     } catch (err) {
 
-        console.error(
-            "SAVE GROUP SETTINGS ERROR:",
-            err
-        );
+        console.error("SAVE GROUP SETTINGS ERROR:", err);
 
-        showMessage(
-            "Failed to update group settings.",
-            true
-        );
+        showMessage("Failed to update group settings.", true);
 
     } finally {
 
@@ -801,10 +697,8 @@ const privacy =
             '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
 
     }
-
 }
-
-
+    
 // ==================================================
 // BACK
 // ==================================================
