@@ -51,10 +51,10 @@ if (!token) {
 
     xhr.open("POST", "/api/shorts/upload", true);
 
-xhr.setRequestHeader(
+  xhr.setRequestHeader(
     "Authorization",
-    "Bearer " + localStorage.getItem("token")
-);  
+    "Bearer " + token
+); 
 
     document.getElementById("progressContainer").style.display = "block";
 
