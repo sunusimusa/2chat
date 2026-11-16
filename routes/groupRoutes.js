@@ -118,6 +118,7 @@ router.put(
 
 router.put(
     "/make-admin",
+    protect,
     promoteToAdmin
 );
 
