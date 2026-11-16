@@ -138,15 +138,25 @@ exports.register = async (req, res) => {
     // RESPONSE
     // =========================================
 
-    const safeUser = user.toObject();
-
-delete safeUser.password;
-delete safeUser.fcmTokens;
+    const safeUser = {
+    _id: user._id,
+    username: user.username,
+    email: user.email,
+    role: user.role,
+    isCreator: user.isCreator,
+    creatorBadge: user.creatorBadge,
+    favoriteCategories: user.favoriteCategories,
+    avatar: user.avatar,
+    cover: user.cover,
+    bio: user.bio,
+    online: user.online,
+    lastSeen: user.lastSeen
+};
 
 return res.status(201).json({
-  success: true,
-  token,
-  user: safeUser
+    success: true,
+    token,
+    user: safeUser
 });
 
 
@@ -307,15 +317,25 @@ exports.login = async (req, res) => {
     // RESPONSE
     // =========================================
 
-    const safeUser = user.toObject();
-
-delete safeUser.password;
-delete safeUser.fcmTokens;
+    const safeUser = {
+    _id: user._id,
+    username: user.username,
+    email: user.email,
+    role: user.role,
+    isCreator: user.isCreator,
+    creatorBadge: user.creatorBadge,
+    favoriteCategories: user.favoriteCategories,
+    avatar: user.avatar,
+    cover: user.cover,
+    bio: user.bio,
+    online: user.online,
+    lastSeen: user.lastSeen
+};
 
 return res.json({
-  success: true,
-  token,
-  user: safeUser
+    success: true,
+    token,
+    user: safeUser
 });
 
 
