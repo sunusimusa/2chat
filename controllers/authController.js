@@ -621,13 +621,9 @@ exports.getUsers = async (
 
 
     return res.status(500).json({
-
-      success: false,
-
-      message:
-        err.message
-
-    });
+    success: false,
+    message: "Unable to retrieve users."
+});
 
   }
 
@@ -688,13 +684,9 @@ exports.getStatus = async (
 
 
     return res.status(500).json({
-
-      success: false,
-
-      message:
-        err.message
-
-    });
+    success: false,
+    message: "Unable to retrieve user status."
+});
 
   }
 
