@@ -106,6 +106,7 @@ router.put(
 
 router.delete(
     "/delete",
+    protect,
     deleteGroup
 );
 
