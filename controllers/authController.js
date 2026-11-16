@@ -345,114 +345,93 @@ return res.json({
 // UPDATE PROFILE
 // =====================================================
 
-exports.updateProfile = async (
-  req,
-  res
-) => {
+exports.updateProfile = async (req, res) => {
+    try {
+        const { username, bio } = req.body;
 
-  try {
+        const user = await User.findById(req.user._id);
 
-    const {
-      username,
-      bio
-    } = req.body;
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found."
+            });
+        }
 
+        // USERNAME VALIDATION
+        if (username !== undefined) {
+            if (typeof username !== "string") {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid username."
+                });
+            }
 
-    const user =
-      await User.findById(
-        req.user._id
-      );
+            const cleanUsername = username.trim();
 
+            if (
+                cleanUsername.length < 3 ||
+                cleanUsername.length > 30 ||
+                !/^[a-zA-Z0-9_]+$/.test(cleanUsername)
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Username must be 3-30 characters and contain only letters, numbers and underscores."
+                });
+            }
 
-    if (!user) {
+            const existingUser = await User.findOne({
+                username: cleanUsername,
+                _id: { $ne: req.user._id }
+            });
 
-      return res.status(404).json({
-        success: false,
-        message: "User not found"
-      });
+            if (existingUser) {
+                return res.status(409).json({
+                    success: false,
+                    message: "Username is already taken."
+                });
+            }
 
-    }
+            user.username = cleanUsername;
+        }
 
+        // BIO VALIDATION
+        if (bio !== undefined) {
+            if (
+                typeof bio !== "string" ||
+                bio.length > 500
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Bio must not exceed 500 characters."
+                });
+            }
 
-    // =========================================
-    // USERNAME
-    // =========================================
+            user.bio = bio.trim();
+        }
 
-    if (username) {
+        await user.save();
 
-      const existingUser =
-        await User.findOne({
-          username,
-          _id: {
-            $ne: req.user._id
-          }
+        return res.json({
+            success: true,
+            user: {
+                _id: user._id,
+                username: user.username,
+                bio: user.bio,
+                avatar: user.avatar,
+                cover: user.cover
+            }
         });
 
+    } catch (err) {
+        console.error("UPDATE PROFILE ERROR:", err);
 
-      if (existingUser) {
-
-        return res.status(400).json({
-          success: false,
-          message: "Username is already taken"
+        return res.status(500).json({
+            success: false,
+            message: "Unable to update profile."
         });
-
-      }
-
-
-      user.username =
-        username.trim();
-
     }
-
-
-    // =========================================
-    // BIO
-    // =========================================
-
-    if (bio !== undefined) {
-
-      user.bio =
-        String(
-          bio
-        ).trim();
-
-    }
-
-
-    await user.save();
-
-
-    const safeUser = user.toObject();
-
-delete safeUser.password;
-delete safeUser.fcmTokens;
-
-return res.json({
-    success: true,
-    user: safeUser
-});
-
-  } catch (err) {
-
-    console.error(
-      "UPDATE PROFILE ERROR:",
-      err
-    );
-
-
-    return res.status(500).json({
-
-      success: false,
-
-      message:
-        err.message
-
-    });
-
-  }
-
 };
-
 
 // =====================================================
 // UPLOAD AVATAR
