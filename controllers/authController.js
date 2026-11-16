@@ -584,13 +584,9 @@ exports.uploadAvatar = async (
 
 
     return res.status(500).json({
-
-      success: false,
-
-      message:
-        err.message
-
-    });
+    success: false,
+    message: "Unable to upload profile picture."
+});
 
   }
 
