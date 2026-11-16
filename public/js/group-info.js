@@ -940,101 +940,99 @@ if (deleteBtn) {
 }
 
 
+
 async function deleteGroup() {
 
     if (!user || !currentGroup) return;
 
+    if (user.username !== currentGroup.owner) {
 
-    if (
-        user.username !==
-        currentGroup.owner
-    ) {
-
-        alert(
-            "Only the group owner can delete this group."
-        );
+        alert("Only the group owner can delete this group.");
 
         return;
 
     }
 
-
-    const confirmed =
-        confirm(
-            "⚠️ Delete this group permanently?"
-        );
-
+    const confirmed = confirm(
+        "⚠️ Delete this group permanently?"
+    );
 
     if (!confirmed) return;
 
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+
+        alert("Please login again.");
+
+        window.location.href = "/login.html";
+
+        return;
+
+    }
 
     try {
 
-        const res =
-            await fetch(
-                "/api/groups/delete",
-                {
+        deleteBtn.disabled = true;
 
-                    method: "DELETE",
+        const res = await fetch(
+            "/api/groups/delete",
+            {
+                method: "DELETE",
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
 
-                    body: JSON.stringify({
+                body: JSON.stringify({
+                    groupId
+                })
+            }
+        );
 
-                        groupId,
+        const data = await res.json();
 
-                        username:
-                            user.username
+        if (res.status === 401) {
 
-                    })
+            alert("Your session has expired. Please login again.");
 
-                }
-            );
+            window.location.href = "/login.html";
 
+            return;
 
-        const data =
-            await res.json();
+        }
 
-
-        if (data.success) {
-
-            alert(
-                "🗑️ Group deleted successfully."
-            );
-
-
-            window.location.href =
-                "/groups.html";
-
-
-        } else {
+        if (!res.ok || !data.success) {
 
             alert(
                 data.message ||
                 "Failed to delete group."
             );
 
+            return;
+
         }
 
+        alert("🗑️ Group deleted successfully.");
+
+        window.location.href = "/groups.html";
 
     } catch (error) {
 
-        console.error(
-            "DELETE GROUP ERROR:",
-            error
-        );
+        console.error("DELETE GROUP ERROR:", error);
 
-        alert(
-            "Network error."
-        );
+        alert("Network error.");
+
+    } finally {
+
+        deleteBtn.disabled = false;
 
     }
 
-}
-
+   }
+   
 
 /* ==================================================
    ESCAPE HTML
