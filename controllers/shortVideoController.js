@@ -117,89 +117,113 @@ exports.getVideos = async (req, res) => {
 
 // Like Video
 exports.likeVideo = async (req, res) => {
-
     try {
+        const { videoId } = req.body;
+        const username = req.user.username;
 
-        const { videoId, username } = req.body;
+        if (!videoId) {
+            return res.status(400).json({
+                success: false,
+                message: "Video ID is required."
+            });
+        }
 
         const video = await ShortVideo.findById(videoId);
 
         if (!video) {
-            return res.json({
+            return res.status(404).json({
                 success: false,
-                message: "Video not found"
+                message: "Video not found."
             });
         }
 
+        if (!Array.isArray(video.likes)) {
+            video.likes = [];
+        }
+
         if (video.likes.includes(username)) {
-
             video.likes = video.likes.filter(
-                u => u !== username
+                user => user !== username
             );
-
         } else {
-
             video.likes.push(username);
-
         }
 
         await video.save();
 
-        res.json({
+        return res.json({
             success: true,
-            likes: video.likes.length
+            likes: video.likes.length,
+            liked: video.likes.includes(username)
         });
 
     } catch (err) {
+        console.error("LIKE VIDEO ERROR:", err);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: err.message
+            message: "Unable to update like. Please try again."
         });
-
     }
-
 };
 
 // Comment
 exports.commentVideo = async (req, res) => {
-
     try {
+        const { videoId, text } = req.body;
+        const username = req.user.username;
 
-        const { videoId, username, text } = req.body;
+        if (!videoId) {
+            return res.status(400).json({
+                success: false,
+                message: "Video ID is required."
+            });
+        }
+
+        if (
+            typeof text !== "string" ||
+            !text.trim() ||
+            text.trim().length > 1000
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Comment must be between 1 and 1000 characters."
+            });
+        }
 
         const video = await ShortVideo.findById(videoId);
 
         if (!video) {
-
-            return res.json({
+            return res.status(404).json({
                 success: false,
-                message: "Video not found"
+                message: "Video not found."
             });
+        }
 
+        if (!Array.isArray(video.comments)) {
+            video.comments = [];
         }
 
         video.comments.push({
             username,
-            text
+            text: text.trim()
         });
 
         await video.save();
 
-        res.json({
+        return res.json({
             success: true,
             comments: video.comments
         });
 
     } catch (err) {
+        console.error("COMMENT VIDEO ERROR:", err);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: err.message
+            message: "Unable to post comment. Please try again."
         });
-
     }
-
 };
 
 // Add View
