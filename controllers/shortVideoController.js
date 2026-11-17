@@ -483,41 +483,61 @@ exports.getForYouVideos = async (req, res) => {
         });
     }
 };
-    
+
 
 exports.addWatchTime = async (req, res) => {
-
     try {
-
+        const videoId = req.params.id;
         const { seconds } = req.body;
 
-        const video = await ShortVideo.findById(req.params.id);
-
-        if (!video) {
-            return res.json({
+        if (
+            typeof videoId !== "string" ||
+            !/^[a-fA-F0-9]{24}$/.test(videoId)
+        ) {
+            return res.status(400).json({
                 success: false,
-                message: "Video not found"
+                message: "Invalid video ID."
             });
         }
 
-        video.watchTime += Number(seconds);
+        if (
+            typeof seconds !== "number" ||
+            !Number.isFinite(seconds) ||
+            seconds <= 0 ||
+            seconds > 30
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid watch time."
+            });
+        }
+
+        const video = await ShortVideo.findById(videoId);
+
+        if (!video) {
+            return res.status(404).json({
+                success: false,
+                message: "Video not found."
+            });
+        }
+
+        video.watchTime = (video.watchTime || 0) + seconds;
 
         await video.save();
 
-        res.json({
+        return res.json({
             success: true,
             watchTime: video.watchTime
         });
 
     } catch (err) {
+        console.error("ADD WATCH TIME ERROR:", err);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: err.message
+            message: "Unable to record watch time."
         });
-
     }
-
 };
 
 exports.getTrendingVideos = async (req, res) => {
