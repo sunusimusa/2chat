@@ -44,7 +44,7 @@ router.put("/comment", protect, commentVideo);
 // View
 router.put("/view/:id", protect, addView);
 
-router.put("/share/:id", addShare);
+router.put("/share/:id", protect, addShare);
 
 // Save / Unsave Video
 router.put("/save", protect, saveVideo);
