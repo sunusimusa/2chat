@@ -856,131 +856,90 @@ exports.getFollowersGrowth = async (req, res) => {
 
 };
 
-exports.getCreatorLevel = async (req,res)=>{
 
-    try{
+exports.getCreatorLevel = async (req, res) => {
+    try {
+        const username = req.user.username;
 
-        const username = req.params.username;
+        const user = await User.findById(req.user._id)
+            .select("followers");
 
-
-        const user = await User.findOne({
-            username
-        });
-
-
-        if(!user){
-
-            return res.json({
-                success:false,
-                message:"User not found"
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found."
             });
-
         }
 
-
-        const videos = await ShortVideo.find({
-            username
-        });
-
-
+        const videos = await ShortVideo.find({ username })
+            .select("views likes watchTime");
 
         let views = 0;
         let likes = 0;
         let watchTime = 0;
 
+        videos.forEach(video => {
+            views += Number(video.views) || 0;
 
+            likes += Array.isArray(video.likes)
+                ? video.likes.length
+                : 0;
 
-        videos.forEach(video=>{
-
-            views += video.views;
-
-            likes += video.likes.length;
-
-            watchTime += video.watchTime || 0;
-
+            watchTime += Number(video.watchTime) || 0;
         });
 
-
-
-        const followers =
-        user.followers.length;
-
-
+        const followers = Array.isArray(user.followers)
+            ? user.followers.length
+            : 0;
 
         let level = "🥉 Bronze Creator";
-
-
         let next = "🥈 Silver Creator";
 
-
-        if(
-            followers >= 1000 &&
-            views >= 100000 &&
-            watchTime >= 36000
-        ){
-
-            level = "🥇 Gold Creator";
-            next = "💎 Diamond Creator";
-
-        }
-
-
-        if(
+        if (
             followers >= 10000 &&
             views >= 1000000 &&
             watchTime >= 360000
-        ){
-
+        ) {
             level = "💎 Diamond Creator";
             next = "MAX";
-
-        }
-
-
-        else if(
+        } else if (
+            followers >= 1000 &&
+            views >= 100000 &&
+            watchTime >= 36000
+        ) {
+            level = "🥇 Gold Creator";
+            next = "💎 Diamond Creator";
+        } else if (
             followers >= 100 &&
             views >= 10000 &&
             watchTime >= 3600
-        ){
-
+        ) {
             level = "🥈 Silver Creator";
             next = "🥇 Gold Creator";
-
         }
 
-
-
-        res.json({
-
-            success:true,
-
+        return res.json({
+            success: true,
             level,
-
             next,
-
-            stats:{
+            stats: {
                 followers,
                 views,
                 likes,
                 watchTime
             }
-
         });
 
+    } catch (err) {
+        console.error("Creator Level Error:", err);
 
-
-    }catch(err){
-
-        res.status(500).json({
-
-            success:false,
-            message:err.message
-
+        return res.status(500).json({
+            success: false,
+            message: "Failed to load creator level."
         });
-
     }
-
 };
+
 
 exports.getCreatorBadge = async(req,res)=>{
 
