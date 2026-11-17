@@ -264,94 +264,83 @@ exports.addView = async (req, res) => {
 
 // ================= SAVE / UNSAVE VIDEO =================
 exports.saveVideo = async (req, res) => {
-
     try {
+        const { videoId } = req.body;
+        const userId = req.user._id;
 
-        console.log("BODY:", req.body);
+        if (
+            typeof videoId !== "string" ||
+            !/^[a-fA-F0-9]{24}$/.test(videoId)
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid video ID."
+            });
+        }
 
-        const { username, videoId } = req.body;
-
-        const user = await User.findOne({ username });
-
-        console.log("USER:", user);
+        const user = await User.findById(userId);
 
         if (!user) {
-            return res.json({
+            return res.status(404).json({
                 success: false,
-                message: "User not found"
+                message: "User not found."
             });
         }
 
         const video = await ShortVideo.findById(videoId);
 
-        console.log("VIDEO:", video);
-
         if (!video) {
-            return res.json({
+            return res.status(404).json({
                 success: false,
-                message: "Video not found"
+                message: "Video not found."
             });
         }
 
-        console.log("Before Save:", user.savedVideos);
+        if (!Array.isArray(user.savedVideos)) {
+            user.savedVideos = [];
+        }
 
         const alreadySaved = user.savedVideos.some(
             id => id.toString() === videoId
         );
 
         if (alreadySaved) {
-
-            // UNSAVE
             user.savedVideos = user.savedVideos.filter(
                 id => id.toString() !== videoId
             );
 
-            if (video.saves > 0) {
-                video.saves--;
-            }
+            video.saves = Math.max(0, (video.saves || 0) - 1);
 
             await user.save();
             await video.save();
-
-            console.log("After Unsave:", user.savedVideos);
 
             return res.json({
                 success: true,
                 saved: false,
                 saves: video.saves
             });
-
-        } else {
-
-            // SAVE
-            user.savedVideos.push(video._id);
-
-            video.saves++;
-
-            await user.save();
-            await video.save();
-
-            console.log("After Save:", user.savedVideos);
-
-            return res.json({
-                success: true,
-                saved: true,
-                saves: video.saves
-            });
-
         }
 
-    } catch (err) {
+        user.savedVideos.push(video._id);
+        video.saves = (video.saves || 0) + 1;
 
-        console.log(err);
+        await user.save();
+        await video.save();
 
-        res.status(500).json({
-            success: false,
-            message: err.message
+        return res.json({
+            success: true,
+            saved: true,
+            saves: video.saves
         });
 
-    }
+    } catch (err) {
+        console.error("SAVE VIDEO ERROR:", err);
 
+        return res.status(500).json({
+            success: false,
+            message: "Unable to save video. Please try again."
+        });
+    }
 };
 
 exports.getSavedVideos = async (req, res) => {
