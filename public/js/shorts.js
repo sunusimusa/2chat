@@ -173,7 +173,13 @@ const data = await res.json();
 
         window.videos = data.videos;
 
-        const savedData = await savedRes.json();
+        const savedRes = await fetch("/api/shorts/saved", {
+    headers: {
+        "Authorization": "Bearer " + token
+    }
+});
+
+const savedData = await savedRes.json();
 
 const savedVideos = savedData.success && Array.isArray(savedData.videos)
     ? savedData.videos.map(v => String(v._id))
