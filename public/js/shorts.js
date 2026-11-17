@@ -516,35 +516,42 @@ function togglePlay(id) {
 // ================= LIKE =================
 
 async function likeVideo(id) {
-
     try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            alert("Please login again.");
+            return;
+        }
 
         const btn = document.getElementById("likeBtn-" + id);
 
         const res = await fetch("/api/shorts/like", {
             method: "PUT",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
             },
             body: JSON.stringify({
-                videoId: id,
-                username: user.username
+                videoId: id
             })
         });
 
         const data = await res.json();
 
-        if (data.success) {
+        if (!res.ok || !data.success) {
+            alert(data.message || "Unable to like video.");
+            return;
+        }
 
-            if (typeof data.liked === "boolean") {
-                btn.classList.toggle("liked", data.liked);
-            } else {
-                btn.classList.toggle("liked");
-            }
+        if (btn && typeof data.liked === "boolean") {
+            btn.classList.toggle("liked", data.liked);
+        }
 
-            document.getElementById("likes-" + id).innerText =
-                data.likes;
+        const likesElement = document.getElementById("likes-" + id);
 
+        if (likesElement) {
+            likesElement.innerText = data.likes;
         }
 
     } catch (err) {
