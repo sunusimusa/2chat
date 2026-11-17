@@ -59,7 +59,7 @@ router.get("/trending", getTrendingVideos);
 
 router.get("/analytics/:username", getAnalytics);
 
-router.get("/analytics-chart/:username", getAnalyticsChart);
+router.get("/analytics-chart", protect, getAnalyticsChart);
 
 router.get(
     "/analytics/top/:username",
