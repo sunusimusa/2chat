@@ -344,42 +344,35 @@ exports.saveVideo = async (req, res) => {
 };
 
 exports.getSavedVideos = async (req, res) => {
+    try {
+        const userId = req.user._id;
 
-    try{
-
-        const user = await User.findOne({
-            username:req.params.username
-        }).populate("savedVideos");
-
-        if(!user){
-
-            return res.json({
-                success:false,
-                message:"User not found"
+        const user = await User.findById(userId)
+            .populate({
+                path: "savedVideos",
+                model: "ShortVideo"
             });
 
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found."
+            });
         }
 
-        res.json({
-
-            success:true,
-
-            videos:user.savedVideos
-
+        return res.json({
+            success: true,
+            videos: user.savedVideos || []
         });
 
-    }catch(err){
+    } catch (err) {
+        console.error("GET SAVED VIDEOS ERROR:", err);
 
-        res.status(500).json({
-
-            success:false,
-
-            message:err.message
-
+        return res.status(500).json({
+            success: false,
+            message: "Unable to load saved videos."
         });
-
     }
-
 };
 
 exports.getForYouVideos = async (req, res) => {
