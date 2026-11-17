@@ -627,14 +627,15 @@ exports.addShare = async (req, res) => {
     }
 };
 
-
 exports.getAnalytics = async (req, res) => {
 
-    try{
+    try {
 
-        const username = req.params.username;
+        // Get authenticated user's username from JWT
+        const username = req.user.username;
 
-        const videos = await ShortVideo.find({ username });
+        const videos = await ShortVideo.find({ username })
+            .select("username avatar caption video views likes comments shares saves createdAt");
 
         let totalViews = 0;
         let totalLikes = 0;
@@ -644,67 +645,56 @@ exports.getAnalytics = async (req, res) => {
         let totalWatchTime = 0;
 
         let topVideo = null;
-        let topViews = 0;
+        let topViews = -1;
 
         videos.forEach(video => {
 
             totalViews += video.views || 0;
-            totalLikes += video.likes.length;
-            totalComments += video.comments.length;
+            totalLikes += video.likes?.length || 0;
+            totalComments += video.comments?.length || 0;
             totalShares += video.shares || 0;
             totalSaves += video.saves || 0;
             totalWatchTime += video.watchTime || 0;
 
-            if(video.views > topViews){
-
-                topViews = video.views;
+            if ((video.views || 0) > topViews) {
+                topViews = video.views || 0;
                 topVideo = video;
-
             }
 
         });
 
-        res.json({
+        return res.json({
 
-            success:true,
+            success: true,
 
-            analytics:{
+            analytics: {
 
-                totalVideos:videos.length,
-
+                totalVideos: videos.length,
                 totalViews,
-
                 totalLikes,
-
                 totalComments,
-
                 totalShares,
-
                 totalSaves,
-
                 totalWatchTime,
-
                 topVideo
 
             }
 
         });
 
-    }catch(err){
+    } catch (err) {
 
-        res.status(500).json({
+        console.error("Analytics Error:", err);
 
-            success:false,
-
-            message:err.message
-
+        return res.status(500).json({
+            success: false,
+            message: "Failed to load analytics."
         });
 
     }
 
 };
-
-
+                
 exports.getAnalyticsChart = async (req, res) => {
     try {
         const username = req.user.username;
