@@ -936,34 +936,44 @@ async function followUser(targetUsername){
 // ================= SAVE VIDEO =================
 
 async function saveVideo(id) {
-
     try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            alert("Please login again.");
+            return;
+        }
 
         const btn = document.getElementById("saveBtn-" + id);
 
         const res = await fetch("/api/shorts/save", {
             method: "PUT",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
             },
             body: JSON.stringify({
-                username: user.username,
                 videoId: id
             })
         });
 
         const data = await res.json();
 
-        if (data.success) {
+        if (!res.ok || !data.success) {
+            alert(data.message || "Unable to save video.");
+            return;
+        }
 
+        if (btn) {
             btn.classList.toggle("liked", data.saved);
-
         }
 
     } catch (err) {
-        console.log("Save error:", err);
+        console.error("Save error:", err);
+        alert("Unable to save video. Please try again.");
     }
 }
+
 
 function showForYou(){
 
