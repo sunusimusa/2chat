@@ -62,7 +62,8 @@ router.get("/analytics", protect, getAnalytics);
 router.get("/analytics-chart", protect, getAnalyticsChart);
 
 router.get(
-    "/analytics/top/:username",
+    "/analytics/top",
+    protect,
     getTopVideos
 );
 
