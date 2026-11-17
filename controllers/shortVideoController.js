@@ -589,37 +589,44 @@ exports.getTrendingVideos = async (req, res) => {
 // ================= SHARE VIDEO =================
 
 exports.addShare = async (req, res) => {
-
     try {
+        const videoId = req.params.id;
 
-        const video = await ShortVideo.findById(req.params.id);
+        if (!videoId || !/^[0-9a-fA-F]{24}$/.test(videoId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid video ID"
+            });
+        }
+
+        const video = await ShortVideo.findById(videoId);
 
         if (!video) {
-            return res.json({
+            return res.status(404).json({
                 success: false,
                 message: "Video not found"
             });
         }
 
-        video.shares += 1;
+        video.shares = (video.shares || 0) + 1;
 
         await video.save();
 
-        res.json({
+        return res.json({
             success: true,
             shares: video.shares
         });
 
     } catch (err) {
+        console.error("Add Share Error:", err);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: err.message
+            message: "Unable to update share count"
         });
-
     }
-
 };
+
 
 exports.getAnalytics = async (req, res) => {
 
