@@ -1012,65 +1012,62 @@ exports.getCreatorBadge = async (req, res) => {
 
 // ================= SEARCH SHORTS =================
 
-exports.searchShorts = async(req,res)=>{
 
-try{
+exports.searchShorts = async (req, res) => {
+    try {
+        const keyword = String(req.params.keyword || "").trim();
 
-const keyword =
-req.params.keyword.toLowerCase();
+        if (!keyword || keyword.length < 2 || keyword.length > 50) {
+            return res.status(400).json({
+                success: false,
+                message: "Search keyword must be between 2 and 50 characters."
+            });
+        }
 
+        // Escape regex special characters
+        const safeKeyword = keyword.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            "\\$&"
+        );
 
-const videos = await ShortVideo.find({
+        const videos = await ShortVideo.find({
+            $or: [
+                {
+                    caption: {
+                        $regex: safeKeyword,
+                        $options: "i"
+                    }
+                },
+                {
+                    hashtags: {
+                        $in: [keyword.toLowerCase()]
+                    }
+                },
+                {
+                    username: {
+                        $regex: safeKeyword,
+                        $options: "i"
+                    }
+                }
+            ]
+        })
+        .select("-__v")
+        .sort({ createdAt: -1 })
+        .limit(30)
+        .lean();
 
-$or:[
+        return res.json({
+            success: true,
+            videos
+        });
 
-{
-caption:{
-$regex:keyword,
-$options:"i"
-}
-},
+    } catch (err) {
+        console.error("Search Shorts Error:", err);
 
-{
-hashtags:{
-$in:[keyword]
-}
-},
-
-{
-username:{
-$regex:keyword,
-$options:"i"
-}
-}
-
-]
-
-})
-.sort({
-createdAt:-1
-});
-
-
-res.json({
-
-success:true,
-
-videos
-
-});
-
-
-}catch(err){
-
-res.status(500).json({
-
-success:false,
-
-message:err.message
-
-});
-
-}
-
+        return res.status(500).json({
+            success: false,
+            message: "Failed to search videos."
+        });
+    }
 };
+                
