@@ -68,146 +68,97 @@ function switchSearchType(type){
 // PERFORM SEARCH
 // ===============================
 
-async function performSearch(){
-
-    const keyword =
-        searchInput.value
+async function performSearch() {
+    const keyword = searchInput.value
         .trim()
-        .replace(/^#/, "");
+        .replace(/^#/, "")
+        .trim();
 
-
-    if(!keyword){
-
-        results.innerHTML = `
-
-            <div class="empty-state">
-
-                <i class="fa-solid fa-magnifying-glass"></i>
-
-                <h3>
-                    Type something to search
-                </h3>
-
-                <p>
-                    Search for a user, Short or hashtag.
-                </p>
-
-            </div>
-
-        `;
-
+    if (!keyword) {
+        showNoResults("Type something to search.");
         return;
-
     }
 
+    if (keyword.length < 2 || keyword.length > 50) {
+        showNoResults(
+            "Search must be between 2 and 50 characters."
+        );
+        return;
+    }
 
     showLoading();
 
-
-    if(searchType === "users"){
-
+    if (searchType === "users") {
         await searchUsers(keyword);
-
-    }else{
-
+    } else {
         await searchShorts(keyword);
-
     }
-
 }
-
 
 // ===============================
 // SEARCH SHORTS
 // ===============================
 
-async function searchShorts(keyword){
+async function searchShorts(keyword) {
+    try {
+        const res = await fetch(
+            "/api/shorts/search/" +
+            encodeURIComponent(keyword)
+        );
 
-    try{
-
-        const res =
-            await fetch(
-                "/api/shorts/search/" +
-                encodeURIComponent(keyword)
-            );
-
-
-        const data =
-            await res.json();
-
-
-        if(
-            data.success &&
-            Array.isArray(data.videos) &&
-            data.videos.length
-        ){
-
-            renderShorts(data.videos);
-
-        }else{
-
-            showNoResults(
-                "No Shorts found 😢"
-            );
-
+        if (!res.ok) {
+            throw new Error("Shorts search request failed.");
         }
 
+        const data = await res.json();
 
-    }catch(err){
+        if (
+            data.success &&
+            Array.isArray(data.videos) &&
+            data.videos.length > 0
+        ) {
+            renderShorts(data.videos);
+        } else {
+            showNoResults("No Shorts found 😢");
+        }
 
-        console.error(err);
-
+    } catch (err) {
+        console.error("Search Shorts Error:", err);
         showError();
-
     }
-
 }
-
 
 // ===============================
 // SEARCH USERS
 // ===============================
 
-async function searchUsers(keyword){
+async function searchUsers(keyword) {
+    try {
+        const res = await fetch(
+            "/api/users/search/" +
+            encodeURIComponent(keyword)
+        );
 
-    try{
-
-        const res =
-            await fetch(
-                "/api/users/search/" +
-                encodeURIComponent(keyword)
-            );
-
-
-        const data =
-            await res.json();
-
-
-        if(
-            data.success &&
-            Array.isArray(data.users) &&
-            data.users.length
-        ){
-
-            renderUsers(data.users);
-
-        }else{
-
-            showNoResults(
-                "No users found 😢"
-            );
-
+        if (!res.ok) {
+            throw new Error("Users search request failed.");
         }
 
+        const data = await res.json();
 
-    }catch(err){
+        if (
+            data.success &&
+            Array.isArray(data.users) &&
+            data.users.length > 0
+        ) {
+            renderUsers(data.users);
+        } else {
+            showNoResults("No users found 😢");
+        }
 
-        console.error(err);
-
+    } catch (err) {
+        console.error("Search Users Error:", err);
         showError();
-
     }
-
 }
 
 
@@ -335,8 +286,8 @@ function renderShorts(videos) {
         card.append(wrapper, info);
         results.appendChild(card);
     });
-}
-
+    }
+             
 // ===============================
 // RENDER USERS
 // ===============================
@@ -418,7 +369,7 @@ function renderUsers(users) {
         results.appendChild(card);
     });
     }
-        
+
 // ===============================
 // OPEN SHORT
 // ===============================
