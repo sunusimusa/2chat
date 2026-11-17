@@ -704,77 +704,58 @@ exports.getAnalytics = async (req, res) => {
 
 };
 
+
 exports.getAnalyticsChart = async (req, res) => {
-
-    try{
-
-        const username = req.params.username;
+    try {
+        const username = req.user.username;
 
         const videos = await ShortVideo.find({
             username
-        });
+        }).select("views createdAt");
 
         const chart = [];
 
-        for(let i = 6; i >= 0; i--){
-
+        for (let i = 6; i >= 0; i--) {
             const day = new Date();
 
-            day.setHours(0,0,0,0);
-
+            day.setHours(0, 0, 0, 0);
             day.setDate(day.getDate() - i);
 
             const nextDay = new Date(day);
-
             nextDay.setDate(nextDay.getDate() + 1);
 
             let views = 0;
 
-            videos.forEach(video=>{
-
-                if(
+            videos.forEach(video => {
+                if (
                     video.createdAt >= day &&
                     video.createdAt < nextDay
-                ){
-
-                    views += video.views;
-
+                ) {
+                    views += video.views || 0;
                 }
-
             });
 
             chart.push({
-
-                day: day.toLocaleDateString("en-US",{
-                    weekday:"short"
+                day: day.toLocaleDateString("en-US", {
+                    weekday: "short"
                 }),
-
                 views
-
             });
-
         }
 
-        res.json({
-
-            success:true,
-
+        return res.json({
+            success: true,
             chart
-
         });
 
-    }catch(err){
+    } catch (err) {
+        console.error("Analytics Chart Error:", err);
 
-        res.status(500).json({
-
-            success:false,
-
-            message:err.message
-
+        return res.status(500).json({
+            success: false,
+            message: "Unable to load analytics chart"
         });
-
     }
-
 };
 
 exports.getTopVideos = async (req,res)=>{
