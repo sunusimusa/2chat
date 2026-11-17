@@ -142,7 +142,6 @@ async function loadVideos() {
 
     try {
 
-
         const token = localStorage.getItem("token");
 
 if (!token) {
