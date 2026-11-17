@@ -57,7 +57,7 @@ router.put("/watch/:id", protect, addWatchTime);
 
 router.get("/trending", getTrendingVideos);
 
-router.get("/analytics/:username", getAnalytics);
+router.get("/analytics", protect, getAnalytics);
 
 router.get("/analytics-chart", protect, getAnalyticsChart);
 
