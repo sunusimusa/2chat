@@ -375,125 +375,107 @@ exports.getSavedVideos = async (req, res) => {
     }
 };
 
+
 exports.getForYouVideos = async (req, res) => {
+    try {
+        // Gano user ta hanyar JWT, ba username daga URL ba
+        const user = await User.findById(req.user._id);
 
-    try{
-
-        const user = await User.findOne({
-            username: req.params.username
-        });
-
-        if(!user){
-
-            return res.json({
-                success:false,
-                message:"User not found"
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found."
             });
-
         }
 
         let videos = await ShortVideo.find()
-            .sort({ createdAt:-1 });
+            .sort({ createdAt: -1 });
 
-        // Videos daga mutanen da yake following su
+        const following = Array.isArray(user.following)
+            ? user.following
+            : [];
+
         const followingVideos = videos.filter(v =>
-            user.following.includes(v.username)
+            following.includes(v.username)
         );
 
-        // Sauran videos
         const otherVideos = videos.filter(v =>
-            !user.following.includes(v.username)
+            !following.includes(v.username)
         );
 
-        // For You Feed
         const favoriteCategories = {};
 
-// Ƙididdige categories daga Saved Videos
-const savedVideos = await ShortVideo.find({
-    _id: { $in: user.savedVideos }
-});
-
-        // Ƙara maki daga videos da user ya yi Comment
-videos.forEach(video => {
-
-    const commented = video.comments.some(
-        comment => comment.username === user.username
-    );
-
-    if(commented){
-
-        favoriteCategories[video.category] =
-            (favoriteCategories[video.category] || 0) + 2;
-
-    }
-
-});
-
-        // Ƙara maki daga videos da user ya yi Like
-videos.forEach(video => {
-
-    if(video.likes.includes(user.username)){
-
-        favoriteCategories[video.category] =
-            (favoriteCategories[video.category] || 0) + 2;
-
-    }
-
-});
-
-savedVideos.forEach(video => {
-
-    favoriteCategories[video.category] =
-        (favoriteCategories[video.category] || 0) + 1;
-
-});
-
-// Shirya sauran videos bisa category
-otherVideos.sort((a, b) => {
-
-    let scoreA = favoriteCategories[a.category] || 0;
-    let scoreB = favoriteCategories[b.category] || 0;
-
-    // Ƙara maki daga Watch Time
-    scoreA += (a.watchTime || 0) / 100;
-    scoreB += (b.watchTime || 0) / 100;
-
-    // Ƙara maki daga Likes
-    scoreA += a.likes.length;
-    scoreB += b.likes.length;
-
-    // Ƙara maki daga Comments
-    scoreA += a.comments.length * 2;
-    scoreB += b.comments.length * 2;
-
-    // Ƙara maki daga Views
-    scoreA += a.views / 10;
-    scoreB += b.views / 10;
-
-    return scoreB - scoreA;
-
-});
-
-const feed = [
-    ...followingVideos,
-    ...otherVideos
-];
-
-        res.json({
-            success:true,
-            videos:feed
+        // Categories daga Saved Videos
+        const savedVideos = await ShortVideo.find({
+            _id: { $in: user.savedVideos || [] }
         });
 
-    }catch(err){
+        // Ƙara maki daga Comments
+        videos.forEach(video => {
+            const commented = video.comments.some(
+                comment => comment.username === user.username
+            );
 
-        res.status(500).json({
-            success:false,
-            message:err.message
+            if (commented) {
+                favoriteCategories[video.category] =
+                    (favoriteCategories[video.category] || 0) + 2;
+            }
         });
 
-    }
+        // Ƙara maki daga Likes
+        videos.forEach(video => {
+            if (video.likes.includes(user.username)) {
+                favoriteCategories[video.category] =
+                    (favoriteCategories[video.category] || 0) + 2;
+            }
+        });
 
+        // Ƙara maki daga Saved Videos
+        savedVideos.forEach(video => {
+            favoriteCategories[video.category] =
+                (favoriteCategories[video.category] || 0) + 1;
+        });
+
+        // Shirya sauran videos bisa category da engagement
+        otherVideos.sort((a, b) => {
+            let scoreA = favoriteCategories[a.category] || 0;
+            let scoreB = favoriteCategories[b.category] || 0;
+
+            scoreA += (a.watchTime || 0) / 100;
+            scoreB += (b.watchTime || 0) / 100;
+
+            scoreA += (a.likes?.length || 0);
+            scoreB += (b.likes?.length || 0);
+
+            scoreA += (a.comments?.length || 0) * 2;
+            scoreB += (b.comments?.length || 0) * 2;
+
+            scoreA += (a.views || 0) / 10;
+            scoreB += (b.views || 0) / 10;
+
+            return scoreB - scoreA;
+        });
+
+        const feed = [
+            ...followingVideos,
+            ...otherVideos
+        ];
+
+        return res.json({
+            success: true,
+            videos: feed
+        });
+
+    } catch (err) {
+        console.error("GET FOR YOU VIDEOS ERROR:", err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to load For You videos."
+        });
+    }
 };
+    
 
 exports.addWatchTime = async (req, res) => {
 
