@@ -42,7 +42,7 @@ router.put("/like", protect, likeVideo);
 router.put("/comment", protect, commentVideo);
 
 // View
-router.put("/view/:id", addView);
+router.put("/view/:id", protect, addView);
 
 router.put("/share/:id", addShare);
 
