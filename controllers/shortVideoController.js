@@ -748,61 +748,56 @@ exports.getAnalyticsChart = async (req, res) => {
     }
 };
 
-exports.getTopVideos = async (req,res)=>{
 
-    try{
+exports.getTopVideos = async (req, res) => {
 
-        const username = req.params.username;
+    try {
 
+        const username = req.user.username;
 
-        let videos = await ShortVideo.find({
-            username
-        });
+        const videos = await ShortVideo.find({ username })
+            .select("username avatar caption video views likes watchTime");
 
-
-        videos.sort((a,b)=>{
-
+        videos.sort((a, b) => {
 
             const scoreA =
                 (a.views || 0) +
-                (a.likes.length * 5) +
+                ((a.likes?.length || 0) * 5) +
                 (a.watchTime || 0);
-
 
             const scoreB =
                 (b.views || 0) +
-                (b.likes.length * 5) +
+                ((b.likes?.length || 0) * 5) +
                 (b.watchTime || 0);
-
 
             return scoreB - scoreA;
 
+        });
+
+        return res.json({
+
+            success: true,
+
+            videos: videos.slice(0, 5)
 
         });
 
+    } catch (err) {
 
-        res.json({
+        console.error("Top Videos Analytics Error:", err);
 
-            success:true,
+        return res.status(500).json({
 
-            videos: videos.slice(0,5)
+            success: false,
 
-        });
-
-
-    }catch(err){
-
-        res.status(500).json({
-
-            success:false,
-
-            message:err.message
+            message: "Failed to load top videos."
 
         });
 
     }
 
 };
+    
 
 exports.getFollowersGrowth = async (req,res)=>{
 
