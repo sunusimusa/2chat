@@ -216,134 +216,127 @@ async function searchUsers(keyword){
 // RENDER SHORTS
 // ===============================
 
-function renderShorts(videos){
-
-    let html = "";
-
+function renderShorts(videos) {
+    results.replaceChildren();
 
     videos.forEach(video => {
+        const id = String(video._id || "");
+        if (!id) return;
 
-        const id =
-            video._id || "";
+        const card = document.createElement("div");
+        card.className = "video-card";
 
+        card.addEventListener("click", () => {
+            openShort(id);
+        });
 
-        const username =
-            escapeHTML(
-                video.username || "Unknown"
+        const wrapper = document.createElement("div");
+        wrapper.className = "video-wrapper";
+
+        const videoElement = document.createElement("video");
+
+        let videoUrl = "";
+
+        try {
+            const parsedUrl = new URL(
+                String(video.video || ""),
+                window.location.origin
             );
 
+            if (
+                parsedUrl.protocol === "https:" ||
+                (
+                    parsedUrl.protocol === "http:" &&
+                    parsedUrl.origin === window.location.origin
+                )
+            ) {
+                videoUrl = parsedUrl.href;
+            }
+        } catch (err) {
+            console.warn("Invalid video URL:", err);
+        }
 
-        const caption =
-            escapeHTML(
-                video.caption || ""
-            );
+        if (videoUrl) {
+            videoElement.src = videoUrl;
+        } else {
+            videoElement.setAttribute("aria-label", "Video unavailable");
+        }
 
+        videoElement.muted = true;
+        videoElement.playsInline = true;
+        videoElement.preload = "metadata";
+        videoElement.controls = true;
 
-        const likes =
-            Array.isArray(video.likes)
+        videoElement.addEventListener("click", event => {
+            event.stopPropagation();
+        });
+
+        const playIcon = document.createElement("div");
+        playIcon.className = "play-icon";
+
+        const playIconElement = document.createElement("i");
+        playIconElement.className = "fa-solid fa-play";
+
+        playIcon.appendChild(playIconElement);
+
+        wrapper.append(videoElement, playIcon);
+
+        const info = document.createElement("div");
+        info.className = "video-info";
+
+        const heading = document.createElement("h3");
+
+        const userIcon = document.createElement("i");
+        userIcon.className = "fa-solid fa-user";
+
+        const username = document.createElement("span");
+        username.textContent =
+            " @" + String(video.username || "Unknown");
+
+        heading.append(userIcon, username);
+
+        const caption = document.createElement("p");
+        caption.className = "caption";
+        caption.textContent = String(video.caption || "");
+
+        const stats = document.createElement("div");
+        stats.className = "video-stats";
+
+        const likes = Array.isArray(video.likes)
             ? video.likes.length
-            : (video.likes || 0);
+            : Number(video.likes) || 0;
 
+        const views = Number(video.views) || 0;
 
-        const views =
-            video.views || 0;
+        const likesElement = document.createElement("span");
+        likesElement.textContent = "❤️ " + likes;
 
+        const viewsElement = document.createElement("span");
+        viewsElement.textContent = "👁 " + views;
 
-        const hashtags =
-            Array.isArray(video.hashtags)
-            ? video.hashtags
-            : [];
+        stats.append(likesElement, viewsElement);
 
+        info.append(heading, caption, stats);
 
-        html += `
+        if (Array.isArray(video.hashtags) && video.hashtags.length) {
+            const tags = document.createElement("div");
+            tags.className = "tags";
 
-        <div
-        class="video-card"
-        onclick="openShort('${id}')">
+            video.hashtags.forEach(tag => {
+                const tagElement = document.createElement("span");
+                tagElement.textContent =
+                    "#" + String(tag).replace(/^#/, "");
 
+                tags.appendChild(tagElement);
+            });
 
-            <div class="video-wrapper">
+            info.appendChild(tags);
+        }
 
-                <video
-                src="${video.video}"
-                muted
-                playsinline
-                preload="metadata"
-                controls
-                onclick="event.stopPropagation()">
-                </video>
-
-                <div class="play-icon">
-
-                    <i class="fa-solid fa-play"></i>
-
-                </div>
-
-            </div>
-
-
-            <div class="video-info">
-
-                <h3>
-
-                    <i class="fa-solid fa-user"></i>
-
-                    @${username}
-
-                </h3>
-
-
-                <p class="caption">
-
-                    ${caption}
-
-                </p>
-
-
-                <div class="video-stats">
-
-                    <span>
-                        ❤️ ${likes}
-                    </span>
-
-                    <span>
-                        👁 ${views}
-                    </span>
-
-                </div>
-
-
-                ${
-                    hashtags.length
-                    ? `
-                    <div class="tags">
-
-                        ${hashtags.map(tag => `
-
-                            <span>
-                                #${escapeHTML(tag)}
-                            </span>
-
-                        `).join("")}
-
-                    </div>
-                    `
-                    : ""
-                }
-
-            </div>
-
-        </div>
-
-        `;
-
+        card.append(wrapper, info);
+        results.appendChild(card);
     });
-
-
-    results.innerHTML = html;
-
 }
-
 
 // ===============================
 // RENDER USERS
