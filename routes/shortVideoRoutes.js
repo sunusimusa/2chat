@@ -37,10 +37,9 @@ router.post(
 router.get("/all", getVideos);
 
 // Like
-router.put("/like", likeVideo);
+router.put("/like", protect, likeVideo);
 
-// Comment
-router.put("/comment", commentVideo);
+router.put("/comment", protect, commentVideo);
 
 // View
 router.put("/view/:id", addView);
