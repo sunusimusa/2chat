@@ -51,7 +51,7 @@ router.put("/save", protect, saveVideo);
 
 router.get("/saved", protect, getSavedVideos);
 
-router.get("/foryou/:username", getForYouVideos);
+router.get("/foryou", protect, getForYouVideos);
 
 router.put("/watch/:id", addWatchTime);
 
