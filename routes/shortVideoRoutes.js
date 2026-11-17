@@ -68,8 +68,9 @@ router.get(
 );
 
 router.get(
-"/analytics/followers/:username",
-getFollowersGrowth
+    "/analytics/followers",
+    protect,
+    getFollowersGrowth
 );
 
 router.get(
