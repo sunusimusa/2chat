@@ -797,88 +797,60 @@ exports.getTopVideos = async (req, res) => {
     }
 
 };
-    
-
-exports.getFollowersGrowth = async (req,res)=>{
-
-    try{
-
-        const username = req.params.username;
 
 
-        const user = await User.findOne({
-            username
-        });
+exports.getFollowersGrowth = async (req, res) => {
 
+    try {
 
-        if(!user){
+        const username = req.user.username;
 
-            return res.json({
+        const user = await User.findOne({ username })
+            .select("followers");
 
-                success:false,
-
-                message:"User not found"
-
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found."
             });
-
         }
 
+        const totalFollowers = Array.isArray(user.followers)
+            ? user.followers.length
+            : 0;
 
         const growth = [];
 
-
-        for(let i = 6; i >= 0; i--){
+        for (let i = 6; i >= 0; i--) {
 
             const date = new Date();
 
-            date.setHours(0,0,0,0);
-
-            date.setDate(
-                date.getDate() - i
-            );
-
-
-            // A yanzu muna amfani da followers count
-            // daga User document
+            date.setHours(0, 0, 0, 0);
+            date.setDate(date.getDate() - i);
 
             growth.push({
-
-                day: date.toLocaleDateString(
-                    "en-US",
-                    {
-                        weekday:"short"
-                    }
-                ),
-
-                followers:user.followers.length
-
+                day: date.toLocaleDateString("en-US", {
+                    weekday: "short"
+                }),
+                followers: totalFollowers
             });
 
         }
 
-
-        res.json({
-
-            success:true,
-
-            totalFollowers:user.followers.length,
-
+        return res.json({
+            success: true,
+            totalFollowers,
             growth
-
         });
 
+    } catch (err) {
 
-    }catch(err){
+        console.error("Followers Growth Error:", err);
 
-
-        res.status(500).json({
-
-            success:false,
-
-            message:err.message
-
+        return res.status(500).json({
+            success: false,
+            message: "Failed to load followers analytics."
         });
-
 
     }
 
