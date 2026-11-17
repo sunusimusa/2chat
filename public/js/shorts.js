@@ -201,8 +201,8 @@ await Promise.all(
 if(currentTab === "following"){
 
     videos = videos.filter(video =>
-        user.following.includes(video.username)
-    );
+    following.includes(video.username)
+);
 
 }else{
 
