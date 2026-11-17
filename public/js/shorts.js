@@ -707,125 +707,131 @@ function closeComments() {
         .classList
         .remove("show");
 
-}              
+} 
+
+function renderComments(comments) {
+    const list = document.getElementById("commentList");
+
+    if (!list) return;
+
+    list.replaceChildren();
+
+    if (!Array.isArray(comments) || comments.length === 0) {
+        const emptyMessage = document.createElement("p");
+        emptyMessage.style.textAlign = "center";
+        emptyMessage.textContent = "No comments yet.";
+        list.appendChild(emptyMessage);
+        return;
+    }
+
+    comments.forEach(comment => {
+        const item = document.createElement("div");
+        item.className = "comment-item";
+
+        const username = document.createElement("b");
+        username.textContent = "@" + (comment.username || "user");
+
+        const text = document.createElement("p");
+        text.textContent = comment.text || "";
+
+        item.appendChild(username);
+        item.appendChild(text);
+
+        list.appendChild(item);
+    });
+}
 
 function loadComments(id) {
 
-    const video = window.videos.find(v => v._id === id);
+    const video = window.videos?.find(
+        v => String(v._id) === String(id)
+    );
 
-    const list =
-        document.getElementById("commentList");
-
-    list.innerHTML = "";
-
-    if (!video.comments.length) {
-
-        list.innerHTML =
-            "<p style='text-align:center;'>No comments yet.</p>";
-
+    if (!video) {
+        renderComments([]);
         return;
-
     }
 
-    video.comments.forEach(comment => {
-
-        list.innerHTML += `
-
-<div class="comment-item">
-
-<b>@${comment.username}</b>
-
-<p>${comment.text}</p>
-
-</div>
-
-`;
-
-    });
-
+    renderComments(video.comments);
 }
 
 async function sendComment() {
 
     const input = document.getElementById("commentText");
 
+    if (!input) return;
+
     const text = input.value.trim();
 
-    if (text === "") return;
+    if (!text || text.length > 1000) {
+        alert("Comment must be between 1 and 1000 characters.");
+        return;
+    }
+
+    if (!currentVideoId) {
+        alert("No video selected.");
+        return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        alert("Please login again.");
+        return;
+    }
 
     try {
 
         const res = await fetch("/api/shorts/comment", {
-
             method: "PUT",
 
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
             },
 
             body: JSON.stringify({
-
                 videoId: currentVideoId,
-
-                username: user.username,
-
-                text
-
+                text: text
             })
-
         });
 
         const data = await res.json();
 
-        if (data.success) {
-
-            input.value = "";
-
-            const list = document.getElementById("commentList");
-
-            list.innerHTML = "";
-
-            data.comments.forEach(comment => {
-
-                list.innerHTML += `
-
-<div class="comment-item">
-
-<b>@${comment.username}</b>
-
-<p>${comment.text}</p>
-
-</div>
-
-`;
-
-            });
-
-            // Sabunta yawan comments a memory
-            const video = window.videos.find(v => v._id === currentVideoId);
-
-            if (video) {
-
-                video.comments = data.comments;
-
-            }
-
-            closeComments();
-
-        } else {
-
-            alert(data.message);
-
+        if (!res.ok || !data.success) {
+            alert(data.message || "Unable to send comment.");
+            return;
         }
+
+        input.value = "";
+
+        renderComments(data.comments);
+
+        const video = window.videos?.find(
+            v => String(v._id) === String(currentVideoId)
+        );
+
+        if (video) {
+            video.comments = data.comments;
+        }
+
+        const countElement = document.getElementById(
+            "comments-" + currentVideoId
+        );
+
+        if (countElement) {
+            countElement.innerText = data.comments.length;
+        }
+
+        closeComments();
 
     } catch (err) {
 
-        console.log(err);
+        console.error("Send comment error:", err);
 
-        alert("Failed to send comment.");
+        alert("Failed to send comment. Please try again.");
 
     }
-
 }
 
 async function doubleLike(id){
