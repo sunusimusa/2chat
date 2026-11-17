@@ -227,41 +227,49 @@ exports.commentVideo = async (req, res) => {
 };
 
 // Add View
+
 exports.addView = async (req, res) => {
-
     try {
+        const videoId = req.params.id;
 
-        const video = await ShortVideo.findById(req.params.id);
-
-        if (!video) {
-
-            return res.json({
+        if (
+            typeof videoId !== "string" ||
+            !/^[a-fA-F0-9]{24}$/.test(videoId)
+        ) {
+            return res.status(400).json({
                 success: false,
-                message: "Video not found"
+                message: "Invalid video ID."
             });
-
         }
 
-        video.views += 1;
+        const video = await ShortVideo.findById(videoId);
+
+        if (!video) {
+            return res.status(404).json({
+                success: false,
+                message: "Video not found."
+            });
+        }
+
+        video.views = (video.views || 0) + 1;
 
         await video.save();
 
-        res.json({
+        return res.json({
             success: true,
             views: video.views
         });
 
     } catch (err) {
+        console.error("ADD VIEW ERROR:", err);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: err.message
+            message: "Unable to record video view."
         });
-
     }
-
 };
-
+            
 // ================= SAVE / UNSAVE VIDEO =================
 exports.saveVideo = async (req, res) => {
     try {
