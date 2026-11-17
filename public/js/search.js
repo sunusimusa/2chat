@@ -1,6 +1,5 @@
 let searchType = "shorts";
 
-
 // ===============================
 // ELEMENTS
 // ===============================
@@ -342,97 +341,84 @@ function renderShorts(videos) {
 // RENDER USERS
 // ===============================
 
-function renderUsers(users){
-
-    let html = "";
-
+function renderUsers(users) {
+    results.replaceChildren();
 
     users.forEach(user => {
+        const usernameValue = String(user.username || "").trim();
 
-        const username =
-            escapeHTML(
-                user.username || ""
+        if (!usernameValue) return;
+
+        const card = document.createElement("div");
+        card.className = "user-card";
+
+        card.addEventListener("click", () => {
+            openProfile(usernameValue);
+        });
+
+        const avatar = document.createElement("img");
+        avatar.className = "user-avatar";
+        avatar.alt = "User avatar";
+        avatar.loading = "lazy";
+
+        let avatarUrl = "/images/default.png";
+
+        try {
+            const parsedUrl = new URL(
+                String(user.avatar || ""),
+                window.location.origin
             );
 
+            if (
+                parsedUrl.protocol === "https:" ||
+                (
+                    parsedUrl.protocol === "http:" &&
+                    parsedUrl.origin === window.location.origin
+                )
+            ) {
+                avatarUrl = parsedUrl.href;
+            }
+        } catch (err) {
+            console.warn("Invalid avatar URL:", err);
+        }
 
-        const name =
-            escapeHTML(
-                user.name ||
-                user.displayName ||
-                username
-            );
+        avatar.src = avatarUrl;
 
+        avatar.addEventListener("error", () => {
+            avatar.src = "/images/default.png";
+        }, { once: true });
 
-        const bio =
-            escapeHTML(
-                user.bio || ""
-            );
+        const details = document.createElement("div");
+        details.className = "user-details";
 
+        const heading = document.createElement("h3");
+        heading.textContent = "@" + usernameValue;
 
-        const avatar =
-    user.avatar && user.avatar.trim() !== ""
-    ? user.avatar
-    : "/images/default.png";
+        const name = document.createElement("p");
+        name.className = "user-name";
+        name.textContent = String(
+            user.name || user.displayName || usernameValue
+        );
 
-        html += `
+        details.append(heading, name);
 
-        <div
-        class="user-card"
-        onclick="openProfile('${username}')">
+        if (user.bio) {
+            const bio = document.createElement("p");
+            bio.className = "user-bio";
+            bio.textContent = String(user.bio);
 
+            details.appendChild(bio);
+        }
 
-            <img
-            src="${avatar}"
-            class="user-avatar"
-            onerror="this.src='/images/default.png'">
+        const arrow = document.createElement("i");
+        arrow.className = "fa-solid fa-chevron-right user-arrow";
 
-            <div class="user-details">
+        card.append(avatar, details, arrow);
 
-                <h3>
-
-                    @${username}
-
-                </h3>
-
-
-                <p class="user-name">
-
-                    ${name}
-
-                </p>
-
-
-                ${
-                    bio
-                    ? `
-                    <p class="user-bio">
-
-                        ${bio}
-
-                    </p>
-                    `
-                    : ""
-                }
-
-            </div>
-
-
-            <i
-            class="fa-solid fa-chevron-right user-arrow">
-            </i>
-
-        </div>
-
-        `;
-
+        results.appendChild(card);
     });
-
-
-    results.innerHTML = html;
-
-}
-
-
+    }
+        
 // ===============================
 // OPEN SHORT
 // ===============================
