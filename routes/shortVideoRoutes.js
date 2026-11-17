@@ -74,8 +74,9 @@ router.get(
 );
 
 router.get(
-"/analytics/level/:username",
-getCreatorLevel
+    "/analytics/level",
+    protect,
+    getCreatorLevel
 );
 
 router.get(
