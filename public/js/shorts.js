@@ -142,9 +142,13 @@ async function loadVideos() {
 
     try {
 
-        const res = await fetch(
-    "/api/shorts/foryou/" + user.username
-);
+        const token = localStorage.getItem("token");
+
+const savedRes = await fetch("/api/shorts/saved", {
+    headers: {
+        "Authorization": "Bearer " + token
+    }
+});
         
         const data = await res.json();
 
