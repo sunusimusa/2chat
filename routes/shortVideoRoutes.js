@@ -80,8 +80,9 @@ router.get(
 );
 
 router.get(
-"/creator-badge/:username",
-getCreatorBadge
+    "/creator-badge",
+    protect,
+    getCreatorBadge
 );
 
 router.get(
