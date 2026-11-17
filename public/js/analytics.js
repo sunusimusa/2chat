@@ -226,10 +226,21 @@ async function loadTopVideos(){
 try{
 
 
-const res = await fetch(
-"/api/shorts/analytics/top/" + user.username
-);
+const token = localStorage.getItem("token");
 
+if (!token) {
+    console.log("Authentication required.");
+    return;
+}
+
+const res = await fetch(
+    "/api/shorts/analytics/top",
+    {
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    }
+);
 
 const data = await res.json();
 
