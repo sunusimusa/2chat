@@ -607,39 +607,46 @@ function closeComments() {
 }
 
 // ================= SHARE =================
-async function shareVideo(id) {
 
+async function shareVideo(id) {
     try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            alert("Please login to share this video.");
+            return;
+        }
 
         const res = await fetch("/api/shorts/share/" + id, {
-            method: "PUT"
+            method: "PUT",
+            headers: {
+                "Authorization": "Bearer " + token
+            }
         });
 
         const data = await res.json();
 
-        if (!data.success) return;
-
-        document.getElementById("shares-" + id).innerText =
-            data.shares;
+        if (!res.ok || !data.success) {
+            alert(data.message || "Unable to share video.");
+            return;
+        }
 
         const url =
             window.location.origin + "/shorts.html?video=" + id;
 
         if (navigator.share) {
-
             await navigator.share({
                 title: "2Chat Shorts",
                 text: "Watch this Short on 2Chat!",
                 url
             });
-
         } else {
-
             await navigator.clipboard.writeText(url);
-
             alert("Link copied successfully.");
-
         }
+
+        document.getElementById("shares-" + id).innerText =
+            data.shares;
 
         const btn = document.getElementById("shareBtn-" + id);
 
@@ -648,13 +655,11 @@ async function shareVideo(id) {
         }
 
     } catch (err) {
-
         if (err.name !== "AbortError") {
             console.log("Share error:", err);
         }
-
-    }
-}
+    } 
+ }
 
 
 async function addView(id) {
