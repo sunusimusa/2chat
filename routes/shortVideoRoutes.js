@@ -53,7 +53,7 @@ router.get("/saved", protect, getSavedVideos);
 
 router.get("/foryou", protect, getForYouVideos);
 
-router.put("/watch/:id", addWatchTime);
+router.put("/watch/:id", protect, addWatchTime);
 
 router.get("/trending", getTrendingVideos);
 
