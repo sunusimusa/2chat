@@ -142,16 +142,23 @@ async function loadVideos() {
 
     try {
 
+
         const token = localStorage.getItem("token");
 
-const savedRes = await fetch("/api/shorts/saved", {
+if (!token) {
+    alert("Please login again.");
+    return;
+}
+
+const res = await fetch("/api/shorts/foryou", {
     headers: {
         "Authorization": "Bearer " + token
     }
 });
-        
-        const data = await res.json();
 
+const data = await res.json();
+
+        
         if (!data.success) {
 
             alert(data.message);
@@ -166,11 +173,7 @@ const savedRes = await fetch("/api/shorts/saved", {
 
         window.videos = data.videos;
 
-        const savedRes = await fetch(
-    "/api/shorts/saved/" + user.username
-);
-
-const savedData = await savedRes.json();
+        const savedData = await savedRes.json();
 
 const savedVideos = savedData.success && Array.isArray(savedData.videos)
     ? savedData.videos.map(v => String(v._id))
