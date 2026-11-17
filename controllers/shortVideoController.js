@@ -940,115 +940,74 @@ exports.getCreatorLevel = async (req, res) => {
     }
 };
 
+exports.getCreatorBadge = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id)
+            .select("username followers creatorBadge");
 
-exports.getCreatorBadge = async(req,res)=>{
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found."
+            });
+        }
 
-try{
+        const videos = await ShortVideo.find({
+            username: user.username
+        }).select("views watchTime");
 
-const username = req.params.username;
+        let views = 0;
+        let watchTime = 0;
 
+        videos.forEach(video => {
+            views += Number(video.views) || 0;
+            watchTime += Number(video.watchTime) || 0;
+        });
 
-const user = await User.findOne({
-    username
-});
+        const followers = Array.isArray(user.followers)
+            ? user.followers.length
+            : 0;
 
+        let badge = "🥉 Bronze Creator";
 
-if(!user){
+        if (
+            followers >= 10000 &&
+            views >= 1000000 &&
+            watchTime >= 360000
+        ) {
+            badge = "💎 Diamond Creator";
+        } else if (
+            followers >= 1000 &&
+            views >= 100000 &&
+            watchTime >= 36000
+        ) {
+            badge = "🥇 Gold Creator";
+        } else if (
+            followers >= 100 &&
+            views >= 10000 &&
+            watchTime >= 3600
+        ) {
+            badge = "🥈 Silver Creator";
+        }
 
-return res.json({
-success:false,
-message:"User not found"
-});
+        if (user.creatorBadge !== badge) {
+            user.creatorBadge = badge;
+            await user.save();
+        }
 
-}
+        return res.json({
+            success: true,
+            badge
+        });
 
+    } catch (err) {
+        console.error("Creator Badge Error:", err);
 
-
-const videos = await ShortVideo.find({
-username
-});
-
-
-let views = 0;
-let watchTime = 0;
-
-
-videos.forEach(video=>{
-
-views += video.views;
-
-watchTime += video.watchTime || 0;
-
-});
-
-
-const followers = user.followers.length;
-
-
-
-let badge = "🥉 Bronze Creator";
-
-
-
-if(
-followers >= 10000 &&
-views >= 1000000 &&
-watchTime >= 360000
-){
-
-badge = "💎 Diamond Creator";
-
-}
-
-else if(
-followers >= 1000 &&
-views >= 100000 &&
-watchTime >= 36000
-){
-
-badge = "🥇 Gold Creator";
-
-}
-
-else if(
-followers >= 100 &&
-views >= 10000 &&
-watchTime >= 3600
-){
-
-badge = "🥈 Silver Creator";
-
-}
-
-
-
-user.creatorBadge = badge;
-
-await user.save();
-
-
-
-res.json({
-
-success:true,
-
-badge
-
-});
-
-
-}catch(err){
-
-res.status(500).json({
-
-success:false,
-
-message:err.message
-
-});
-
-}
-
+        return res.status(500).json({
+            success: false,
+            message: "Failed to load creator badge."
+        });
+    }
 };
 
 // ================= SEARCH SHORTS =================
