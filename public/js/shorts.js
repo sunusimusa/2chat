@@ -1004,31 +1004,49 @@ function showFollowing(){
 
 }
 
-async function addWatchTime(id, seconds){
 
-    try{
+async function addWatchTime(id, seconds) {
+    try {
+        const token = localStorage.getItem("token");
 
-        await fetch("/api/shorts/watch/" + id,{
+        if (!token) {
+            return;
+        }
 
-            method:"PUT",
+        if (
+            typeof seconds !== "number" ||
+            !Number.isFinite(seconds) ||
+            seconds <= 0 ||
+            seconds > 30
+        ) {
+            return;
+        }
 
-            headers:{
-                "Content-Type":"application/json"
-            },
+        const res = await fetch(
+            "/api/shorts/watch/" + encodeURIComponent(id),
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify({
+                    seconds
+                })
+            }
+        );
 
-            body:JSON.stringify({
-                seconds
-            })
+        const data = await res.json();
 
-        });
+        if (!res.ok || !data.success) {
+            console.error("Watch time error:", data.message);
+        }
 
-    }catch(err){
-
-        console.log(err);
-
+    } catch (err) {
+        console.error("Add watch time error:", err);
     }
+ }
 
-}
 
 function openShortProfile(username){
 
