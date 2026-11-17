@@ -656,24 +656,31 @@ async function shareVideo(id) {
     }
 }
 
-async function addView(id) {
 
+async function addView(id) {
     try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            return;
+        }
 
         const res = await fetch(
-            "/api/shorts/view/" + id,
+            "/api/shorts/view/" + encodeURIComponent(id),
             {
-                method: "PUT"
+                method: "PUT",
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
             }
         );
 
         const data = await res.json();
 
-        if (!data.success) {
+        if (!res.ok || !data.success) {
             return;
         }
 
-        // Sabunta Views a videos memory
         const video = window.videos?.find(
             item => String(item._id) === String(id)
         );
@@ -682,7 +689,6 @@ async function addView(id) {
             video.views = data.views;
         }
 
-        // Sabunta Views a gefen dama
         const viewsElement = document.getElementById(
             "views-" + id
         );
@@ -691,9 +697,7 @@ async function addView(id) {
             viewsElement.innerText = data.views;
         }
 
-        // Sabunta Views a cikin menu
         if (currentVisibleVideoId === id) {
-
             const viewsText = document.getElementById(
                 "shortMenuViewsText"
             );
@@ -701,16 +705,13 @@ async function addView(id) {
             if (viewsText) {
                 viewsText.innerText = "Views: " + data.views;
             }
-
         }
 
     } catch (err) {
-
-        console.log("Add view error:", err);
-
-    }
-
+        console.error("Add view error:", err);
+    }               
 }
+
 
 function closeComments() {
 
