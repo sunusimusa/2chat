@@ -49,7 +49,7 @@ router.put("/share/:id", addShare);
 // Save / Unsave Video
 router.put("/save", protect, saveVideo);
 
-router.get("/saved/:username", getSavedVideos);
+router.get("/saved", protect, getSavedVideos);
 
 router.get("/foryou/:username", getForYouVideos);
 
