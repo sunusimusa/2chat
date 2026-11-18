@@ -23,6 +23,8 @@ const clearSearch =
 
 function switchSearchType(type){
 
+    searchRequestId++;
+
     searchType = type;
 
     const shortsTab =
@@ -67,8 +69,11 @@ function switchSearchType(type){
 // ===============================
 // PERFORM SEARCH
 // ===============================
-
 async function performSearch() {
+    const requestId = ++searchRequestId;
+
+    if (!searchInput || !results) return;
+
     const keyword = searchInput.value
         .trim()
         .replace(/^#/, "")
@@ -89,28 +94,32 @@ async function performSearch() {
     showLoading();
 
     if (searchType === "users") {
-        await searchUsers(keyword);
+        await searchUsers(keyword, requestId);
     } else {
-        await searchShorts(keyword);
+        await searchShorts(keyword, requestId);
     }
-}
+    }
 
 // ===============================
 // SEARCH SHORTS
 // ===============================
 
-async function searchShorts(keyword) {
+async function searchShorts(keyword, requestId) {
     try {
         const res = await fetch(
             "/api/shorts/search/" +
             encodeURIComponent(keyword)
         );
 
+        if (requestId !== searchRequestId) return;
+
         if (!res.ok) {
             throw new Error("Shorts search request failed.");
         }
 
         const data = await res.json();
+
+        if (requestId !== searchRequestId) return;
 
         if (
             data.success &&
@@ -123,6 +132,8 @@ async function searchShorts(keyword) {
         }
 
     } catch (err) {
+        if (requestId !== searchRequestId) return;
+
         console.error("Search Shorts Error:", err);
         showError();
     }
@@ -131,20 +142,22 @@ async function searchShorts(keyword) {
 // ===============================
 // SEARCH USERS
 // ===============================
-
-
-async function searchUsers(keyword) {
+async function searchUsers(keyword, requestId) {
     try {
         const res = await fetch(
             "/api/users/search/" +
             encodeURIComponent(keyword)
         );
 
+        if (requestId !== searchRequestId) return;
+
         if (!res.ok) {
             throw new Error("Users search request failed.");
         }
 
         const data = await res.json();
+
+        if (requestId !== searchRequestId) return;
 
         if (
             data.success &&
@@ -157,6 +170,8 @@ async function searchUsers(keyword) {
         }
 
     } catch (err) {
+        if (requestId !== searchRequestId) return;
+
         console.error("Search Users Error:", err);
         showError();
     }
