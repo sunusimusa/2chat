@@ -1,4 +1,9 @@
 const router = require("express").Router();
+
+const protect = require("../middleware/auth");
+
+router.use(protect);
+
 const multer = require("multer");
 
 const storage = multer.memoryStorage();
