@@ -1130,6 +1130,17 @@ if (!messageId) {
 
         }
 
+        const isMember =
+    group.members.includes(username) ||
+    group.owner === username;
+
+if (!isMember) {
+    return res.status(403).json({
+        success: false,
+        message: "You are not a member of this group."
+    });
+}
+
         // ==================================================
         // OWNER / ADMIN ONLY
         // ==================================================
@@ -1245,6 +1256,17 @@ if (!messageId) {
             });
 
         }
+
+        const isMember =
+    group.members.includes(username) ||
+    group.owner === username;
+
+if (!isMember) {
+    return res.status(403).json({
+        success: false,
+        message: "You are not a member of this group."
+    });
+}
 
         // ==================================================
         // OWNER / ADMIN ONLY
