@@ -132,6 +132,7 @@ async function searchShorts(keyword) {
 // SEARCH USERS
 // ===============================
 
+
 async function searchUsers(keyword) {
     try {
         const res = await fetch(
@@ -160,7 +161,6 @@ async function searchUsers(keyword) {
         showError();
     }
 }
-
 
 // ===============================
 // RENDER SHORTS
