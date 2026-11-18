@@ -233,16 +233,23 @@ if (!isMember) {
 
         if (replyTo) {
 
-            finalReplyTo = replyTo;
+    const repliedMessage =
+        await GroupMessage.findOne({
+            _id: replyTo,
+            groupId: groupId
+        });
 
-            finalReplyUser =
-                replyUser || "";
+    if (!repliedMessage) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid reply message."
+        });
+    }
 
-            finalReplyText =
-                replyText || "";
-
-            finalReplyImage =
-                replyImage || "";
+    finalReplyTo = repliedMessage._id;
+    finalReplyUser = repliedMessage.sender;
+    finalReplyText = repliedMessage.text || "";
+    finalReplyImage = repliedMessage.image || "";
 
         }
 
@@ -487,8 +494,6 @@ if (!message) {
     });
 }
 
-// AUTHENTICATED USER
-const username = req.user.username;
 
 // FIND GROUP
 const group = await Group.findById(message.groupId);
@@ -541,30 +546,6 @@ if (!isMember) {
 
                 message:
                     "Invalid reaction."
-
-            });
-
-        }
-
-
-        // ==================================================
-        // FIND MESSAGE
-        // ==================================================
-
-        const message =
-            await GroupMessage.findById(
-                messageId
-            );
-
-
-        if (!message) {
-
-            return res.status(404).json({
-
-                success: false,
-
-                message:
-                    "Message not found."
 
             });
 
@@ -704,19 +685,7 @@ if (!messageId) {
     });
 }
 
-       
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "messageId and username are required."
-
-            });
-
-        }
-
-
+                  
         // FIND MESSAGE
         const message =
             await GroupMessage.findById(
@@ -755,6 +724,17 @@ if (!messageId) {
             });
 
         }
+
+        const isMember =
+    group.members.includes(username) ||
+    group.owner === username;
+
+if (!isMember) {
+    return res.status(403).json({
+        success: false,
+        message: "You are not a member of this group."
+    });
+}
 
 
         // ==================================================
@@ -853,16 +833,8 @@ if (!messageId) {
         success: false,
         message: "messageId is required."
     });
-}
-
-        
-            return res.status(400).json({
-                success: false,
-                message: "messageId and username are required."
-            });
-
-        }
-
+} 
+            
         const message =
             await GroupMessage.findById(messageId);
 
@@ -874,6 +846,28 @@ if (!messageId) {
             });
 
         }
+
+        // FIND GROUP
+const group = await Group.findById(message.groupId);
+
+if (!group) {
+    return res.status(404).json({
+        success: false,
+        message: "Group not found."
+    });
+}
+
+// CHECK MEMBERSHIP
+const isMember =
+    group.members.includes(username) ||
+    group.owner === username;
+
+if (!isMember) {
+    return res.status(403).json({
+        success: false,
+        message: "You are not a member of this group."
+    });
+}
 
         // Mai message kawai zai iya edit
         if (message.sender !== username) {
@@ -955,19 +949,7 @@ exports.markMessageAsSeen = async (req, res) => {
                 success: false,
                 message: "messageId is required."
             });
-        }
-
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "messageId and username are required."
-
-            });
-
-        }
-
+        }         
 
         // ==================================================
         // FIND MESSAGE
@@ -990,6 +972,28 @@ exports.markMessageAsSeen = async (req, res) => {
 
         }
 
+        // FIND GROUP
+const group = await Group.findById(message.groupId);
+
+if (!group) {
+    return res.status(404).json({
+        success: false,
+        message: "Group not found."
+    });
+}
+
+// CHECK MEMBERSHIP
+const isMember =
+    group.members.includes(username) ||
+    group.owner === username;
+
+if (!isMember) {
+    return res.status(403).json({
+        success: false,
+        message: "You are not a member of this group."
+    });
+    }
+        
 
         // ==================================================
         // DON'T COUNT MESSAGE OWNER
@@ -1093,17 +1097,7 @@ if (!messageId) {
     });
 }
         
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "messageId and username are required."
-
-            });
-
-        }
-
+            
         // FIND MESSAGE
         const message =
             await GroupMessage.findById(messageId);
@@ -1218,17 +1212,7 @@ if (!messageId) {
         message: "messageId is required."
     });
 }
-        
-            return res.status(400).json({
-
-                success: false,
-
-                message:
-                    "messageId and username are required."
-
-            });
-
-        }
+            
 
         // FIND MESSAGE
         const message =
