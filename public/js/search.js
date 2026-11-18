@@ -22,50 +22,33 @@ const clearSearch =
 // SWITCH SEARCH TYPE
 // ===============================
 
-function switchSearchType(type){
-
+function switchSearchType(type) {
     searchRequestId++;
+
+    if (!searchInput || !searchTitle) return;
+
+    if (type !== "shorts" && type !== "users") return;
+
+    const shortsTab = document.getElementById("shortsTab");
+    const usersTab = document.getElementById("usersTab");
+
+    if (!shortsTab || !usersTab) return;
 
     searchType = type;
 
-    const shortsTab =
-        document.getElementById("shortsTab");
+    shortsTab.classList.toggle("active", type === "shorts");
+    usersTab.classList.toggle("active", type === "users");
 
-    const usersTab =
-        document.getElementById("usersTab");
-
-
-    shortsTab.classList.remove("active");
-    usersTab.classList.remove("active");
-
-
-    if(type === "shorts"){
-
-        shortsTab.classList.add("active");
-
-        searchTitle.innerText =
-            "Search Shorts";
-
-        searchInput.placeholder =
-            "Search Shorts or #hashtag...";
-
-    }else{
-
-        usersTab.classList.add("active");
-
-        searchTitle.innerText =
-            "Search Users";
-
-        searchInput.placeholder =
-            "Search username...";
-
+    if (type === "shorts") {
+        searchTitle.textContent = "Search Shorts";
+        searchInput.placeholder = "Search Shorts or #hashtag...";
+    } else {
+        searchTitle.textContent = "Search Users";
+        searchInput.placeholder = "Search username...";
     }
 
-
     searchInput.focus();
-
 }
-
 
 // ===============================
 // PERFORM SEARCH
