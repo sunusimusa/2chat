@@ -478,52 +478,46 @@ function showError() {
 // CLEAR
 // ===============================
 
-clearSearch.addEventListener("click", () => {
-    searchRequestId++;
+if (clearSearch && searchInput && results) {
+    clearSearch.addEventListener("click", () => {
+        searchRequestId++;
 
-    if (!searchInput || !results) return;
+        searchInput.value = "";
 
-    searchInput.value = "";
+        results.replaceChildren();
 
-    results.replaceChildren();
+        const container = document.createElement("div");
+        container.className = "empty-state";
 
-    const container = document.createElement("div");
-    container.className = "empty-state";
+        const icon = document.createElement("i");
+        icon.className = "fa-solid fa-magnifying-glass";
 
-    const icon = document.createElement("i");
-    icon.className = "fa-solid fa-magnifying-glass";
+        const heading = document.createElement("h3");
+        heading.textContent = "Search 2Chat";
 
-    const heading = document.createElement("h3");
-    heading.textContent = "Search 2Chat";
+        const paragraph = document.createElement("p");
+        paragraph.textContent =
+            "Find Shorts, hashtags and users.";
 
-    const paragraph = document.createElement("p");
-    paragraph.textContent = "Find Shorts, hashtags and users.";
+        container.append(icon, heading, paragraph);
+        results.appendChild(container);
 
-    container.append(icon, heading, paragraph);
-    results.appendChild(container);
-
-    searchInput.focus();
-});
+        searchInput.focus();
+    });
+}
 
 // ===============================
 // ENTER TO SEARCH
 // ===============================
 
-searchInput.addEventListener(
-    "keydown",
-    event => {
-
-        if(event.key === "Enter"){
-
+if (searchInput) {
+    searchInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
             event.preventDefault();
-
             performSearch();
-
         }
-
-    }
-);
-
+    });
+}
 
 // ===============================
 // HTML SAFETY
