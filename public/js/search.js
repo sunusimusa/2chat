@@ -1,4 +1,5 @@
 let searchType = "shorts";
+let searchRequestId = 0;
 
 // ===============================
 // ELEMENTS
