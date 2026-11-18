@@ -15,8 +15,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String CHANNEL_ID = "2chat_messages";
 
+
     @Override
-    public void onNewToken(String token) {
+    public void onNewToken(String token)
+    {
         super.onNewToken(token);
 
         android.util.Log.d(
@@ -24,8 +26,18 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 "FCM token refreshed."
         );
 
-        // We will securely send this token to the backend later.
-    }
+        Intent intent = new Intent(
+   MainActivity.ACTION_FCM_TOKEN_REFRESHED
+            
+    );
+
+    // Restrict this broadcast to this application.
+        
+    intent.setPackage(getPackageName());
+    intent.putExtra("fcm_token", token);
+
+    sendBroadcast(intent);
+  }
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
