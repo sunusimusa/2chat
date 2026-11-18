@@ -6,23 +6,17 @@ require("../models/Notification");
 
 // CREATE POST
 
-exports.createPost = async (req, res) => {
 
+exports.createPost = async (req, res) => {
     try {
 
-        const {
-            userId,
-            username,
-            avatar,
-            text
-        } = req.body;
+        const userId = req.user._id;
+        const username = req.user.username;
+        const avatar = req.user.avatar;
+        const { text } = req.body;
 
         let image = "";
         let video = "";
-
-        // ==========================================
-        // UPLOAD FILE
-        // ==========================================
 
         if (req.file) {
 
@@ -32,122 +26,65 @@ exports.createPost = async (req, res) => {
             const isVideo =
                 req.file.mimetype.startsWith("video/");
 
-            // ==========================================
-            // IMAGE
-            // ==========================================
-
-            if (isImage) {
-
-                const result =
-                    await new Promise((resolve, reject) => {
-
-                        const stream =
-                            cloudinary.uploader.upload_stream(
-                                {
-                                    resource_type: "image",
-                                    folder: "2chat-images"
-                                },
-
-                                (error, result) => {
-
-                                    if (error) {
-                                        reject(error);
-                                    } else {
-                                        resolve(result);
-                                    }
-
-                                }
-                            );
-
-                        stream.end(req.file.buffer);
-
-                    });
-
-                image = result.secure_url;
-
+            if (!isImage && !isVideo) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Only image and video files are allowed."
+                });
             }
 
-            // ==========================================
-            // VIDEO
-            // ==========================================
+            const result = await new Promise((resolve, reject) => {
 
-            else if (isVideo) {
+                const stream = cloudinary.uploader.upload_stream(
+                    {
+                        resource_type: isImage ? "image" : "video",
+                        folder: isImage ? "2chat-images" : "2chat-videos"
+                    },
+                    (error, result) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(result);
+                        }
+                    }
+                );
 
-                const result =
-                    await new Promise((resolve, reject) => {
-
-                        const stream =
-                            cloudinary.uploader.upload_stream(
-                                {
-                                    resource_type: "video",
-                                    folder: "2chat-videos"
-                                },
-
-                                (error, result) => {
-
-                                    if (error) {
-                                        reject(error);
-                                    } else {
-                                        resolve(result);
-                                    }
-
-                                }
-                            );
-
-                        stream.end(req.file.buffer);
-
-                    });
-
-                video = result.secure_url;
-
-            }
-
-        }
-
-        // ==========================================
-        // CREATE POST
-        // ==========================================
-
-        const post =
-            await Post.create({
-
-                userId,
-                username,
-                avatar,
-                text,
-                image,
-                video
+                stream.end(req.file.buffer);
 
             });
 
-        // ==========================================
-        // RESPONSE
-        // ==========================================
+            if (isImage) {
+                image = result.secure_url;
+            } else {
+                video = result.secure_url;
+            }
+        }
 
-        res.json({
+        const post = await Post.create({
+            userId,
+            username,
+            avatar,
+            text,
+            image,
+            video
+        });
 
+        return res.json({
             success: true,
             post
-
         });
 
     } catch (err) {
 
-        console.error(
-            "CREATE POST ERROR:",
-            err
-        );
+        console.error("CREATE POST ERROR:", err);
 
-        res.status(500).json({
-
+        return res.status(500).json({
             success: false,
-            message: err.message
-
+            message: "Failed to create post."
         });
-
     }
-
 };
+
 
 // GET POSTS
 
