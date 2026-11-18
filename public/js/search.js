@@ -410,49 +410,45 @@ function openProfile(username){
 // LOADING
 // ===============================
 
-function showLoading(){
 
-    results.innerHTML = `
+function showLoading() {
+    results.replaceChildren();
 
-        <div class="loading">
+    const container = document.createElement("div");
+    container.className = "loading";
 
-            <i class="fa-solid fa-spinner fa-spin"></i>
+    const icon = document.createElement("i");
+    icon.className = "fa-solid fa-spinner fa-spin";
 
-            <p>
-                Searching...
-            </p>
+    const message = document.createElement("p");
+    message.textContent = "Searching...";
 
-        </div>
-
-    `;
-
+    container.append(icon, message);
+    results.appendChild(container);
 }
-
 
 // ===============================
 // NO RESULTS
 // ===============================
 
-function showNoResults(message){
 
-    results.innerHTML = `
+function showNoResults(message) {
+    results.replaceChildren();
 
-        <div class="empty-state">
+    const container = document.createElement("div");
+    container.className = "empty-state";
 
-            <i class="fa-regular fa-face-frown"></i>
+    const icon = document.createElement("i");
+    icon.className = "fa-regular fa-face-frown";
 
-            <h3>
-                ${message}
-            </h3>
+    const heading = document.createElement("h3");
+    heading.textContent = String(message);
 
-            <p>
-                Try another search.
-            </p>
+    const paragraph = document.createElement("p");
+    paragraph.textContent = "Try another search.";
 
-        </div>
-
-    `;
-
+    container.append(icon, heading, paragraph);
+    results.appendChild(container);
 }
 
 
@@ -460,62 +456,52 @@ function showNoResults(message){
 // ERROR
 // ===============================
 
-function showError(){
+function showError() {
+    results.replaceChildren();
 
-    results.innerHTML = `
+    const container = document.createElement("div");
+    container.className = "empty-state error";
 
-        <div class="empty-state error">
+    const icon = document.createElement("i");
+    icon.className = "fa-solid fa-triangle-exclamation";
 
-            <i class="fa-solid fa-triangle-exclamation"></i>
+    const heading = document.createElement("h3");
+    heading.textContent = "Search failed";
 
-            <h3>
-                Search failed
-            </h3>
+    const paragraph = document.createElement("p");
+    paragraph.textContent = "Please try again.";
 
-            <p>
-                Please try again.
-            </p>
-
-        </div>
-
-    `;
-
+    container.append(icon, heading, paragraph);
+    results.appendChild(container);
 }
-
 
 // ===============================
 // CLEAR
 // ===============================
 
-clearSearch.addEventListener(
-    "click",
-    () => {
+clearSearch.addEventListener("click", () => {
+    searchInput.value = "";
 
-        searchInput.value = "";
+    results.replaceChildren();
 
-        results.innerHTML = `
+    const container = document.createElement("div");
+    container.className = "empty-state";
 
-            <div class="empty-state">
+    const icon = document.createElement("i");
+    icon.className = "fa-solid fa-magnifying-glass";
 
-                <i class="fa-solid fa-magnifying-glass"></i>
+    const heading = document.createElement("h3");
+    heading.textContent = "Search 2Chat";
 
-                <h3>
-                    Search 2Chat
-                </h3>
+    const paragraph = document.createElement("p");
+    paragraph.textContent =
+        "Find Shorts, hashtags and users.";
 
-                <p>
-                    Find Shorts, hashtags and users.
-                </p>
+    container.append(icon, heading, paragraph);
+    results.appendChild(container);
 
-            </div>
-
-        `;
-
-        searchInput.focus();
-
-    }
-);
-
+    searchInput.focus();
+});
 
 // ===============================
 // ENTER TO SEARCH
