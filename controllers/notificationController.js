@@ -8,10 +8,10 @@ try{
 
 const notifications =
 await Notification.find({
-receiver:req.params.username
+    receiver: req.user.username
 })
 .sort({createdAt:-1});
-
+  
 res.json({
 success:true,
 notifications
@@ -33,12 +33,32 @@ async(req,res)=>{
 
 try{
 
-await Notification.findByIdAndUpdate(
-req.body.id,
-{
-read:true
-}
+  if (!req.body.id) {
+    return res.status(400).json({
+        success: false,
+        message: "Notification ID is required."
+    });
+  }
+
+const notification = await Notification.findOneAndUpdate(
+    {
+        _id: req.body.id,
+        receiver: req.user.username
+    },
+    {
+        read: true
+    },
+    {
+        new: true
+    }
 );
+
+if (!notification) {
+    return res.status(404).json({
+        success: false,
+        message: "Notification not found."
+    });
+      }
 
 res.json({
 success:true
@@ -62,12 +82,12 @@ try{
 const count =
 await Notification.countDocuments({
 
-receiver:req.params.username,
+    receiver: req.user.username,
 
-read:false
+    read: false
 
 });
-
+  
 res.json({
 
 success:true,
