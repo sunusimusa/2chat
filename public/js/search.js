@@ -496,6 +496,10 @@ function showError() {
 // ===============================
 
 clearSearch.addEventListener("click", () => {
+    searchRequestId++;
+
+    if (!searchInput || !results) return;
+
     searchInput.value = "";
 
     results.replaceChildren();
@@ -510,8 +514,7 @@ clearSearch.addEventListener("click", () => {
     heading.textContent = "Search 2Chat";
 
     const paragraph = document.createElement("p");
-    paragraph.textContent =
-        "Find Shorts, hashtags and users.";
+    paragraph.textContent = "Find Shorts, hashtags and users.";
 
     container.append(icon, heading, paragraph);
     results.appendChild(container);
