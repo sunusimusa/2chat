@@ -115,219 +115,234 @@ message:err.message
 
 // LIKE POST
 
-exports.likePost = async (req,res)=>{
 
-try{
+exports.likePost = async (req, res) => {
+    try {
 
-const { postId, username } = req.body;
+        const { postId } = req.body;
+        const username = req.user.username;
 
-const post =
-await Post.findById(postId);
+        if (!postId) {
+            return res.status(400).json({
+                success: false,
+                message: "Post ID is required."
+            });
+        }
 
-if(!post){
+        const post = await Post.findById(postId);
 
-return res.status(404).json({
-success:false,
-message:"Post not found"
-});
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: "Post not found."
+            });
+        }
 
-}
+        if (post.likes.includes(username)) {
 
-if(post.likes.includes(username)){
+            post.likes = post.likes.filter(
+                u => u !== username
+            );
 
-post.likes =
-post.likes.filter(
-u => u !== username
-);
+        } else {
 
-}else{
+            post.likes.push(username);
 
-post.likes.push(username);
+            if (post.username !== username) {
+                await Notification.create({
+                    receiver: post.username,
+                    sender: username,
+                    type: "like",
+                    postId: post._id,
+                    text: username + " liked your post ❤️"
+                });
+            }
+        }
 
-  
-if(post.username !== username){
+        await post.save();
 
-await Notification.create({
+        return res.json({
+            success: true,
+            likes: post.likes.length
+        });
 
-receiver:post.username,
+    } catch (err) {
 
-sender:username,
+        console.error("LIKE POST ERROR:", err);
 
-type:"like",
-
-postId:post._id,
-
-text:username + " liked your post ❤️"
-
-});
-
-}
-
-}
-
-await post.save();
-
-res.json({
-success:true,
-likes:post.likes.length
-});
-
-}catch(err){
-
-res.status(500).json({
-success:false,
-message:err.message
-});
-
-}
-
+        return res.status(500).json({
+            success: false,
+            message: "Failed to like post."
+        });
+    }
 };
+    
 
 // COMMENT POST
 
-exports.commentPost = async (req,res)=>{
 
-try{
+exports.commentPost = async (req, res) => {
+    try {
 
-const {
-postId,
-username,
-text
-} = req.body;
+        const { postId, text } = req.body;
+        const username = req.user.username;
 
-const post =
-await Post.findById(postId);
+        if (!postId || !text || !text.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Post ID and comment text are required."
+            });
+        }
 
-if(!post){
+        const post = await Post.findById(postId);
 
-return res.status(404).json({
-success:false,
-message:"Post not found"
-});
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: "Post not found."
+            });
+        }
 
-}
+        if (!post.comments) {
+            post.comments = [];
+        }
 
-if(!post.comments){
-  post.comments = [];
-}
+        post.comments.push({
+            username,
+            text: text.trim()
+        });
 
-post.comments.push({
-  username,
-  text
-});
+        await post.save();
 
-await post.save();
+        if (post.username !== username) {
+            await Notification.create({
+                receiver: post.username,
+                sender: username,
+                type: "comment",
+                postId: post._id,
+                text: username + " commented on your post 💬"
+            });
+        }
 
-if(post.username !== username){
+        return res.json({
+            success: true
+        });
 
-await Notification.create({
+    } catch (err) {
 
-receiver:post.username,
+        console.error("COMMENT POST ERROR:", err);
 
-sender:username,
-
-type:"comment",
-
-postId:post._id,
-
-text:username + " commented on your post 💬"
-
-});
-
-}  
-
-res.json({
-success:true
-});
-
-}catch(err){
-
-res.status(500).json({
-success:false,
-message:err.message
-});
-
-}
-
+        return res.status(500).json({
+            success: false,
+            message: "Failed to comment on post."
+        });
+    }
 };
+
 
 // DELETE POST
 
-exports.deletePost = async (req,res)=>{
 
-try{
+exports.deletePost = async (req, res) => {
+    try {
 
-const { postId } = req.body;
+        const { postId } = req.body;
+        const userId = req.user._id;
 
-const post =
-await Post.findById(postId);
+        if (!postId) {
+            return res.status(400).json({
+                success: false,
+                message: "Post ID is required."
+            });
+        }
 
-if(!post){
+        const post = await Post.findById(postId);
 
-return res.status(404).json({
-success:false,
-message:"Post not found"
-});
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: "Post not found."
+            });
+        }
 
-}
+        if (post.userId.toString() !== userId.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to delete this post."
+            });
+        }
 
-await Post.findByIdAndDelete(postId);
+        await Post.findByIdAndDelete(postId);
 
-res.json({
-success:true,
-message:"Post deleted"
-});
+        return res.json({
+            success: true,
+            message: "Post deleted successfully."
+        });
 
-}catch(err){
+    } catch (err) {
 
-res.status(500).json({
-success:false,
-message:err.message
-});
+        console.error("DELETE POST ERROR:", err);
 
-}
-
+        return res.status(500).json({
+            success: false,
+            message: "Failed to delete post."
+        });
+    }
 };
+            
 
 // EDIT POST
 
-exports.editPost = async (req,res)=>{
 
-try{
+exports.editPost = async (req, res) => {
+    try {
 
-const { postId, text } = req.body;
+        const { postId, text } = req.body;
+        const userId = req.user._id;
 
-const post =
-await Post.findById(postId);
+        if (!postId || typeof text !== "string" || !text.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Post ID and valid text are required."
+            });
+        }
 
-if(!post){
+        const post = await Post.findById(postId);
 
-return res.status(404).json({
-success:false,
-message:"Post not found"
-});
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: "Post not found."
+            });
+        }
 
-}
+        if (post.userId.toString() !== userId.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to edit this post."
+            });
+        }
 
-post.text = text;
+        post.text = text.trim();
 
-await post.save();
+        await post.save();
 
-res.json({
-success:true,
-post
-});
+        return res.json({
+            success: true,
+            post
+        });
 
-}catch(err){
+    } catch (err) {
 
-res.status(500).json({
-success:false,
-message:err.message
-});
+        console.error("EDIT POST ERROR:", err);
 
-}
-
+        return res.status(500).json({
+            success: false,
+            message: "Failed to edit post."
+        });
+    }
 };
+
 
 // GET MY POSTS
 
