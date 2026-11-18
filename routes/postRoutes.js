@@ -1,3 +1,4 @@
+
 const router = require("express").Router();
 
 const {
@@ -12,12 +13,26 @@ const {
 } = require("../controllers/postController");
 
 const upload = require("../middleware/upload");
+const protect = require("../middleware/auth");
+
+// PROTECTED ROUTES
 
 router.post(
     "/create",
+    protect,
     upload.single("file"),
     createPost
 );
+
+router.put("/like", protect, likePost);
+
+router.put("/comment", protect, commentPost);
+
+router.put("/edit", protect, editPost);
+
+router.delete("/delete", protect, deletePost);
+
+// PUBLIC ROUTES
 
 router.get("/", getPosts);
 
@@ -31,12 +46,5 @@ router.get(
     getSinglePost
 );
 
-router.put("/like", likePost);
-
-router.put("/comment", commentPost);
-
-router.put("/edit", editPost);
-
-router.delete("/delete", deletePost);
-
 module.exports = router;
+    
