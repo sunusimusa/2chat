@@ -390,17 +390,19 @@ exports.getAllUsers = async (req, res) => {
 // SEARCH USERS
 // =====================================================
 
-
 exports.searchUsers = async (req, res) => {
     try {
         const keyword = String(
             req.params.keyword || ""
         ).trim();
 
-        if (!keyword) {
-            return res.json({
-                success: true,
-                users: []
+        if (
+            keyword.length < 2 ||
+            keyword.length > 50
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Search keyword must be between 2 and 50 characters."
             });
         }
 
@@ -416,12 +418,11 @@ exports.searchUsers = async (req, res) => {
                     $options: "i"
                 }
             },
-            "username avatar online lastSeen bio"
+            "username avatar bio"
         )
-        .sort({
-            username: 1
-        })
-        .limit(30);
+        .sort({ username: 1 })
+        .limit(30)
+        .lean();
 
         return res.json({
             success: true,
@@ -429,10 +430,7 @@ exports.searchUsers = async (req, res) => {
         });
 
     } catch (err) {
-        console.error(
-            "SEARCH USERS ERROR:",
-            err
-        );
+        console.error("SEARCH USERS ERROR:", err);
 
         return res.status(500).json({
             success: false,
