@@ -1,4 +1,8 @@
-const socket = io();
+const socket = io({
+    auth: {
+        token: localStorage.getItem("token")
+    }
+});
 
 const user =
 JSON.parse(localStorage.getItem("user"));
