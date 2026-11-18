@@ -12,6 +12,23 @@ const upload = multer({
     storage,
     limits: {
         fileSize: 10 * 1024 * 1024
+    },
+    fileFilter: (req, file, cb) => {
+        if (
+            file.fieldname === "image" &&
+            file.mimetype.startsWith("image/")
+        ) {
+            return cb(null, true);
+        }
+
+        if (
+            file.fieldname === "voice" &&
+            file.mimetype.startsWith("audio/")
+        ) {
+            return cb(null, true);
+        }
+
+        cb(new Error("Invalid file type."));
     }
 });
 
