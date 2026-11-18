@@ -1,5 +1,18 @@
 const router = require("express").Router();
 
+const { rateLimit } = require("express-rate-limit");
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many attempts. Please try again later."
+  }
+});
+
 const protect = require("../middleware/auth");
 
 const {
@@ -24,10 +37,11 @@ router.get("/", (req, res) => {
 });
 
 // Register
-router.post("/register", register);
-
+router.post("/register",
+authLimiter, register);
 // Login
-router.post("/login", login);
+router.post("/login",
+authLimiter, login);
 
 router.post(
   "/fcm-token",
