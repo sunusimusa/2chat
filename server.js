@@ -4,6 +4,7 @@ const { Server } = require("socket.io");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
+const jwt = require("jsonwebtoken");
 
 require("dotenv").config();
 
@@ -111,6 +112,62 @@ const io =
         }
     );
 
+
+// =====================================================
+// SOCKET.IO JWT AUTHENTICATION
+// =====================================================
+
+io.use(async (socket, next) => {
+
+    try {
+
+        const token =
+            socket.handshake.auth?.token;
+
+        if (!token) {
+            return next(
+                new Error("Authentication required.")
+            );
+        }
+
+        const decoded =
+            jwt.verify(
+                token,
+                process.env.JWT_SECRET
+            );
+
+        const user =
+            await mongoose
+                .model("User")
+                .findById(decoded.id)
+                .select("-password");
+
+        if (!user) {
+            return next(
+                new Error("User not found.")
+            );
+        }
+
+        socket.user = user;
+        socket.userId = String(user._id);
+        socket.username = user.username;
+
+        next();
+
+    } catch (error) {
+
+        console.error(
+            "SOCKET AUTH ERROR:",
+            error.message
+        );
+
+        next(
+            new Error("Invalid or expired token.")
+        );
+
+    }
+
+});
 
 // =====================================================
 // CORS
