@@ -568,30 +568,55 @@ io.on(
         // =================================================
 
         socket.on(
-            "groupMessage",
-            (message) => {
+    "groupMessage",
+    async (message) => {
 
-                if (
-                    !message ||
-                    !message.groupId
-                ) {
-                    return;
-                }
+        try {
 
-
-                socket
-                    .to(
-                        String(
-                            message.groupId
-                        )
-                    )
-                    .emit(
-                        "newGroupMessage",
-                        message
-                    );
-
+            if (
+                !message ||
+                !message.groupId ||
+                !socket.username
+            ) {
+                return;
             }
-        );
+
+            const Group = mongoose.model("Group");
+
+            const group = await Group.findById(
+                message.groupId
+            );
+
+            if (!group) {
+                return;
+            }
+
+            const isMember =
+                group.members.includes(socket.username) ||
+                group.owner === socket.username;
+
+            if (!isMember) {
+                return;
+            }
+
+            socket
+                .to(String(group._id))
+                .emit(
+                    "newGroupMessage",
+                    message
+                );
+
+        } catch (error) {
+
+            console.error(
+                "GROUP MESSAGE SOCKET ERROR:",
+                error.message
+            );
+
+        }
+
+    }
+);
 
 
         // =================================================
@@ -599,31 +624,56 @@ io.on(
         // =================================================
 
         socket.on(
-            "groupMessageReaction",
-            (message) => {
+    "groupMessageReaction",
+    async (message) => {
 
-                if (
-                    !message ||
-                    !message._id ||
-                    !message.groupId
-                ) {
-                    return;
-                }
+        try {
 
-
-                socket
-                    .to(
-                        String(
-                            message.groupId
-                        )
-                    )
-                    .emit(
-                        "groupMessageReaction",
-                        message
-                    );
-
+            if (
+                !message ||
+                !message._id ||
+                !message.groupId ||
+                !socket.username
+            ) {
+                return;
             }
-        );
+
+            const Group = mongoose.model("Group");
+
+            const group = await Group.findById(
+                message.groupId
+            );
+
+            if (!group) {
+                return;
+            }
+
+            const isMember =
+                group.members.includes(socket.username) ||
+                group.owner === socket.username;
+
+            if (!isMember) {
+                return;
+            }
+
+            socket
+                .to(String(group._id))
+                .emit(
+                    "groupMessageReaction",
+                    message
+                );
+
+        } catch (error) {
+
+            console.error(
+                "GROUP REACTION SOCKET ERROR:",
+                error.message
+            );
+
+        }
+
+    }
+);
 
 
         // =================================================
@@ -631,77 +681,118 @@ io.on(
         // =================================================
 
         socket.on(
-            "groupMessageSeen",
-            (data) => {
+    "groupMessageSeen",
+    async (data) => {
 
-                if (!data) {
-                    return;
-                }
+        try {
 
-
-                const {
-                    groupId,
-                    messageId,
-                    username
-                } = data;
-
-
-                if (
-                    !groupId ||
-                    !messageId ||
-                    !username
-                ) {
-                    return;
-                }
-
-
-                socket
-                    .to(
-                        String(groupId)
-                    )
-                    .emit(
-                        "groupMessageSeen",
-                        {
-                            groupId,
-                            messageId,
-                            username
-                        }
-                    );
-
+            if (
+                !data ||
+                !data.groupId ||
+                !data.messageId ||
+                !socket.username
+            ) {
+                return;
             }
-        );
+
+            const Group = mongoose.model("Group");
+
+            const group = await Group.findById(
+                data.groupId
+            );
+
+            if (!group) {
+                return;
+            }
+
+            const isMember =
+                group.members.includes(socket.username) ||
+                group.owner === socket.username;
+
+            if (!isMember) {
+                return;
+            }
+
+            socket
+                .to(String(group._id))
+                .emit(
+                    "groupMessageSeen",
+                    {
+                        groupId: String(group._id),
+                        messageId: data.messageId,
+                        username: socket.username
+                    }
+                );
+
+        } catch (error) {
+
+            console.error(
+                "GROUP MESSAGE SEEN ERROR:",
+                error.message
+            );
+
+        }
+
+    }
+);
+        
 
 
         // =================================================
         // GROUP MESSAGE PINNED
         // =================================================
+socket.on(
+    "groupMessagePinned",
+    async (message) => {
 
-        socket.on(
-            "groupMessagePinned",
-            (message) => {
+        try {
 
-                if (
-                    !message ||
-                    !message._id ||
-                    !message.groupId
-                ) {
-                    return;
-                }
-
-
-                socket
-                    .to(
-                        String(
-                            message.groupId
-                        )
-                    )
-                    .emit(
-                        "groupMessagePinned",
-                        message
-                    );
-
+            if (
+                !message ||
+                !message._id ||
+                !message.groupId ||
+                !socket.username
+            ) {
+                return;
             }
-        );
+
+            const Group = mongoose.model("Group");
+
+            const group = await Group.findById(
+                message.groupId
+            );
+
+            if (!group) {
+                return;
+            }
+
+            const isMember =
+                group.members.includes(socket.username) ||
+                group.owner === socket.username;
+
+            if (!isMember) {
+                return;
+            }
+
+            socket
+                .to(String(group._id))
+                .emit(
+                    "groupMessagePinned",
+                    message
+                );
+
+        } catch (error) {
+
+            console.error(
+                "GROUP MESSAGE PINNED ERROR:",
+                error.message
+            );
+
+        }
+
+    }
+);
+ 
 
 
         // =================================================
@@ -709,31 +800,56 @@ io.on(
         // =================================================
 
         socket.on(
-            "groupMessageUnpinned",
-            (message) => {
+    "groupMessageUnpinned",
+    async (message) => {
 
-                if (
-                    !message ||
-                    !message._id ||
-                    !message.groupId
-                ) {
-                    return;
-                }
+        try {
 
-
-                socket
-                    .to(
-                        String(
-                            message.groupId
-                        )
-                    )
-                    .emit(
-                        "groupMessageUnpinned",
-                        message
-                    );
-
+            if (
+                !message ||
+                !message._id ||
+                !message.groupId ||
+                !socket.username
+            ) {
+                return;
             }
-        );
+
+            const Group = mongoose.model("Group");
+
+            const group = await Group.findById(
+                message.groupId
+            );
+
+            if (!group) {
+                return;
+            }
+
+            const isMember =
+                group.members.includes(socket.username) ||
+                group.owner === socket.username;
+
+            if (!isMember) {
+                return;
+            }
+
+            socket
+                .to(String(group._id))
+                .emit(
+                    "groupMessageUnpinned",
+                    message
+                );
+
+        } catch (error) {
+
+            console.error(
+                "GROUP MESSAGE UNPINNED ERROR:",
+                error.message
+            );
+
+        }
+
+    }
+);
 
 
         // =================================================
@@ -741,41 +857,57 @@ io.on(
         // =================================================
 
         socket.on(
-            "groupTyping",
-            (data) => {
+    "groupTyping",
+    async (data) => {
 
-                if (!data) {
-                    return;
-                }
+        try {
 
-
-                const {
-                    groupId,
-                    username
-                } = data;
-
-
-                if (
-                    !groupId ||
-                    !username
-                ) {
-                    return;
-                }
-
-
-                socket
-                    .to(
-                        String(groupId)
-                    )
-                    .emit(
-                        "groupTyping",
-                        {
-                            username
-                        }
-                    );
-
+            if (
+                !data ||
+                !data.groupId ||
+                !socket.username
+            ) {
+                return;
             }
-        );
+
+            const Group = mongoose.model("Group");
+
+            const group = await Group.findById(
+                data.groupId
+            );
+
+            if (!group) {
+                return;
+            }
+
+            const isMember =
+                group.members.includes(socket.username) ||
+                group.owner === socket.username;
+
+            if (!isMember) {
+                return;
+            }
+
+            socket
+                .to(String(group._id))
+                .emit(
+                    "groupTyping",
+                    {
+                        username: socket.username
+                    }
+                );
+
+        } catch (error) {
+
+            console.error(
+                "GROUP TYPING ERROR:",
+                error.message
+            );
+
+        }
+
+    }
+);
 
 
         // =================================================
@@ -783,41 +915,57 @@ io.on(
         // =================================================
 
         socket.on(
-            "groupStopTyping",
-            (data) => {
+    "groupStopTyping",
+    async (data) => {
 
-                if (!data) {
-                    return;
-                }
+        try {
 
-
-                const {
-                    groupId,
-                    username
-                } = data;
-
-
-                if (
-                    !groupId ||
-                    !username
-                ) {
-                    return;
-                }
-
-
-                socket
-                    .to(
-                        String(groupId)
-                    )
-                    .emit(
-                        "groupStopTyping",
-                        {
-                            username
-                        }
-                    );
-
+            if (
+                !data ||
+                !data.groupId ||
+                !socket.username
+            ) {
+                return;
             }
-        );
+
+            const Group = mongoose.model("Group");
+
+            const group = await Group.findById(
+                data.groupId
+            );
+
+            if (!group) {
+                return;
+            }
+
+            const isMember =
+                group.members.includes(socket.username) ||
+                group.owner === socket.username;
+
+            if (!isMember) {
+                return;
+            }
+
+            socket
+                .to(String(group._id))
+                .emit(
+                    "groupStopTyping",
+                    {
+                        username: socket.username
+                    }
+                );
+
+        } catch (error) {
+
+            console.error(
+                "GROUP STOP TYPING ERROR:",
+                error.message
+            );
+
+        }
+
+    }
+);
 
 
         // =================================================
@@ -825,31 +973,56 @@ io.on(
         // =================================================
 
         socket.on(
-            "groupMessageDeleted",
-            (message) => {
+    "groupMessageDeleted",
+    async (message) => {
 
-                if (
-                    !message ||
-                    !message._id ||
-                    !message.groupId
-                ) {
-                    return;
-                }
+        try {
 
-
-                socket
-                    .to(
-                        String(
-                            message.groupId
-                        )
-                    )
-                    .emit(
-                        "groupMessageDeleted",
-                        message
-                    );
-
+            if (
+                !message ||
+                !message._id ||
+                !message.groupId ||
+                !socket.username
+            ) {
+                return;
             }
-        );
+
+            const Group = mongoose.model("Group");
+
+            const group = await Group.findById(
+                message.groupId
+            );
+
+            if (!group) {
+                return;
+            }
+
+            const isMember =
+                group.members.includes(socket.username) ||
+                group.owner === socket.username;
+
+            if (!isMember) {
+                return;
+            }
+
+            socket
+                .to(String(group._id))
+                .emit(
+                    "groupMessageDeleted",
+                    message
+                );
+
+        } catch (error) {
+
+            console.error(
+                "GROUP MESSAGE DELETED ERROR:",
+                error.message
+            );
+
+        }
+
+    }
+);
 
 
         // =================================================
@@ -857,30 +1030,56 @@ io.on(
         // =================================================
 
         socket.on(
-            "groupMessageEdited",
-            (message) => {
+    "groupMessageEdited",
+    async (message) => {
 
-                if (
-                    !message ||
-                    !message.groupId
-                ) {
-                    return;
-                }
+        try {
 
-
-                socket
-                    .to(
-                        String(
-                            message.groupId
-                        )
-                    )
-                    .emit(
-                        "groupMessageEdited",
-                        message
-                    );
-
+            if (
+                !message ||
+                !message._id ||
+                !message.groupId ||
+                !socket.username
+            ) {
+                return;
             }
-        );
+
+            const Group = mongoose.model("Group");
+
+            const group = await Group.findById(
+                message.groupId
+            );
+
+            if (!group) {
+                return;
+            }
+
+            const isMember =
+                group.members.includes(socket.username) ||
+                group.owner === socket.username;
+
+            if (!isMember) {
+                return;
+            }
+
+            socket
+                .to(String(group._id))
+                .emit(
+                    "groupMessageEdited",
+                    message
+                );
+
+        } catch (error) {
+
+            console.error(
+                "GROUP MESSAGE EDITED ERROR:",
+                error.message
+            );
+
+        }
+
+    }
+);
 
 
         // =================================================
@@ -888,64 +1087,50 @@ io.on(
         // =================================================
 
         socket.on(
-            "join",
-            async (username) => {
+    "join",
+    async () => {
 
-                try {
+        try {
 
-                    if (!username) {
-                        return;
-                    }
+            const username = socket.username;
 
-
-                    socket.username =
-                        username;
-
-
-                    socket.join(
-                        username
-                    );
-
-
-                    await mongoose
-                        .model("User")
-                        .updateOne(
-
-                            {
-                                username
-                            },
-
-                            {
-                                online:
-                                    true
-                            }
-
-                        );
-
-
-                    io.emit(
-                        "userOnline",
-                        username
-                    );
-
-
-                    console.log(
-                        username +
-                        " joined"
-                    );
-
-
-                } catch (err) {
-
-                    console.error(
-                        "SOCKET JOIN ERROR:",
-                        err
-                    );
-
-                }
-
+            if (!username || !socket.userId) {
+                return;
             }
-        );
+
+            socket.join(username);
+
+            await mongoose
+                .model("User")
+                .updateOne(
+                    {
+                        _id: socket.userId
+                    },
+                    {
+                        online: true
+                    }
+                );
+
+            io.emit(
+                "userOnline",
+                username
+            );
+
+            console.log(
+                username + " joined"
+            );
+
+        } catch (err) {
+
+            console.error(
+                "SOCKET JOIN ERROR:",
+                err.message
+            );
+
+        }
+
+    }
+);
 
 
         // =================================================
@@ -953,31 +1138,28 @@ io.on(
         // =================================================
 
         socket.on(
-            "typing",
-            (data) => {
+    "typing",
+    (data) => {
 
-                if (
-                    !data ||
-                    !data.receiver
-                ) {
-                    return;
+        if (
+            !data ||
+            !data.receiver ||
+            !socket.username
+        ) {
+            return;
+        }
+
+        socket
+            .to(data.receiver)
+            .emit(
+                "typing",
+                {
+                    sender: socket.username
                 }
+            );
 
-
-                socket
-                    .to(
-                        data.receiver
-                    )
-                    .emit(
-                        "typing",
-                        {
-                            sender:
-                                data.sender
-                        }
-                    );
-
-            }
-        );
+    }
+);
 
 
         // =================================================
@@ -985,27 +1167,28 @@ io.on(
         // =================================================
 
         socket.on(
-            "stopTyping",
-            (data) => {
+    "stopTyping",
+    (data) => {
 
-                if (
-                    !data ||
-                    !data.receiver
-                ) {
-                    return;
+        if (
+            !data ||
+            !data.receiver ||
+            !socket.username
+        ) {
+            return;
+        }
+
+        socket
+            .to(data.receiver)
+            .emit(
+                "stopTyping",
+                {
+                    sender: socket.username
                 }
+            );
 
-
-                socket
-                    .to(
-                        data.receiver
-                    )
-                    .emit(
-                        "stopTyping"
-                    );
-
-            }
-        );
+    }
+);
 
 
         // =================================================
@@ -1013,43 +1196,59 @@ io.on(
         // =================================================
 
         socket.on(
-            "newMessage",
-            (msg) => {
+    "newMessage",
+    async (msg) => {
 
-                if (
-                    !msg ||
-                    !msg.receiver
-                ) {
-                    return;
-                }
+        try {
 
-
-                // Delivered
-                io
-                    .to(
-                        msg.receiver
-                    )
-                    .emit(
-                        "messageDelivered",
-                        {
-                            messageId:
-                                msg._id
-                        }
-                    );
-
-
-                // Receive message
-                io
-                    .to(
-                        msg.receiver
-                    )
-                    .emit(
-                        "receiveMessage",
-                        msg
-                    );
-
+            if (
+                !msg ||
+                !msg._id ||
+                !msg.receiver ||
+                !socket.username
+            ) {
+                return;
             }
-        );
+
+            const Message = mongoose.model("Message");
+
+            const savedMessage = await Message.findOne({
+                _id: msg._id,
+                sender: socket.username,
+                receiver: msg.receiver
+            }).lean();
+
+            if (!savedMessage) {
+                return;
+            }
+
+            io
+                .to(msg.receiver)
+                .emit(
+                    "messageDelivered",
+                    {
+                        messageId: String(savedMessage._id)
+                    }
+                );
+
+            io
+                .to(msg.receiver)
+                .emit(
+                    "receiveMessage",
+                    savedMessage
+                );
+
+        } catch (error) {
+
+            console.error(
+                "NEW MESSAGE SOCKET ERROR:",
+                error.message
+            );
+
+        }
+
+    }
+);
 
 
         // =================================================
@@ -1057,32 +1256,51 @@ io.on(
         // =================================================
 
         socket.on(
-            "messageSeen",
-            (data) => {
+    "messageSeen",
+    async (data) => {
 
-                if (
-                    !data ||
-                    !data.sender ||
-                    !data.messageId
-                ) {
-                    return;
-                }
+        try {
 
-
-                io
-                    .to(
-                        data.sender
-                    )
-                    .emit(
-                        "messageSeen",
-                        {
-                            messageId:
-                                data.messageId
-                        }
-                    );
-
+            if (
+                !data ||
+                !data.messageId ||
+                !socket.username
+            ) {
+                return;
             }
-        );
+
+            const Message = mongoose.model("Message");
+
+            const message = await Message.findOne({
+                _id: data.messageId,
+                receiver: socket.username,
+                sender: data.sender
+            }).lean();
+
+            if (!message) {
+                return;
+            }
+
+            io
+                .to(message.sender)
+                .emit(
+                    "messageSeen",
+                    {
+                        messageId: String(message._id)
+                    }
+                );
+
+        } catch (error) {
+
+            console.error(
+                "MESSAGE SEEN SOCKET ERROR:",
+                error.message
+            );
+
+        }
+
+    }
+);
 
 
         // =================================================
