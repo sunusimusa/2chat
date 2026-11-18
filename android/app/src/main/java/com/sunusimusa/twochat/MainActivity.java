@@ -39,7 +39,6 @@ static final String ACTION_FCM_TOKEN_REFRESHED =
     private boolean fcmTokenReceiverRegistered = false;
 
     private WebView webView;
-    private String pendingFcmToken;
     private ValueCallback<Uri[]> filePathCallback;
 
     private static final int FILE_CHOOSER_REQUEST = 1001;

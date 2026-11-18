@@ -3,6 +3,7 @@ const cloudinary = require("../config/cloudinary");
 const Notification = require("../models/Notification");
 const User = require("../models/User");
 const streamifier = require("streamifier");
+const { sendPushNotification } = require("../services/notificationService");
 
 // ================= SEND MESSAGE =================
 exports.sendMessage = async (req, res) => {
@@ -105,6 +106,13 @@ text:`${sender} sent you a message 📨`
 
 });
 
+sendPushNotification({
+    recipientUsername: receiver,
+    title: sender,
+    body: `${sender} sent you a photo 📷`,
+    data: { type: "message", sender, receiver }
+}).catch(err => console.error("Image push error:", err));
+
 return res.json({
 
 success:true,
@@ -163,6 +171,13 @@ type:"message",
 text:`${sender} sent you a message 📨`
 
 });
+
+sendPushNotification({
+    recipientUsername: receiver,
+    title: sender,
+    body: `${sender} sent you a message 📨`,
+    data: { type: "message", sender, receiver }
+}).catch(err => console.error("Chat push error:", err));
 
 return res.json({
 
@@ -269,6 +284,13 @@ type:"message",
 text:`${sender} sent you a voice message 🎤`
 
 });
+
+sendPushNotification({
+    recipientUsername: receiver,
+    title: sender,
+    body: `${sender} sent you a voice message 🎤`,
+    data: { type: "message", sender, receiver }
+}).catch(err => console.error("Voice push error:", err));
 
 return res.json({
 

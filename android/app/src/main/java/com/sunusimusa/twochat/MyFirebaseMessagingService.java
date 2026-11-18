@@ -1,3 +1,4 @@
+
 package com.sunusimusa.twochat;
 
 import android.app.Notification;
@@ -15,8 +16,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String CHANNEL_ID = "2chat_messages";
 
-
-        @Override
+    @Override
     public void onNewToken(String token) {
         super.onNewToken(token);
 
@@ -43,7 +43,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String body = "You have a new notification.";
 
         if (remoteMessage.getNotification() != null) {
-
             if (remoteMessage.getNotification().getTitle() != null) {
                 title = remoteMessage.getNotification().getTitle();
             }
@@ -65,7 +64,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void showNotification(String title, String body) {
-
         NotificationManager manager =
                 (NotificationManager) getSystemService(
                         Context.NOTIFICATION_SERVICE
@@ -76,7 +74,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
             NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,
                     "2Chat Messages",
@@ -128,5 +125,4 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 notification
         );
     }
-    }
-                  
+}
