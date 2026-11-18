@@ -510,26 +510,57 @@ io.on(
         // =================================================
 
         socket.on(
-            "joinGroup",
-            (groupId) => {
+    "joinGroup",
+    async (groupId) => {
 
-                if (!groupId) {
-                    return;
-                }
+        try {
 
-
-                socket.join(
-                    String(groupId)
-                );
-
-
-                console.log(
-                    "👥 Joined Group:",
-                    groupId
-                );
-
+            if (!groupId || !socket.username) {
+                return;
             }
-        );
+
+            const Group = mongoose.model("Group");
+
+            const group = await Group.findById(groupId);
+
+            if (!group) {
+                return;
+            }
+
+            const isMember =
+                group.members.includes(socket.username) ||
+                group.owner === socket.username;
+
+            if (!isMember) {
+                socket.emit(
+                    "groupJoinError",
+                    {
+                        message: "You are not a member of this group."
+                    }
+                );
+
+                return;
+            }
+
+            socket.join(String(group._id));
+
+            console.log(
+                "👥 Joined Group:",
+                group._id,
+                socket.username
+            );
+
+        } catch (error) {
+
+            console.error(
+                "JOIN GROUP ERROR:",
+                error.message
+            );
+
+        }
+
+    }
+);
 
 
         // =================================================
