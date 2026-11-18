@@ -10,7 +10,11 @@ if (!user) {
     throw new Error("User not logged in");
 }
 
-const socket = io();
+const socket = io({
+    auth: {
+        token: localStorage.getItem("token")
+    }
+});
 
 const params = new URLSearchParams(location.search);
 const receiver = params.get("user");
