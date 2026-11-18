@@ -3,6 +3,9 @@ package com.sunusimusa.twochat;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.Context;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.media.MediaRecorder;
 import android.net.Uri;
@@ -28,6 +31,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends Activity {
+
+static final String ACTION_FCM_TOKEN_REFRESHED =
+"com.sunusimusa.twochat.FCM_TOKEN_REFRESHED";
+
+    private BroadcastReceiver fcmTokenReceiver;
+    private boolean fcmTokenReceiverRegistered = false;
 
     private WebView webView;
     private String pendingFcmToken;
@@ -149,6 +158,8 @@ public class MainActivity extends Activity {
 
         setContentView(webView);
 
+        registerFcmTokenReceiver();
+
         requestNotificationPermission();
 
         FirebaseMessaging.getInstance().getToken()
@@ -176,8 +187,66 @@ public class MainActivity extends Activity {
         webView.loadUrl(APP_URL + "/home.html");
     }
 
-        
 
+
+
+    private void registerFcmTokenReceiver() {
+    if (fcmTokenReceiverRegistered) {
+        return;
+    }
+
+    fcmTokenReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null ||
+                    !ACTION_FCM_TOKEN_REFRESHED.equals(intent.getAction())) {
+                return;
+            }
+
+            String refreshedToken = intent.getStringExtra("fcm_token");
+
+            if (refreshedToken == null || refreshedToken.trim().isEmpty()) {
+                return;
+            }
+
+            pendingFcmToken = refreshedToken.trim();
+            fcmRetryCount = 0;
+
+            deliverFcmToken();
+        }
+    };
+
+    IntentFilter filter = new IntentFilter(ACTION_FCM_TOKEN_REFRESHED);
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        registerReceiver(
+                fcmTokenReceiver,
+                filter,
+                Context.RECEIVER_NOT_EXPORTED
+        );
+    } else {
+        registerReceiver(fcmTokenReceiver, filter);
+    }
+
+    fcmTokenReceiverRegistered = true;
+}
+
+private void unregisterFcmTokenReceiver() {
+    if (fcmTokenReceiverRegistered && fcmTokenReceiver != null) {
+        try {
+            unregisterReceiver(fcmTokenReceiver);
+        } catch (IllegalArgumentException e) {
+            android.util.Log.w(
+                    "2ChatFCM",
+                    "FCM receiver was already unregistered."
+            );
+        }
+
+        fcmTokenReceiverRegistered = false;
+        fcmTokenReceiver = null;
+    }
+}
+    
 private int fcmRetryCount = 0;
 private static final int MAX_FCM_RETRIES = 15;
 
@@ -813,6 +882,8 @@ private void deliverFcmToken() {
 
     @Override
     protected void onDestroy() {
+
+        unregisterFcmTokenReceiver();
 
         pendingNativeStart = false;
 
