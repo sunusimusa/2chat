@@ -14,15 +14,15 @@ exports.sendMessage = async (req, res) => {
     try {
 
         const {
-            groupId,
-            sender,
-            text,
-            voiceDuration,
-            replyTo,
-            replyUser,
-            replyText,
-            replyImage
-        } = req.body;
+    groupId,
+    text,
+    voiceDuration,
+    replyTo,
+    replyText,
+    replyImage
+} = req.body;
+
+const sender = req.user.username;
 
 
         const imageFile =
@@ -69,6 +69,17 @@ exports.sendMessage = async (req, res) => {
             });
 
         }
+
+        const isMember =
+    group.members.includes(sender) ||
+    group.owner === sender;
+
+if (!isMember) {
+    return res.status(403).json({
+        success: false,
+        message: "You are not a member of this group."
+           });
+         }
 
 
         let image = "";
@@ -367,8 +378,34 @@ exports.getMessages = async (req, res) => {
 
     try {
 
+        const group =
+            await Group.findById(
+                req.params.groupId
+            );
+
+        if (!group) {
+            return res.status(404).json({
+                success: false,
+                message: "Group not found."
+            });
+        }
+
+        const username = req.user.username;
+
+        const isMember =
+            group.members.includes(username) ||
+            group.owner === username;
+
+        if (!isMember) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not a member of this group."
+            });
+        }
+
         const messages =
             await GroupMessage.find({
+
 
                 groupId:
                     req.params.groupId
@@ -422,32 +459,58 @@ exports.reactToMessage = async (req, res) => {
     try {
 
         const {
-            messageId,
-            username,
-            emoji
-        } = req.body;
+        messageId,
+        emoji
+    } = req.body;
+
+const username = req.user.username;
 
 
         // ==================================================
         // CHECK REQUIRED
         // ==================================================
+        
+if (!messageId || !emoji) {
+    return res.status(400).json({
+        success: false,
+        message: "messageId and emoji are required."
+    });
+}
 
-        if (
-            !messageId ||
-            !username ||
-            !emoji
-        ) {
+// FIND MESSAGE
+const message = await GroupMessage.findById(messageId);
 
-            return res.status(400).json({
+if (!message) {
+    return res.status(404).json({
+        success: false,
+        message: "Message not found."
+    });
+}
 
-                success: false,
+// AUTHENTICATED USER
+const username = req.user.username;
 
-                message:
-                    "messageId, username and emoji are required."
+// FIND GROUP
+const group = await Group.findById(message.groupId);
 
-            });
+if (!group) {
+    return res.status(404).json({
+        success: false,
+        message: "Group not found."
+    });
+}
 
-        }
+// CHECK MEMBERSHIP
+const isMember =
+    group.members.includes(username) ||
+    group.owner === username;
+
+if (!isMember) {
+    return res.status(403).json({
+        success: false,
+        message: "You are not a member of this group."
+    });
+}
 
 
         // ==================================================
@@ -630,13 +693,18 @@ exports.deleteMessage = async (req, res) => {
 
     try {
 
-        const {
-            messageId,
-            username
-        } = req.body;
+        const { messageId } = req.body;
 
-        if (!messageId || !username) {
+const username = req.user.username;
 
+if (!messageId) {
+    return res.status(400).json({
+        success: false,
+        message: "messageId is required."
+    });
+}
+
+       
             return res.status(400).json({
 
                 success: false,
@@ -774,13 +842,20 @@ exports.editMessage = async (req, res) => {
     try {
 
         const {
-            messageId,
-            username,
-            text
-        } = req.body;
+    messageId,
+    text
+} = req.body;
 
-        if (!messageId || !username) {
+const username = req.user.username;
 
+if (!messageId) {
+    return res.status(400).json({
+        success: false,
+        message: "messageId is required."
+    });
+}
+
+        
             return res.status(400).json({
                 success: false,
                 message: "messageId and username are required."
@@ -867,17 +942,20 @@ exports.markMessageAsSeen = async (req, res) => {
 
     try {
 
-        const {
-            messageId,
-            username
-        } = req.body;
+        const { messageId } = req.body;
 
+       const username = req.user.username;
 
         // ==================================================
         // CHECK REQUIRED
         // ==================================================
-
-        if (!messageId || !username) {
+        
+        if (!messageId) {
+           return res.status(400).json({
+                success: false,
+                message: "messageId is required."
+            });
+        }
 
             return res.status(400).json({
 
@@ -1004,13 +1082,17 @@ exports.pinMessage = async (req, res) => {
 
     try {
 
-        const {
-            messageId,
-            username
-        } = req.body;
+        const { messageId } = req.body;
 
-        if (!messageId || !username) {
+const username = req.user.username;
 
+if (!messageId) {
+    return res.status(400).json({
+        success: false,
+        message: "messageId is required."
+    });
+}
+        
             return res.status(400).json({
 
                 success: false,
@@ -1126,13 +1208,17 @@ exports.unpinMessage = async (req, res) => {
 
     try {
 
-        const {
-            messageId,
-            username
-        } = req.body;
+        const { messageId } = req.body;
 
-        if (!messageId || !username) {
+const username = req.user.username;
 
+if (!messageId) {
+    return res.status(400).json({
+        success: false,
+        message: "messageId is required."
+    });
+}
+        
             return res.status(400).json({
 
                 success: false,
