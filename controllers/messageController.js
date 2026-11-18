@@ -23,7 +23,7 @@ const sender = req.user.username;
   
 if(!sender || !receiver){
 
-return res.json({
+return res.status(400).json({
 success:false,
 message:"Sender or receiver missing."
 });
@@ -81,7 +81,8 @@ receiver,
 
 text:text || "",
 image,
-
+type: image ? "image" : "text",
+  
 replyTo:replyTo || null,
 replyText:replyText || "",
 replyImage:replyImage || "",
@@ -139,7 +140,8 @@ receiver,
 
 text:text || "",
 image,
-
+type: image ? "image" : "text",
+  
 replyTo:replyTo || null,
 replyText:replyText || "",
 replyImage:replyImage || "",
@@ -195,7 +197,7 @@ const sender = req.user.username;
   
 if(!sender || !receiver){
 
-return res.json({
+return res.status(400).json({
 success:false,
 message:"Sender or receiver missing."
 });
@@ -250,6 +252,7 @@ receiver,
 text:"",
 image:"",
 voice:result.secure_url,
+type:"voice",
 
 voiceDuration:Number(req.body.duration) || 0,
 
