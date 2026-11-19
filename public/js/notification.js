@@ -1,108 +1,126 @@
-const user =
-JSON.parse(
-localStorage.getItem("user")
-);
+const user = JSON.parse(localStorage.getItem("user"));
+const token = localStorage.getItem("token");
 
-if(!user){
+const container = document.getElementById("notifications");
 
-location.href="/login.html";
+if (!user || !token) {
+    location.href = "/login.html";
+}
+
+async function loadNotifications() {
+
+    container.innerHTML = "<p>Loading notifications...</p>";
+
+    try {
+
+        const res = await fetch(
+            "/api/notifications/" + encodeURIComponent(user.username),
+            {
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+            throw new Error(data.message || "Unable to load notifications.");
+        }
+
+        let html = "";
+
+        if (!data.notifications || data.notifications.length === 0) {
+
+            html = `
+                <h3 style="text-align:center;margin-top:50px;">
+                    No Notifications Yet
+                </h3>
+            `;
+
+        } else {
+
+            data.notifications.forEach(n => {
+
+                html += `
+                    <div
+                        class="notification ${n.read ? "" : "unread"}"
+                        onclick="readNotification('${n._id}','${n.type}','${n.postId || ""}')">
+
+                        <h3>${n.text}</h3>
+
+                        <div class="time">
+                            ${new Date(n.createdAt).toLocaleString()}
+                        </div>
+
+                    </div>
+                `;
+
+            });
+
+        }
+
+        container.innerHTML = html;
+
+    } catch (error) {
+
+        console.error("Notification Loading Error:", error);
+
+        container.innerHTML = `
+            <p style="text-align:center;margin-top:40px;color:red;">
+                Failed to load notifications.
+                Please refresh and try again.
+            </p>
+        `;
+
+    }
 
 }
 
-async function loadNotifications(){
 
-const res =
-await fetch(
-"/api/notifications/" + user.username
-);
+async function readNotification(id, type, postId) {
 
-const data =
-await res.json();
+    try {
 
-if(!data.success){
+        const res = await fetch(
+            "/api/notifications/read",
+            {
+                method: "PUT",
 
-return;
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
 
-}
+                body: JSON.stringify({ id })
+            }
+        );
 
-let html="";
+        const data = await res.json();
 
-if(data.notifications.length===0){
+        if (!res.ok || !data.success) {
+            throw new Error(data.message || "Unable to mark notification as read.");
+        }
 
-html = `
-<h3 style="text-align:center;margin-top:50px;">
-No Notifications Yet
-</h3>
-`;
+        if (type === "like" || type === "comment") {
 
-}else{
+            if (postId) {
+                location.href = "/post.html?id=" + encodeURIComponent(postId);
+                return;
+            }
 
-data.notifications.forEach(n=>{
+        }
 
-html += `
+        await loadNotifications();
 
-<div
-class="notification ${n.read ? "" : "unread"}"
-onclick="readNotification('${n._id}','${n.type}','${n.postId || ""}')">
+    } catch (error) {
 
-<h3>
+        console.error("Mark Notification Read Error:", error);
+        alert("Unable to open notification. Please try again.");
 
-${n.text}
-
-</h3>
-
-<div class="time">
-
-${new Date(n.createdAt).toLocaleString()}
-
-</div>
-
-</div>
-
-`;
-
-});
-
-}
-
-document.getElementById("notifications").innerHTML =
-html;
-
-}
-
-async function readNotification(id,type,postId){
-
-await fetch(
-
-"/api/notifications/read",
-
-{
-
-method:"PUT",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-id
-})
-
-}
-
-);
-
-if(type==="like" || type==="comment"){
-
-location.href =
-"/post.html?id="+postId;
-
-return;
+    }
 
 }
 
 loadNotifications();
-
-}
-
-loadNotifications();
+            
