@@ -1292,21 +1292,39 @@ body{
 
     }
 
+
+/* =====================================================
+   2CHAT HOME FEED VIDEO
+===================================================== */
+
 .post-video{
     width:100%;
+    max-width:100%;
     margin-top:10px;
     overflow:hidden;
-    border-radius:15px;
+    border-radius:12px;
     background:#000;
 }
 
 .post-video video{
-    width:100%;
-    max-height:600px;
     display:block;
+    width:100%;
+    height:auto;
+    max-height:420px;
+    aspect-ratio:4 / 5;
     object-fit:contain;
     background:#000;
 }
+
+/* MOBILE */
+@media(max-width:600px){
+
+    .post-video video{
+        max-height:420px;
+    }
+
+}
+
 
 .video-btn{
     display:flex;
