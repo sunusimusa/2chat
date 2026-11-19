@@ -1,1 +1,62 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>2Chat Notification Settings</title>
+
+    <link rel="stylesheet" href="/css/notification-settings.css">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+</head>
+
+<body>
+
+    <header class="settings-header">
+        <button type="button" onclick="history.back()">
+            <i class="fa-solid fa-arrow-left"></i>
+        </button>
+
+        <h2>Notification Settings</h2>
+    </header>
+
+    <main class="settings-container">
+
+        <section class="notification-card">
+
+            <div class="notification-icon">
+                <i class="fa-solid fa-bell"></i>
+            </div>
+
+            <div class="notification-info">
+                <h3>Push Notifications</h3>
+                <p>
+                    Receive notifications about messages and activity
+                    on your 2Chat account.
+                </p>
+            </div>
+
+            <label class="switch">
+                <input
+                    type="checkbox"
+                    id="notificationsToggle"
+                    disabled
+                >
+                <span class="slider"></span>
+            </label>
+
+        </section>
+
+        <p id="settingsMessage" role="status">
+            Loading notification settings...
+        </p>
+
+    </main>
+
+    <script src="/js/notification-settings.js"></script>
+
+</body>
+</html>
