@@ -1242,9 +1242,12 @@ if(
                         method:"PUT",
 
                         headers:{
-                            "Content-Type":
-                                "application/json"
-                        },
+    "Content-Type":
+        "application/json",
+
+    "Authorization":
+        "Bearer " + localStorage.getItem("token")
+},
 
                         body:JSON.stringify({
 
@@ -2381,9 +2384,12 @@ reactionPicker
                             method:"PUT",
 
                             headers:{
-                                "Content-Type":
-                                    "application/json"
-                            },
+    "Content-Type":
+        "application/json",
+
+    "Authorization":
+        "Bearer " + localStorage.getItem("token")
+},
 
                             body:JSON.stringify({
 
@@ -2744,10 +2750,13 @@ editAction.addEventListener(
                         method:"PUT",
 
                         headers:{
-                            "Content-Type":
-                                "application/json"
-                        },
+    "Content-Type":
+        "application/json",
 
+    "Authorization":
+        "Bearer " + localStorage.getItem("token")
+},
+                        
                         body:JSON.stringify({
 
                             messageId:
@@ -3038,9 +3047,13 @@ pinAction.addEventListener(
                         method: "PUT",
 
                         headers:{
-                            "Content-Type":
-                                "application/json"
-                        },
+    "Content-Type":
+        "application/json",
+
+    "Authorization":
+        "Bearer " + localStorage.getItem("token")
+},
+                        
 
                         body: JSON.stringify({
 
