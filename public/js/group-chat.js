@@ -228,9 +228,22 @@ async function loadMessages(){
 
     try{
 
-        const res =
-        await fetch("/api/group-messages/" + groupId);
+        const token = localStorage.getItem("token");
 
+if (!token) {
+    console.error("Authentication token not found");
+    return;
+}
+
+const res = await fetch(
+    "/api/group-messages/" + groupId,
+    {
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    }
+);
+    
         const data =
         await res.json();
 
