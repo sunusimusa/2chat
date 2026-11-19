@@ -33,6 +33,23 @@ if (!user) {
 
 }
 
+// =====================================================
+// AUTHENTICATED API HEADERS
+// =====================================================
+
+function getAuthHeaders(extraHeaders = {}) {
+
+    const token = localStorage.getItem("token");
+
+    return {
+        ...extraHeaders,
+        ...(token ? {
+            "Authorization": "Bearer " + token
+        } : {})
+    };
+
+}
+
 
 // =====================================================
 // CREATE POST AVATAR
@@ -328,10 +345,9 @@ async function commentPost(postId){
                 {
                     method:"PUT",
 
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
+                    headers: getAuthHeaders({
+    "Content-Type": "application/json"
+}),
 
                     body:JSON.stringify({
                         postId,
@@ -414,17 +430,16 @@ async function editPost(
 
     try{
 
-        const res =
-            await fetch(
-                "/api/posts/edit",
-                {
-                    method:"PUT",
-
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-
+        const res = await fetch("/api/posts/edit", {
+    method: "PUT",
+    headers: getAuthHeaders({
+        "Content-Type": "application/json"
+    }),
+    body: JSON.stringify({
+        // Ka bar bayanan da suke nan yadda suke
+    })
+});
+        
                     body:JSON.stringify({
                         postId,
                         text
@@ -565,14 +580,14 @@ async function createPost() {
 
     try {
 
-        const res =
-            await fetch(
-                "/api/posts/create",
-                {
-                    method: "POST",
-                    body: formData
-                }
-            );
+        const res = await fetch(
+    "/api/posts/create",
+    {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: formData
+    }
+);
 
         const data =
             await res.json();
@@ -766,14 +781,13 @@ async function loadNotificationCount(){
 
     try{
 
-        const res =
-            await fetch(
-                "/api/notifications/count/" +
-                encodeURIComponent(
-                    user.username
-                )
-            );
-
+        const res = await fetch(
+    "/api/notifications/count/" +
+    encodeURIComponent(user.username),
+    {
+        headers: getAuthHeaders()
+    }
+);
 
         const data =
             await res.json();
