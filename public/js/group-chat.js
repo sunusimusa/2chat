@@ -186,7 +186,22 @@ async function loadGroup(){
 
     try{
 
-        const res = await fetch("/api/groups/" + groupId);
+        const token = localStorage.getItem("token");
+
+if (!token) {
+    alert("Your session has expired. Please login again.");
+    return;
+}
+
+const res = await fetch(
+    "/api/groups/" + groupId,
+    {
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    }
+);
+
         
         const data = await res.json();
 
