@@ -132,6 +132,10 @@ const userSchema = new mongoose.Schema(
     select: false
   },
 
+    notificationsEnabled: {
+    type: Boolean,
+    default: true
+  },
 
     // =========================================
     // SAVED SHORT VIDEOS
