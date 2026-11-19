@@ -1535,14 +1535,24 @@ if(recordedVoice){
 
     try{
 
-        const res = await fetch(
-            "/api/group-messages/send",
-            {
-                method:"POST",
-                body:formData
-            }
-        );
+        const token = localStorage.getItem("token");
 
+if (!token) {
+    alert("Your session has expired. Please login again.");
+    return;
+}
+
+const res = await fetch(
+    "/api/group-messages/send",
+    {
+        method: "POST",
+        headers: {
+            "Authorization": "Bearer " + token
+        },
+        body: formData
+    }
+);
+        
         // ==========================
         // READ RESPONSE
         // ==========================
