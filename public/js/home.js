@@ -435,11 +435,7 @@ async function editPost(
     headers: getAuthHeaders({
         "Content-Type": "application/json"
     }),
-    body: JSON.stringify({
-        // Ka bar bayanan da suke nan yadda suke
-    })
-});
-        
+    
                     body:JSON.stringify({
                         postId,
                         text
@@ -658,10 +654,9 @@ async function likePost(postId){
                 {
                     method:"PUT",
 
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
+                    headers: getAuthHeaders({
+                 "Content-Type": "application/json"
+                }),
 
                     body:JSON.stringify({
                         postId,
@@ -728,10 +723,9 @@ async function deletePost(postId){
                 {
                     method:"DELETE",
 
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
+                    headers: getAuthHeaders({
+                  "Content-Type": "application/json"
+                 }),
 
                     body:JSON.stringify({
                         postId
