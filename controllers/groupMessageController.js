@@ -324,24 +324,54 @@ if (!isMember) {
         }
 
 
-        await Group.findByIdAndUpdate(
+        // ==================================================
+// GROUP PUSH NOTIFICATIONS
+// ==================================================
 
-            groupId,
+const recipients = [
+    ...new Set([
+        ...group.members,
+        group.owner
+    ])
+].filter(username => username !== sender);
 
-            {
+const notificationTitle = `New message in ${group.name}`;
+const notificationBody = `You have a new message from ${sender}`;
 
-                lastMessage,
+await Promise.all(
+    recipients.map(async (username) => {
 
-                lastMessageSender:
-                    sender,
+        try {
 
-                lastMessageTime:
-                    new Date()
+            await Notification.create({
+                receiver: username,
+                sender,
+                type: "message",
+                text: notificationTitle
+            });
 
-            }
+            await sendPushNotification({
+                recipientUsername: username,
+                title: notificationTitle,
+                body: notificationBody,
+                data: {
+                    type: "group_message",
+                    groupId: String(groupId),
+                    sender
+                }
+            });
 
-        );
+        } catch (error) {
 
+            console.error(
+                `GROUP NOTIFICATION ERROR (${username}):`,
+                error
+            );
+
+        }
+
+    })
+);
 
         // ==================================================
         // RESPONSE
