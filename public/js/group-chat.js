@@ -387,6 +387,7 @@ function observeMessagesForSeen(){
    MARK GROUP MESSAGE AS SEEN
 ========================== */
 
+
 async function markMessageAsSeen(messageElement){
 
     if(!messageElement){
@@ -399,7 +400,6 @@ async function markMessageAsSeen(messageElement){
     const messageSender =
         messageElement.dataset.sender;
 
-    // Ba sai mun mark own message ba
     if(
         !messageId ||
         !messageSender ||
@@ -408,7 +408,6 @@ async function markMessageAsSeen(messageElement){
         return;
     }
 
-    // Kada mu aika sau biyu
     if(
         messageElement.dataset.seen === "true"
     ){
@@ -416,6 +415,14 @@ async function markMessageAsSeen(messageElement){
     }
 
     try{
+
+        const token =
+            localStorage.getItem("token");
+
+        if(!token){
+            console.error("Authentication token not found");
+            return;
+        }
 
         const res =
             await fetch(
@@ -425,7 +432,10 @@ async function markMessageAsSeen(messageElement){
 
                     headers:{
                         "Content-Type":
-                            "application/json"
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer " + token
                     },
 
                     body:JSON.stringify({
@@ -454,14 +464,11 @@ async function markMessageAsSeen(messageElement){
             );
 
             return;
-
         }
 
-        // Mark locally
         messageElement.dataset.seen =
             "true";
 
-        // Notify other group members
         socket.emit(
             "groupMessageSeen",
             {
@@ -486,6 +493,7 @@ async function markMessageAsSeen(messageElement){
     }
 
 }
+
 
 /* ==========================
 APPEND MESSAGE
