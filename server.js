@@ -94,9 +94,12 @@ const CoinPackage =
 const app =
     express();
 
+// Render runs Express behind a trusted proxy.
+// Trust exactly one proxy hop.
+app.set("trust proxy", 1);
+
 const server =
     http.createServer(app);
-
 
 // =====================================================
 // SOCKET.IO
