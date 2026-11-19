@@ -1289,40 +1289,24 @@ body{
 
     }
 
-/* =====================================================
-   2CHAT HOME - CONTROL VIDEO HEIGHT
-===================================================== */
 
-.post-video{
-    width:100%;
-    height:300px;
-    margin-top:10px;
-    overflow:hidden;
-    border-radius:12px;
-    background:#000;
+/* 2CHAT FACEBOOK-STYLE HOME VIDEO */
+
+.post-video {
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: #000;
+    border-radius: 0;
 }
 
-.post-video video{
-    display:block;
-    width:100%;
-    height:300px;
-    max-height:300px;
-    object-fit:contain;
-    background:#000;
-}
-
-/* SMALL MOBILE */
-@media(max-width:600px){
-
-    .post-video{
-        height:280px;
-    }
-
-    .post-video video{
-        height:280px;
-        max-height:280px;
-    }
-
+.post-video video {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 75vh;
+    object-fit: contain;
+    background: #000;
 }
 
 .video-btn{
