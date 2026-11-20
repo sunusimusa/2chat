@@ -303,8 +303,7 @@ exports.addView = async (req, res) => {
          ) {
             return res.status(403).json({
                 success: false,
-                 message: "This video is not
-            available."
+                 message: "This video is not available."
                 });
             }
 
