@@ -486,7 +486,7 @@ exports.getSavedVideos = async (req, res) => {
 
         return res.json({
             success: true,
-            videos: user.savedVideos || []
+            videos: (user.savedVideos || []).filter(Boolean)
         });
 
     } catch (err) {
@@ -537,8 +537,12 @@ exports.getForYouVideos = async (req, res) => {
 
         // Categories daga Saved Videos
         const savedVideos = await ShortVideo.find({
-            _id: { $in: user.savedVideos || [] }
-        });
+    _id: { $in: user.savedVideos || [] },
+    $or: [
+        { moderationStatus: "approved" },
+        { moderationStatus: { $exists: false } }
+    ]
+});
 
         // Ƙara maki daga Comments
         videos.forEach(video => {
