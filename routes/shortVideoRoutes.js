@@ -4,6 +4,8 @@ const upload = require("../middleware/upload");
 
 const protect = require("../middleware/auth");
 
+const adminAuth = require("../middleware/adminAuth");
+
 const {
     uploadVideo,
     getVideos,
@@ -11,6 +13,7 @@ const {
     commentVideo,
     addView,
     saveVideo,
+    migrateLegacyShorts,
     getSavedVideos,
     getForYouVideos,
     addWatchTime,
@@ -31,6 +34,13 @@ router.post(
     protect,
     upload.single("video"),
     uploadVideo
+);
+
+router.post(
+    "/admin/migrate-legacy",
+    protect,
+    adminAuth,
+    migrateLegacyShorts
 );
 
 // Get All Videos
