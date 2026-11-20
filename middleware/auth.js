@@ -3,31 +3,24 @@ const User = require("../models/User");
 
 const protect = async (req, res, next) => {
     try {
-
         const authHeader = req.headers.authorization;
 
-        if (
-            !authHeader ||
-            !authHeader.startsWith("Bearer ")
-        ) {
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
             return res.status(401).json({
                 success: false,
                 message: "Not authorized"
             });
         }
 
-        const token =
-            authHeader.split(" ")[1];
+        const token = authHeader.split(" ")[1];
 
-        const decoded =
-            jwt.verify(
-                token,
-                process.env.JWT_SECRET
-            );
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET
+        );
 
-        const user =
-            await User.findById(decoded.id)
-                .select("-password");
+        const user = await User.findById(decoded.id)
+            .select("-password");
 
         if (!user) {
             return res.status(401).json({
@@ -36,18 +29,46 @@ const protect = async (req, res, next) => {
             });
         }
 
-        req.user = user;
+        // =========================================
+        // ACCOUNT SUSPENSION CHECK
+        // =========================================
 
+        if (user.isSuspended) {
+
+            // Check whether temporary suspension has expired
+            if (
+                user.suspendedUntil &&
+                user.suspendedUntil <= new Date()
+            ) {
+                user.isSuspended = false;
+                user.suspensionReason = "";
+                user.suspendedUntil = null;
+                user.suspendedBy = null;
+
+                await user.save();
+            } else {
+                return res.status(403).json({
+                    success: false,
+                    suspended: true,
+                    message: "Your account has been suspended.",
+                    reason: user.suspensionReason || "Community Guidelines violation",
+                    suspendedUntil: user.suspendedUntil
+                });
+            }
+        }
+
+        req.user = user;
         next();
 
     } catch (err) {
+        console.error("AUTH ERROR:", err);
 
         return res.status(401).json({
             success: false,
             message: "Invalid or expired token"
         });
-
     }
 };
 
 module.exports = protect;
+                
