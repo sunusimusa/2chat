@@ -1096,7 +1096,10 @@ exports.searchShorts = async (req, res) => {
             "\\$&"
         );
 
-        const videos = await ShortVideo.find({
+        
+const videos = await ShortVideo.find({
+    $and: [
+        {
             $or: [
                 {
                     caption: {
@@ -1116,7 +1119,16 @@ exports.searchShorts = async (req, res) => {
                     }
                 }
             ]
-        })
+        },
+        {
+            $or: [
+                { moderationStatus: "approved" },
+                { moderationStatus: { $exists: false } }
+            ]
+        }
+    ]
+})
+
         .select("-__v")
         .sort({ createdAt: -1 })
         .limit(30)
