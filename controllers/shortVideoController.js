@@ -4,6 +4,53 @@ const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
 
 
+/**
+ * LEGACY SHORTS MODERATION MIGRATION
+ *
+ * Tsoffin videos da ba su da moderationStatus
+ * za su koma pending domin admin ya sake duba su.
+ */
+
+exports.migrateLegacyShorts = async (req, res) => {
+    try {
+        const result = await ShortVideo.updateMany(
+            {
+                moderationStatus: { $exists: false }
+            },
+            {
+                $set: {
+                    moderationStatus: "pending",
+                    moderationReason: "Legacy video awaiting moderation review",
+                    moderationDetails: "This video requires admin review before public visibility."
+                },
+                $push: {
+                    moderationHistory: {
+                        action: "submitted",
+                        reason: "Legacy video moved to moderation review",
+                        performedBy: req.user._id,
+                        createdAt: new Date()
+                    }
+                }
+            }
+        );
+
+        return res.json({
+            success: true,
+            message: "Legacy Shorts migration completed.",
+            matchedCount: result.matchedCount,
+            modifiedCount: result.modifiedCount
+        });
+
+    } catch (err) {
+        console.error("LEGACY SHORTS MIGRATION ERROR:", err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to migrate legacy Shorts."
+        });
+    }
+};
+
 // Upload Short Video
 exports.uploadVideo = async (req, res) => {
     try {
