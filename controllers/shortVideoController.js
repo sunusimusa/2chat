@@ -138,12 +138,18 @@ exports.uploadVideo = async (req, res) => {
                 
 
 // Get Videos
+
 exports.getVideos = async (req, res) => {
 
     try {
 
-        const videos = await ShortVideo.find()
-            .sort({ createdAt: -1 });
+        const videos = await ShortVideo.find({
+            $or: [
+                { moderationStatus: "approved" },
+                { moderationStatus: { $exists: false } }
+            ]
+        })
+        .sort({ createdAt: -1 });
 
         res.json({
             success: true,
@@ -160,7 +166,7 @@ exports.getVideos = async (req, res) => {
     }
 
 };
-
+        
 // Like Video
 exports.likeVideo = async (req, res) => {
     try {
