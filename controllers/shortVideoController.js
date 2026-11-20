@@ -168,6 +168,7 @@ exports.getVideos = async (req, res) => {
 };
         
 // Like Video
+
 exports.likeVideo = async (req, res) => {
     try {
         const { videoId } = req.body;
@@ -182,14 +183,21 @@ exports.likeVideo = async (req, res) => {
 
         const video = await ShortVideo.findById(videoId);
 
+        if (!video) {
+            return res.status(404).json({
+                success: false,
+                message: "Video not found."
+            });
+        }
+
         if (
-          video.moderationStatus &&
-          video.moderationStatus !== "approved"
+            video.moderationStatus &&
+            video.moderationStatus !== "approved"
         ) {
-         return res.status(403).json({
-        success: false,
-        message: "This video is not available."
-         });
+            return res.status(403).json({
+                success: false,
+                message: "This video is not available."
+            });
         }
 
         if (!Array.isArray(video.likes)) {
@@ -221,8 +229,9 @@ exports.likeVideo = async (req, res) => {
         });
     }
 };
-
+                
 // Comment
+
 exports.commentVideo = async (req, res) => {
     try {
         const { videoId, text } = req.body;
@@ -255,6 +264,16 @@ exports.commentVideo = async (req, res) => {
             });
         }
 
+        if (
+            video.moderationStatus &&
+            video.moderationStatus !== "approved"
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "This video is not available."
+            });
+        }
+
         if (!Array.isArray(video.comments)) {
             video.comments = [];
         }
@@ -280,6 +299,7 @@ exports.commentVideo = async (req, res) => {
         });
     }
 };
+        
 
 // Add View
 
@@ -287,6 +307,7 @@ exports.addView = async (req, res) => {
     try {
         const videoId = req.params.id;
 
+        // Validate video ID
         if (
             typeof videoId !== "string" ||
             !/^[a-fA-F0-9]{24}$/.test(videoId)
@@ -297,19 +318,28 @@ exports.addView = async (req, res) => {
             });
         }
 
+        // Find video
         const video = await ShortVideo.findById(videoId);
 
+        if (!video) {
+            return res.status(404).json({
+                success: false,
+                message: "Video not found."
+            });
+        }
+
+        // Check moderation status
         if (
-           video.moderationStatus &&
-           video.moderationStatus !==
-        "approved"
-         ) {
+            video.moderationStatus &&
+            video.moderationStatus !== "approved"
+        ) {
             return res.status(403).json({
                 success: false,
-                 message: "This video is not available."
-                });
-            }
+                message: "This video is not available."
+            });
+        }
 
+        // Increase views
         video.views = (video.views || 0) + 1;
 
         await video.save();
@@ -328,7 +358,7 @@ exports.addView = async (req, res) => {
         });
     }
 };
-            
+
 // ================= SAVE / UNSAVE VIDEO =================
 exports.saveVideo = async (req, res) => {
     try {
