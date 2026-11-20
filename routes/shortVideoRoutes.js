@@ -7,6 +7,10 @@ const protect = require("../middleware/auth");
 const adminAuth = require("../middleware/adminAuth");
 
 const {
+    moderateShort
+} = require("../controllers/shortModerationController");
+
+const {
     uploadVideo,
     getVideos,
     likeVideo,
