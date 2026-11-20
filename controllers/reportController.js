@@ -1,7 +1,6 @@
 const Report = require("../models/Report");
 const User = require("../models/User");
 
-
 // =====================================================
 // CREATE REPORT
 // =====================================================
@@ -333,123 +332,68 @@ const getReports = async (req, res) => {
 
 };
 
-
-
 // =====================================================
 // UPDATE REPORT - ADMIN
 // =====================================================
 
 const updateReport = async (req, res) => {
-
     try {
-
-        const {
-            status,
-            adminNote
-        } = req.body;
-
+        const { status, adminNote } = req.body;
 
         const validStatuses = [
             "pending",
             "reviewed",
-            "action_taken",
             "dismissed"
         ];
 
-
-        if (
-            !status ||
-            !validStatuses.includes(status)
-        ) {
-
+        if (!status || !validStatuses.includes(status)) {
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "Invalid report status"
-
+                message: "Invalid report status. Actual moderation action is not available through this endpoint."
             });
-
         }
 
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid report ID"
+            });
+        }
 
-        const report =
-            await Report.findById(
-                req.params.id
-            );
-
+        const report = await Report.findById(req.params.id);
 
         if (!report) {
-
             return res.status(404).json({
-
                 success: false,
-
-                message:
-                    "Report not found"
-
+                message: "Report not found"
             });
-
         }
 
-
-        report.status =
-            status;
-
-
-        if (
-            typeof adminNote === "string"
-        ) {
-
-            report.adminNote =
-                adminNote.trim();
-
+        if (typeof adminNote === "string") {
+            report.adminNote = adminNote.trim();
         }
 
-
-        report.reviewedBy =
-            req.user._id;
-
-
-        report.reviewedAt =
-            new Date();
-
+        report.status = status;
+        report.reviewedBy = req.admin._id;
+        report.reviewedAt = new Date();
 
         await report.save();
 
-
         return res.json({
-
             success: true,
-
-            message:
-                "Report updated successfully"
-
+            message: "Report updated successfully",
+            report
         });
-
 
     } catch (err) {
-
-        console.error(
-            "UPDATE REPORT ERROR:",
-            err
-        );
-
+        console.error("UPDATE REPORT ERROR:", err);
 
         return res.status(500).json({
-
             success: false,
-
-            message:
-                "Failed to update report"
-
+            message: "Failed to update report"
         });
-
     }
-
 };
-
 
 module.exports = {
     createReport,
