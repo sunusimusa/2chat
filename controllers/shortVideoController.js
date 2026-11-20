@@ -602,8 +602,16 @@ exports.getTrendingVideos = async (req, res) => {
 
     try {
 
-        const videos = await ShortVideo.find();
-
+        const videos = await
+        ShortVideo.find({
+            $or: [
+                { moderationStatus:
+        "approved" },
+                 { moderationStatus:
+        { $exists: false } }
+            ]
+        });
+        
         videos.sort((a, b) => {
 
             const scoreA =
