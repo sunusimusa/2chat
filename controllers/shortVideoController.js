@@ -448,8 +448,14 @@ exports.getForYouVideos = async (req, res) => {
             });
         }
 
-        let videos = await ShortVideo.find()
-            .sort({ createdAt: -1 });
+        let videos = await ShortVideo.find({
+            $or: [
+                { moderationStatus:
+        "approved" },
+                 { moderationStatus:
+        { $exists: false } }
+            ]
+        }).sort({ createdAt: -1 });
 
         const following = Array.isArray(user.following)
             ? user.following
