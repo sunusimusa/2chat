@@ -182,11 +182,14 @@ exports.likeVideo = async (req, res) => {
 
         const video = await ShortVideo.findById(videoId);
 
-        if (!video) {
-            return res.status(404).json({
-                success: false,
-                message: "Video not found."
-            });
+        if (
+          video.moderationStatus &&
+          video.moderationStatus !== "approved"
+        ) {
+         return res.status(403).json({
+        success: false,
+        message: "This video is not available."
+         });
         }
 
         if (!Array.isArray(video.likes)) {
