@@ -3,7 +3,6 @@ const User = require("../models/User");
 const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
 
-
 /**
  * LEGACY SHORTS MODERATION MIGRATION
  *
@@ -27,7 +26,7 @@ exports.migrateLegacyShorts = async (req, res) => {
                     moderationHistory: {
                         action: "submitted",
                         reason: "Legacy video moved to moderation review",
-                        performedBy: req.user._id,
+                        performedBy: req.admin._id,
                         createdAt: new Date()
                     }
                 }
