@@ -350,17 +350,22 @@ await Promise.all(
                 text: notificationTitle
             });
 
-            await sendPushNotification({
-                recipientUsername: username,
-                title: notificationTitle,
-                body: notificationBody,
-                data: {
-                    type: "group_message",
-                    groupId: String(groupId),
-                    sender
-                }
-            });
+      const pushResult = await sendPushNotification({ 
+      recipientUsername: username,
+          title: notificationTitle,
+          body: notificationBody,
+          data: {
+              type: "group_message",
+              groupId: String(groupId),
+              sender
+         }
+      });
 
+      console.log("GROUP PUSH RESULT:", {
+       recipient: username,
+       result: pushResult
+    });
+            
         } catch (error) {
 
             console.error(
