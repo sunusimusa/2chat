@@ -44,6 +44,34 @@ const userSchema = new mongoose.Schema(
     },
 
 
+    
+// =========================================
+// ACCOUNT SUSPENSION / MODERATION
+// =========================================
+
+isSuspended: {
+    type: Boolean,
+    default: false,
+    index: true
+},
+
+suspensionReason: {
+    type: String,
+    default: "",
+    maxlength: 1000
+},
+
+suspendedUntil: {
+    type: Date,
+    default: null
+},
+
+suspendedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null
+},
+    
     // =========================================
     // CREATOR SYSTEM
     // =========================================
