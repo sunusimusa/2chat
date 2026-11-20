@@ -296,12 +296,17 @@ exports.addView = async (req, res) => {
 
         const video = await ShortVideo.findById(videoId);
 
-        if (!video) {
-            return res.status(404).json({
+        if (
+           video.moderationStatus &&
+           video.moderationStatus !==
+        "approved"
+         ) {
+            return res.status(403).json({
                 success: false,
-                message: "Video not found."
-            });
-        }
+                 message: "This video is not
+            available."
+                });
+            }
 
         video.views = (video.views || 0) + 1;
 
