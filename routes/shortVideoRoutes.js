@@ -43,6 +43,14 @@ router.post(
     migrateLegacyShorts
 );
 
+// Admin: Moderate Short Video
+router.put(
+    "/admin/moderate/:id",
+    protect,
+    adminAuth,
+    moderateShort
+);
+
 // Get All Videos
 router.get("/all", getVideos);
 
