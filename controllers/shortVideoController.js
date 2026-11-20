@@ -360,11 +360,13 @@ exports.addView = async (req, res) => {
 };
 
 // ================= SAVE / UNSAVE VIDEO =================
+
 exports.saveVideo = async (req, res) => {
     try {
         const { videoId } = req.body;
         const userId = req.user._id;
 
+        // Validate video ID
         if (
             typeof videoId !== "string" ||
             !/^[a-fA-F0-9]{24}$/.test(videoId)
@@ -375,6 +377,7 @@ exports.saveVideo = async (req, res) => {
             });
         }
 
+        // Find user
         const user = await User.findById(userId);
 
         if (!user) {
@@ -384,12 +387,24 @@ exports.saveVideo = async (req, res) => {
             });
         }
 
+        // Find video
         const video = await ShortVideo.findById(videoId);
 
         if (!video) {
             return res.status(404).json({
                 success: false,
                 message: "Video not found."
+            });
+        }
+
+        // Check moderation status
+        if (
+            video.moderationStatus &&
+            video.moderationStatus !== "approved"
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "This video is not available."
             });
         }
 
@@ -406,7 +421,10 @@ exports.saveVideo = async (req, res) => {
                 id => id.toString() !== videoId
             );
 
-            video.saves = Math.max(0, (video.saves || 0) - 1);
+            video.saves = Math.max(
+                0,
+                (video.saves || 0) - 1
+            );
 
             await user.save();
             await video.save();
@@ -439,6 +457,7 @@ exports.saveVideo = async (req, res) => {
         });
     }
 };
+            
 
 exports.getSavedVideos = async (req, res) => {
     try {
@@ -587,12 +606,12 @@ exports.getForYouVideos = async (req, res) => {
     }
 };
 
-
 exports.addWatchTime = async (req, res) => {
     try {
         const videoId = req.params.id;
         const { seconds } = req.body;
 
+        // Validate video ID
         if (
             typeof videoId !== "string" ||
             !/^[a-fA-F0-9]{24}$/.test(videoId)
@@ -603,6 +622,7 @@ exports.addWatchTime = async (req, res) => {
             });
         }
 
+        // Validate watch time
         if (
             typeof seconds !== "number" ||
             !Number.isFinite(seconds) ||
@@ -615,6 +635,7 @@ exports.addWatchTime = async (req, res) => {
             });
         }
 
+        // Find video
         const video = await ShortVideo.findById(videoId);
 
         if (!video) {
@@ -624,6 +645,18 @@ exports.addWatchTime = async (req, res) => {
             });
         }
 
+        // Check moderation status
+        if (
+            video.moderationStatus &&
+            video.moderationStatus !== "approved"
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "This video is not available."
+            });
+        }
+
+        // Update watch time
         video.watchTime = (video.watchTime || 0) + seconds;
 
         await video.save();
@@ -642,6 +675,7 @@ exports.addWatchTime = async (req, res) => {
         });
     }
 };
+            
 
 exports.getTrendingVideos = async (req, res) => {
 
