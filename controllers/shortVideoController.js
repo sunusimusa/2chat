@@ -546,23 +546,23 @@ exports.getForYouVideos = async (req, res) => {
 
         // Ƙara maki daga Comments
         videos.forEach(video => {
-            const commented = video.comments.some(
-                comment => comment.username === user.username
-            );
+    const commented = (video.comments || []).some(
+        comment => comment.username === user.username
+    );
 
-            if (commented) {
-                favoriteCategories[video.category] =
-                    (favoriteCategories[video.category] || 0) + 2;
-            }
-        });
-
+    if (commented) {
+        favoriteCategories[video.category] =
+            (favoriteCategories[video.category] || 0) + 2;
+    }
+});
+        
         // Ƙara maki daga Likes
         videos.forEach(video => {
-            if (video.likes.includes(user.username)) {
-                favoriteCategories[video.category] =
-                    (favoriteCategories[video.category] || 0) + 2;
-            }
-        });
+    if ((video.likes || []).includes(user.username)) {
+        favoriteCategories[video.category] =
+            (favoriteCategories[video.category] || 0) + 2;
+    }
+});
 
         // Ƙara maki daga Saved Videos
         savedVideos.forEach(video => {
@@ -697,21 +697,21 @@ exports.getTrendingVideos = async (req, res) => {
         
         videos.sort((a, b) => {
 
-            const scoreA =
-                (a.views * 1) +
-                (a.likes.length * 5) +
-                (a.comments.length * 8) +
-                ((a.watchTime || 0) / 60);
+    const scoreA =
+        ((a.views || 0) * 1) +
+        ((a.likes?.length || 0) * 5) +
+        ((a.comments?.length || 0) * 8) +
+        ((a.watchTime || 0) / 60);
 
-            const scoreB =
-                (b.views * 1) +
-                (b.likes.length * 5) +
-                (b.comments.length * 8) +
-                ((b.watchTime || 0) / 60);
+    const scoreB =
+        ((b.views || 0) * 1) +
+        ((b.likes?.length || 0) * 5) +
+        ((b.comments?.length || 0) * 8) +
+        ((b.watchTime || 0) / 60);
 
-            return scoreB - scoreA;
+    return scoreB - scoreA;
 
-        });
+});
 
         res.json({
 
