@@ -409,10 +409,18 @@ exports.getSavedVideos = async (req, res) => {
 
         const user = await User.findById(userId)
             .populate({
-                path: "savedVideos",
-                model: "ShortVideo"
+                 path: "savedVideos",
+                 model: "ShortVideo",
+                 match: {
+                     $or: [
+                        { moderationStatus:
+             "approved" },
+                          { moderationStatus:
+            { $exists: false } }
+                    ]
+                 }
             });
-
+        
         if (!user) {
             return res.status(404).json({
                 success: false,
