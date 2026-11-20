@@ -733,26 +733,44 @@ exports.getTrendingVideos = async (req, res) => {
 
 // ================= SHARE VIDEO =================
 
+
 exports.addShare = async (req, res) => {
     try {
         const videoId = req.params.id;
 
-        if (!videoId || !/^[0-9a-fA-F]{24}$/.test(videoId)) {
+        // Validate video ID
+        if (
+            typeof videoId !== "string" ||
+            !/^[a-fA-F0-9]{24}$/.test(videoId)
+        ) {
             return res.status(400).json({
                 success: false,
-                message: "Invalid video ID"
+                message: "Invalid video ID."
             });
         }
 
+        // Find video
         const video = await ShortVideo.findById(videoId);
 
         if (!video) {
             return res.status(404).json({
                 success: false,
-                message: "Video not found"
+                message: "Video not found."
             });
         }
 
+        // Check moderation status
+        if (
+            video.moderationStatus &&
+            video.moderationStatus !== "approved"
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "This video is not available."
+            });
+        }
+
+        // Increase share count
         video.shares = (video.shares || 0) + 1;
 
         await video.save();
@@ -763,14 +781,15 @@ exports.addShare = async (req, res) => {
         });
 
     } catch (err) {
-        console.error("Add Share Error:", err);
+        console.error("ADD SHARE ERROR:", err);
 
         return res.status(500).json({
             success: false,
-            message: "Unable to update share count"
+            message: "Unable to update share count."
         });
     }
 };
+    
 
 exports.getAnalytics = async (req, res) => {
 
