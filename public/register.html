@@ -1,507 +1,391 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>2Chat Register</title>
 
-    <!-- REGISTER CSS -->
-    <link
-        rel="stylesheet"
-        href="/css/register.css"
-    >
+    <link rel="stylesheet" href="/css/register.css">
 
-    <!-- FONT AWESOME -->
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
     >
 
+    <!-- International Phone Input CSS -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/intl-tel-input@29.5.11/dist/css/intlTelInput.css"
+    >
+
     <style>
-
-        /* ==========================
-           LEGAL
-        =========================== */
-
         .legal-text {
-
             margin-top: 18px;
-
             text-align: center;
-
             font-size: 13px;
-
             line-height: 1.6;
-
             color: #777;
-
         }
-
 
         .legal-text a {
-
             color: #ff0874;
-
             text-decoration: none;
-
             font-weight: 600;
-
         }
-
 
         .legal-text a:hover {
-
             text-decoration: underline;
-
         }
 
-        
-.password-group {
-    position: relative;
-}
+        .password-group {
+            position: relative;
+        }
 
-.password-group input {
-    padding-right: 48px;
-}
+        .password-group input {
+            padding-right: 48px;
+        }
 
-.password-toggle {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    border: none;
-    background: transparent;
-    color: #777;
-    cursor: pointer;
-    font-size: 16px;
-    padding: 5px;
-}
-        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: #777;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 5px;
+        }
 
+        /* INTERNATIONAL PHONE INPUT */
+        .phone-group .iti {
+            flex: 1;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .phone-group .iti input {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .phone-group .iti__dropdown-content {
+            z-index: 9999;
+        }
     </style>
-
 </head>
-
 
 <body>
 
-
 <div class="register-container">
 
-
-    <!-- ==========================
-         LOGO
-    =========================== -->
-
     <div class="register-logo">
-
         <i class="fa-solid fa-user-plus"></i>
-
     </div>
 
-
-    <!-- ==========================
-         TITLE
-    =========================== -->
-
-    <h2>
-        Create 2Chat Account
-    </h2>
-
+    <h2>Create 2Chat Account</h2>
 
     <p class="register-subtitle">
         Join 2Chat and connect with your community.
     </p>
 
-
-    <!-- ==========================
-         USERNAME
-    =========================== -->
-
+    <!-- USERNAME -->
     <div class="input-group">
-
         <i class="fa-solid fa-user"></i>
-
         <input
             id="username"
             type="text"
             placeholder="Username"
             autocomplete="username"
         >
-
     </div>
 
-
-    <!-- ==========================
-         EMAIL
-    =========================== -->
-
+    <!-- EMAIL -->
     <div class="input-group">
-
         <i class="fa-solid fa-envelope"></i>
-
         <input
             id="email"
             type="email"
             placeholder="Email"
             autocomplete="email"
         >
-
     </div>
 
-    
-    <!-- ==========================
-         PHONE NUMBER
-    =========================== -->
-
-    <div class="input-group">
-
+    <!-- INTERNATIONAL PHONE NUMBER -->
+    <div class="input-group phone-group">
         <i class="fa-solid fa-phone"></i>
-
         <input
             id="phoneNumber"
             type="tel"
-            placeholder="Phone Number (e.g. +2348012345678)"
+            placeholder="Phone Number"
             autocomplete="tel"
         >
-
     </div>
 
-
-    <!-- ==========================
-         DATE OF BIRTH
-    =========================== -->
-
+    <!-- DATE OF BIRTH -->
     <div class="input-group">
-
         <i class="fa-solid fa-calendar"></i>
-
         <input
             id="dateOfBirth"
             type="date"
             autocomplete="bday"
             aria-label="Date of birth"
         >
-
     </div>
-    
 
-    <!-- ==========================
-         PASSWORD
-    =========================== -->
-    
-<!-- PASSWORD -->
-<div class="input-group password-group">
-    <i class="fa-solid fa-lock"></i>
+    <!-- PASSWORD -->
+    <div class="input-group password-group">
+        <i class="fa-solid fa-lock"></i>
 
-    <input
-        id="password"
-        type="password"
-        placeholder="Password"
-        autocomplete="new-password"
-    >
+        <input
+            id="password"
+            type="password"
+            placeholder="Password"
+            autocomplete="new-password"
+        >
 
-    <button
-        type="button"
-        class="password-toggle"
-        onclick="togglePassword('password', 'passwordEye')"
-        aria-label="Show password"
-    >
-        <i id="passwordEye" class="fa-solid fa-eye"></i>
-    </button>
-</div>
+        <button
+            type="button"
+            class="password-toggle"
+            onclick="togglePassword('password', 'passwordEye')"
+            aria-label="Show password"
+        >
+            <i id="passwordEye" class="fa-solid fa-eye"></i>
+        </button>
+    </div>
 
-<!-- CONFIRM PASSWORD -->
-<div class="input-group password-group">
-    <i class="fa-solid fa-lock"></i>
+    <!-- CONFIRM PASSWORD -->
+    <div class="input-group password-group">
+        <i class="fa-solid fa-lock"></i>
 
-    <input
-        id="confirmPassword"
-        type="password"
-        placeholder="Confirm Password"
-        autocomplete="new-password"
-    >
+        <input
+            id="confirmPassword"
+            type="password"
+            placeholder="Confirm Password"
+            autocomplete="new-password"
+        >
 
-    <button
-        type="button"
-        class="password-toggle"
-        onclick="togglePassword('confirmPassword', 'confirmPasswordEye')"
-        aria-label="Show confirm password"
-    >
-        <i id="confirmPasswordEye" class="fa-solid fa-eye"></i>
-    </button>
-</div>
+        <button
+            type="button"
+            class="password-toggle"
+            onclick="togglePassword('confirmPassword', 'confirmPasswordEye')"
+            aria-label="Show confirm password"
+        >
+            <i id="confirmPasswordEye" class="fa-solid fa-eye"></i>
+        </button>
+    </div>
 
-    <!-- ==========================
-         REGISTER
-    =========================== -->
-
+    <!-- REGISTER -->
     <button
         id="registerButton"
         class="register-btn"
         type="button"
         onclick="register()"
     >
-
         <i class="fa-solid fa-user-plus"></i>
-
         Register
-
     </button>
-
-
-    <!-- ==========================
-         MESSAGE
-    =========================== -->
 
     <p id="msg"></p>
 
-
-    <!-- ==========================
-         TERMS & PRIVACY
-    =========================== -->
-
+    <!-- TERMS & PRIVACY -->
     <p class="legal-text">
-
         By creating a 2Chat account, you agree to our
-
-        <a href="/terms.html">
-            Terms of Service
-        </a>
-
+        <a href="/terms.html">Terms of Service</a>
         and acknowledge our
-
-        <a href="/privacy.html">
-            Privacy Policy
-        </a>.
-
+        <a href="/privacy.html">Privacy Policy</a>.
     </p>
 
-
-    <!-- ==========================
-         LOGIN
-    =========================== -->
-
+    <!-- LOGIN -->
     <p class="login-text">
-
         Already have an account?
-
-        <a href="/login.html">
-            Login Here
-        </a>
-
+        <a href="/login.html">Login Here</a>
     </p>
-
 
 </div>
 
-
+<!-- INTERNATIONAL PHONE INPUT JS -->
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@29.5.11/dist/js/intlTelInput.min.js"></script>
 
 <script>
+    // INITIALIZE INTERNATIONAL PHONE INPUT
+    const phoneInput = document.getElementById("phoneNumber");
 
-    
-function togglePassword(inputId, eyeId) {
-    const input = document.getElementById(inputId);
-    const eye = document.getElementById(eyeId);
+    const phoneITI = window.intlTelInput(phoneInput, {
+        initialCountry: "ng",
+        separateDialCode: false,
+        nationalMode: false,
+        formatAsYouType: true,
+        loadUtils: () => import(
+            "https://cdn.jsdelivr.net/npm/intl-tel-input@29.5.11/dist/js/utils.js"
+        )
+    });
 
-    if (input.type === "password") {
-        input.type = "text";
-        eye.classList.remove("fa-eye");
-        eye.classList.add("fa-eye-slash");
-    } else {
-        input.type = "password";
-        eye.classList.remove("fa-eye-slash");
-        eye.classList.add("fa-eye");
+    // PASSWORD VISIBILITY
+    function togglePassword(inputId, eyeId) {
+        const input = document.getElementById(inputId);
+        const eye = document.getElementById(eyeId);
+
+        if (input.type === "password") {
+            input.type = "text";
+            eye.classList.remove("fa-eye");
+            eye.classList.add("fa-eye-slash");
+        } else {
+            input.type = "password";
+            eye.classList.remove("fa-eye-slash");
+            eye.classList.add("fa-eye");
+        }
     }
-}    
 
-async function register() {
+    // REGISTER
+    async function register() {
+        const username =
+            document.getElementById("username").value.trim();
 
-    const username =
-        document.getElementById("username").value.trim();
+        const email =
+            document.getElementById("email").value.trim();
 
-    const email =
-        document.getElementById("email").value.trim();
+        const dateOfBirth =
+            document.getElementById("dateOfBirth").value;
 
-    const password =
-        document.getElementById("password").value;
+        const password =
+            document.getElementById("password").value;
 
-    const confirmPassword =
-    document.getElementById("confirmPassword").value;
+        const confirmPassword =
+            document.getElementById("confirmPassword").value;
 
-    const msg =
-        document.getElementById("msg");
+        const msg =
+            document.getElementById("msg");
 
-    const button =
-        document.getElementById("registerButton");
+        const button =
+            document.getElementById("registerButton");
 
-
-    // ==========================
-    // VALIDATION
-    // ==========================
-    
-if (!username || !email || !password || !confirmPassword) {
-    msg.innerText = "Please fill in all fields.";
-    return;
-}
-
-if (password.length < 8 || password.length > 128) {
-    msg.innerText = "Password must be between 8 and 128 characters.";
-    return;
-}
-
-if (password !== confirmPassword) {
-    msg.innerText = "Passwords do not match.";
-    return;
-}
-    
-    // ==========================
-    // LOADING
-    // ==========================
-
-    button.disabled = true;
-
-    button.innerHTML = `
-        <i class="fa-solid fa-spinner fa-spin"></i>
-        Creating Account...
-    `;
-
-    msg.innerText = "";
-
-
-    try {
-
-        const res =
-            await fetch(
-                "/api/auth/register",
-                {
-
-                    method: "POST",
-
-                    headers: {
-
-                        "Content-Type":
-                            "application/json"
-
-                    },
-
-                    body: JSON.stringify({
-
-                        username,
-                        email,
-                        password
-
-                    })
-
-                }
-            );
-
-
-        const data =
-            await res.json();
-
-
-        // ==========================
-        // SUCCESS
-        // ==========================
-
-        if(data.success){
-
-            localStorage.setItem(
-                "token",
-                data.token
-            );
-
-
-            /*
-            SAVE USER
-            */
-
-            if(data.user){
-
-                localStorage.setItem(
-                    "user",
-                    JSON.stringify(data.user)
-                );
-
-            }
-
-
-            const afterAuthRedirect =
-                localStorage.getItem(
-                    "afterAuthRedirect"
-                );
-
-
-            if (afterAuthRedirect) {
-
-                localStorage.removeItem(
-                    "afterAuthRedirect"
-                );
-
-                location.href =
-                    afterAuthRedirect;
-
-                return;
-
-            }
-
-
-            /*
-            NORMAL REGISTER
-            */
-
-            location.href =
-                "/home.html";
-
+        // REQUIRED FIELDS
+        if (
+            !username ||
+            !email ||
+            !phoneInput.value.trim() ||
+            !dateOfBirth ||
+            !password ||
+            !confirmPassword
+        ) {
+            msg.innerText = "Please fill in all fields.";
+            return;
         }
 
+        // PASSWORD LENGTH
+        if (password.length < 8 || password.length > 128) {
+            msg.innerText =
+                "Password must be between 8 and 128 characters.";
+            return;
+        }
 
-        // ==========================
-        // ERROR
-        // ==========================
+        // PASSWORD MATCH
+        if (password !== confirmPassword) {
+            msg.innerText = "Passwords do not match.";
+            return;
+        }
 
-        msg.innerText =
-            data.message ||
-            "Registration failed.";
+        // DATE VALIDATION
+        const dob = new Date(dateOfBirth + "T00:00:00");
 
+        if (Number.isNaN(dob.getTime()) || dob > new Date()) {
+            msg.innerText = "Please enter a valid date of birth.";
+            return;
+        }
 
-    } catch (error) {
+        // WAIT FOR PHONE VALIDATION UTILITIES
+        button.disabled = true;
+        msg.innerText = "Checking phone number...";
 
-        console.error(
-            "REGISTER ERROR:",
-            error
-        );
+        try {
+            await phoneITI.promise;
 
-        msg.innerText =
-            "Network error. Please try again.";
+            // PHONE VALIDATION
+            if (!phoneITI.isValidNumber()) {
+                msg.innerText =
+                    "Please enter a valid phone number for the selected country.";
 
+                button.disabled = false;
+                return;
+            }
+
+            // INTERNATIONAL E.164 FORMAT
+            const phoneNumber = phoneITI.getNumber();
+
+            // LOADING
+            button.innerHTML = `
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                Creating Account...
+            `;
+
+            msg.innerText = "";
+
+            const res = await fetch("/api/auth/register", {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    username,
+                    email,
+                    phoneNumber,
+                    dateOfBirth,
+                    password
+                })
+            });
+
+            const data = await res.json();
+
+            // SUCCESS
+            if (data.success) {
+                localStorage.setItem("token", data.token);
+
+                if (data.user) {
+                    localStorage.setItem(
+                        "user",
+                        JSON.stringify(data.user)
+                    );
+                }
+
+                const afterAuthRedirect =
+                    localStorage.getItem("afterAuthRedirect");
+
+                if (afterAuthRedirect) {
+                    localStorage.removeItem("afterAuthRedirect");
+                    location.href = afterAuthRedirect;
+                    return;
+                }
+
+                location.href = "/home.html";
+                return;
+            }
+
+            // ERROR
+            msg.innerText =
+                data.message || "Registration failed.";
+
+        } catch (error) {
+            console.error("REGISTER ERROR:", error);
+
+            msg.innerText =
+                "Network or phone validation error. Please try again.";
+
+        } finally {
+            button.disabled = false;
+
+            button.innerHTML = `
+                <i class="fa-solid fa-user-plus"></i>
+                Register
+            `;
+        }
     }
-
-
-    // ==========================
-    // RESTORE BUTTON
-    // ==========================
-
-    button.disabled = false;
-
-    button.innerHTML = `
-        <i class="fa-solid fa-user-plus"></i>
-        Register
-    `;
-
-}
-
 </script>
 
-
 </body>
-
-    </html>
+</html>
+                
