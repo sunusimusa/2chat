@@ -45,168 +45,260 @@ const createWalletIfMissing = async (userId) => {
 // =====================================================
 
 exports.register = async (req, res) => {
-
   try {
-
     const {
       username,
       email,
-      password
+      password,
+      phoneNumber,
+      dateOfBirth
     } = req.body;
 
-// =========================================
-// BASIC VALIDATION
-// =========================================
+    // =========================================
+    // BASIC VALIDATION
+    // =========================================
 
-if (
-    typeof username !== "string" ||
-    typeof email !== "string" ||
-    typeof password !== "string" ||
-    !username.trim() ||
-    !email.trim() ||
-    !password
-) {
-    return res.status(400).json({
+    if (
+      typeof username !== "string" ||
+      typeof email !== "string" ||
+      typeof password !== "string" ||
+      typeof phoneNumber !== "string" ||
+      typeof dateOfBirth !== "string" ||
+      !username.trim() ||
+      !email.trim() ||
+      !password ||
+      !phoneNumber.trim() ||
+      !dateOfBirth.trim()
+    ) {
+      return res.status(400).json({
         success: false,
-        message: "Username, email and password are required"
-    });
-}
+        message: "All registration fields are required."
+      });
+    }
 
-const cleanUsername = username.trim();
-const cleanEmail = email.trim().toLowerCase();
+    const cleanUsername = username.trim();
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPhone = phoneNumber.trim();
 
-if (
-    cleanUsername.length < 3 ||
-    cleanUsername.length > 30 ||
-    !/^[a-zA-Z0-9][a-zA-Z0-9._-]{1,28}[a-zA-Z0-9]$/.test(cleanUsername)
-) {
-    return res.status(400).json({
+    // =========================================
+    // USERNAME VALIDATION
+    // =========================================
+
+    if (
+      cleanUsername.length < 3 ||
+      cleanUsername.length > 30 ||
+      !/^[a-zA-Z0-9][a-zA-Z0-9._-]{1,28}[a-zA-Z0-9]$/.test(cleanUsername)
+    ) {
+      return res.status(400).json({
         success: false,
-        message: "Username must be 3-30 characters, use letters, numbers, dots, underscores or hyphens, and start and end with a letter or number."
-    });
-}
+        message: "Invalid username. Use 3-30 characters."
+      });
+    }
 
-if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
-    return res.status(400).json({
+    // =========================================
+    // EMAIL VALIDATION
+    // =========================================
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      return res.status(400).json({
         success: false,
         message: "Please enter a valid email address."
-    });
-}
+      });
+    }
 
-if (password.length < 8 || password.length > 128) {
-    return res.status(400).json({
+    // =========================================
+    // INTERNATIONAL PHONE VALIDATION
+    // E.164 FORMAT
+    // =========================================
+
+    if (!/^\+[1-9]\d{7,14}$/.test(cleanPhone)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid international phone number."
+      });
+    }
+
+    // =========================================
+    // PASSWORD VALIDATION
+    // =========================================
+
+    if (password.length < 8 || password.length > 128) {
+      return res.status(400).json({
         success: false,
         message: "Password must be between 8 and 128 characters."
-    });
-      }
+      });
+    }
 
+    // =========================================
+    // DATE OF BIRTH VALIDATION
+    // =========================================
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid date of birth."
+      });
+    }
+
+    const [year, month, day] = dateOfBirth.split("-").map(Number);
+
+    const birthDate = new Date(
+      Date.UTC(year, month - 1, day)
+    );
+
+    if (
+      birthDate.getUTCFullYear() !== year ||
+      birthDate.getUTCMonth() !== month - 1 ||
+      birthDate.getUTCDate() !== day
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid date of birth."
+      });
+    }
+
+    const today = new Date();
+
+    const todayUTC = new Date(Date.UTC(
+      today.getUTCFullYear(),
+      today.getUTCMonth(),
+      today.getUTCDate()
+    ));
+
+    if (birthDate > todayUTC) {
+      return res.status(400).json({
+        success: false,
+        message: "Date of birth cannot be in the future."
+      });
+    }
+
+    // =========================================
+    // CALCULATE AGE
+    // =========================================
+
+    let age =
+      todayUTC.getUTCFullYear() - year;
+
+    const birthdayNotReached =
+      todayUTC.getUTCMonth() < month - 1 ||
+      (
+        todayUTC.getUTCMonth() === month - 1 &&
+        todayUTC.getUTCDate() < day
+      );
+
+    if (birthdayNotReached) {
+      age--;
+    }
+
+    if (age < 13) {
+      return res.status(403).json({
+        success: false,
+        message: "You must be at least 13 years old to use 2Chat."
+      });
+    }
+
+    const accountType =
+      age < 18 ? "teen" : "adult";
 
     // =========================================
     // CHECK EXISTING USER
     // =========================================
-    
-    const userExists = await
-    User.findOne({
-        $or: [
-            { email: cleanEmail },
-            { username: cleanUsername }
-        ]
+
+    const userExists = await User.findOne({
+      $or: [
+        { email: cleanEmail },
+        { username: cleanUsername },
+        { phoneNumber: cleanPhone }
+      ]
     });
 
     if (userExists) {
-
-      return res.status(400).json({
+      return res.status(409).json({
         success: false,
-        message: "User already exists"
+        message: "Email, username or phone number is already registered."
       });
-
     }
-
 
     // =========================================
     // HASH PASSWORD
     // =========================================
 
-    const hashedPassword =
-      await bcrypt.hash(
-        password,
-        10
-      );
+    const hashedPassword = await bcrypt.hash(
+      password,
+      10
+    );
 
+    // =========================================
+    // CREATE USER
+    // =========================================
 
-// =========================================
-// CREATE USER
-// =========================================
-
-const user = await User.create({
-    username: cleanUsername,
-    email: cleanEmail,
-    password: hashedPassword
-});
+    const user = await User.create({
+      username: cleanUsername,
+      email: cleanEmail,
+      phoneNumber: cleanPhone,
+      dateOfBirth: birthDate,
+      accountType,
+      password: hashedPassword
+    });
 
     // =========================================
     // CREATE WALLET
     // =========================================
 
-    await createWalletIfMissing(
-      user._id
-    );
-
+    await createWalletIfMissing(user._id);
 
     // =========================================
     // TOKEN
     // =========================================
 
-    const token =
-      generateToken(
-        user._id
-      );
-
+    const token = generateToken(user._id);
 
     // =========================================
-    // RESPONSE
+    // SAFE USER RESPONSE
     // =========================================
 
     const safeUser = {
-    _id: user._id,
-    username: user.username,
-    email: user.email,
-    role: user.role,
-    isCreator: user.isCreator,
-    creatorBadge: user.creatorBadge,
-    favoriteCategories: user.favoriteCategories,
-    avatar: user.avatar,
-    cover: user.cover,
-    bio: user.bio,
-    online: user.online,
-    lastSeen: user.lastSeen
-};
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      dateOfBirth: user.dateOfBirth,
+      accountType: user.accountType,
+      role: user.role,
+      isCreator: user.isCreator,
+      creatorBadge: user.creatorBadge,
+      favoriteCategories: user.favoriteCategories,
+      avatar: user.avatar,
+      cover: user.cover,
+      bio: user.bio,
+      online: user.online,
+      lastSeen: user.lastSeen
+    };
 
-return res.status(201).json({
-    success: true,
-    token,
-    user: safeUser
-});
-
+    return res.status(201).json({
+      success: true,
+      token,
+      user: safeUser
+    });
 
   } catch (err) {
+    console.error("REGISTER ERROR:", err);
 
-    console.error(
-      "REGISTER ERROR:",
-      err
-    );
-
+    // HANDLE DUPLICATE DATABASE INDEX
+    if (err.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message: "Email, username or phone number is already registered."
+      });
+    }
 
     return res.status(500).json({
-    success: false,
-    message: "Unable to create account."
-});
-
+      success: false,
+      message: "Unable to create account."
+    });
   }
-
 };
-
-
+      
 // =====================================================
 // LOGIN
 // =====================================================
