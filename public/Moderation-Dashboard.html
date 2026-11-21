@@ -456,7 +456,8 @@ loginForm.addEventListener("submit", async function(e){
 
     showDashboard();
     await loadReports();
-
+    await loadPendingShorts();
+    
   }catch(error){
     loginMessage.textContent = error.message;
   }finally{
@@ -566,7 +567,8 @@ async function checkExistingSession(){
 
     showDashboard();
     await loadReports();
-
+    await loadPendingShorts();
+    
   }catch(error){
     logout();
   }
