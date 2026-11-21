@@ -286,7 +286,6 @@ exports.followUser = async (req, res) => {
 // GET USER PROFILE
 // =====================================================
 
-
 exports.getUserProfile = async (req, res) => {
     try {
         const username = String(
@@ -306,7 +305,7 @@ exports.getUserProfile = async (req, res) => {
                 $options: "i"
             }
         }).select(
-            "username avatar cover bio online lastSeen followers following isCreator creatorBadge"
+            "username email phoneNumber dateOfBirth avatar cover bio online lastSeen followers following isCreator creatorBadge accountType"
         );
 
         if (!user) {
@@ -316,9 +315,23 @@ exports.getUserProfile = async (req, res) => {
             });
         }
 
+        const isOwner =
+            req.user._id.toString() === user._id.toString();
+
+        const profileData = user.toObject();
+
+        // Private information is visible only to the account owner
+        if (!isOwner) {
+            delete profileData.email;
+            delete profileData.phoneNumber;
+            delete profileData.dateOfBirth;
+            delete profileData.accountType;
+        }
+
         return res.json({
             success: true,
-            user
+            user: profileData,
+            isOwner
         });
 
     } catch (err) {
