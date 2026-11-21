@@ -1,294 +1,341 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>2Chat Profile</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101827">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1">
+    <title>2Chat | Profile</title>
 
-<link rel="stylesheet" href="/css/profile.css">
-
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-
+    <link rel="stylesheet" href="/css/profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 </head>
 
 <body>
 
-<!-- Cover -->
-<div class="cover">
+<div class="profile-page">
 
-<img
-id="coverImage"
-src="/images/default-cover.jpg"
-class="cover-image">
+    <!-- COVER -->
+    <header class="profile-cover">
 
-<input
-type="file"
-id="coverFile"
-accept="image/*"
-hidden>
+        <img
+            id="coverImage"
+            src="/images/default-cover.jpg"
+            class="cover-image"
+            alt="Profile cover">
 
-<button
-class="cover-btn"
-onclick="document.getElementById('coverFile').click()">
+        <input type="file" id="coverFile" accept="image/*" hidden>
 
-<i class="fa-solid fa-camera"></i>
-Change Cover
+        <button
+            class="cover-btn"
+            onclick="document.getElementById('coverFile').click()">
+            <i class="fa-solid fa-camera"></i>
+            Change Cover
+        </button>
 
-</button>
+        <a href="/home.html" class="back-home">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+
+    </header>
+
+    <!-- PROFILE HEADER -->
+    <main class="profile-main">
+
+        <section class="profile-box">
+
+            <div class="profile-top">
+
+                <div class="avatar-wrapper">
+
+                    <img id="avatar" class="avatar" alt="Profile photo">
+
+                    <input type="file" id="avatarFile" accept="image/*" hidden>
+
+                    <button
+                        class="avatar-btn"
+                        onclick="document.getElementById('avatarFile').click()">
+                        <i class="fa-solid fa-camera"></i>
+                    </button>
+
+                </div>
+
+                <div class="profile-identity">
+
+                    <h1 id="username">User</h1>
+
+                    <div id="creatorBadge" class="creator-badge">
+                        🥉 Bronze Creator
+                    </div>
+
+                    <p id="bio" class="profile-bio">
+                        Welcome to my 2Chat profile.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- PROFILE STATISTICS -->
+            <div class="stats">
+
+                <div class="stat">
+                    <h2 id="postsCount">0</h2>
+                    <p>Posts</p>
+                </div>
+
+                <div class="stat">
+                    <b id="followers">0</b>
+                    <p>Followers</p>
+                </div>
+
+                <div
+                    class="stat following-stat"
+                    onclick="location.href='/following.html'">
+
+                    <b id="following">0</b>
+                    <p>Following</p>
+
+                </div>
+
+            </div>
+
+            <!-- VISITOR ACTIONS -->
+            <div class="visitor-actions">
+
+                <button
+                    id="followBtn"
+                    style="display:none;"
+                    onclick="followUser(profileUsername)">
+                    <i class="fa-solid fa-user-plus"></i>
+                    Follow
+                </button>
+
+                <button
+                    id="sendGiftBtn"
+                    class="send-gift-profile-btn"
+                    style="display:none;"
+                    onclick="openCreatorGifts()">
+                    <i class="fa-solid fa-gift"></i>
+                    Send Gift
+                </button>
+
+            </div>
+
+        </section>
+
+        <!-- PRIVATE ACCOUNT INFORMATION -->
+        <section id="privateDetails" class="profile-section" hidden>
+
+            <div class="section-heading">
+                <div>
+                    <h2>Personal Information</h2>
+                    <p>Your private account details</p>
+                </div>
+
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-icon">
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+
+                <div>
+                    <span>Email Address</span>
+                    <p id="email">Not available</p>
+                </div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-icon">
+                    <i class="fa-solid fa-phone"></i>
+                </div>
+
+                <div>
+                    <span>Phone Number</span>
+                    <p id="phoneNumber">Not available</p>
+                </div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-icon">
+                    <i class="fa-solid fa-calendar"></i>
+                </div>
+
+                <div>
+                    <span>Date of Birth</span>
+                    <p id="dateOfBirth">Not available</p>
+                </div>
+            </div>
+
+            <p class="private-note">
+                <i class="fa-solid fa-lock"></i>
+                Only you can see this information.
+            </p>
+
+        </section>
+
+        <!-- EDIT PROFILE -->
+        <section id="editProfileSection" class="profile-section">
+
+            <div class="section-heading">
+                <div>
+                    <h2>Edit Profile</h2>
+                    <p>Manage your public profile</p>
+                </div>
+
+                <i class="fa-solid fa-user-pen"></i>
+            </div>
+
+            <label for="newUsername">Username</label>
+
+            <input
+                id="newUsername"
+                type="text"
+                placeholder="Enter username">
+
+            <label for="newBio">Bio</label>
+
+            <textarea
+                id="newBio"
+                placeholder="Tell people about yourself"></textarea>
+
+            <button id="saveProfileBtn" onclick="saveProfile()">
+                <i class="fa-solid fa-floppy-disk"></i>
+                Save Profile
+            </button>
+
+        </section>
+
+        <!-- ACCOUNT TOOLS -->
+        <section id="accountTools" class="profile-section">
+
+            <div class="section-heading">
+                <div>
+                    <h2>Account & Settings</h2>
+                    <p>Your personal 2Chat tools</p>
+                </div>
+
+                <i class="fa-solid fa-gear"></i>
+            </div>
+
+            <div class="tools-grid">
+
+                <button id="savedVideosBtn"
+                    onclick="location.href='/saved-shorts.html'">
+                    <i class="fa-solid fa-bookmark"></i>
+                    <span>Saved Videos</span>
+                </button>
+
+                <button id="walletBtn"
+                    onclick="location.href='/wallet.html'">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>Wallet</span>
+                </button>
+
+                <button id="notificationSettingsBtn"
+                    onclick="location.href='/notification-settings.html'">
+                    <i class="fa-solid fa-bell"></i>
+                    <span>Notifications</span>
+                </button>
+
+                <button id="monetizationBtn"
+                    style="display:none;"
+                    onclick="location.href='/monetization.html'">
+                    <i class="fa-solid fa-coins"></i>
+                    <span>Monetization</span>
+                </button>
+
+                <button id="giftsReceivedBtn"
+                    onclick="location.href='/creator-gifts.html'">
+                    <i class="fa-solid fa-gift"></i>
+                    <span>Gifts Received</span>
+                </button>
+
+                <button id="creatorStudioBtn"
+                    onclick="location.href='/analytics.html'">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Creator Studio</span>
+                </button>
+
+            </div>
+
+            <button id="uploadAvatarBtn" onclick="uploadAvatar()">
+                <i class="fa-solid fa-camera"></i>
+                Upload Avatar
+            </button>
+
+        </section>
+
+        <!-- GENERAL ACTIONS -->
+        <section class="profile-section account-actions">
+
+            <button onclick="goHome()">
+                <i class="fa-solid fa-house"></i>
+                Home
+            </button>
+
+            <button onclick="logout()" class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </button>
+
+        </section>
+
+        <!-- MY POSTS -->
+        <section class="my-posts">
+
+            <div class="section-heading">
+                <div>
+                    <h2>
+                        <i class="fa-solid fa-images"></i>
+                        My Posts
+                    </h2>
+                    <p>Your shared moments on 2Chat</p>
+                </div>
+            </div>
+
+            <div id="myPosts"></div>
+
+        </section>
+
+    </main>
 
 </div>
 
-<!-- Profile -->
-<div class="profile-box">
-
-<img
-id="avatar"
-class="avatar">
-
-<input
-type="file"
-id="avatarFile"
-hidden>
-
-<button
-class="avatar-btn"
-onclick="document.getElementById('avatarFile').click()">
-
-<i class="fa-solid fa-camera"></i>
-Change Photo
-
-</button>
-
-<h2 id="username"></h2>
-
-<div
-id="creatorBadge"
-class="creator-badge">
-
-🥉 Bronze Creator
-
-</div>
-
-<p id="email"></p>
-
-<p id="bio"></p>
-
-<div class="stats">
-
-<div class="stat">
-<h2 id="postsCount">0</h2>
-<p>Posts</p>
-</div>
-
-<div class="stat">
-<b id="followers">0</b><br>
-Followers
-</div>
-
-<div class="stat following-stat"
-     onclick="location.href='/following.html'">
-
-    <b id="following">0</b>
-
-    <p>Following</p>
-
-</div>
-
-</div>
-
-<hr>
-
-<input
-id="newUsername"
-placeholder="New Username">
-
-<br><br>
-
-<textarea
-id="newBio"
-placeholder="Write your bio"></textarea>
-
-<br><br>
-
-<button
-id="followBtn"
-style="display:none;"
-onclick="followUser(profileUsername)">
-
-<i class="fa-solid fa-user-plus"></i>
-Follow
-
-</button>
-
-<button
-    id="sendGiftBtn"
-    class="send-gift-profile-btn"
-    style="display:none;"
-    onclick="openCreatorGifts()">
-     
-    🎁 Send Gift
-
-</button>
-
-<button
-id="savedVideosBtn"
-onclick="location.href='/saved-shorts.html'">
-
-<i class="fa-solid fa-bookmark"></i>
-Saved Videos
-
-</button>
-
-<button
-id="walletBtn"
-onclick="location.href='/wallet.html'">
-
-<i class="fa-solid fa-wallet"></i>
-Wallet
-
-</button>
-
-<button
-id="notificationSettingsBtn"
-onclick="location.href='/notification-settings.html'">
-
-<i class="fa-solid fa-bell"></i>
-Notification Settings
-
-</button>     
-
- 
-<button
-    id="monetizationBtn"
-    style="display:none;"
-    onclick="location.href='/monetization.html'">
-
-    <i class="fa-solid fa-coins"></i>
-    Monetization
-
-</button>
-     
-<button
-id="giftsReceivedBtn"
-onclick="location.href='/creator-gifts.html'">
-
-<i class="fa-solid fa-gift"></i>
-Gifts Received
-
-</button>
-
-<button
-id="creatorStudioBtn"
-onclick="location.href='/analytics.html'">
-
-<i class="fa-solid fa-chart-line"></i>
-Creator Studio
-
-</button>
-
-<button
-id="saveProfileBtn"
-onclick="saveProfile()">
-
-<i class="fa-solid fa-floppy-disk"></i>
-Save Profile
-
-</button>
-
-<button
-id="uploadAvatarBtn"
-onclick="uploadAvatar()">
-
-<i class="fa-solid fa-camera"></i>
-Upload Avatar
-
-</button>
-
-<button
-onclick="goHome()">
-
-<i class="fa-solid fa-house"></i>
-Home
-
-</button>
-
-<button
-onclick="logout()">
-
-<i class="fa-solid fa-right-from-bracket"></i>
-Logout
-
-</button>
-
-</div>
-
-<!-- My Posts -->
-
-<div class="my-posts">
-
-<h2>
-
-<i class="fa-solid fa-images"></i>
-
-My Posts
-
-</h2>
-
-<div id="myPosts"></div>
-
-</div>
-
-<!-- Bottom Navigation -->
-
-<div class="bottom-nav">
-
-<a href="/home.html">
-
-<i class="fa-solid fa-house"></i>
-
-<span>Home</span>
-
-</a>
-
-<a href="/shorts.html">  
-  
-<i class="fa-solid fa-clapperboard"></i>  
-  
-<span>Shorts</span>  
-  
-</a>  
-
-<a href="/trending.html">
-
-<i class="fa-solid fa-fire"></i>
-
-<span>Trending</span>
-
-</a>
-
-<a href="//saved-shorts.html">
-
-<i class="fa-solid fa-bookmark"></i>
-
-<span>Saved</span>
-
-</a>
-
-<a
-href="/profile.html"
-class="active">
-
-<i class="fa-solid fa-user"></i>
-
-<span>Profile</span>
-
-</a>
-
-</div>
+<!-- BOTTOM NAVIGATION -->
+<nav class="bottom-nav">
+
+    <a href="/home.html">
+        <i class="fa-solid fa-house"></i>
+        <span>Home</span>
+    </a>
+
+    <a href="/shorts.html">
+        <i class="fa-solid fa-clapperboard"></i>
+        <span>Shorts</span>
+    </a>
+
+    <a href="/trending.html">
+        <i class="fa-solid fa-fire"></i>
+        <span>Trending</span>
+    </a>
+
+    <a href="/saved-shorts.html">
+        <i class="fa-solid fa-bookmark"></i>
+        <span>Saved</span>
+    </a>
+
+    <a href="/profile.html" class="active">
+        <i class="fa-solid fa-user"></i>
+        <span>Profile</span>
+    </a>
+
+</nav>
 
 <script src="/js/profile.js"></script>
 
 </body>
 </html>
+     
