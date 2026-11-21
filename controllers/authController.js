@@ -478,6 +478,7 @@ return res.json({
 // UPDATE PROFILE
 // =====================================================
 
+
 exports.updateProfile = async (req, res) => {
     try {
         const { username, bio } = req.body;
@@ -493,6 +494,7 @@ exports.updateProfile = async (req, res) => {
 
         // USERNAME VALIDATION
         if (username !== undefined) {
+
             if (typeof username !== "string") {
                 return res.status(400).json({
                     success: false,
@@ -503,19 +505,24 @@ exports.updateProfile = async (req, res) => {
             const cleanUsername = username.trim();
 
             if (
-    cleanUsername.length < 3 ||
-    cleanUsername.length > 30 ||
-    !/^[a-zA-Z0-9][a-zA-Z0-9._-]{1,28}[a-zA-Z0-9]$/.test(cleanUsername)
-) {
-    return res.status(400).json({
-        success: false,
-        message: "Username must be 3-30 characters, use letters, numbers, dots, underscores or hyphens, and start and end with a letter or number."
-    });
-}
+                cleanUsername.length < 3 ||
+                cleanUsername.length > 30 ||
+                !/^[a-zA-Z0-9][a-zA-Z0-9._-]{1,28}[a-zA-Z0-9]$/.test(cleanUsername)
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Username must be 3-30 characters, use letters, numbers, dots, underscores or hyphens, and start and end with a letter or number."
+                });
+            }
 
             const existingUser = await User.findOne({
-                username: cleanUsername,
-                _id: { $ne: req.user._id }
+                username: {
+                    $regex: "^" +
+                        cleanUsername.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") +
+                        "$",
+                    $options: "i"
+                },
+                _id: { $ne: user._id }
             });
 
             if (existingUser) {
@@ -530,6 +537,7 @@ exports.updateProfile = async (req, res) => {
 
         // BIO VALIDATION
         if (bio !== undefined) {
+
             if (
                 typeof bio !== "string" ||
                 bio.length > 500
@@ -547,6 +555,7 @@ exports.updateProfile = async (req, res) => {
 
         return res.json({
             success: true,
+            message: "Profile updated successfully.",
             user: {
                 _id: user._id,
                 username: user.username,
@@ -557,7 +566,15 @@ exports.updateProfile = async (req, res) => {
         });
 
     } catch (err) {
+
         console.error("UPDATE PROFILE ERROR:", err);
+
+        if (err.code === 11000) {
+            return res.status(409).json({
+                success: false,
+                message: "Username is already taken."
+            });
+        }
 
         return res.status(500).json({
             success: false,
@@ -565,7 +582,7 @@ exports.updateProfile = async (req, res) => {
         });
     }
 };
-
+                  
 // =====================================================
 // UPLOAD AVATAR
 // =====================================================
