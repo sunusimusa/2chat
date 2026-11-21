@@ -186,7 +186,22 @@ async function loadGroup(){
 
     try{
 
-        const res = await fetch("/api/groups/" + groupId);
+        const token = localStorage.getItem("token");
+
+if (!token) {
+    alert("Your session has expired. Please login again.");
+    return;
+}
+
+const res = await fetch(
+    "/api/groups/" + groupId,
+    {
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    }
+);
+
         
         const data = await res.json();
 
@@ -228,9 +243,22 @@ async function loadMessages(){
 
     try{
 
-        const res =
-        await fetch("/api/group-messages/" + groupId);
+        const token = localStorage.getItem("token");
 
+if (!token) {
+    console.error("Authentication token not found");
+    return;
+}
+
+const res = await fetch(
+    "/api/group-messages/" + groupId,
+    {
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    }
+);
+    
         const data =
         await res.json();
 
@@ -359,6 +387,7 @@ function observeMessagesForSeen(){
    MARK GROUP MESSAGE AS SEEN
 ========================== */
 
+
 async function markMessageAsSeen(messageElement){
 
     if(!messageElement){
@@ -371,7 +400,6 @@ async function markMessageAsSeen(messageElement){
     const messageSender =
         messageElement.dataset.sender;
 
-    // Ba sai mun mark own message ba
     if(
         !messageId ||
         !messageSender ||
@@ -380,7 +408,6 @@ async function markMessageAsSeen(messageElement){
         return;
     }
 
-    // Kada mu aika sau biyu
     if(
         messageElement.dataset.seen === "true"
     ){
@@ -388,6 +415,14 @@ async function markMessageAsSeen(messageElement){
     }
 
     try{
+
+        const token =
+            localStorage.getItem("token");
+
+        if(!token){
+            console.error("Authentication token not found");
+            return;
+        }
 
         const res =
             await fetch(
@@ -397,7 +432,10 @@ async function markMessageAsSeen(messageElement){
 
                     headers:{
                         "Content-Type":
-                            "application/json"
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer " + token
                     },
 
                     body:JSON.stringify({
@@ -426,14 +464,11 @@ async function markMessageAsSeen(messageElement){
             );
 
             return;
-
         }
 
-        // Mark locally
         messageElement.dataset.seen =
             "true";
 
-        // Notify other group members
         socket.emit(
             "groupMessageSeen",
             {
@@ -458,6 +493,7 @@ async function markMessageAsSeen(messageElement){
     }
 
 }
+
 
 /* ==========================
 APPEND MESSAGE
@@ -923,9 +959,12 @@ messageActionMenu
                             method:"PUT",
 
                             headers:{
-                                "Content-Type":
-                                    "application/json"
-                            },
+    "Content-Type":
+        "application/json",
+
+    "Authorization":
+        "Bearer " + localStorage.getItem("token")
+},
 
                             body:JSON.stringify({
 
@@ -1203,9 +1242,12 @@ if(
                         method:"PUT",
 
                         headers:{
-                            "Content-Type":
-                                "application/json"
-                        },
+    "Content-Type":
+        "application/json",
+
+    "Authorization":
+        "Bearer " + localStorage.getItem("token")
+},
 
                         body:JSON.stringify({
 
@@ -1535,14 +1577,24 @@ if(recordedVoice){
 
     try{
 
-        const res = await fetch(
-            "/api/group-messages/send",
-            {
-                method:"POST",
-                body:formData
-            }
-        );
+        const token = localStorage.getItem("token");
 
+if (!token) {
+    alert("Your session has expired. Please login again.");
+    return;
+}
+
+const res = await fetch(
+    "/api/group-messages/send",
+    {
+        method: "POST",
+        headers: {
+            "Authorization": "Bearer " + token
+        },
+        body: formData
+    }
+);
+        
         // ==========================
         // READ RESPONSE
         // ==========================
@@ -2332,9 +2384,12 @@ reactionPicker
                             method:"PUT",
 
                             headers:{
-                                "Content-Type":
-                                    "application/json"
-                            },
+    "Content-Type":
+        "application/json",
+
+    "Authorization":
+        "Bearer " + localStorage.getItem("token")
+},
 
                             body:JSON.stringify({
 
@@ -2695,10 +2750,13 @@ editAction.addEventListener(
                         method:"PUT",
 
                         headers:{
-                            "Content-Type":
-                                "application/json"
-                        },
+    "Content-Type":
+        "application/json",
 
+    "Authorization":
+        "Bearer " + localStorage.getItem("token")
+},
+                        
                         body:JSON.stringify({
 
                             messageId:
@@ -2989,9 +3047,13 @@ pinAction.addEventListener(
                         method: "PUT",
 
                         headers:{
-                            "Content-Type":
-                                "application/json"
-                        },
+    "Content-Type":
+        "application/json",
+
+    "Authorization":
+        "Bearer " + localStorage.getItem("token")
+},
+                        
 
                         body: JSON.stringify({
 

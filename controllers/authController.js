@@ -881,17 +881,30 @@ exports.registerFcmToken = async (req, res) => {
       });
     }
 
-    await User.findByIdAndUpdate(
-      req.user._id,
-      {
-        $addToSet: {
-          fcmTokens: token.trim()
-        }
-      },
-      {
-        runValidators: true
-      }
-    );
+    const updatedUser = await User.findByIdAndUpdate(
+  req.user._id,
+  {
+    $addToSet: {
+      fcmTokens: token.trim()
+    }
+  },
+  {
+    new: true,
+    runValidators: true
+  }
+);
+
+if (!updatedUser) {
+  return res.status(404).json({
+    success: false,
+    message: "User not found while registering FCM token."
+  });
+}
+
+console.log("✅ FCM TOKEN SAVED:", {
+  username: updatedUser.username,
+  tokenCount: updatedUser.fcmTokens?.length || 0
+});
 
     return res.json({
       success: true,

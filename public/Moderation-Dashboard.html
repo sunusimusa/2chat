@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2Chat Moderation Dashboard</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:Arial,sans-serif;
+  background:#f3f5f9;
+  color:#182230;
+  padding:20px;
+}
+.container{max-width:1100px;margin:auto}
+header{
+  display:flex;justify-content:space-between;
+  align-items:center;gap:12px;margin-bottom:25px;
+}
+h1{font-size:24px}
+.subtitle{color:#667085;margin-top:6px;font-size:13px}
+.panel{
+  background:white;border:1px solid #e5e7eb;
+  border-radius:12px;padding:20px;margin-bottom:20px;
+}
+.login-box{max-width:420px;margin:70px auto}
+input,select,button{
+  width:100%;padding:12px;margin-top:12px;
+  border:1px solid #d0d5dd;border-radius:8px;
+  font-size:14px;
+}
+button{
+  background:#155eef;color:white;border:0;
+  font-weight:bold;cursor:pointer;
+}
+button:disabled{opacity:.6;cursor:not-allowed}
+.logout{width:auto;margin:0;background:#344054}
+.message{margin-top:12px;font-size:13px;color:#d92d20}
+.toolbar{
+  display:flex;gap:12px;align-items:center;
+  flex-wrap:wrap;margin-bottom:15px;
+}
+.toolbar select{max-width:220px;margin:0}
+.stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:12px;margin-bottom:20px;
+}
+.stat{
+  background:white;padding:16px;border-radius:10px;
+  border:1px solid #e5e7eb;
+}
+.stat strong{display:block;font-size:25px;margin-top:8px}
+.report{
+  border:1px solid #e5e7eb;border-radius:10px;
+  padding:16px;margin-top:12px;background:#fff;
+}
+.report-top{
+  display:flex;justify-content:space-between;
+  gap:10px;flex-wrap:wrap;
+}
+.tag{
+  display:inline-block;padding:5px 9px;
+  border-radius:20px;background:#f2f4f7;
+  font-size:12px;font-weight:bold;
+}
+.report p{margin-top:10px;font-size:14px;line-height:1.5}
+.meta{color:#667085;font-size:12px}
+.empty{text-align:center;padding:35px;color:#667085}
+.hidden{display:none}
+  .short-card{
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  padding:16px;
+  margin-top:12px;
+  background:#fff;
+}
+
+.short-card video{
+  width:100%;
+  max-height:350px;
+  background:#000;
+  border-radius:8px;
+  margin-top:12px;
+}
+
+.short-actions{
+  display:flex;
+  gap:10px;
+  margin-top:15px;
+}
+
+.short-actions button{
+  flex:1;
+  margin:0;
+}
+
+.approve-btn{
+  background:#039855;
+}
+
+.remove-btn{
+  background:#d92d20;
+}
+
+.short-meta{
+  color:#667085;
+  font-size:12px;
+  margin-top:8px;
+}
+
+@media(max-width:600px){
+  .short-actions{
+    flex-direction:column;
+  }
+}
+  
+@media(max-width:600px){
+  body{padding:12px}
+  .stats{grid-template-columns:1fr}
+  h1{font-size:19px}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <div>
+    <h1>2Chat Moderation</h1>
+    <p class="subtitle">Admin report management</p>
+  </div>
+  <button id="logoutBtn" class="logout hidden">Logout</button>
+</header>
+
+<section id="loginSection" class="panel login-box">
+  <h2>Admin Login</h2>
+  <p class="subtitle">Sign in with your existing 2Chat admin account.</p>
+
+  <form id="loginForm">
+    <input id="loginValue" type="text"
+      placeholder="Email or username" required autocomplete="username">
+
+    <input id="password" type="password"
+      placeholder="Password" required autocomplete="current-password">
+
+    <button id="loginBtn" type="submit">Login</button>
+    <div id="loginMessage" class="message"></div>
+  </form>
+</section>
+
+<section id="dashboardSection" class="hidden">
+
+  <div class="stats">
+    <div class="stat">
+      Total Reports
+      <strong id="totalCount">0</strong>
+    </div>
+    <div class="stat">
+      Pending
+      <strong id="pendingCount">0</strong>
+    </div>
+    <div class="stat">
+      Reviewed
+      <strong id="reviewedCount">0</strong>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="toolbar">
+      <h2 style="flex:1">Reports</h2>
+      <select id="statusFilter">
+        <option value="all">All Reports</option>
+        <option value="pending">Pending</option>
+        <option value="reviewed">Reviewed</option>
+        <option value="action_taken">Action Taken</option>
+        <option value="dismissed">Dismissed</option>
+      </select>
+      <button id="refreshBtn" style="width:auto;margin:0">Refresh</button>
+    </div>
+
+    <div id="reportsList">
+      <div class="empty">Loading reports...</div>
+    </div>
+
+    <div id="dashboardMessage" class="message"></div>
+  </div>
+
+    <!-- PENDING SHORTS MODERATION -->
+  <div class="panel">
+    <div class="toolbar">
+      <h2 style="flex:1">Pending Shorts</h2>
+      <button
+        id="refreshShortsBtn"
+        style="width:auto;margin:0"
+      >
+        Refresh
+      </button>
+    </div>
+
+    <div id="pendingShortsList">
+      <div class="empty">Loading pending Shorts...</div>
+    </div>
+
+    <div id="shortsMessage" class="message"></div>
+      </div>
+
+</section>
+</div>
+
+<script>
+const API = "";
+
+const loginSection = document.getElementById("loginSection");
+const dashboardSection = document.getElementById("dashboardSection");
+const loginForm = document.getElementById("loginForm");
+const loginMessage = document.getElementById("loginMessage");
+const dashboardMessage = document.getElementById("dashboardMessage");
+const reportsList = document.getElementById("reportsList");
+const logoutBtn = document.getElementById("logoutBtn");
+
+let reports = [];
+let token = localStorage.getItem("moderationToken") || "";
+
+ let pendingShorts = [];
+
+const pendingShortsList = document.getElementById("pendingShortsList");
+const shortsMessage = document.getElementById("shortsMessage");
+
+async function loadPendingShorts(){
+  pendingShortsList.innerHTML =
+    '<div class="empty">Loading pending Shorts...</div>';
+
+  shortsMessage.textContent = "";
+
+  try{
+    const response = await fetch(
+      API + "/api/shorts/admin/pending",
+      {
+        headers:{
+          "Authorization":"Bearer " + token
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if(response.status === 401 || response.status === 403){
+      logout();
+      throw new Error("Admin access denied. Please login again.");
+    }
+
+    if(!response.ok || !data.success){
+      throw new Error(data.message || "Could not load pending Shorts.");
+    }
+
+    pendingShorts = Array.isArray(data.videos) ? data.videos : [];
+
+    renderPendingShorts();
+
+  }catch(error){
+    pendingShortsList.innerHTML =
+      '<div class="empty">Unable to load pending Shorts.</div>';
+
+    shortsMessage.textContent = error.message;
+  }
+}
+
+function renderPendingShorts(){
+  if(!pendingShorts.length){
+    pendingShortsList.innerHTML =
+      '<div class="empty">No pending Shorts found.</div>';
+    return;
+  }
+
+  pendingShortsList.innerHTML = pendingShorts.map(video => {
+    const date = video.createdAt
+      ? new Date(video.createdAt).toLocaleString()
+      : "Unknown date";
+
+    return `
+      <article class="short-card">
+        <div class="report-top">
+          <strong>${escapeHTML(video.username || "Unknown creator")}</strong>
+          <span class="tag">pending</span>
+        </div>
+
+        <p>${escapeHTML(video.caption || "No caption")}</p>
+
+        <p class="short-meta">
+          Category: ${escapeHTML(video.category || "General")}
+        </p>
+
+        <p class="short-meta">
+          Submitted: ${escapeHTML(date)}
+        </p>
+
+        <video controls preload="metadata"
+          src="${escapeHTML(video.video || "")}">
+        </video>
+
+        <div class="short-actions">
+          <button class="approve-btn"
+            data-action="approve"
+            data-id="${escapeHTML(video._id)}">
+            Approve
+          </button>
+
+          <button class="remove-btn"
+            data-action="remove"
+            data-id="${escapeHTML(video._id)}">
+            Remove
+          </button>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+pendingShortsList.addEventListener("click", async function(e){
+  const button = e.target.closest("button[data-action]");
+
+  if(!button) return;
+
+  const videoId = button.dataset.id;
+  const action = button.dataset.action;
+
+  let reason = "";
+
+  if(action === "remove"){
+    reason = prompt("Enter the reason for removing this video:");
+
+    if(reason === null) return;
+
+    reason = reason.trim();
+
+    if(!reason || reason.length > 500){
+      alert("Reason must be between 1 and 500 characters.");
+      return;
+    }
+  }
+
+  if(action === "approve" &&
+     !confirm("Approve this Short video?")){
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Processing...";
+
+  try{
+    const response = await fetch(
+      API + "/api/shorts/admin/moderate/" + encodeURIComponent(videoId),
+      {
+        method:"PUT",
+        headers:{
+          "Content-Type":"application/json",
+          "Authorization":"Bearer " + token
+        },
+        body:JSON.stringify({ action, reason })
+      }
+    );
+
+    const data = await response.json();
+
+    if(response.status === 401 || response.status === 403){
+      logout();
+      throw new Error("Admin access denied. Please login again.");
+    }
+
+    if(!response.ok || !data.success){
+      throw new Error(data.message || "Moderation action failed.");
+    }
+
+    shortsMessage.textContent = data.message;
+    await loadPendingShorts();
+
+  }catch(error){
+    shortsMessage.textContent = error.message;
+    button.disabled = false;
+    button.textContent = action === "approve" ? "Approve" : "Remove";
+  }
+});
+
+document.getElementById("refreshShortsBtn")
+  .addEventListener("click", loadPendingShorts); 
+
+function escapeHTML(value){
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  })[char]);
+}
+
+function showDashboard(){
+  loginSection.classList.add("hidden");
+  dashboardSection.classList.remove("hidden");
+  logoutBtn.classList.remove("hidden");
+}
+
+function showLogin(){
+  loginSection.classList.remove("hidden");
+  dashboardSection.classList.add("hidden");
+  logoutBtn.classList.add("hidden");
+}
+
+function logout(){
+  token = "";
+  localStorage.removeItem("moderationToken");
+  localStorage.removeItem("moderationUser");
+  reports = [];
+  showLogin();
+}
+
+logoutBtn.addEventListener("click", logout);
+
+loginForm.addEventListener("submit", async function(e){
+  e.preventDefault();
+
+  const loginBtn = document.getElementById("loginBtn");
+  loginBtn.disabled = true;
+  loginBtn.textContent = "Signing in...";
+  loginMessage.textContent = "";
+
+  try{
+    const response = await fetch(API + "/api/auth/login", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        email:document.getElementById("loginValue").value.trim(),
+        password:document.getElementById("password").value
+      })
+    });
+
+    const data = await response.json();
+
+    if(!response.ok || !data.success){
+      throw new Error(data.message || "Login failed");
+    }
+
+    if(!data.user || data.user.role !== "admin"){
+      throw new Error("Access denied. Admin account required.");
+    }
+
+    if(!data.token){
+      throw new Error("Login response did not include a token.");
+    }
+
+    token = data.token;
+    localStorage.setItem("moderationToken", token);
+    localStorage.setItem("moderationUser", JSON.stringify(data.user));
+
+    showDashboard();
+    await loadReports();
+    await loadPendingShorts();
+    
+  }catch(error){
+    loginMessage.textContent = error.message;
+  }finally{
+    loginBtn.disabled = false;
+    loginBtn.textContent = "Login";
+  }
+});
+
+async function loadReports(){
+  reportsList.innerHTML = '<div class="empty">Loading reports...</div>';
+  dashboardMessage.textContent = "";
+
+  try{
+    const response = await fetch(API + "/api/reports", {
+      headers:{
+        "Authorization":"Bearer " + token
+      }
+    });
+
+    const data = await response.json();
+
+    if(response.status === 401 || response.status === 403){
+      logout();
+      throw new Error("Your session expired or access was denied. Please login again.");
+    }
+
+    if(!response.ok || !data.success){
+      throw new Error(data.message || "Could not load reports.");
+    }
+
+    reports = Array.isArray(data.reports) ? data.reports : [];
+    updateStats();
+    renderReports();
+
+  }catch(error){
+    reportsList.innerHTML = '<div class="empty">Unable to load reports.</div>';
+    dashboardMessage.textContent = error.message;
+  }
+}
+
+function updateStats(){
+  document.getElementById("totalCount").textContent = reports.length;
+  document.getElementById("pendingCount").textContent =
+    reports.filter(r => r.status === "pending").length;
+  document.getElementById("reviewedCount").textContent =
+    reports.filter(r => r.status === "reviewed").length;
+}
+
+function renderReports(){
+  const filter = document.getElementById("statusFilter").value;
+
+  const filtered = filter === "all"
+    ? reports
+    : reports.filter(r => r.status === filter);
+
+  if(!filtered.length){
+    reportsList.innerHTML = '<div class="empty">No reports found.</div>';
+    return;
+  }
+
+  reportsList.innerHTML = filtered.map(report => {
+    const reporter = report.reportedBy?.username || "Unknown";
+    const reportedUser = report.reportedUser?.username || "Not specified";
+    const date = report.createdAt
+      ? new Date(report.createdAt).toLocaleString()
+      : "Unknown date";
+
+    return `
+      <article class="report">
+        <div class="report-top">
+          <strong>${escapeHTML(report.contentType || "Unknown content")}</strong>
+          <span class="tag">${escapeHTML(report.status || "pending")}</span>
+        </div>
+
+        <p><b>Reason:</b> ${escapeHTML(report.reason || "Not specified")}</p>
+        <p><b>Reported by:</b> ${escapeHTML(reporter)}</p>
+        <p><b>Reported user:</b> ${escapeHTML(reportedUser)}</p>
+        <p><b>Content ID:</b> ${escapeHTML(report.contentId || "N/A")}</p>
+        <p><b>Description:</b> ${escapeHTML(report.description || "No description provided")}</p>
+        <p class="meta">Submitted: ${escapeHTML(date)}</p>
+      </article>
+    `;
+  }).join("");
+}
+
+document.getElementById("statusFilter")
+  .addEventListener("change", renderReports);
+
+document.getElementById("refreshBtn")
+  .addEventListener("click", loadReports);
+
+async function checkExistingSession(){
+  if(!token){
+    showLogin();
+    return;
+  }
+
+  try{
+    const user = JSON.parse(
+      localStorage.getItem("moderationUser") || "null"
+    );
+
+    if(!user || user.role !== "admin"){
+      logout();
+      return;
+    }
+
+    showDashboard();
+    await loadReports();
+    await loadPendingShorts();
+    
+  }catch(error){
+    logout();
+  }
+}
+
+checkExistingSession();
+</script>
+</body>
+</html>
+  

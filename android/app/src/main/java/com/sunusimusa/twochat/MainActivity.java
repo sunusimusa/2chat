@@ -41,6 +41,8 @@ static final String ACTION_FCM_TOKEN_REFRESHED =
     private WebView webView;
     private ValueCallback<Uri[]> filePathCallback;
 
+    private String pendingFcmToken;
+
     private static final int FILE_CHOOSER_REQUEST = 1001;
     private static final int PERMISSION_REQUEST = 1002;
     private static final int NATIVE_AUDIO_PERMISSION_REQUEST = 1003;

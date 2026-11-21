@@ -4,6 +4,13 @@ const upload = require("../middleware/upload");
 
 const protect = require("../middleware/auth");
 
+const adminAuth = require("../middleware/adminAuth");
+
+const {
+    moderateShort,
+    getPendingShorts
+} = require("../controllers/shortModerationController");
+
 const {
     uploadVideo,
     getVideos,
@@ -11,6 +18,7 @@ const {
     commentVideo,
     addView,
     saveVideo,
+    migrateLegacyShorts,
     getSavedVideos,
     getForYouVideos,
     addWatchTime,
@@ -31,6 +39,29 @@ router.post(
     protect,
     upload.single("video"),
     uploadVideo
+);
+
+router.post(
+    "/admin/migrate-legacy",
+    protect,
+    adminAuth,
+    migrateLegacyShorts
+);
+
+// Admin: Moderate Short Video
+router.put(
+    "/admin/moderate/:id",
+    protect,
+    adminAuth,
+    moderateShort
+);
+
+// Admin: Get Pending Shorts
+router.get(
+    "/admin/pending",
+    protect,
+    adminAuth,
+    getPendingShorts
 );
 
 // Get All Videos

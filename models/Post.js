@@ -36,6 +36,36 @@ const postSchema = new mongoose.Schema({
         default: []
     },
 
+        moderationStatus: {
+        type: String,
+        enum: ["pending", "approved", "rejected", "removed"],
+        default: "pending",
+        index: true
+    },
+
+    moderationReason: {
+        type: String,
+        default: "",
+        maxlength: 1000
+    },
+
+    isRemoved: {
+        type: Boolean,
+        default: false,
+        index: true
+    },
+
+    removedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null
+    },
+
+    removedAt: {
+        type: Date,
+        default: null
+    },
+
     comments: {
         type: [
             {

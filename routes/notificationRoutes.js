@@ -1,34 +1,41 @@
-const router =
-require("express").Router();
-
+const router = require("express").Router();
 const protect = require("../middleware/auth");
 
 router.use(protect);
 
 const {
+    getNotifications,
+    readNotification,
+    getUnreadCount,
+    getNotificationSettings,
+    updateNotificationSettings
+} = require("../controllers/notificationController");
 
-getNotifications,
 
-readNotification,
-
-getUnreadCount
-
-} =
-require("../controllers/notificationController");
+// =========================================
+// NOTIFICATION SETTINGS
+// =========================================
 
 router.get(
-"/:username",
-getNotifications
+    "/settings",
+    getNotificationSettings
 );
 
 router.put(
-"/read",
-readNotification
+    "/settings",
+    updateNotificationSettings
 );
 
-router.get(
-"/count/:username",
-getUnreadCount
-);
+
+// =========================================
+// NOTIFICATION LIST
+// =========================================
+
+router.get("/:username", getNotifications);
+
+router.put("/read", readNotification);
+
+router.get("/count/:username", getUnreadCount);
+
 
 module.exports = router;

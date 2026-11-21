@@ -22,15 +22,103 @@ const shortVideoSchema = new mongoose.Schema({
         default: "general"
     },
 
-    hashtags:{
-    type:[String],
-    default:[]
-},
+    hashtags: {
+        type: [String],
+        default: []
+    },
 
     video: {
         type: String,
         required: true
     },
+
+    // ==============================
+    // CONTENT MODERATION
+    // ==============================
+
+    moderationStatus: {
+        type: String,
+        enum: [
+            "pending",
+            "approved",
+            "rejected",
+            "removed"
+        ],
+        default: "pending",
+        index: true
+    },
+
+    moderationReason: {
+        type: String,
+        default: ""
+    },
+
+    moderationDetails: {
+        type: String,
+        default: ""
+    },
+
+    moderationCategories: {
+        type: [String],
+        enum: [
+            "nudity",
+            "sexual_content",
+            "child_safety",
+            "graphic_violence",
+            "gore",
+            "threats",
+            "harassment",
+            "hate",
+            "spam",
+            "other"
+        ],
+        default: []
+    },
+
+    reviewedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null
+    },
+
+    reviewedAt: {
+        type: Date,
+        default: null
+    },
+
+    moderationHistory: [{
+        action: {
+            type: String,
+            enum: [
+                "submitted",
+                "screened",
+                "approved",
+                "rejected",
+                "removed",
+                "restored"
+            ]
+        },
+
+        reason: {
+            type: String,
+            default: ""
+        },
+
+        performedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null
+        },
+
+        createdAt: {
+            type: Date,
+            default: Date.now
+        }
+    }],
+
+    // ==============================
+    // EXISTING SHORTS FEATURES
+    // ==============================
 
     likes: {
         type: [String],
@@ -70,4 +158,16 @@ const shortVideoSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// Indexes for moderation dashboard
+shortVideoSchema.index({
+    moderationStatus: 1,
+    createdAt: -1
+});
+
+shortVideoSchema.index({
+    username: 1,
+    moderationStatus: 1
+});
+
 module.exports = mongoose.model("ShortVideo", shortVideoSchema);
+        

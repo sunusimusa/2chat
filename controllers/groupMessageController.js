@@ -1,9 +1,11 @@
 const GroupMessage = require("../models/GroupMessage");
 const Group = require("../models/Group");
+const Notification = require("../models/Notification");
+
+const { sendPushNotification } = require("../services/notificationService");
 
 const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
-
 
 // ==================================================
 // SEND GROUP MESSAGE
@@ -322,24 +324,59 @@ if (!isMember) {
         }
 
 
-        await Group.findByIdAndUpdate(
+        // ==================================================
+// GROUP PUSH NOTIFICATIONS
+// ==================================================
 
-            groupId,
+const recipients = [
+    ...new Set([
+        ...group.members,
+        group.owner
+    ])
+].filter(username => username !== sender);
 
-            {
+const notificationTitle = `New message in ${group.name}`;
+const notificationBody = `You have a new message from ${sender}`;
 
-                lastMessage,
+await Promise.all(
+    recipients.map(async (username) => {
 
-                lastMessageSender:
-                    sender,
+        try {
 
-                lastMessageTime:
-                    new Date()
+            await Notification.create({
+                receiver: username,
+                sender,
+                type: "message",
+                text: notificationTitle
+            });
 
-            }
+      const pushResult = await sendPushNotification({ 
+      recipientUsername: username,
+          title: notificationTitle,
+          body: notificationBody,
+          data: {
+              type: "group_message",
+              groupId: String(groupId),
+              sender
+         }
+      });
 
-        );
+      console.log("GROUP PUSH RESULT:", {
+       recipient: username,
+       result: pushResult
+    });
+            
+        } catch (error) {
 
+            console.error(
+                `GROUP NOTIFICATION ERROR (${username}):`,
+                error
+            );
+
+        }
+
+    })
+);
 
         // ==================================================
         // RESPONSE

@@ -3,6 +3,52 @@ const User = require("../models/User");
 const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
 
+/**
+ * LEGACY SHORTS MODERATION MIGRATION
+ *
+ * Tsoffin videos da ba su da moderationStatus
+ * za su koma pending domin admin ya sake duba su.
+ */
+
+exports.migrateLegacyShorts = async (req, res) => {
+    try {
+        const result = await ShortVideo.updateMany(
+            {
+                moderationStatus: { $exists: false }
+            },
+            {
+                $set: {
+                    moderationStatus: "pending",
+                    moderationReason: "Legacy video awaiting moderation review",
+                    moderationDetails: "This video requires admin review before public visibility."
+                },
+                $push: {
+                    moderationHistory: {
+                        action: "submitted",
+                        reason: "Legacy video moved to moderation review",
+                        performedBy: req.admin._id,
+                        createdAt: new Date()
+                    }
+                }
+            }
+        );
+
+        return res.json({
+            success: true,
+            message: "Legacy Shorts migration completed.",
+            matchedCount: result.matchedCount,
+            modifiedCount: result.modifiedCount
+        });
+
+    } catch (err) {
+        console.error("LEGACY SHORTS MIGRATION ERROR:", err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to migrate legacy Shorts."
+        });
+    }
+};
 
 // Upload Short Video
 exports.uploadVideo = async (req, res) => {
@@ -92,12 +138,18 @@ exports.uploadVideo = async (req, res) => {
                 
 
 // Get Videos
+
 exports.getVideos = async (req, res) => {
 
     try {
 
-        const videos = await ShortVideo.find()
-            .sort({ createdAt: -1 });
+        const videos = await ShortVideo.find({
+            $or: [
+                { moderationStatus: "approved" },
+                { moderationStatus: { $exists: false } }
+            ]
+        })
+        .sort({ createdAt: -1 });
 
         res.json({
             success: true,
@@ -114,8 +166,9 @@ exports.getVideos = async (req, res) => {
     }
 
 };
-
+        
 // Like Video
+
 exports.likeVideo = async (req, res) => {
     try {
         const { videoId } = req.body;
@@ -134,6 +187,16 @@ exports.likeVideo = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: "Video not found."
+            });
+        }
+
+        if (
+            video.moderationStatus &&
+            video.moderationStatus !== "approved"
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "This video is not available."
             });
         }
 
@@ -166,8 +229,9 @@ exports.likeVideo = async (req, res) => {
         });
     }
 };
-
+                
 // Comment
+
 exports.commentVideo = async (req, res) => {
     try {
         const { videoId, text } = req.body;
@@ -200,6 +264,16 @@ exports.commentVideo = async (req, res) => {
             });
         }
 
+        if (
+            video.moderationStatus &&
+            video.moderationStatus !== "approved"
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "This video is not available."
+            });
+        }
+
         if (!Array.isArray(video.comments)) {
             video.comments = [];
         }
@@ -225,6 +299,7 @@ exports.commentVideo = async (req, res) => {
         });
     }
 };
+        
 
 // Add View
 
@@ -232,6 +307,7 @@ exports.addView = async (req, res) => {
     try {
         const videoId = req.params.id;
 
+        // Validate video ID
         if (
             typeof videoId !== "string" ||
             !/^[a-fA-F0-9]{24}$/.test(videoId)
@@ -242,6 +318,7 @@ exports.addView = async (req, res) => {
             });
         }
 
+        // Find video
         const video = await ShortVideo.findById(videoId);
 
         if (!video) {
@@ -251,6 +328,18 @@ exports.addView = async (req, res) => {
             });
         }
 
+        // Check moderation status
+        if (
+            video.moderationStatus &&
+            video.moderationStatus !== "approved"
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "This video is not available."
+            });
+        }
+
+        // Increase views
         video.views = (video.views || 0) + 1;
 
         await video.save();
@@ -269,13 +358,15 @@ exports.addView = async (req, res) => {
         });
     }
 };
-            
+
 // ================= SAVE / UNSAVE VIDEO =================
+
 exports.saveVideo = async (req, res) => {
     try {
         const { videoId } = req.body;
         const userId = req.user._id;
 
+        // Validate video ID
         if (
             typeof videoId !== "string" ||
             !/^[a-fA-F0-9]{24}$/.test(videoId)
@@ -286,6 +377,7 @@ exports.saveVideo = async (req, res) => {
             });
         }
 
+        // Find user
         const user = await User.findById(userId);
 
         if (!user) {
@@ -295,12 +387,24 @@ exports.saveVideo = async (req, res) => {
             });
         }
 
+        // Find video
         const video = await ShortVideo.findById(videoId);
 
         if (!video) {
             return res.status(404).json({
                 success: false,
                 message: "Video not found."
+            });
+        }
+
+        // Check moderation status
+        if (
+            video.moderationStatus &&
+            video.moderationStatus !== "approved"
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "This video is not available."
             });
         }
 
@@ -317,7 +421,10 @@ exports.saveVideo = async (req, res) => {
                 id => id.toString() !== videoId
             );
 
-            video.saves = Math.max(0, (video.saves || 0) - 1);
+            video.saves = Math.max(
+                0,
+                (video.saves || 0) - 1
+            );
 
             await user.save();
             await video.save();
@@ -350,6 +457,7 @@ exports.saveVideo = async (req, res) => {
         });
     }
 };
+            
 
 exports.getSavedVideos = async (req, res) => {
     try {
@@ -357,10 +465,18 @@ exports.getSavedVideos = async (req, res) => {
 
         const user = await User.findById(userId)
             .populate({
-                path: "savedVideos",
-                model: "ShortVideo"
+                 path: "savedVideos",
+                 model: "ShortVideo",
+                 match: {
+                     $or: [
+                        { moderationStatus:
+             "approved" },
+                          { moderationStatus:
+            { $exists: false } }
+                    ]
+                 }
             });
-
+        
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -370,7 +486,7 @@ exports.getSavedVideos = async (req, res) => {
 
         return res.json({
             success: true,
-            videos: user.savedVideos || []
+            videos: (user.savedVideos || []).filter(Boolean)
         });
 
     } catch (err) {
@@ -396,8 +512,14 @@ exports.getForYouVideos = async (req, res) => {
             });
         }
 
-        let videos = await ShortVideo.find()
-            .sort({ createdAt: -1 });
+        let videos = await ShortVideo.find({
+            $or: [
+                { moderationStatus:
+        "approved" },
+                 { moderationStatus:
+        { $exists: false } }
+            ]
+        }).sort({ createdAt: -1 });
 
         const following = Array.isArray(user.following)
             ? user.following
@@ -415,28 +537,32 @@ exports.getForYouVideos = async (req, res) => {
 
         // Categories daga Saved Videos
         const savedVideos = await ShortVideo.find({
-            _id: { $in: user.savedVideos || [] }
-        });
+    _id: { $in: user.savedVideos || [] },
+    $or: [
+        { moderationStatus: "approved" },
+        { moderationStatus: { $exists: false } }
+    ]
+});
 
         // Ƙara maki daga Comments
         videos.forEach(video => {
-            const commented = video.comments.some(
-                comment => comment.username === user.username
-            );
+    const commented = (video.comments || []).some(
+        comment => comment.username === user.username
+    );
 
-            if (commented) {
-                favoriteCategories[video.category] =
-                    (favoriteCategories[video.category] || 0) + 2;
-            }
-        });
-
+    if (commented) {
+        favoriteCategories[video.category] =
+            (favoriteCategories[video.category] || 0) + 2;
+    }
+});
+        
         // Ƙara maki daga Likes
         videos.forEach(video => {
-            if (video.likes.includes(user.username)) {
-                favoriteCategories[video.category] =
-                    (favoriteCategories[video.category] || 0) + 2;
-            }
-        });
+    if ((video.likes || []).includes(user.username)) {
+        favoriteCategories[video.category] =
+            (favoriteCategories[video.category] || 0) + 2;
+    }
+});
 
         // Ƙara maki daga Saved Videos
         savedVideos.forEach(video => {
@@ -484,12 +610,12 @@ exports.getForYouVideos = async (req, res) => {
     }
 };
 
-
 exports.addWatchTime = async (req, res) => {
     try {
         const videoId = req.params.id;
         const { seconds } = req.body;
 
+        // Validate video ID
         if (
             typeof videoId !== "string" ||
             !/^[a-fA-F0-9]{24}$/.test(videoId)
@@ -500,6 +626,7 @@ exports.addWatchTime = async (req, res) => {
             });
         }
 
+        // Validate watch time
         if (
             typeof seconds !== "number" ||
             !Number.isFinite(seconds) ||
@@ -512,6 +639,7 @@ exports.addWatchTime = async (req, res) => {
             });
         }
 
+        // Find video
         const video = await ShortVideo.findById(videoId);
 
         if (!video) {
@@ -521,6 +649,18 @@ exports.addWatchTime = async (req, res) => {
             });
         }
 
+        // Check moderation status
+        if (
+            video.moderationStatus &&
+            video.moderationStatus !== "approved"
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "This video is not available."
+            });
+        }
+
+        // Update watch time
         video.watchTime = (video.watchTime || 0) + seconds;
 
         await video.save();
@@ -539,30 +679,39 @@ exports.addWatchTime = async (req, res) => {
         });
     }
 };
+            
 
 exports.getTrendingVideos = async (req, res) => {
 
     try {
 
-        const videos = await ShortVideo.find();
-
+        const videos = await
+        ShortVideo.find({
+            $or: [
+                { moderationStatus:
+        "approved" },
+                 { moderationStatus:
+        { $exists: false } }
+            ]
+        });
+        
         videos.sort((a, b) => {
 
-            const scoreA =
-                (a.views * 1) +
-                (a.likes.length * 5) +
-                (a.comments.length * 8) +
-                ((a.watchTime || 0) / 60);
+    const scoreA =
+        ((a.views || 0) * 1) +
+        ((a.likes?.length || 0) * 5) +
+        ((a.comments?.length || 0) * 8) +
+        ((a.watchTime || 0) / 60);
 
-            const scoreB =
-                (b.views * 1) +
-                (b.likes.length * 5) +
-                (b.comments.length * 8) +
-                ((b.watchTime || 0) / 60);
+    const scoreB =
+        ((b.views || 0) * 1) +
+        ((b.likes?.length || 0) * 5) +
+        ((b.comments?.length || 0) * 8) +
+        ((b.watchTime || 0) / 60);
 
-            return scoreB - scoreA;
+    return scoreB - scoreA;
 
-        });
+});
 
         res.json({
 
@@ -588,26 +737,44 @@ exports.getTrendingVideos = async (req, res) => {
 
 // ================= SHARE VIDEO =================
 
+
 exports.addShare = async (req, res) => {
     try {
         const videoId = req.params.id;
 
-        if (!videoId || !/^[0-9a-fA-F]{24}$/.test(videoId)) {
+        // Validate video ID
+        if (
+            typeof videoId !== "string" ||
+            !/^[a-fA-F0-9]{24}$/.test(videoId)
+        ) {
             return res.status(400).json({
                 success: false,
-                message: "Invalid video ID"
+                message: "Invalid video ID."
             });
         }
 
+        // Find video
         const video = await ShortVideo.findById(videoId);
 
         if (!video) {
             return res.status(404).json({
                 success: false,
-                message: "Video not found"
+                message: "Video not found."
             });
         }
 
+        // Check moderation status
+        if (
+            video.moderationStatus &&
+            video.moderationStatus !== "approved"
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "This video is not available."
+            });
+        }
+
+        // Increase share count
         video.shares = (video.shares || 0) + 1;
 
         await video.save();
@@ -618,14 +785,15 @@ exports.addShare = async (req, res) => {
         });
 
     } catch (err) {
-        console.error("Add Share Error:", err);
+        console.error("ADD SHARE ERROR:", err);
 
         return res.status(500).json({
             success: false,
-            message: "Unable to update share count"
+            message: "Unable to update share count."
         });
     }
 };
+    
 
 exports.getAnalytics = async (req, res) => {
 
@@ -634,9 +802,14 @@ exports.getAnalytics = async (req, res) => {
         // Get authenticated user's username from JWT
         const username = req.user.username;
 
-        const videos = await ShortVideo.find({ username })
-            .select("username avatar caption video views likes comments shares saves createdAt");
-
+        const videos = await ShortVideo.find({
+    username,
+    $or: [
+        { moderationStatus: "approved" },
+        { moderationStatus: { $exists: false } }
+    ]
+}).select("username avatar caption video views likes comments shares saves createdAt");
+        
         let totalViews = 0;
         let totalLikes = 0;
         let totalComments = 0;
@@ -700,8 +873,12 @@ exports.getAnalyticsChart = async (req, res) => {
         const username = req.user.username;
 
         const videos = await ShortVideo.find({
-            username
-        }).select("views createdAt");
+    username,
+    $or: [
+        { moderationStatus: "approved" },
+        { moderationStatus: { $exists: false } }
+    ]
+}).select("views createdAt");
 
         const chart = [];
 
@@ -755,9 +932,14 @@ exports.getTopVideos = async (req, res) => {
 
         const username = req.user.username;
 
-        const videos = await ShortVideo.find({ username })
-            .select("username avatar caption video views likes watchTime");
-
+        const videos = await ShortVideo.find({
+    username,
+    $or: [
+        { moderationStatus: "approved" },
+        { moderationStatus: { $exists: false } }
+    ]
+}).select("username avatar caption video views likes watchTime");
+        
         videos.sort((a, b) => {
 
             const scoreA =
@@ -871,9 +1053,14 @@ exports.getCreatorLevel = async (req, res) => {
             });
         }
 
-        const videos = await ShortVideo.find({ username })
-            .select("views likes watchTime");
-
+        const videos = await ShortVideo.find({
+    username,
+    $or: [
+        { moderationStatus: "approved" },
+        { moderationStatus: { $exists: false } }
+    ]
+}).select("views likes watchTime");
+        
         let views = 0;
         let likes = 0;
         let watchTime = 0;
@@ -953,9 +1140,13 @@ exports.getCreatorBadge = async (req, res) => {
         }
 
         const videos = await ShortVideo.find({
-            username: user.username
-        }).select("views watchTime");
-
+    username: user.username,
+    $or: [
+        { moderationStatus: "approved" },
+        { moderationStatus: { $exists: false } }
+    ]
+}).select("views watchTime");
+        
         let views = 0;
         let watchTime = 0;
 
@@ -1012,7 +1203,6 @@ exports.getCreatorBadge = async (req, res) => {
 
 // ================= SEARCH SHORTS =================
 
-
 exports.searchShorts = async (req, res) => {
     try {
         const keyword = String(req.params.keyword || "").trim();
@@ -1030,7 +1220,10 @@ exports.searchShorts = async (req, res) => {
             "\\$&"
         );
 
-        const videos = await ShortVideo.find({
+        
+const videos = await ShortVideo.find({
+    $and: [
+        {
             $or: [
                 {
                     caption: {
@@ -1050,7 +1243,16 @@ exports.searchShorts = async (req, res) => {
                     }
                 }
             ]
-        })
+        },
+        {
+            $or: [
+                { moderationStatus: "approved" },
+                { moderationStatus: { $exists: false } }
+            ]
+        }
+    ]
+})
+
         .select("-__v")
         .sort({ createdAt: -1 })
         .limit(30)

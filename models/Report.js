@@ -81,14 +81,64 @@ const reportSchema = new mongoose.Schema(
         reviewedAt: {
             type: Date,
             default: null
-        }
-    },
+        },
 
+        actionHistory: [
+            {
+                action: {
+                    type: String,
+                    enum: [
+                        "content_removed",
+                        "content_restored",
+                        "user_suspended",
+                        "user_unsuspended",
+                        "report_dismissed"
+                    ],
+                    required: true
+                },
+
+                targetType: {
+                    type: String,
+                    enum: [
+                        "profile",
+                        "post",
+                        "short",
+                        "message",
+                        "group_message",
+                        "user"
+                    ],
+                    required: true
+                },
+
+                targetId: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    default: null
+                },
+
+                reason: {
+                    type: String,
+                    trim: true,
+                    maxlength: 1000,
+                    default: ""
+                },
+
+                performedBy: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "User",
+                    required: true
+                },
+
+                createdAt: {
+                    type: Date,
+                    default: Date.now
+                }
+            }
+        ]
+    },
     {
         timestamps: true
     }
 );
-
 
 // =====================================================
 // INDEXES

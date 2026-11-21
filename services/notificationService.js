@@ -1,4 +1,3 @@
-
 /* =====================================================
    2CHAT CENTRAL PUSH NOTIFICATION SERVICE
 ===================================================== */
@@ -176,11 +175,26 @@ async function sendPushNotification({
             };
         }
 
-        const user = await User.findOne({
-            username: recipientUsername.trim()
-        }).select("_id username +fcmTokens");
+       const user = await User.findOne({
+    username: recipientUsername.trim()
+}).select("_id username +fcmTokens notificationsEnabled");
 
-        if (!user || !user.fcmTokens?.length) {
+if (!user) {
+    return {
+        success: false,
+        message: "Recipient not found."
+    };
+}
+
+// Respect user's notification preference
+if (user.notificationsEnabled === false) {
+    return {
+        success: false,
+        message: "Recipient has disabled notifications."
+    };
+}
+
+if (!user.fcmTokens?.length) {
 
             return {
                 success: false,
