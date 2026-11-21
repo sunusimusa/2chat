@@ -26,6 +26,36 @@ const userSchema = new mongoose.Schema(
       index: true
     },
 
+    // =========================================
+// PHONE NUMBER
+// =========================================
+
+phoneNumber: {
+  type: String,
+  trim: true,
+  unique: true,
+  sparse: true
+},
+
+// =========================================
+// DATE OF BIRTH
+// =========================================
+
+dateOfBirth: {
+  type: Date,
+  default: null
+},
+
+// =========================================
+// ACCOUNT AGE CATEGORY
+// =========================================
+
+accountType: {
+  type: String,
+  enum: ["teen", "adult"],
+  default: null
+},
+
       password: {
       type: String,
       required: true,
