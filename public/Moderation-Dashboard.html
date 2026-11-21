@@ -223,6 +223,169 @@ const logoutBtn = document.getElementById("logoutBtn");
 let reports = [];
 let token = localStorage.getItem("moderationToken") || "";
 
+ let pendingShorts = [];
+
+const pendingShortsList = document.getElementById("pendingShortsList");
+const shortsMessage = document.getElementById("shortsMessage");
+
+async function loadPendingShorts(){
+  pendingShortsList.innerHTML =
+    '<div class="empty">Loading pending Shorts...</div>';
+
+  shortsMessage.textContent = "";
+
+  try{
+    const response = await fetch(
+      API + "/api/shorts/admin/pending",
+      {
+        headers:{
+          "Authorization":"Bearer " + token
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if(response.status === 401 || response.status === 403){
+      logout();
+      throw new Error("Admin access denied. Please login again.");
+    }
+
+    if(!response.ok || !data.success){
+      throw new Error(data.message || "Could not load pending Shorts.");
+    }
+
+    pendingShorts = Array.isArray(data.videos) ? data.videos : [];
+
+    renderPendingShorts();
+
+  }catch(error){
+    pendingShortsList.innerHTML =
+      '<div class="empty">Unable to load pending Shorts.</div>';
+
+    shortsMessage.textContent = error.message;
+  }
+}
+
+function renderPendingShorts(){
+  if(!pendingShorts.length){
+    pendingShortsList.innerHTML =
+      '<div class="empty">No pending Shorts found.</div>';
+    return;
+  }
+
+  pendingShortsList.innerHTML = pendingShorts.map(video => {
+    const date = video.createdAt
+      ? new Date(video.createdAt).toLocaleString()
+      : "Unknown date";
+
+    return `
+      <article class="short-card">
+        <div class="report-top">
+          <strong>${escapeHTML(video.username || "Unknown creator")}</strong>
+          <span class="tag">pending</span>
+        </div>
+
+        <p>${escapeHTML(video.caption || "No caption")}</p>
+
+        <p class="short-meta">
+          Category: ${escapeHTML(video.category || "General")}
+        </p>
+
+        <p class="short-meta">
+          Submitted: ${escapeHTML(date)}
+        </p>
+
+        <video controls preload="metadata"
+          src="${escapeHTML(video.video || "")}">
+        </video>
+
+        <div class="short-actions">
+          <button class="approve-btn"
+            data-action="approve"
+            data-id="${escapeHTML(video._id)}">
+            Approve
+          </button>
+
+          <button class="remove-btn"
+            data-action="remove"
+            data-id="${escapeHTML(video._id)}">
+            Remove
+          </button>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+pendingShortsList.addEventListener("click", async function(e){
+  const button = e.target.closest("button[data-action]");
+
+  if(!button) return;
+
+  const videoId = button.dataset.id;
+  const action = button.dataset.action;
+
+  let reason = "";
+
+  if(action === "remove"){
+    reason = prompt("Enter the reason for removing this video:");
+
+    if(reason === null) return;
+
+    reason = reason.trim();
+
+    if(!reason || reason.length > 500){
+      alert("Reason must be between 1 and 500 characters.");
+      return;
+    }
+  }
+
+  if(action === "approve" &&
+     !confirm("Approve this Short video?")){
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Processing...";
+
+  try{
+    const response = await fetch(
+      API + "/api/shorts/admin/moderate/" + encodeURIComponent(videoId),
+      {
+        method:"PUT",
+        headers:{
+          "Content-Type":"application/json",
+          "Authorization":"Bearer " + token
+        },
+        body:JSON.stringify({ action, reason })
+      }
+    );
+
+    const data = await response.json();
+
+    if(response.status === 401 || response.status === 403){
+      logout();
+      throw new Error("Admin access denied. Please login again.");
+    }
+
+    if(!response.ok || !data.success){
+      throw new Error(data.message || "Moderation action failed.");
+    }
+
+    shortsMessage.textContent = data.message;
+    await loadPendingShorts();
+
+  }catch(error){
+    shortsMessage.textContent = error.message;
+    button.disabled = false;
+    button.textContent = action === "approve" ? "Approve" : "Remove";
+  }
+});
+
+document.getElementById("refreshShortsBtn")
+  .addEventListener("click", loadPendingShorts); 
+
 function escapeHTML(value){
   return String(value ?? "").replace(/[&<>"']/g, char => ({
     "&":"&amp;",
