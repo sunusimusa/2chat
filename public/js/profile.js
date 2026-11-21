@@ -78,11 +78,14 @@ async function loadProfile() {
     try {
 
         const res = await fetch(
-            "/api/users/profile/" +
-            encodeURIComponent(
-                profileUsername
-            )
-        );
+    "/api/users/profile/" + encodeURIComponent(profileUsername),
+    {
+        method: "GET",
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    }
+);
 
         const data = await res.json();
 
