@@ -179,4 +179,36 @@ exports.getPendingShorts = async (req, res) => {
             message: "Unable to load pending Shorts."
         });
     }
-};                
+}; 
+
+
+// ==========================================
+// ADMIN: GET PENDING SHORT VIDEOS
+// ==========================================
+
+exports.getPendingShorts = async (req, res) => {
+    try {
+        const videos = await ShortVideo.find({
+            moderationStatus: "pending"
+        })
+        .select(
+            "username avatar caption category hashtags video createdAt moderationStatus"
+        )
+        .sort({ createdAt: -1 });
+
+        return res.json({
+            success: true,
+            count: videos.length,
+            videos
+        });
+
+    } catch (err) {
+        console.error("GET PENDING SHORTS ERROR:", err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to load pending Shorts."
+        });
+    }
+};
+
