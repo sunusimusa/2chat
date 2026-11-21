@@ -78,473 +78,282 @@ async function loadProfile() {
     try {
 
         const res = await fetch(
-    "/api/users/profile/" + encodeURIComponent(profileUsername),
-    {
-        method: "GET",
-        headers: {
-            "Authorization": "Bearer " + token
-        }
-    }
-);
+            "/api/users/profile/" +
+            encodeURIComponent(profileUsername),
+            {
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            }
+        );
 
         const data = await res.json();
 
         if (!res.ok || !data.success) {
-
-            alert(
-                data.message ||
-                "User profile not found."
-            );
-
+            alert(data.message || "User profile not found.");
             return;
         }
 
+        const profile = data.user;
 
-        const profile =
-            data.user;
+        profileUserId = profile._id;
 
+        // Use backend ownership verification
+        const isOwner = data.isOwner === true;
 
-        profileUserId =
-            profile._id;
-
-
-        // ===============================
-        // OWNER CHECK
-        // ===============================
-
-        const isOwner =
-            String(profile.username)
-                .toLowerCase() ===
-            String(user.username)
-                .toLowerCase();
-
-
-        // ===============================
+        // =================================
         // ELEMENTS
-        // ===============================
+        // =================================
 
-        const followBtn =
-            document.getElementById(
-                "followBtn"
-            );
+        const get = id => document.getElementById(id);
 
-        const sendGiftBtn =
-            document.getElementById(
-                "sendGiftBtn"
-            );
+        const privateDetails = get("privateDetails");
+        const editProfileSection = get("editProfileSection");
+        const accountTools = get("accountTools");
 
-        const savedVideosBtn =
-            document.getElementById(
-                "savedVideosBtn"
-            );
+        const followBtn = get("followBtn");
+        const sendGiftBtn = get("sendGiftBtn");
 
-        const walletBtn =
-            document.getElementById(
-                "walletBtn"
-            );
+        const savedVideosBtn = get("savedVideosBtn");
+        const walletBtn = get("walletBtn");
+        const notificationSettingsBtn = get("notificationSettingsBtn");
+        const giftsReceivedBtn = get("giftsReceivedBtn");
+        const creatorStudioBtn = get("creatorStudioBtn");
+        const monetizationBtn = get("monetizationBtn");
 
-        const giftsReceivedBtn =
-            document.getElementById(
-                "giftsReceivedBtn"
-            );
+        const saveProfileBtn = get("saveProfileBtn");
+        const uploadAvatarBtn = get("uploadAvatarBtn");
 
-        const creatorStudioBtn =
-            document.getElementById(
-                "creatorStudioBtn"
-            );
+        const coverBtn = document.querySelector(".cover-btn");
+        const avatarBtn = document.querySelector(".avatar-btn");
 
-        const monetizationBtn =
-            document.getElementById(
-                "monetizationBtn"
-            );
+        const newUsername = get("newUsername");
+        const newBio = get("newBio");
 
-        const saveProfileBtn =
-            document.getElementById(
-                "saveProfileBtn"
-            );
-
-        const uploadAvatarBtn =
-            document.getElementById(
-                "uploadAvatarBtn"
-            );
-
-        const coverBtn =
-            document.querySelector(
-                ".cover-btn"
-            );
-
-        const avatarBtn =
-            document.querySelector(
-                ".avatar-btn"
-            );
-
-        const coverFile =
-            document.getElementById(
-                "coverFile"
-            );
-
-        const avatarFile =
-            document.getElementById(
-                "avatarFile"
-            );
-
-        const newUsername =
-            document.getElementById(
-                "newUsername"
-            );
-
-        const newBio =
-            document.getElementById(
-                "newBio"
-            );
-
-
-        // =================================================
-        // OWNER PROFILE
-        // =================================================
+        // =================================
+        // OWNER / VISITOR PERMISSIONS
+        // =================================
 
         if (isOwner) {
 
-            // -------------------------------
-            // Editing controls
-            // -------------------------------
+            // Private information
+            if (privateDetails) {
+                privateDetails.hidden = false;
+            }
 
-            if (coverBtn)
-                coverBtn.style.display =
-                    "flex";
+            // Editing and account tools
+            if (editProfileSection) {
+                editProfileSection.style.display = "block";
+            }
 
-            if (avatarBtn)
-                avatarBtn.style.display =
-                    "flex";
+            if (accountTools) {
+                accountTools.style.display = "block";
+            }
 
-            if (newUsername)
-                newUsername.style.display =
-                    "block";
+            // Owner controls
+            if (coverBtn) coverBtn.style.display = "flex";
+            if (avatarBtn) avatarBtn.style.display = "grid";
 
-            if (newBio)
-                newBio.style.display =
-                    "block";
+            if (savedVideosBtn) savedVideosBtn.style.display = "flex";
+            if (walletBtn) walletBtn.style.display = "flex";
 
+            if (notificationSettingsBtn) {
+                notificationSettingsBtn.style.display = "flex";
+            }
 
-            // -------------------------------
-            // Owner buttons
-            // -------------------------------
+            if (giftsReceivedBtn) giftsReceivedBtn.style.display = "flex";
+            if (creatorStudioBtn) creatorStudioBtn.style.display = "flex";
 
-            if (savedVideosBtn)
-                savedVideosBtn.style.display =
-                    "flex";
+            if (saveProfileBtn) saveProfileBtn.style.display = "block";
+            if (uploadAvatarBtn) uploadAvatarBtn.style.display = "block";
 
-            if (walletBtn)
-                walletBtn.style.display =
-                    "flex";
+            // Fill edit fields
+            if (newUsername) {
+                newUsername.value = profile.username || "";
+            }
 
-            if (giftsReceivedBtn)
-                giftsReceivedBtn.style.display =
-                    "flex";
+            if (newBio) {
+                newBio.value = profile.bio || "";
+            }
 
-            if (creatorStudioBtn)
-                creatorStudioBtn.style.display =
-                    "flex";
+            // Private email
+            const emailElement = get("email");
 
-            if (saveProfileBtn)
-                saveProfileBtn.style.display =
-                    "flex";
+            if (emailElement) {
+                emailElement.textContent = profile.email || "No email";
+            }
 
-            if (uploadAvatarBtn)
-                uploadAvatarBtn.style.display =
-                    "flex";
+            // Private phone
+            const phoneElement = get("phoneNumber");
 
+            if (phoneElement) {
+                phoneElement.textContent =
+                    profile.phoneNumber || "Not available";
+            }
 
-            // -------------------------------
-            // Hide visitor buttons
-            // -------------------------------
+            // Private date of birth
+            const dobElement = get("dateOfBirth");
 
-            if (followBtn)
-                followBtn.style.display =
-                    "none";
+            if (dobElement) {
 
-            if (sendGiftBtn)
-                sendGiftBtn.style.display =
-                    "none";
+                if (profile.dateOfBirth) {
 
+                    const dateString = String(
+                        profile.dateOfBirth
+                    ).slice(0, 10);
 
-            // -------------------------------
-            // Check Monetization
-            // -------------------------------
+                    const parts = dateString.split("-");
 
-            await loadMonetizationStatus(
-                monetizationBtn
-            );
+                    dobElement.textContent =
+                        parts.length === 3
+                            ? `${parts[2]}/${parts[1]}/${parts[0]}`
+                            : "Not available";
 
-        }
+                } else {
+                    dobElement.textContent = "Not available";
+                }
+            }
 
+            // Monetization
+            await loadMonetizationStatus(monetizationBtn);
 
-        // =================================================
-        // OTHER USER PROFILE
-        // =================================================
+            // Hide visitor actions
+            if (followBtn) followBtn.style.display = "none";
+            if (sendGiftBtn) sendGiftBtn.style.display = "none";
 
-        else {
+        } else {
 
-            // -------------------------------
-            // Hide editing
-            // -------------------------------
+            // Hide all private information
+            if (privateDetails) {
+                privateDetails.hidden = true;
+            }
 
-            if (coverBtn)
-                coverBtn.style.display =
-                    "none";
+            // Hide owner sections
+            if (editProfileSection) {
+                editProfileSection.style.display = "none";
+            }
 
-            if (avatarBtn)
-                avatarBtn.style.display =
-                    "none";
+            if (accountTools) {
+                accountTools.style.display = "none";
+            }
 
-            if (coverFile)
-                coverFile.style.display =
-                    "none";
+            // Hide owner controls
+            if (coverBtn) coverBtn.style.display = "none";
+            if (avatarBtn) avatarBtn.style.display = "none";
 
-            if (avatarFile)
-                avatarFile.style.display =
-                    "none";
+            if (savedVideosBtn) savedVideosBtn.style.display = "none";
+            if (walletBtn) walletBtn.style.display = "none";
 
-            if (newUsername)
-                newUsername.style.display =
-                    "none";
+            if (notificationSettingsBtn) {
+                notificationSettingsBtn.style.display = "none";
+            }
 
-            if (newBio)
-                newBio.style.display =
-                    "none";
+            if (giftsReceivedBtn) giftsReceivedBtn.style.display = "none";
+            if (creatorStudioBtn) creatorStudioBtn.style.display = "none";
+            if (monetizationBtn) monetizationBtn.style.display = "none";
 
+            if (saveProfileBtn) saveProfileBtn.style.display = "none";
+            if (uploadAvatarBtn) uploadAvatarBtn.style.display = "none";
 
-            // -------------------------------
-            // Hide owner buttons
-            // -------------------------------
-
-            if (savedVideosBtn)
-                savedVideosBtn.style.display =
-                    "none";
-
-            if (walletBtn)
-                walletBtn.style.display =
-                    "none";
-
-            if (giftsReceivedBtn)
-                giftsReceivedBtn.style.display =
-                    "none";
-
-            if (creatorStudioBtn)
-                creatorStudioBtn.style.display =
-                    "none";
-
-            if (monetizationBtn)
-                monetizationBtn.style.display =
-                    "none";
-
-            if (saveProfileBtn)
-                saveProfileBtn.style.display =
-                    "none";
-
-            if (uploadAvatarBtn)
-                uploadAvatarBtn.style.display =
-                    "none";
-
-
-            // -------------------------------
-            // Follow button
-            // -------------------------------
-
+            // Show visitor actions
             if (followBtn) {
 
-                followBtn.style.display =
-                    "block";
+                followBtn.style.display = "block";
 
-                updateFollowButton(
-                    profile,
-                    followBtn
-                );
+                updateFollowButton(profile, followBtn);
 
-                followBtn.onclick =
-                    async function () {
-
-                        await followUser(
-                            profile.username
-                        );
-
-                    };
-
+                followBtn.onclick = async function () {
+                    await followUser(profile.username);
+                };
             }
-
-
-            // -------------------------------
-            // Send Gift
-            // -------------------------------
 
             if (sendGiftBtn) {
-
-                sendGiftBtn.style.display =
-                    "block";
-
+                sendGiftBtn.style.display = "block";
             }
-
         }
 
+        // =================================
+        // PROFILE PHOTO
+        // =================================
 
-        // =================================================
-        // PROFILE DATA
-        // =================================================
-
-        const avatar =
-            document.getElementById(
-                "avatar"
-            );
+        const avatar = get("avatar");
 
         if (avatar) {
-
-            if (
-                profile.avatar &&
-                typeof profile.avatar ===
-                    "string" &&
-                profile.avatar.trim() !== ""
-            ) {
-
-                avatar.src =
-                    profile.avatar;
-
-            } else {
-
-                avatar.src =
-                    "/images/default.png";
-
-            }
-
+            avatar.src =
+                profile.avatar ||
+                "/images/default.png";
         }
 
+        // =================================
+        // COVER PHOTO
+        // =================================
 
-        // -------------------------------
-        // Cover
-        // -------------------------------
-
-        const coverImage =
-            document.getElementById(
-                "coverImage"
-            );
+        const coverImage = get("coverImage");
 
         if (coverImage) {
-
             coverImage.src =
                 profile.cover ||
                 "/images/default-cover.jpg";
-
         }
 
+        // =================================
+        // USERNAME
+        // =================================
 
-        // -------------------------------
-        // Username
-        // -------------------------------
-
-        const usernameElement =
-            document.getElementById(
-                "username"
-            );
+        const usernameElement = get("username");
 
         if (usernameElement) {
-
-            usernameElement.innerText =
-                "@" +
-                (
-                    profile.username ||
-                    "User"
-                );
-
+            usernameElement.textContent =
+                "@" + (profile.username || "User");
         }
 
+        // =================================
+        // BIO
+        // =================================
 
-        // -------------------------------
-        // Email
-        // -------------------------------
-
-        const emailElement =
-            document.getElementById(
-                "email"
-            );
-
-        if (emailElement) {
-
-            emailElement.innerText =
-                profile.email ||
-                "No email";
-
-        }
-
-
-        // -------------------------------
-        // Bio
-        // -------------------------------
-
-        const bioElement =
-            document.getElementById(
-                "bio"
-            );
+        const bioElement = get("bio");
 
         if (bioElement) {
-
-            bioElement.innerText =
-                profile.bio ||
-                "No bio yet";
-
+            bioElement.textContent =
+                profile.bio || "No bio yet";
         }
 
+        // =================================
+        // FOLLOWERS
+        // =================================
 
-        // -------------------------------
-        // Followers
-        // -------------------------------
-
-        const followersElement =
-            document.getElementById(
-                "followers"
-            );
+        const followersElement = get("followers");
 
         if (followersElement) {
-
-            followersElement.innerText =
-                Array.isArray(
-                    profile.followers
-                )
+            followersElement.textContent =
+                Array.isArray(profile.followers)
                     ? profile.followers.length
                     : 0;
-
         }
 
+        // =================================
+        // FOLLOWING
+        // =================================
 
-        // -------------------------------
-        // Following
-        // -------------------------------
-
-        const followingElement =
-            document.getElementById(
-                "following"
-            );
+        const followingElement = get("following");
 
         if (followingElement) {
-
-            followingElement.innerText =
-                Array.isArray(
-                    profile.following
-                )
+            followingElement.textContent =
+                Array.isArray(profile.following)
                     ? profile.following.length
                     : 0;
-
         }
 
     } catch (err) {
 
-        console.error(
-            "LOAD PROFILE ERROR:",
-            err
-        );
+        console.error("LOAD PROFILE ERROR:", err);
+
+        alert("Failed to load profile. Please try again.");
 
     }
 
 }
-
 
 // =====================================================
 // MONETIZATION STATUS
