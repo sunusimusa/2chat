@@ -74,6 +74,26 @@
         .phone-group .iti__dropdown-content {
             z-index: 9999;
         }
+
+        
+/* FIX INTERNATIONAL COUNTRY FLAGS */
+.iti {
+    --iti-path-flags-1x: url("https://cdn.jsdelivr.net/npm/intl-tel-input@29.5.8/dist/img/flags.webp");
+    --iti-path-flags-2x: url("https://cdn.jsdelivr.net/npm/intl-tel-input@29.5.8/dist/img/flags@2x.webp");
+}
+
+/* KEEP PHONE ICON VISIBLE */
+.phone-group > .fa-phone {
+    display: inline-block !important;
+    flex: 0 0 auto;
+}
+
+.phone-group .iti {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+}
+        
     </style>
 </head>
 
