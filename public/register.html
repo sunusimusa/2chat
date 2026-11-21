@@ -62,6 +62,29 @@
 
         }
 
+        
+.password-group {
+    position: relative;
+}
+
+.password-group input {
+    padding-right: 48px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: #777;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px;
+}
+        
+
     </style>
 
 </head>
@@ -137,20 +160,48 @@
     <!-- ==========================
          PASSWORD
     =========================== -->
+    
+<!-- PASSWORD -->
+<div class="input-group password-group">
+    <i class="fa-solid fa-lock"></i>
 
-    <div class="input-group">
+    <input
+        id="password"
+        type="password"
+        placeholder="Password"
+        autocomplete="new-password"
+    >
 
-        <i class="fa-solid fa-lock"></i>
+    <button
+        type="button"
+        class="password-toggle"
+        onclick="togglePassword('password', 'passwordEye')"
+        aria-label="Show password"
+    >
+        <i id="passwordEye" class="fa-solid fa-eye"></i>
+    </button>
+</div>
 
-        <input
-            id="password"
-            type="password"
-            placeholder="Password"
-            autocomplete="new-password"
-        >
+<!-- CONFIRM PASSWORD -->
+<div class="input-group password-group">
+    <i class="fa-solid fa-lock"></i>
 
-    </div>
+    <input
+        id="confirmPassword"
+        type="password"
+        placeholder="Confirm Password"
+        autocomplete="new-password"
+    >
 
+    <button
+        type="button"
+        class="password-toggle"
+        onclick="togglePassword('confirmPassword', 'confirmPasswordEye')"
+        aria-label="Show confirm password"
+    >
+        <i id="confirmPasswordEye" class="fa-solid fa-eye"></i>
+    </button>
+</div>
 
     <!-- ==========================
          REGISTER
@@ -219,6 +270,22 @@
 
 <script>
 
+    
+function togglePassword(inputId, eyeId) {
+    const input = document.getElementById(inputId);
+    const eye = document.getElementById(eyeId);
+
+    if (input.type === "password") {
+        input.type = "text";
+        eye.classList.remove("fa-eye");
+        eye.classList.add("fa-eye-slash");
+    } else {
+        input.type = "password";
+        eye.classList.remove("fa-eye-slash");
+        eye.classList.add("fa-eye");
+    }
+}    
+
 async function register() {
 
     const username =
@@ -230,6 +297,9 @@ async function register() {
     const password =
         document.getElementById("password").value;
 
+    const confirmPassword =
+    document.getElementById("confirmPassword").value;
+
     const msg =
         document.getElementById("msg");
 
@@ -240,27 +310,22 @@ async function register() {
     // ==========================
     // VALIDATION
     // ==========================
+    
+if (!username || !email || !password || !confirmPassword) {
+    msg.innerText = "Please fill in all fields.";
+    return;
+}
 
-    if (!username || !email || !password) {
+if (password.length < 8 || password.length > 128) {
+    msg.innerText = "Password must be between 8 and 128 characters.";
+    return;
+}
 
-        msg.innerText =
-            "Please fill in all fields.";
-
-        return;
-
-    }
-
-
-    if (password.length < 6) {
-
-        msg.innerText =
-            "Password must be at least 6 characters.";
-
-        return;
-
-    }
-
-
+if (password !== confirmPassword) {
+    msg.innerText = "Passwords do not match.";
+    return;
+}
+    
     // ==========================
     // LOADING
     // ==========================
