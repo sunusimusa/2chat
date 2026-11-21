@@ -39,12 +39,13 @@ exports.moderateShort = async (req, res) => {
             action === "remove" &&
             (
                 typeof reason !== "string" ||
-                !reason.trim()
+!reason.trim() ||
+reason.trim().length > 500
             )
         ) {
             return res.status(400).json({
                 success: false,
-                message: "A removal reason is required."
+                message: "Removal reason must be between 1 and 500 characters."
             });
         }
 
@@ -108,7 +109,11 @@ exports.moderateShort = async (req, res) => {
         video.reviewedAt = new Date();
 
         // Keep moderation audit history
-        video.moderationHistory.push({
+        if (!Array.isArray(video.moderationHistory)) {
+    video.moderationHistory = [];
+}
+
+video.moderationHistory.push({
             action:
                 action === "approve"
                     ? "approved"
