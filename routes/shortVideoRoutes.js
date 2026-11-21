@@ -7,7 +7,8 @@ const protect = require("../middleware/auth");
 const adminAuth = require("../middleware/adminAuth");
 
 const {
-    moderateShort
+    moderateShort,
+    getPendingShorts
 } = require("../controllers/shortModerationController");
 
 const {
@@ -53,6 +54,14 @@ router.put(
     protect,
     adminAuth,
     moderateShort
+);
+
+// Admin: Get Pending Shorts
+router.get(
+    "/admin/pending",
+    protect,
+    adminAuth,
+    getPendingShorts
 );
 
 // Get All Videos
