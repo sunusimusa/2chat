@@ -1053,9 +1053,14 @@ exports.getCreatorLevel = async (req, res) => {
             });
         }
 
-        const videos = await ShortVideo.find({ username })
-            .select("views likes watchTime");
-
+        const videos = await ShortVideo.find({
+    username,
+    $or: [
+        { moderationStatus: "approved" },
+        { moderationStatus: { $exists: false } }
+    ]
+}).select("views likes watchTime");
+        
         let views = 0;
         let likes = 0;
         let watchTime = 0;
@@ -1135,9 +1140,13 @@ exports.getCreatorBadge = async (req, res) => {
         }
 
         const videos = await ShortVideo.find({
-            username: user.username
-        }).select("views watchTime");
-
+    username: user.username,
+    $or: [
+        { moderationStatus: "approved" },
+        { moderationStatus: { $exists: false } }
+    ]
+}).select("views watchTime");
+        
         let views = 0;
         let watchTime = 0;
 
@@ -1193,7 +1202,6 @@ exports.getCreatorBadge = async (req, res) => {
 };
 
 // ================= SEARCH SHORTS =================
-
 
 exports.searchShorts = async (req, res) => {
     try {
