@@ -68,6 +68,53 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .meta{color:#667085;font-size:12px}
 .empty{text-align:center;padding:35px;color:#667085}
 .hidden{display:none}
+  .short-card{
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  padding:16px;
+  margin-top:12px;
+  background:#fff;
+}
+
+.short-card video{
+  width:100%;
+  max-height:350px;
+  background:#000;
+  border-radius:8px;
+  margin-top:12px;
+}
+
+.short-actions{
+  display:flex;
+  gap:10px;
+  margin-top:15px;
+}
+
+.short-actions button{
+  flex:1;
+  margin:0;
+}
+
+.approve-btn{
+  background:#039855;
+}
+
+.remove-btn{
+  background:#d92d20;
+}
+
+.short-meta{
+  color:#667085;
+  font-size:12px;
+  margin-top:8px;
+}
+
+@media(max-width:600px){
+  .short-actions{
+    flex-direction:column;
+  }
+}
+  
 @media(max-width:600px){
   body{padding:12px}
   .stats{grid-template-columns:1fr}
@@ -139,6 +186,25 @@ button:disabled{opacity:.6;cursor:not-allowed}
 
     <div id="dashboardMessage" class="message"></div>
   </div>
+
+    <!-- PENDING SHORTS MODERATION -->
+  <div class="panel">
+    <div class="toolbar">
+      <h2 style="flex:1">Pending Shorts</h2>
+      <button
+        id="refreshShortsBtn"
+        style="width:auto;margin:0"
+      >
+        Refresh
+      </button>
+    </div>
+
+    <div id="pendingShortsList">
+      <div class="empty">Loading pending Shorts...</div>
+    </div>
+
+    <div id="shortsMessage" class="message"></div>
+      </div>
 
 </section>
 </div>
