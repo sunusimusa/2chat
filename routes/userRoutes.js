@@ -27,6 +27,7 @@ router.put(
 
 router.get(
     "/profile/:username",
+    protect,
     getUserProfile
 );
 
