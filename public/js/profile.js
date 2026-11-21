@@ -454,15 +454,10 @@ async function loadMonetizationStatus(
 async function saveProfile() {
 
     const usernameElement =
-        document.getElementById(
-            "newUsername"
-        );
+        document.getElementById("newUsername");
 
     const bioElement =
-        document.getElementById(
-            "newBio"
-        );
-
+        document.getElementById("newBio");
 
     const username =
         usernameElement
@@ -474,73 +469,61 @@ async function saveProfile() {
             ? bioElement.value.trim()
             : "";
 
-
     if (!token) {
-
         return alert(
             "❌ Login session expired. Please login again."
         );
-
     }
 
+    if (!username) {
+        return alert(
+            "❌ Username cannot be empty."
+        );
+    }
 
     try {
 
-        const res =
-            await fetch(
-                "/api/auth/profile",
-                {
-                    method: "PUT",
+        const res = await fetch(
+            "/api/auth/profile",
+            {
+                method: "PUT",
 
-                    headers: {
-                        "Content-Type":
-                            "application/json",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
 
-                        "Authorization":
-                            "Bearer " +
-                            token
-                    },
+                body: JSON.stringify({
+                    username,
+                    bio
+                })
+            }
+        );
 
-                    body: JSON.stringify({
-                        username,
-                        bio
-                    })
-                }
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+            return alert(
+                "❌ " +
+                (data.message || "Update failed")
             );
+        }
 
-
-        const data =
-            await res.json();
-
-
-        if (data.success) {
-
+        if (data.user) {
             localStorage.setItem(
                 "user",
-                JSON.stringify(
-                    data.user
-                )
+                JSON.stringify(data.user)
             );
-
-
-            alert(
-                "✅ Profile Updated"
-            );
-
-
-            location.reload();
-
-        } else {
-
-            alert(
-                "❌ " +
-                (
-                    data.message ||
-                    "Update failed"
-                )
-            );
-
         }
+
+        const updatedUsername =
+            data.user?.username || username;
+
+        alert("✅ Profile Updated");
+
+        window.location.href =
+            "/profile.html?username=" +
+            encodeURIComponent(updatedUsername);
 
     } catch (err) {
 
@@ -552,11 +535,8 @@ async function saveProfile() {
         alert(
             "❌ Failed to update profile."
         );
-
     }
-
-}
-
+ }
 
 // =====================================================
 // LOGOUT
