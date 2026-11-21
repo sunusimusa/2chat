@@ -147,4 +147,36 @@ video.moderationHistory.push({
         });
     }
 };
-              
+
+
+// ==========================================
+// ADMIN: GET PENDING SHORTS QUEUE
+// ==========================================
+
+exports.getPendingShorts = async (req, res) => {
+    try {
+        const videos = await ShortVideo.find({
+            moderationStatus: "pending"
+        })
+        .select(
+            "username avatar caption video hashtags category createdAt moderationStatus moderationReason"
+        )
+        .sort({ createdAt: 1 })
+        .limit(50)
+        .lean();
+
+        return res.json({
+            success: true,
+            total: videos.length,
+            videos
+        });
+
+    } catch (err) {
+        console.error("PENDING SHORTS QUEUE ERROR:", err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to load pending Shorts."
+        });
+    }
+};                
