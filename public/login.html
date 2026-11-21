@@ -103,6 +103,34 @@
 
     }
 
+    
+.password-group {
+  position: relative;
+  width: 100%;
+}
+
+.password-group input {
+  padding-right: 45px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: auto;
+  padding: 6px;
+  border: none;
+  background: transparent;
+  color: #0084ff;
+  cursor: pointer;
+  font-size: 17px;
+}
+
+.password-toggle:hover {
+  background: transparent;
+}
+    
   </style>
 
 </head>
@@ -126,6 +154,8 @@
     autocomplete="email"
   />
 
+    
+<div class="password-group">
 
   <input
     type="password"
@@ -134,6 +164,16 @@
     autocomplete="current-password"
   />
 
+  <button
+    type="button"
+    class="password-toggle"
+    onclick="togglePassword()"
+    aria-label="Show password"
+  >
+    <i id="passwordEye" class="fa-solid fa-eye"></i>
+  </button>
+
+</div>
 
   <button
     id="loginButton"
@@ -174,6 +214,32 @@
 
 <script>
 
+  
+function togglePassword() {
+
+  const password =
+    document.getElementById("password");
+
+  const eye =
+    document.getElementById("passwordEye");
+
+  if (password.type === "password") {
+
+    password.type = "text";
+
+    eye.classList.remove("fa-eye");
+    eye.classList.add("fa-eye-slash");
+
+  } else {
+
+    password.type = "password";
+
+    eye.classList.remove("fa-eye-slash");
+    eye.classList.add("fa-eye");
+
+  }
+
+  }
 
 async function login(){
 
