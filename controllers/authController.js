@@ -304,175 +304,150 @@ exports.register = async (req, res) => {
 // =====================================================
 
 exports.login = async (req, res) => {
+    try {
+        const {
+            email,
+            username,
+            phoneNumber,
+            password
+        } = req.body;
 
-  try {
+        // PASSWORD VALIDATION
+        if (
+            typeof password !== "string" ||
+            !password
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Password is required."
+            });
+        }
 
-    const {
-      email,
-      username,
-      password
-    } = req.body;
+        // LOGIN IDENTIFIER
+        const loginValue = String(
+            email || phoneNumber || username || ""
+        ).trim();
 
+        if (!loginValue) {
+            return res.status(400).json({
+                success: false,
+                message: "Email, phone number or username is required."
+            });
+        }
 
-    // =========================================
-    // PASSWORD
-    // =========================================
+        // ESCAPE REGEX CHARACTERS
+        const escapeRegex = value =>
+            value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-    if (!password) {
+        const loginConditions = [
+            {
+                email: {
+                    $regex: "^" + escapeRegex(loginValue) + "$",
+                    $options: "i"
+                }
+            },
+            {
+                username: {
+                    $regex: "^" + escapeRegex(loginValue) + "$",
+                    $options: "i"
+                }
+            },
+            {
+                phoneNumber: loginValue
+            }
+        ];
 
-      return res.status(400).json({
-        success: false,
-        message: "Password is required"
-      });
+        // FIND USER
+        const user = await User.findOne({
+            $or: loginConditions
+        }).select("+password");
 
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid credentials."
+            });
+        }
+
+        // CHECK PASSWORD
+        const match = await bcrypt.compare(
+            password,
+            user.password
+        );
+
+        if (!match) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid credentials."
+            });
+        }
+
+        // ACCOUNT SUSPENSION CHECK
+        if (user.isSuspended) {
+            if (
+                user.suspendedUntil &&
+                user.suspendedUntil <= new Date()
+            ) {
+                user.isSuspended = false;
+                user.suspensionReason = "";
+                user.suspendedUntil = null;
+                user.suspendedBy = null;
+            } else {
+                return res.status(403).json({
+                    success: false,
+                    suspended: true,
+                    message: "Your account has been suspended.",
+                    reason: user.suspensionReason ||
+                        "Community Guidelines violation",
+                    suspendedUntil: user.suspendedUntil
+                });
+            }
+        }
+
+        // ONLINE STATUS
+        user.online = true;
+        user.lastSeen = new Date();
+
+        await user.save();
+
+        // LEGACY WALLET SUPPORT
+        await createWalletIfMissing(user._id);
+
+        // GENERATE TOKEN
+        const token = generateToken(user._id);
+
+        // SAFE USER RESPONSE
+        const safeUser = {
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            isCreator: user.isCreator,
+            creatorBadge: user.creatorBadge,
+            favoriteCategories: user.favoriteCategories,
+            avatar: user.avatar,
+            cover: user.cover,
+            bio: user.bio,
+            online: user.online,
+            lastSeen: user.lastSeen
+        };
+
+        return res.json({
+            success: true,
+            token,
+            user: safeUser
+        });
+
+    } catch (err) {
+        console.error("LOGIN ERROR:", err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to log in."
+        });
     }
-
-
-    // =========================================
-    // LOGIN VALUE
-    // =========================================
-
-    const loginValue =
-      email || username;
-
-
-    if (!loginValue) {
-
-      return res.status(400).json({
-        success: false,
-        message: "Email or username is required"
-      });
-
-    }
-
-
-    // =========================================
-    // FIND USER
-    // =========================================
-
-    const user =
-  await User.findOne({
-    $or: [
-      { email: loginValue },
-      { username: loginValue }
-    ]
-  }).select("+password");
-
-
-    if (!user) {
-
-      return res.status(400).json({
-        success: false,
-        message: "Invalid credentials"
-      });
-
-    }
-
-
-    // =========================================
-    // CHECK PASSWORD
-    // =========================================
-
-    const match =
-      await bcrypt.compare(
-        password,
-        user.password
-      );
-
-
-    if (!match) {
-
-      return res.status(400).json({
-        success: false,
-        message: "Invalid credentials"
-      });
-
-    }
-
-
-    // =========================================
-    // ONLINE STATUS
-    // =========================================
-
-    user.online =
-      true;
-
-    user.lastSeen =
-      new Date();
-
-
-    await user.save();
-
-
-    // =========================================
-    // LEGACY WALLET SUPPORT
-    // =========================================
-    //
-    // Idan tsohon user ba shi da Wallet,
-    // za a ƙirƙira masa automatically.
-    //
-    // Idan Wallet yana nan, ba za a sake
-    // ƙirƙirar wani ba.
-    //
-
-    await createWalletIfMissing(
-      user._id
-    );
-
-
-    // =========================================
-    // TOKEN
-    // =========================================
-
-    const token =
-      generateToken(
-        user._id
-      );
-
-
-    // =========================================
-    // RESPONSE
-    // =========================================
-
-    const safeUser = {
-    _id: user._id,
-    username: user.username,
-    email: user.email,
-    role: user.role,
-    isCreator: user.isCreator,
-    creatorBadge: user.creatorBadge,
-    favoriteCategories: user.favoriteCategories,
-    avatar: user.avatar,
-    cover: user.cover,
-    bio: user.bio,
-    online: user.online,
-    lastSeen: user.lastSeen
 };
-
-return res.json({
-    success: true,
-    token,
-    user: safeUser
-});
-
-
-  } catch (err) {
-
-    console.error(
-      "LOGIN ERROR:",
-      err
-    );
-
-
-    return res.status(500).json({
-    success: false,
-    message: "Unable to log in."
-});
-
-  }
-
-};
-
+      
 
 // =====================================================
 // UPDATE PROFILE
