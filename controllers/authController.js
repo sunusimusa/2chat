@@ -407,6 +407,16 @@ exports.login = async (req, res) => {
             });
         }
 
+      
+// EMAIL VERIFICATION CHECK
+if (user.emailVerified === false) {
+    return res.status(403).json({
+        success: false,
+        requiresEmailVerification: true,
+        message: "Please verify your email address before logging in."
+    });
+}
+
         // ACCOUNT SUSPENSION CHECK
         if (user.isSuspended) {
             if (
