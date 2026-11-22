@@ -26,6 +26,41 @@ const userSchema = new mongoose.Schema(
       index: true
     },
 
+    
+    // =========================================
+    // EMAIL VERIFICATION / OTP
+    // =========================================
+
+    emailVerified: {
+      type: Boolean,
+      default: true
+    },
+
+    emailOtpHash: {
+      type: String,
+      default: null,
+      select: false
+    },
+
+    emailOtpExpires: {
+      type: Date,
+      default: null,
+      select: false
+    },
+
+    emailOtpAttempts: {
+      type: Number,
+      default: 0,
+      select: false
+    },
+
+    emailOtpLastSentAt: {
+      type: Date,
+      default: null,
+      select: false
+    },
+    
+
     // =========================================
 // PHONE NUMBER
 // =========================================
