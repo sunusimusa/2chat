@@ -1030,3 +1030,159 @@ console.log("✅ FCM TOKEN SAVED:", {
   }
 };
 
+
+exports.verifyEmailOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    // VALIDATE INPUT
+    if (
+      typeof email !== "string" ||
+      typeof otp !== "string" ||
+      !email.trim() ||
+      !/^\d{6}$/.test(otp)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid email and 6-digit verification code."
+      });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+
+    // FIND USER AND LOAD PRIVATE OTP FIELDS
+    const user = await User.findOne({
+      email: cleanEmail
+    }).select(
+      "+emailOtpHash +emailOtpExpires +emailOtpAttempts"
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Account not found."
+      });
+    }
+
+    if (user.emailVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "This email address is already verified."
+      });
+    }
+
+    if (!user.emailOtpHash || !user.emailOtpExpires) {
+      return res.status(400).json({
+        success: false,
+        message: "No active verification code. Please request a new code."
+      });
+    }
+
+    // CHECK ATTEMPT LIMIT
+    if (user.emailOtpAttempts >= 5) {
+      return res.status(429).json({
+        success: false,
+        message: "Too many incorrect attempts. Please request a new code."
+      });
+    }
+
+    // CHECK EXPIRY
+    if (user.emailOtpExpires.getTime() < Date.now()) {
+      user.emailOtpHash = null;
+      user.emailOtpExpires = null;
+      user.emailOtpAttempts = 0;
+
+      await user.save();
+
+      return res.status(400).json({
+        success: false,
+        message: "Verification code has expired. Please request a new code."
+      });
+    }
+
+    // HASH SUBMITTED OTP
+    const submittedHash = crypto
+      .createHash("sha256")
+      .update(`${user._id}:${otp}`)
+      .digest("hex");
+
+    const storedHashBuffer = Buffer.from(user.emailOtpHash, "hex");
+    const submittedHashBuffer = Buffer.from(submittedHash, "hex");
+
+    const otpMatches =
+      storedHashBuffer.length === submittedHashBuffer.length &&
+      crypto.timingSafeEqual(
+        storedHashBuffer,
+        submittedHashBuffer
+      );
+
+    // WRONG OTP
+    if (!otpMatches) {
+      user.emailOtpAttempts += 1;
+
+      if (user.emailOtpAttempts >= 5) {
+        user.emailOtpHash = null;
+        user.emailOtpExpires = null;
+      }
+
+      await user.save();
+
+      return res.status(400).json({
+        success: false,
+        message: user.emailOtpAttempts >= 5
+          ? "Too many incorrect attempts. Please request a new code."
+          : "Incorrect verification code."
+      });
+    }
+
+    // VERIFY EMAIL
+    user.emailVerified = true;
+    user.emailOtpHash = null;
+    user.emailOtpExpires = null;
+    user.emailOtpAttempts = 0;
+    user.emailOtpLastSentAt = null;
+
+    await user.save();
+
+    // CREATE WALLET AFTER VERIFICATION
+    await createWalletIfMissing(user._id);
+
+    // GENERATE LOGIN TOKEN
+    const token = generateToken(user._id);
+
+    // SAFE USER RESPONSE
+    const safeUser = {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      dateOfBirth: user.dateOfBirth,
+      accountType: user.accountType,
+      role: user.role,
+      isCreator: user.isCreator,
+      creatorBadge: user.creatorBadge,
+      favoriteCategories: user.favoriteCategories,
+      avatar: user.avatar,
+      cover: user.cover,
+      bio: user.bio,
+      online: user.online,
+      lastSeen: user.lastSeen
+    };
+
+    return res.status(200).json({
+      success: true,
+      message: "Email verified successfully.",
+      token,
+      user: safeUser
+    });
+
+  } catch (err) {
+    console.error("VERIFY EMAIL OTP ERROR:", err.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to verify email. Please try again."
+    });
+  }
+};
+    
