@@ -75,6 +75,47 @@ const shortVideoSchema = new mongoose.Schema({
         default: []
     },
 
+    // ==============================
+    // AI MODERATION SCAN QUEUE
+    // ==============================
+
+    moderationScanStatus: {
+        type: String,
+        enum: [
+            "queued",
+            "processing",
+            "completed",
+            "failed"
+        ],
+        default: "queued",
+        index: true
+    },
+
+    moderationAttempts: {
+        type: Number,
+        default: 0
+    },
+
+    moderationNextAttemptAt: {
+        type: Date,
+        default: Date.now
+    },
+
+    moderationLockUntil: {
+        type: Date,
+        default: null
+    },
+
+    moderationScannedAt: {
+        type: Date,
+        default: null
+    },
+
+    moderationProvider: {
+        type: String,
+        default: ""
+    },
+
     reviewedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -158,7 +199,10 @@ const shortVideoSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Indexes for moderation dashboard
+// ==============================
+// DATABASE INDEXES
+// ==============================
+
 shortVideoSchema.index({
     moderationStatus: 1,
     createdAt: -1
@@ -169,5 +213,10 @@ shortVideoSchema.index({
     moderationStatus: 1
 });
 
+shortVideoSchema.index({
+    moderationScanStatus: 1,
+    moderationNextAttemptAt: 1
+});
+
 module.exports = mongoose.model("ShortVideo", shortVideoSchema);
-        
+            
