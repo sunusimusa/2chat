@@ -24,6 +24,7 @@ const {
 register,
 login,
 verifyEmailOtp,
+resendEmailOtp,
 updateProfile,
 uploadAvatar,
 uploadCover,
@@ -50,6 +51,13 @@ router.post(
   "/verify-email-otp",
   authLimiter,
   verifyEmailOtp
+);
+
+// Resend Email OTP
+router.post(
+  "/resend-email-otp",
+  authLimiter,
+  resendEmailOtp
 );
 
 router.post(
