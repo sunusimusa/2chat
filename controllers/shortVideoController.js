@@ -1198,37 +1198,35 @@ exports.searchShorts = async (req, res) => {
 
         
 const videos = await ShortVideo.find({
-    $and: [
-        {
-            $or: [
-                {
-                    caption: {
-                        $regex: safeKeyword,
-                        $options: "i"
-                    }
-                },
-                {
-                    hashtags: {
-                        $in: [keyword.toLowerCase()]
-                    }
-                },
-                {
-                    username: {
-                        $regex: safeKeyword,
-                        $options: "i"
-                    }
+    
+$and: [
+    {
+        $or: [
+            {
+                caption: {
+                    $regex: safeKeyword,
+                    $options: "i"
                 }
-            ]
-        },
-        {
-            $or: [
-                { moderationStatus: "approved" },
-                { moderationStatus: { $exists: false } }
-            ]
-        }
-    ]
+            },
+            {
+                hashtags: {
+                    $in: [keyword.toLowerCase()]
+                }
+            },
+            {
+                username: {
+                    $regex: safeKeyword,
+                    $options: "i"
+                }
+            }
+        ]
+    },
+    {
+        moderationStatus: "approved"
+    }
+]
 })
-
+        
         .select("-__v")
         .sort({ createdAt: -1 })
         .limit(30)
