@@ -1,39 +1,58 @@
-const nodemailer = require("nodemailer");
-
 const sendEmail = async ({ to, subject, text, html }) => {
-  try {
-    if (!process.env.SMTP_HOST ||
-        !process.env.SMTP_USER ||
-        !process.env.SMTP_PASS) {
-      throw new Error("SMTP environment variables are missing");
+    try {
+        const apiKey = process.env.RESEND_API_KEY;
+
+        if (!apiKey) {
+            throw new Error("RESEND_API_KEY is missing");
+        }
+
+        const response = await fetch(
+            "https://api.resend.com/emails",
+            {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    from: "2Chat <onboarding@resend.dev>",
+                    to: Array.isArray(to) ? to : [to],
+                    subject,
+                    text,
+                    html
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            console.error(
+                "Resend API Error:",
+                result.message || result.name || response.status
+            );
+
+            throw new Error(
+                result.message || "Email delivery failed"
+            );
+        }
+
+        console.log(
+            "Email sent successfully:",
+            result.id
+        );
+
+        return result;
+
+    } catch (error) {
+        console.error(
+            "Email sending failed:",
+            error.message
+        );
+
+        throw error;
     }
-
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT || 587),
-      secure: Number(process.env.SMTP_PORT) === 465,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-      }
-    });
-
-    const info = await transporter.sendMail({
-      from: process.env.MAIL_FROM || process.env.SMTP_USER,
-      to,
-      subject,
-      text,
-      html
-    });
-
-    console.log("Email sent:", info.messageId);
-    return info;
-
-  } catch (error) {
-    console.error("Email sending failed:", error.message);
-    throw error;
-  }
 };
 
 module.exports = sendEmail;
-      
+              
