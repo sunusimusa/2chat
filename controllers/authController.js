@@ -4,6 +4,8 @@ const generateToken = require("../utils/generateToken");
 const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
 const Wallet = require("../models/Wallet");
+const crypto = require("crypto");
+const sendEmail = require("../utils/sendEmail");
 
 // =====================================================
 // WALLET DEFAULT DATA
