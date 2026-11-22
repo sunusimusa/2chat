@@ -503,13 +503,8 @@ exports.getForYouVideos = async (req, res) => {
         }
 
         let videos = await ShortVideo.find({
-            $or: [
-                { moderationStatus:
-        "approved" },
-                 { moderationStatus:
-        { $exists: false } }
-            ]
-        }).sort({ createdAt: -1 });
+    moderationStatus: "approved"
+}).sort({ createdAt: -1 });
 
         const following = Array.isArray(user.following)
             ? user.following
@@ -528,10 +523,7 @@ exports.getForYouVideos = async (req, res) => {
         // Categories daga Saved Videos
         const savedVideos = await ShortVideo.find({
     _id: { $in: user.savedVideos || [] },
-    $or: [
-        { moderationStatus: "approved" },
-        { moderationStatus: { $exists: false } }
-    ]
+    moderationStatus: "approved"
 });
 
         // Ƙara maki daga Comments
