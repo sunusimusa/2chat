@@ -1002,10 +1002,7 @@ exports.getCreatorLevel = async (req, res) => {
 
         const videos = await ShortVideo.find({
     username,
-    $or: [
-        { moderationStatus: "approved" },
-        { moderationStatus: { $exists: false } }
-    ]
+    moderationStatus: "approved"
 }).select("views likes watchTime");
         
         let views = 0;
@@ -1088,10 +1085,7 @@ exports.getCreatorBadge = async (req, res) => {
 
         const videos = await ShortVideo.find({
     username: user.username,
-    $or: [
-        { moderationStatus: "approved" },
-        { moderationStatus: { $exists: false } }
-    ]
+    moderationStatus: "approved"
 }).select("views watchTime");
         
         let views = 0;
