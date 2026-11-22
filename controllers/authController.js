@@ -123,6 +123,8 @@ const sendEmailOtp = async (user) => {
 // =====================================================
 
 exports.register = async (req, res) => {
+  let user = null;
+
   try {
     const {
       username,
@@ -132,10 +134,7 @@ exports.register = async (req, res) => {
       dateOfBirth
     } = req.body;
 
-    // =========================================
     // BASIC VALIDATION
-    // =========================================
-
     if (
       typeof username !== "string" ||
       typeof email !== "string" ||
@@ -158,10 +157,7 @@ exports.register = async (req, res) => {
     const cleanEmail = email.trim().toLowerCase();
     const cleanPhone = phoneNumber.trim();
 
-    // =========================================
     // USERNAME VALIDATION
-    // =========================================
-
     if (
       cleanUsername.length < 3 ||
       cleanUsername.length > 30 ||
@@ -173,10 +169,7 @@ exports.register = async (req, res) => {
       });
     }
 
-    // =========================================
     // EMAIL VALIDATION
-    // =========================================
-
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
       return res.status(400).json({
         success: false,
@@ -184,11 +177,7 @@ exports.register = async (req, res) => {
       });
     }
 
-    // =========================================
-    // INTERNATIONAL PHONE VALIDATION
-    // E.164 FORMAT
-    // =========================================
-
+    // PHONE VALIDATION
     if (!/^\+[1-9]\d{7,14}$/.test(cleanPhone)) {
       return res.status(400).json({
         success: false,
@@ -196,10 +185,7 @@ exports.register = async (req, res) => {
       });
     }
 
-    // =========================================
     // PASSWORD VALIDATION
-    // =========================================
-
     if (password.length < 8 || password.length > 128) {
       return res.status(400).json({
         success: false,
@@ -207,10 +193,7 @@ exports.register = async (req, res) => {
       });
     }
 
-    // =========================================
     // DATE OF BIRTH VALIDATION
-    // =========================================
-
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)) {
       return res.status(400).json({
         success: false,
@@ -220,9 +203,7 @@ exports.register = async (req, res) => {
 
     const [year, month, day] = dateOfBirth.split("-").map(Number);
 
-    const birthDate = new Date(
-      Date.UTC(year, month - 1, day)
-    );
+    const birthDate = new Date(Date.UTC(year, month - 1, day));
 
     if (
       birthDate.getUTCFullYear() !== year ||
@@ -250,12 +231,8 @@ exports.register = async (req, res) => {
       });
     }
 
-    // =========================================
     // CALCULATE AGE
-    // =========================================
-
-    let age =
-      todayUTC.getUTCFullYear() - year;
+    let age = todayUTC.getUTCFullYear() - year;
 
     const birthdayNotReached =
       todayUTC.getUTCMonth() < month - 1 ||
@@ -275,13 +252,9 @@ exports.register = async (req, res) => {
       });
     }
 
-    const accountType =
-      age < 18 ? "teen" : "adult";
+    const accountType = age < 18 ? "teen" : "adult";
 
-    // =========================================
     // CHECK EXISTING USER
-    // =========================================
-
     const userExists = await User.findOne({
       $or: [
         { email: cleanEmail },
@@ -297,72 +270,46 @@ exports.register = async (req, res) => {
       });
     }
 
-    // =========================================
     // HASH PASSWORD
-    // =========================================
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const hashedPassword = await bcrypt.hash(
-      password,
-      10
-    );
-
-    // =========================================
-    // CREATE USER
-    // =========================================
-
-    const user = await User.create({
+    // CREATE UNVERIFIED USER
+    user = await User.create({
       username: cleanUsername,
       email: cleanEmail,
       phoneNumber: cleanPhone,
       dateOfBirth: birthDate,
       accountType,
-      password: hashedPassword
+      password: hashedPassword,
+      emailVerified: false
     });
 
-    // =========================================
-    // CREATE WALLET
-    // =========================================
+    // SEND EMAIL OTP
+    await sendEmailOtp(user);
 
-    await createWalletIfMissing(user._id);
-
-    // =========================================
-    // TOKEN
-    // =========================================
-
-    const token = generateToken(user._id);
-
-    // =========================================
-    // SAFE USER RESPONSE
-    // =========================================
-
-    const safeUser = {
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      phoneNumber: user.phoneNumber,
-      dateOfBirth: user.dateOfBirth,
-      accountType: user.accountType,
-      role: user.role,
-      isCreator: user.isCreator,
-      creatorBadge: user.creatorBadge,
-      favoriteCategories: user.favoriteCategories,
-      avatar: user.avatar,
-      cover: user.cover,
-      bio: user.bio,
-      online: user.online,
-      lastSeen: user.lastSeen
-    };
-
+    // WAIT FOR EMAIL VERIFICATION
     return res.status(201).json({
       success: true,
-      token,
-      user: safeUser
+      requiresEmailVerification: true,
+      message: "Verification code sent to your email address.",
+      email: user.email
     });
 
   } catch (err) {
-    console.error("REGISTER ERROR:", err);
+    console.error("REGISTER ERROR:", err.message);
 
-    // HANDLE DUPLICATE DATABASE INDEX
+    // REMOVE NEW ACCOUNT IF OTP DELIVERY FAILS
+    if (user && user.emailVerified === false) {
+      try {
+        await User.deleteOne({
+          _id: user._id,
+          emailVerified: false
+        });
+      } catch (cleanupError) {
+        console.error("REGISTRATION CLEANUP ERROR:", cleanupError.message);
+      }
+    }
+
     if (err.code === 11000) {
       return res.status(409).json({
         success: false,
@@ -372,11 +319,11 @@ exports.register = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Unable to create account."
+      message: "Unable to complete registration. Please try again."
     });
   }
 };
-      
+              
 // =====================================================
 // LOGIN
 // =====================================================
