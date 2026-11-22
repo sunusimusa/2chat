@@ -158,11 +158,12 @@
 
 
   <input
-    type="email"
+    type="text"
     id="email"
-    placeholder="Email"
-    autocomplete="email"
-  />
+    placeholder="Email or Phone Number"
+    autocomplete="username"
+    required
+/>
 
     
 <div class="password-group">
@@ -251,174 +252,107 @@ function togglePassword() {
 
   }
 
-async function login(){
 
+async function login() {
 
-  const email =
-    document
-      .getElementById("email")
-      .value
-      .trim();
+    const loginValue = document
+        .getElementById("email")
+        .value
+        .trim();
 
+    const password = document
+        .getElementById("password")
+        .value;
 
-  const password =
-    document
-      .getElementById("password")
-      .value;
+    const msg = document.getElementById("msg");
+    const button = document.getElementById("loginButton");
 
-
-  const msg =
-    document.getElementById("msg");
-
-
-  const button =
-    document.getElementById("loginButton");
-
-
-  // ==========================
-  // VALIDATION
-  // ==========================
-
-  if(!email || !password){
-
-    msg.innerText =
-      "Please enter your email and password.";
-
-    return;
-
-  }
-
-
-  // ==========================
-  // LOADING
-  // ==========================
-
-  button.disabled = true;
-
-  button.innerText =
-    "Logging in...";
-
-  msg.innerText = "";
-
-
-  try{
-
-
-    const res = await fetch(
-      "/api/auth/login",
-      {
-
-        method:"POST",
-
-        headers:{
-          "Content-Type":
-            "application/json"
-        },
-
-        body:JSON.stringify({
-          email,
-          password
-        })
-
-      }
-    );
-
-
-    const data =
-      await res.json();
-
-
-    // ==========================
-    // SUCCESS
-    // ==========================
-
-    if(data.success){
-
-
-      localStorage.setItem(
-        "token",
-        data.token
-      );
-
-
-      localStorage.setItem(
-        "user",
-        JSON.stringify(data.user)
-      );
-
-
-      // ==========================
-      // CHECK GROUP REDIRECT
-      // ==========================
-
-      const afterAuthRedirect =
-        localStorage.getItem(
-          "afterAuthRedirect"
-        );
-
-
-      if(afterAuthRedirect){
-
-
-        localStorage.removeItem(
-          "afterAuthRedirect"
-        );
-
-
-        location.href =
-          afterAuthRedirect;
-
-
+    // VALIDATION
+    if (!loginValue || !password) {
+        msg.innerText =
+            "Please enter your email or phone number and password.";
         return;
-
-      }
-
-
-      // ==========================
-      // NORMAL LOGIN
-      // ==========================
-
-      location.href =
-        "/home.html";
-
-
-    }else{
-
-
-      msg.innerText =
-        data.message ||
-        "Login failed";
-
-
     }
 
+    // LOADING
+    button.disabled = true;
+    button.innerText = "Logging in...";
+    msg.innerText = "";
 
-  }catch(error){
+    try {
 
+        const res = await fetch("/api/auth/login", {
+            method: "POST",
 
-    console.error(
-      "LOGIN ERROR:",
-      error
-    );
+            headers: {
+                "Content-Type": "application/json"
+            },
 
+            body: JSON.stringify({
+                email: loginValue,
+                password
+            })
+        });
 
-    msg.innerText =
-      "Network error. Please try again.";
+        const data = await res.json();
 
+        if (!res.ok || !data.success) {
 
+            msg.innerText =
+                data.message || "Login failed.";
+
+            return;
+        }
+
+        if (!data.token || !data.user) {
+            msg.innerText =
+                "Invalid server response. Please try again.";
+            return;
+        }
+
+        // SAVE LOGIN DATA
+        localStorage.setItem("token", data.token);
+
+        localStorage.setItem(
+            "user",
+            JSON.stringify(data.user)
+        );
+
+        // GROUP REDIRECT
+        const afterAuthRedirect =
+            localStorage.getItem("afterAuthRedirect");
+
+        if (afterAuthRedirect) {
+
+            localStorage.removeItem("afterAuthRedirect");
+
+            // Only allow local paths
+            if (
+                afterAuthRedirect.startsWith("/") &&
+                !afterAuthRedirect.startsWith("//")
+            ) {
+                location.href = afterAuthRedirect;
+                return;
+            }
+        }
+
+        // NORMAL REDIRECT
+        location.href = "/home.html";
+
+    } catch (error) {
+
+        console.error("LOGIN ERROR:", error);
+
+        msg.innerText =
+            "Network error. Please try again.";
+
+    } finally {
+
+        button.disabled = false;
+        button.innerText = "Login";
+    }
   }
-
-
-  // ==========================
-  // RESTORE BUTTON
-  // ==========================
-
-  button.disabled = false;
-
-  button.innerText =
-    "Login";
-
-}
+      
 
 </script>
 
