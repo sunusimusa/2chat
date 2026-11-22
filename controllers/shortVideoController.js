@@ -581,6 +581,7 @@ exports.getForYouVideos = async (req, res) => {
     }
 };
 
+
 exports.addWatchTime = async (req, res) => {
     try {
         const videoId = req.params.id;
@@ -598,12 +599,18 @@ exports.addWatchTime = async (req, res) => {
         }
 
         // Validate watch time
-        if (video.moderationStatus !== "approved") {
-    return res.status(403).json({
-        success: false,
-        message: "This video is not available."
-    });
-}
+        const watchSeconds = Number(seconds);
+
+        if (
+            !Number.isFinite(watchSeconds) ||
+            watchSeconds <= 0 ||
+            watchSeconds > 60
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid watch time."
+            });
+        }
 
         // Find video
         const video = await ShortVideo.findById(videoId);
@@ -616,10 +623,7 @@ exports.addWatchTime = async (req, res) => {
         }
 
         // Check moderation status
-        if (
-            video.moderationStatus &&
-            video.moderationStatus !== "approved"
-        ) {
+        if (video.moderationStatus !== "approved") {
             return res.status(403).json({
                 success: false,
                 message: "This video is not available."
@@ -627,7 +631,7 @@ exports.addWatchTime = async (req, res) => {
         }
 
         // Update watch time
-        video.watchTime = (video.watchTime || 0) + seconds;
+        video.watchTime = (video.watchTime || 0) + watchSeconds;
 
         await video.save();
 
@@ -645,7 +649,7 @@ exports.addWatchTime = async (req, res) => {
         });
     }
 };
-            
+                                        
 
 exports.getTrendingVideos = async (req, res) => {
 
