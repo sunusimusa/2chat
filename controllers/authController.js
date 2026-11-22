@@ -42,6 +42,82 @@ const createWalletIfMissing = async (userId) => {
 };
 
 
+const sendEmailOtp = async (user) => {
+
+    // GENERATE 6-DIGIT OTP
+    const otp = crypto.randomInt(100000, 1000000).toString();
+
+    // HASH OTP
+    const otpHash = crypto
+        .createHash("sha256")
+        .update(`${user._id}:${otp}`)
+        .digest("hex");
+
+    // SAVE OTP SECURITY DATA
+    user.emailOtpHash = otpHash;
+    user.emailOtpExpires = new Date(Date.now() + 10 * 60 * 1000);
+    user.emailOtpAttempts = 0;
+    user.emailOtpLastSentAt = new Date();
+
+    await user.save();
+
+    // SEND EMAIL
+    const safeUsername = String(user.username)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
+    try {
+
+        await sendEmail({
+            to: user.email,
+            subject: "Your 2Chat Verification Code",
+
+            text:
+                `Hello ${user.username},\n\n` +
+                `Your 2Chat verification code is: ${otp}\n\n` +
+                `This code expires in 10 minutes.\n\n` +
+                `If you did not request this code, please ignore this email.`,
+
+            html: `
+                <div style="font-family:Arial,sans-serif;max-width:500px;margin:auto;padding:25px;color:#222;">
+                    <h2 style="color:#0084ff;">Welcome to 2Chat!</h2>
+
+                    <p>Hello ${safeUsername},</p>
+
+                    <p>Use this verification code to verify your email address:</p>
+
+                    <div style="background:#f1f5f9;padding:18px;text-align:center;border-radius:8px;">
+                        <h1 style="letter-spacing:8px;color:#0084ff;margin:0;">
+                            ${otp}
+                        </h1>
+                    </div>
+
+                    <p>This code expires in <strong>10 minutes</strong>.</p>
+
+                    <p>If you did not request this code, please ignore this email.</p>
+
+                    <p>Thank you,<br><strong>2Chat Team</strong></p>
+                </div>
+            `
+        });
+
+    } catch (error) {
+
+        // INVALIDATE OTP IF EMAIL DELIVERY FAILS
+        user.emailOtpHash = null;
+        user.emailOtpExpires = null;
+        user.emailOtpAttempts = 0;
+        user.emailOtpLastSentAt = null;
+
+        await user.save();
+
+        throw error;
+    }
+};
+                      
 // =====================================================
 // REGISTER
 // =====================================================
