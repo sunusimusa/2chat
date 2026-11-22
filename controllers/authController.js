@@ -1186,3 +1186,77 @@ exports.verifyEmailOtp = async (req, res) => {
   }
 };
     
+
+exports.resendEmailOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // VALIDATE EMAIL
+    if (
+      typeof email !== "string" ||
+      !email.trim()
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter your email address."
+      });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+
+    // FIND USER
+    const user = await User.findOne({
+      email: cleanEmail
+    }).select("+emailOtpLastSentAt");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Account not found."
+      });
+    }
+
+    if (user.emailVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "This email address is already verified."
+      });
+    }
+
+    // 60-SECOND RESEND COOLDOWN
+    if (user.emailOtpLastSentAt) {
+      const elapsed =
+        Date.now() - user.emailOtpLastSentAt.getTime();
+
+      const cooldown = 60 * 1000;
+
+      if (elapsed < cooldown) {
+        const retryAfterSeconds = Math.ceil(
+          (cooldown - elapsed) / 1000
+        );
+
+        return res.status(429).json({
+          success: false,
+          retryAfterSeconds,
+          message: `Please wait ${retryAfterSeconds} seconds before requesting another code.`
+        });
+      }
+    }
+
+    // SEND NEW OTP
+    await sendEmailOtp(user);
+
+    return res.status(200).json({
+      success: true,
+      message: "A new verification code has been sent to your email."
+    });
+
+  } catch (err) {
+    console.error("RESEND EMAIL OTP ERROR:", err.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to send verification code. Please try again."
+    });
+  }
+};
