@@ -185,10 +185,9 @@ exports.likeVideo = async (req, res) => {
             });
         }
 
-        if (
-            video.moderationStatus &&
-            video.moderationStatus !== "approved"
-        ) {
+        if (video.moderationStatus !== "approved")
+
+        {
             return res.status(403).json({
                 success: false,
                 message: "This video is not available."
@@ -258,15 +257,13 @@ exports.commentVideo = async (req, res) => {
                 message: "Video not found."
             });
         }
+        if (video.moderationStatus !== "approved") {
+    return res.status(403).json({
+        success: false,
+        message: "This video is not available."
+    });
+        }
 
-        if (
-            video.moderationStatus &&
-            video.moderationStatus !== "approved"
-        ) {
-            return res.status(403).json({
-                success: false,
-                message: "This video is not available."
-            });
         }
 
         if (!Array.isArray(video.comments)) {
@@ -324,14 +321,13 @@ exports.addView = async (req, res) => {
         }
 
         // Check moderation status
-        if (
-            video.moderationStatus &&
-            video.moderationStatus !== "approved"
-        ) {
-            return res.status(403).json({
-                success: false,
-                message: "This video is not available."
-            });
+        if (video.moderationStatus !== "approved") {
+    return res.status(403).json({
+        success: false,
+        message: "This video is not available."
+    });
+        }
+        
         }
 
         // Increase views
@@ -393,14 +389,13 @@ exports.saveVideo = async (req, res) => {
         }
 
         // Check moderation status
-        if (
-            video.moderationStatus &&
-            video.moderationStatus !== "approved"
-        ) {
-            return res.status(403).json({
-                success: false,
-                message: "This video is not available."
-            });
+        if (video.moderationStatus !== "approved") {
+    return res.status(403).json({
+        success: false,
+        message: "This video is not available."
+    });
+        }
+        
         }
 
         if (!Array.isArray(user.savedVideos)) {
