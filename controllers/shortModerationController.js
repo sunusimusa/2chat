@@ -80,13 +80,13 @@ reason.trim().length > 500
         }
 
         if (
-            action === "approve" &&
-            video.moderationStatus === "approved"
-        ) {
-            return res.status(409).json({
-                success: false,
-                message: "This video is already approved."
-            });
+    action === "approve" &&
+    video.moderationStatus !== "pending"
+) {
+    return res.status(409).json({
+        success: false,
+        message: "Only pending videos can be approved. Restore removed videos first."
+    });
         }
 
         // Apply moderation action
