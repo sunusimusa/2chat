@@ -139,32 +139,27 @@ exports.uploadVideo = async (req, res) => {
 
 // Get Videos
 
+
 exports.getVideos = async (req, res) => {
-
     try {
-
         const videos = await ShortVideo.find({
-            $or: [
-                { moderationStatus: "approved" },
-                { moderationStatus: { $exists: false } }
-            ]
+            moderationStatus: "approved"
         })
         .sort({ createdAt: -1 });
 
-        res.json({
+        return res.json({
             success: true,
             videos
         });
 
     } catch (err) {
+        console.error("GET SHORTS ERROR:", err);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: err.message
+            message: "Unable to load videos."
         });
-
     }
-
 };
         
 // Like Video
