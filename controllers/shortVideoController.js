@@ -758,15 +758,11 @@ exports.getAnalytics = async (req, res) => {
 
         // Get authenticated user's username from JWT
         const username = req.user.username;
-
         const videos = await ShortVideo.find({
     username,
-    $or: [
-        { moderationStatus: "approved" },
-        { moderationStatus: { $exists: false } }
-    ]
-}).select("username avatar caption video views likes comments shares saves createdAt");
-        
+    moderationStatus: "approved"
+}).select("username avatar caption video views likes comments shares saves createdAt watchTime");
+ 
         let totalViews = 0;
         let totalLikes = 0;
         let totalComments = 0;
@@ -831,12 +827,9 @@ exports.getAnalyticsChart = async (req, res) => {
 
         const videos = await ShortVideo.find({
     username,
-    $or: [
-        { moderationStatus: "approved" },
-        { moderationStatus: { $exists: false } }
-    ]
+    moderationStatus: "approved"
 }).select("views createdAt");
-
+ 
         const chart = [];
 
         for (let i = 6; i >= 0; i--) {
