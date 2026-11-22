@@ -264,8 +264,6 @@ exports.commentVideo = async (req, res) => {
     });
         }
 
-        }
-
         if (!Array.isArray(video.comments)) {
             video.comments = [];
         }
@@ -326,8 +324,6 @@ exports.addView = async (req, res) => {
         success: false,
         message: "This video is not available."
     });
-        }
-        
         }
 
         // Increase views
@@ -394,8 +390,6 @@ exports.saveVideo = async (req, res) => {
         success: false,
         message: "This video is not available."
     });
-        }
-        
         }
 
         if (!Array.isArray(user.savedVideos)) {
@@ -604,17 +598,12 @@ exports.addWatchTime = async (req, res) => {
         }
 
         // Validate watch time
-        if (
-            typeof seconds !== "number" ||
-            !Number.isFinite(seconds) ||
-            seconds <= 0 ||
-            seconds > 30
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid watch time."
-            });
-        }
+        if (video.moderationStatus !== "approved") {
+    return res.status(403).json({
+        success: false,
+        message: "This video is not available."
+    });
+}
 
         // Find video
         const video = await ShortVideo.findById(videoId);
@@ -735,15 +724,12 @@ exports.addShare = async (req, res) => {
         }
 
         // Check moderation status
-        if (
-            video.moderationStatus &&
-            video.moderationStatus !== "approved"
-        ) {
-            return res.status(403).json({
-                success: false,
-                message: "This video is not available."
-            });
-        }
+       if (video.moderationStatus !== "approved") {
+    return res.status(403).json({
+        success: false,
+        message: "This video is not available."
+    });
+       }
 
         // Increase share count
         video.shares = (video.shares || 0) + 1;
