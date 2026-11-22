@@ -23,6 +23,7 @@ const {
 const {
 register,
 login,
+verifyEmailOtp,
 updateProfile,
 uploadAvatar,
 uploadCover,
@@ -39,9 +40,17 @@ router.get("/", (req, res) => {
 // Register
 router.post("/register",
 authLimiter, register);
+
 // Login
 router.post("/login",
 authLimiter, login);
+
+// Verify Email OTP
+router.post(
+  "/verify-email-otp",
+  authLimiter,
+  verifyEmailOtp
+);
 
 router.post(
   "/fcm-token",
