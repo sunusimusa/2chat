@@ -463,12 +463,7 @@ exports.getSavedVideos = async (req, res) => {
                  path: "savedVideos",
                  model: "ShortVideo",
                  match: {
-                     $or: [
-                        { moderationStatus:
-             "approved" },
-                          { moderationStatus:
-            { $exists: false } }
-                    ]
+    moderationStatus: "approved"
                  }
             });
         
