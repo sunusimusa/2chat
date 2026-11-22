@@ -884,12 +884,9 @@ exports.getTopVideos = async (req, res) => {
 
         const videos = await ShortVideo.find({
     username,
-    $or: [
-        { moderationStatus: "approved" },
-        { moderationStatus: { $exists: false } }
-    ]
+    moderationStatus: "approved"
 }).select("username avatar caption video views likes watchTime");
-        
+    
         videos.sort((a, b) => {
 
             const scoreA =
