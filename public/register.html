@@ -210,6 +210,48 @@
 
     <p id="msg"></p>
 
+    
+<!-- EMAIL OTP VERIFICATION -->
+<div id="otpSection" style="display:none; margin-top:20px;">
+
+    <h3>Verify Your Email</h3>
+
+    <p>
+        We sent a 6-digit verification code to your email address.
+    </p>
+
+    <input
+        id="emailOtp"
+        type="text"
+        inputmode="numeric"
+        maxlength="6"
+        placeholder="Enter 6-digit code"
+        autocomplete="one-time-code"
+        style="width:100%; padding:14px; margin:12px 0; text-align:center; letter-spacing:8px;"
+    >
+
+    <button
+        id="verifyOtpButton"
+        type="button"
+        class="register-btn"
+        onclick="verifyEmailOtp()"
+    >
+        Verify Email
+    </button>
+
+    <button
+        id="resendOtpButton"
+        type="button"
+        onclick="resendEmailOtp()"
+        style="margin-top:12px;"
+    >
+        Resend Code
+    </button>
+
+    <p id="otpMsg"></p>
+
+</div>
+    
     <!-- TERMS & PRIVACY -->
     <p class="legal-text">
         By creating a 2Chat account, you agree to our
@@ -230,180 +272,417 @@
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@29.5.8/dist/js/intlTelInput.min.js"></script>
 
 <script>
-    // INITIALIZE INTERNATIONAL PHONE INPUT
-    const phoneInput = document.getElementById("phoneNumber");
+ 
+// =========================================
+// INTERNATIONAL PHONE INPUT
+// =========================================
 
-    const phoneITI = window.intlTelInput(phoneInput, {
-        initialCountry: "ng",
-        separateDialCode: false,
-        nationalMode: false,
-        formatAsYouType: true,
-        loadUtils: () => import(
-            "https://cdn.jsdelivr.net/npm/intl-tel-input@29.5.8/dist/js/utils.js"
-        )
-    });
+const phoneInput = document.getElementById("phoneNumber");
 
-    // PASSWORD VISIBILITY
-    function togglePassword(inputId, eyeId) {
-        const input = document.getElementById(inputId);
-        const eye = document.getElementById(eyeId);
+const phoneITI = window.intlTelInput(phoneInput, {
+    initialCountry: "ng",
+    separateDialCode: false,
+    nationalMode: false,
+    formatAsYouType: true,
+    loadUtils: () => import(
+        "https://cdn.jsdelivr.net/npm/intl-tel-input@29.5.8/dist/js/utils.js"
+    )
+});
 
-        if (input.type === "password") {
-            input.type = "text";
-            eye.classList.remove("fa-eye");
-            eye.classList.add("fa-eye-slash");
-        } else {
-            input.type = "password";
-            eye.classList.remove("fa-eye-slash");
-            eye.classList.add("fa-eye");
-        }
+// =========================================
+// ELEMENTS
+// =========================================
+
+const msg = document.getElementById("msg");
+const otpMsg = document.getElementById("otpMsg");
+
+const registerButton =
+    document.getElementById("registerButton");
+
+const otpSection =
+    document.getElementById("otpSection");
+
+const verifyOtpButton =
+    document.getElementById("verifyOtpButton");
+
+const resendOtpButton =
+    document.getElementById("resendOtpButton");
+
+let pendingEmail = "";
+let resendTimer = null;
+
+// =========================================
+// PASSWORD VISIBILITY
+// =========================================
+
+function togglePassword(inputId, eyeId) {
+    const input = document.getElementById(inputId);
+    const eye = document.getElementById(eyeId);
+
+    if (input.type === "password") {
+        input.type = "text";
+        eye.classList.remove("fa-eye");
+        eye.classList.add("fa-eye-slash");
+    } else {
+        input.type = "password";
+        eye.classList.remove("fa-eye-slash");
+        eye.classList.add("fa-eye");
+    }
+}
+
+// =========================================
+// SAFE REDIRECT AFTER AUTHENTICATION
+// =========================================
+
+function redirectAfterAuthentication() {
+    const redirect =
+        localStorage.getItem("afterAuthRedirect");
+
+    localStorage.removeItem("afterAuthRedirect");
+
+    if (
+        redirect &&
+        redirect.startsWith("/") &&
+        !redirect.startsWith("//")
+    ) {
+        location.href = redirect;
+        return;
     }
 
-    // REGISTER
-    async function register() {
-        const username =
-            document.getElementById("username").value.trim();
+    location.href = "/home.html";
+}
 
-        const email =
-            document.getElementById("email").value.trim();
+// =========================================
+// SHOW OTP SECTION
+// =========================================
 
-        const dateOfBirth =
-            document.getElementById("dateOfBirth").value;
+function showOtpSection(email) {
+    pendingEmail = email;
 
-        const password =
-            document.getElementById("password").value;
+    document.querySelectorAll(".input-group").forEach(element => {
+        element.style.display = "none";
+    });
 
-        const confirmPassword =
-            document.getElementById("confirmPassword").value;
+    registerButton.style.display = "none";
 
-        const msg =
-            document.getElementById("msg");
+    otpSection.style.display = "block";
 
-        const button =
-            document.getElementById("registerButton");
+    msg.innerText = "";
 
-        // REQUIRED FIELDS
-        if (
-            !username ||
-            !email ||
-            !phoneInput.value.trim() ||
-            !dateOfBirth ||
-            !password ||
-            !confirmPassword
-        ) {
-            msg.innerText = "Please fill in all fields.";
+    otpMsg.innerText =
+        "A verification code has been sent to " + email;
+
+    document.getElementById("emailOtp").focus();
+
+    startResendCountdown(60);
+}
+
+// =========================================
+// RESEND COUNTDOWN
+// =========================================
+
+function startResendCountdown(seconds) {
+    clearInterval(resendTimer);
+
+    let remaining = seconds;
+
+    resendOtpButton.disabled = true;
+
+    resendOtpButton.innerText =
+        `Resend Code (${remaining}s)`;
+
+    resendTimer = setInterval(() => {
+        remaining--;
+
+        if (remaining <= 0) {
+            clearInterval(resendTimer);
+
+            resendOtpButton.disabled = false;
+            resendOtpButton.innerText = "Resend Code";
+
             return;
         }
 
-        // PASSWORD LENGTH
-        if (password.length < 8 || password.length > 128) {
+        resendOtpButton.innerText =
+            `Resend Code (${remaining}s)`;
+
+    }, 1000);
+}
+
+// =========================================
+// REGISTER
+// =========================================
+
+async function register() {
+
+    const username =
+        document.getElementById("username").value.trim();
+
+    const email =
+        document.getElementById("email").value.trim();
+
+    const dateOfBirth =
+        document.getElementById("dateOfBirth").value;
+
+    const password =
+        document.getElementById("password").value;
+
+    const confirmPassword =
+        document.getElementById("confirmPassword").value;
+
+    if (
+        !username ||
+        !email ||
+        !phoneInput.value.trim() ||
+        !dateOfBirth ||
+        !password ||
+        !confirmPassword
+    ) {
+        msg.innerText = "Please fill in all fields.";
+        return;
+    }
+
+    if (password.length < 8 || password.length > 128) {
+        msg.innerText =
+            "Password must be between 8 and 128 characters.";
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        msg.innerText = "Passwords do not match.";
+        return;
+    }
+
+    const dob = new Date(dateOfBirth + "T00:00:00");
+
+    if (Number.isNaN(dob.getTime()) || dob > new Date()) {
+        msg.innerText = "Please enter a valid date of birth.";
+        return;
+    }
+
+    buttonLoading(true, "Creating Account...");
+
+    try {
+        await phoneITI.promise;
+
+        if (!phoneITI.isValidNumber()) {
             msg.innerText =
-                "Password must be between 8 and 128 characters.";
+                "Please enter a valid international phone number.";
+
             return;
         }
 
-        // PASSWORD MATCH
-        if (password !== confirmPassword) {
-            msg.innerText = "Passwords do not match.";
-            return;
-        }
+        const phoneNumber = phoneITI.getNumber();
 
-        // DATE VALIDATION
-        const dob = new Date(dateOfBirth + "T00:00:00");
+        const res = await fetch("/api/auth/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username,
+                email,
+                phoneNumber,
+                dateOfBirth,
+                password
+            })
+        });
 
-        if (Number.isNaN(dob.getTime()) || dob > new Date()) {
-            msg.innerText = "Please enter a valid date of birth.";
-            return;
-        }
+        const data = await res.json();
 
-        // WAIT FOR PHONE VALIDATION UTILITIES
-        button.disabled = true;
-        msg.innerText = "Checking phone number...";
-
-        try {
-            await phoneITI.promise;
-
-            // PHONE VALIDATION
-            if (!phoneITI.isValidNumber()) {
-                msg.innerText =
-                    "Please enter a valid phone number for the selected country.";
-
-                button.disabled = false;
-                return;
-            }
-
-            // INTERNATIONAL E.164 FORMAT
-            const phoneNumber = phoneITI.getNumber();
-
-            // LOADING
-            button.innerHTML = `
-                <i class="fa-solid fa-spinner fa-spin"></i>
-                Creating Account...
-            `;
-
-            msg.innerText = "";
-
-            const res = await fetch("/api/auth/register", {
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-                    username,
-                    email,
-                    phoneNumber,
-                    dateOfBirth,
-                    password
-                })
-            });
-
-            const data = await res.json();
-
-            // SUCCESS
-            if (data.success) {
-                localStorage.setItem("token", data.token);
-
-                if (data.user) {
-                    localStorage.setItem(
-                        "user",
-                        JSON.stringify(data.user)
-                    );
-                }
-
-                const afterAuthRedirect =
-                    localStorage.getItem("afterAuthRedirect");
-
-                if (afterAuthRedirect) {
-                    localStorage.removeItem("afterAuthRedirect");
-                    location.href = afterAuthRedirect;
-                    return;
-                }
-
-                location.href = "/home.html";
-                return;
-            }
-
-            // ERROR
+        if (!res.ok || !data.success) {
             msg.innerText =
                 data.message || "Registration failed.";
 
-        } catch (error) {
-            console.error("REGISTER ERROR:", error);
-
-            msg.innerText =
-                "Network or phone validation error. Please try again.";
-
-        } finally {
-            button.disabled = false;
-
-            button.innerHTML = `
-                <i class="fa-solid fa-user-plus"></i>
-                Register
-            `;
+            return;
         }
+
+        if (data.requiresEmailVerification === true) {
+            showOtpSection(data.email || email);
+            return;
+        }
+
+        msg.innerText =
+            "Unexpected registration response. Please contact support.";
+
+    } catch (error) {
+        console.error("REGISTER ERROR:", error);
+
+        msg.innerText =
+            "Network or phone validation error. Please try again.";
+
+    } finally {
+        buttonLoading(false, "Register");
     }
+}
+
+// =========================================
+// BUTTON LOADING
+// =========================================
+
+function buttonLoading(loading, label) {
+    registerButton.disabled = loading;
+
+    registerButton.innerHTML = loading
+        ? `<i class="fa-solid fa-spinner fa-spin"></i> ${label}`
+        : `<i class="fa-solid fa-user-plus"></i> ${label}`;
+}
+
+// =========================================
+// VERIFY EMAIL OTP
+// =========================================
+
+async function verifyEmailOtp() {
+
+    const otp =
+        document.getElementById("emailOtp").value.trim();
+
+    if (!pendingEmail) {
+        otpMsg.innerText =
+            "Registration email is missing. Please register again.";
+        return;
+    }
+
+    if (!/^\d{6}$/.test(otp)) {
+        otpMsg.innerText =
+            "Please enter a valid 6-digit verification code.";
+        return;
+    }
+
+    verifyOtpButton.disabled = true;
+
+    verifyOtpButton.innerHTML =
+        `<i class="fa-solid fa-spinner fa-spin"></i> Verifying...`;
+
+    otpMsg.innerText = "";
+
+    try {
+        const res = await fetch("/api/auth/verify-email-otp", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: pendingEmail,
+                otp
+            })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+            otpMsg.innerText =
+                data.message || "Email verification failed.";
+
+            return;
+        }
+
+        if (!data.token || !data.user) {
+            otpMsg.innerText =
+                "Verification succeeded but login details are missing. Please contact support.";
+            return;
+        }
+
+        // SAVE AUTHENTICATION DATA
+        localStorage.setItem("token", data.token);
+
+        localStorage.setItem(
+            "user",
+            JSON.stringify(data.user)
+        );
+
+        otpMsg.innerText =
+            "Email verified successfully! Redirecting...";
+
+        redirectAfterAuthentication();
+
+    } catch (error) {
+        console.error("OTP VERIFICATION ERROR:", error);
+
+        otpMsg.innerText =
+            "Network error. Please try again.";
+
+    } finally {
+        verifyOtpButton.disabled = false;
+
+        verifyOtpButton.innerText = "Verify Email";
+    }
+}
+
+// =========================================
+// RESEND EMAIL OTP
+// =========================================
+
+async function resendEmailOtp() {
+
+    if (!pendingEmail) {
+        otpMsg.innerText =
+            "Registration email is missing. Please register again.";
+        return;
+    }
+
+    resendOtpButton.disabled = true;
+
+    resendOtpButton.innerText = "Sending...";
+
+    otpMsg.innerText = "";
+
+    try {
+        const res = await fetch("/api/auth/resend-email-otp", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: pendingEmail
+            })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+            otpMsg.innerText =
+                data.message || "Unable to resend verification code.";
+
+            if (data.retryAfterSeconds) {
+                startResendCountdown(data.retryAfterSeconds);
+            } else {
+                resendOtpButton.disabled = false;
+                resendOtpButton.innerText = "Resend Code";
+            }
+
+            return;
+        }
+
+        otpMsg.innerText =
+            "A new verification code has been sent.";
+
+        document.getElementById("emailOtp").value = "";
+
+        startResendCountdown(60);
+
+    } catch (error) {
+        console.error("RESEND OTP ERROR:", error);
+
+        otpMsg.innerText =
+            "Network error. Please try again.";
+
+        resendOtpButton.disabled = false;
+        resendOtpButton.innerText = "Resend Code";
+    }
+}
+
+// =========================================
+// OTP INPUT: NUMBERS ONLY
+// =========================================
+
+document.getElementById("emailOtp").addEventListener(
+    "input",
+    function () {
+        this.value = this.value.replace(/\D/g, "").slice(0, 6);
+    }
+);
+    
 </script>
 
 </body>
