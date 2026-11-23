@@ -2,10 +2,17 @@ const mongoose = require("mongoose");
 
 const shortVideoSchema = new mongoose.Schema({
 
-    username: {
-        type: String,
-        required: true
-    },
+    userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null,
+    index: true
+},
+
+username: {
+    type: String,
+    required: true
+},
 
     avatar: {
         type: String,
