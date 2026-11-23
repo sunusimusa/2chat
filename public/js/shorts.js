@@ -170,8 +170,6 @@ const data = await res.json();
 
         const following = user.following || [];
 
-        window.videos = data.videos;
-
         const savedRes = await fetch("/api/shorts/saved", {
     headers: {
         "Authorization": "Bearer " + token
@@ -185,6 +183,34 @@ const savedVideos = savedData.success && Array.isArray(savedData.videos)
     : [];
 
         let videos = [...data.videos];
+
+        // Load a specific Short from a shared link
+const params = new URLSearchParams(window.location.search);
+const sharedVideoId = params.get("video");
+
+if (sharedVideoId) {
+    const alreadyLoaded = videos.some(
+        video => String(video._id) === String(sharedVideoId)
+    );
+
+    if (!alreadyLoaded) {
+        try {
+            const singleRes = await fetch(
+                `/api/shorts/video/${encodeURIComponent(sharedVideoId)}`
+            );
+
+            const singleData = await singleRes.json();
+
+            if (singleData.success && singleData.video) {
+                videos.unshift(singleData.video);
+            }
+        } catch (error) {
+            console.error("Unable to load shared Short:", error);
+        }
+    }
+}
+
+window.videos = videos;
 
         const creatorUsernames = [
     ...new Set(
@@ -201,9 +227,10 @@ await Promise.all(
 if(currentTab === "following"){
 
     videos = videos.filter(video =>
-    following.includes(video.username)
+    following.includes(video.username) ||
+    String(video._id) === String(sharedVideoId)
 );
-
+    
 }else{
 
     // For You: sabbin videos da masu likes da views su fara fitowa
