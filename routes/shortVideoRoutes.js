@@ -121,4 +121,10 @@ router.get(
 searchShorts
 );
 
+// Get Single Short by ID
+router.get(
+    "/video/:id",
+    getShortById
+);
+
 module.exports = router;
