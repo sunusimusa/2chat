@@ -1216,3 +1216,42 @@ $and: [
     }
 };
                 
+// ================= GET SINGLE SHORT BY ID =================
+
+exports.getShortById = async (req, res) => {
+    try {
+        const videoId = req.params.id;
+
+        if (!/^[a-fA-F0-9]{24}$/.test(videoId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid video ID."
+            });
+        }
+
+        const video = await ShortVideo.findOne({
+            _id: videoId,
+            moderationStatus: "approved"
+        }).lean();
+
+        if (!video) {
+            return res.status(404).json({
+                success: false,
+                message: "Short not found or unavailable."
+            });
+        }
+
+        return res.json({
+            success: true,
+            video
+        });
+
+    } catch (err) {
+        console.error("GET SINGLE SHORT ERROR:", err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to load this Short."
+        });
+    }
+};
