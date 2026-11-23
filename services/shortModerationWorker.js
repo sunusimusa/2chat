@@ -1,4 +1,3 @@
-
 const ShortVideo = require("../models/ShortVideo");
 
 const POLL_INTERVAL_MS = 5000;
