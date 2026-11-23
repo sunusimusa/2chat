@@ -30,7 +30,8 @@ const {
     getFollowersGrowth,
     getCreatorLevel,
     getCreatorBadge,
-    searchShorts
+    searchShorts,
+    getShortById
 } = require("../controllers/shortVideoController");
 
 // Upload Short Video
@@ -122,9 +123,6 @@ searchShorts
 );
 
 // Get Single Short by ID
-router.get(
-    "/video/:id",
-    getShortById
-);
+router.get("/video/:id",getShortById);
 
 module.exports = router;
