@@ -319,6 +319,13 @@ async function processNextJob() {
  * Start worker after MongoDB connection.
  */
 function startShortModerationWorker() {
+        if (process.env.AI_MODERATION_ENABLED !== "true") {
+        console.log(
+            "[Moderation] AI is disabled. Admin review mode is active."
+        );
+        return;
+    }
+   
     if (workerStarted) {
         console.log("[Moderation] Worker already started.");
         return;
