@@ -51,6 +51,10 @@ const statusRoutes =
 const shortVideoRoutes =
     require("./routes/shortVideoRoutes");
 
+const {
+    startShortModerationWorker
+} = require("./workers/shortModerationWorker");
+
 const walletRoutes =
     require("./routes/walletRoutes");
 
@@ -1675,11 +1679,18 @@ mongoose
             await seedCoinPackages();
 
 
-            // =============================================
-            // START SERVER
-            // =============================================
+         // =============================================
+         // START SHORT MODERATION WORKER
+         // =============================================
 
-            server.listen(
+           startShortModerationWorker();
+
+
+          // =============================================
+          // START SERVER
+          // =============================================
+
+              server.listen(
                 PORT,
                 () => {
 
