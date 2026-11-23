@@ -263,9 +263,10 @@ videos.forEach(video => {
 id="video-${video._id}"
 src="${video.video}"
 playsinline
-loop
+preload="metadata"
 ondblclick="doubleLike('${video._id}')"
-onclick="togglePlay('${video._id}')">
+onclick="togglePlay('${video._id}')"
+onended="playNextVideo('${video._id}')">
 </video>
 
 <div id="heart-${video._id}" class="heart-animation">
