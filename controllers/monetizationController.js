@@ -68,10 +68,11 @@ exports.getMonetizationStatus = async (req, res) => {
         // CREATOR VIDEOS
         // =========================================
 
-        const videos = await ShortVideo.find({
-    username: user.username,
-    moderationStatus: "approved"
-});
+        const videos = await
+        ShortVideo.find({
+             username: user.username,
+             moderationStatus: "approved"
+       });
 
         let totalViews = 0;
         let totalWatchTime = 0;
