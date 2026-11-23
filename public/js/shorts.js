@@ -1530,6 +1530,42 @@ if (commentInput) {
 
 }
 
+// ================= PLAY NEXT SHORT =================
+
+function playNextVideo(currentId) {
+
+    const currentShort = document
+        .getElementById("video-" + currentId);
+
+    if (!currentShort) return;
+
+    const currentContainer = currentShort.closest(".short");
+
+    if (!currentContainer) return;
+
+    const nextContainer = currentContainer.nextElementSibling;
+
+    if (!nextContainer) {
+        console.log("No next Short available.");
+        return;
+    }
+
+    const nextVideo = nextContainer.querySelector("video");
+
+    if (!nextVideo) return;
+
+    nextContainer.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+    setTimeout(() => {
+        nextVideo.play().catch(error => {
+            console.log("Autoplay blocked:", error);
+        });
+    }, 500);
+}
+
 // ================= LOAD =================
 
 loadVideos();
