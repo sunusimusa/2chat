@@ -389,12 +389,10 @@ onended="playNextVideo('${video._id}')">
 
 `;
 
-        });
+ });
 
-        const params = new URLSearchParams(window.location.search);
-
-const videoId = params.get("video");
-
+    const videoId = sharedVideoId;
+        
 if(videoId){
 
     const target =
