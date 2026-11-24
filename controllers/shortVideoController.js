@@ -1257,3 +1257,169 @@ exports.getShortById = async (req, res) => {
         });
     }
 };
+
+
+// ========================================
+// EDIT MY SHORT — CAPTION & HASHTAGS
+// ========================================
+
+exports.editMyShort = async (req, res) => {
+    try {
+        const videoId = req.params.id;
+
+        if (!/^[a-fA-F0-9]{24}$/.test(videoId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid video ID."
+            });
+        }
+
+        const { caption, hashtags } = req.body;
+
+        if (
+            typeof caption !== "string" ||
+            caption.trim().length > 1000
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Caption must not exceed 1000 characters."
+            });
+        }
+
+        let tags = [];
+
+        if (typeof hashtags === "string") {
+            tags = hashtags
+                .split(/\s+/)
+                .map(tag => tag.replace(/^#/, "").toLowerCase())
+                .filter(tag => /^[a-z0-9_]{1,30}$/.test(tag))
+                .slice(0, 20);
+        } else if (Array.isArray(hashtags)) {
+            tags = hashtags
+                .filter(tag => typeof tag === "string")
+                .map(tag => tag.replace(/^#/, "").toLowerCase())
+                .filter(tag => /^[a-z0-9_]{1,30}$/.test(tag))
+                .slice(0, 20);
+        } else if (hashtags !== undefined) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid hashtags."
+            });
+        }
+
+        const video = await ShortVideo.findOne({
+            _id: videoId,
+            userId: req.user._id
+        });
+
+        if (!video) {
+            return res.status(404).json({
+                success: false,
+                message: "Short not found or you are not its owner."
+            });
+        }
+
+        video.caption = caption.trim();
+        video.hashtags = tags;
+
+        await video.save();
+
+        return res.json({
+            success: true,
+            message: "Short updated successfully.",
+            video
+        });
+
+    } catch (err) {
+        console.error("EDIT SHORT ERROR:", err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to edit Short."
+        });
+    }
+};
+
+
+// ========================================
+// DELETE MY SHORT
+// ========================================
+
+exports.deleteMyShort = async (req, res) => {
+    try {
+        const videoId = req.params.id;
+
+        if (!/^[a-fA-F0-9]{24}$/.test(videoId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid video ID."
+            });
+        }
+
+        const video = await ShortVideo.findOne({
+            _id: videoId,
+            userId: req.user._id
+        });
+
+        if (!video) {
+            return res.status(404).json({
+                success: false,
+                message: "Short not found or you are not its owner."
+            });
+        }
+
+        // Do not delete the database record if its
+        // Cloudinary public ID is missing.
+        if (!video.videoPublicId) {
+            return res.status(409).json({
+                success: false,
+                message: "Cloudinary video ID is missing. This Short cannot be safely deleted automatically."
+            });
+        }
+
+        // Delete video from Cloudinary first.
+        const cloudResult = await cloudinary.uploader.destroy(
+            video.videoPublicId,
+            {
+                resource_type: "video",
+                invalidate: true
+            }
+        );
+
+        if (
+            cloudResult.result !== "ok" &&
+            cloudResult.result !== "not found"
+        ) {
+            return res.status(502).json({
+                success: false,
+                message: "Cloudinary could not delete this video. Please try again."
+            });
+        }
+
+        // Remove Short from MongoDB.
+        await ShortVideo.deleteOne({
+            _id: video._id,
+            userId: req.user._id
+        });
+
+        // Remove deleted Short from users' saved lists.
+        await User.updateMany(
+            { savedVideos: video._id },
+            { $pull: { savedVideos: video._id } }
+        );
+
+        return res.json({
+            success: true,
+            message: "Your Short has been deleted successfully."
+        });
+
+    } catch (err) {
+        console.error("DELETE SHORT ERROR:", err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to delete Short. Please try again."
+        });
+    }
+};
+                    
