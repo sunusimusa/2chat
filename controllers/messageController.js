@@ -2,6 +2,41 @@ const Message = require("../models/Message");
 const cloudinary = require("../config/cloudinary");
 const Notification = require("../models/Notification");
 const User = require("../models/User");
+
+// =========================================
+// CHECK BLOCK STATUS
+// =========================================
+
+const isBlockedBetweenUsers = async (user1, user2) => {
+
+    const [firstUser, secondUser] = await Promise.all([
+
+        User.findOne({ username: user1 })
+            .select("blockedUsers"),
+
+        User.findOne({ username: user2 })
+            .select("blockedUsers")
+
+    ]);
+
+    if (!firstUser || !secondUser) {
+        return true;
+    }
+
+    const firstBlockedSecond =
+        (firstUser.blockedUsers || []).some(
+            id => String(id) === String(secondUser._id)
+        );
+
+    const secondBlockedFirst =
+        (secondUser.blockedUsers || []).some(
+            id => String(id) === String(firstUser._id)
+        );
+
+    return firstBlockedSecond || secondBlockedFirst;
+
+};
+
 const streamifier = require("streamifier");
 const { sendPushNotification } = require("../services/notificationService");
 
