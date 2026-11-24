@@ -770,6 +770,26 @@ function forwardShort(event, id) {
     updateShortPlayer(id);
 }
 
+const shortControlTimers = {};
+
+function showShortControls(id) {
+    const video = document.getElementById("video-" + id);
+    const panel = document.querySelector(
+        `#video-${id} + .short-player-controls`
+    );
+
+    if (!video || !panel) return;
+
+    panel.classList.remove("controls-hidden");
+
+    clearTimeout(shortControlTimers[id]);
+
+    if (!video.paused) {
+        shortControlTimers[id] = setTimeout(() => {
+            panel.classList.add("controls-hidden");
+        }, 2500);
+    }
+}
 
 function setupShortPlayerControls() {
     document.querySelectorAll(".short video").forEach(video => {
