@@ -19,6 +19,8 @@ const socket = io({
 const params = new URLSearchParams(location.search);
 const receiver = params.get("user");
 
+let receiverUserId = null;
+
 if (!receiver) {
     console.error("Receiver not found");
 }
@@ -450,6 +452,8 @@ async function loadChatUser() {
         }
 
         const chatUser = data.user;
+
+       receiverUserId = chatUser._id;
 
         const name =
             document.getElementById("chatName");
