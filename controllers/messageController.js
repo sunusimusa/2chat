@@ -686,6 +686,28 @@ if (
     });
 }
 
+// =========================================
+// BLOCK PROTECTION
+// =========================================
+
+const otherUser =
+    message.sender === username
+        ? message.receiver
+        : message.sender;
+
+const blocked = await isBlockedBetweenUsers(
+    username,
+    otherUser
+);
+
+if (blocked) {
+    return res.status(403).json({
+        success: false,
+        blocked: true,
+        message: "You cannot react to messages from this user."
+    });
+}        
+
 // Do not allow reactions on deleted messages
 if (
     message.deletedForEveryone ||
