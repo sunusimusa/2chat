@@ -1433,3 +1433,12 @@ button {
 .chat-user:active {
     opacity: 0.85;
 }
+
+/* ENABLE MESSAGE TEXT SELECTION */
+
+.message-text {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    -webkit-touch-callout: default !important;
+    cursor: text;
+}
