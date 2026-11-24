@@ -114,6 +114,25 @@ exports.followUser = async (req, res) => {
 
         }
 
+        // =================================================
+// BLOCK PROTECTION
+// =================================================
+
+const iBlockedTarget = (me.blockedUsers || []).some(
+    id => String(id) === String(target._id)
+);
+
+const targetBlockedMe = (target.blockedUsers || []).some(
+    id => String(id) === String(me._id)
+);
+
+if (iBlockedTarget || targetBlockedMe) {
+    return res.status(403).json({
+        success: false,
+        blocked: true,
+        message: "You cannot follow this user because a block is active."
+    });
+}
 
         // =================================================
         // NORMALIZE ARRAYS
