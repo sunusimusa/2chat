@@ -113,13 +113,14 @@ exports.uploadVideo = async (req, res) => {
 
         // Ƙirƙirar Short da authenticated user
         const short = await ShortVideo.create({
-            username,
-            avatar,
-            caption,
-            category: category || "general",
-            hashtags: tags,
-            video: uploadResult.secure_url
-        });
+    userId: req.user._id,
+    username,
+    avatar,
+    caption,
+    category: category || "general",
+    hashtags: tags,
+    video: uploadResult.secure_url
+});
 
         return res.status(201).json({
             success: true,
