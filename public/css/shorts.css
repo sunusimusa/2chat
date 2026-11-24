@@ -1258,3 +1258,14 @@ body {
 .short-player-buttons button:active {
     transform: scale(0.92);
    }
+
+.short-player-controls {
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.short-player-controls.controls-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
