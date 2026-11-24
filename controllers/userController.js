@@ -451,3 +451,179 @@ exports.searchUsers = async (req, res) => {
         });
     }
 };
+
+
+
+// =====================================================
+// BLOCK USER
+// =====================================================
+
+exports.blockUser = async (req, res) => {
+    try {
+        const targetId = req.params.userId;
+        const myId = req.user._id;
+
+        if (!mongoose.Types.ObjectId.isValid(targetId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid user ID."
+            });
+        }
+
+        if (String(myId) === String(targetId)) {
+            return res.status(400).json({
+                success: false,
+                message: "You cannot block yourself."
+            });
+        }
+
+        const [me, target] = await Promise.all([
+            User.findById(myId),
+            User.findById(targetId)
+        ]);
+
+        if (!me || !target) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found."
+            });
+        }
+
+        if (target.role === "admin") {
+            return res.status(403).json({
+                success: false,
+                message: "You cannot block an admin account."
+            });
+        }
+
+        const alreadyBlocked = me.blockedUsers.some(
+            id => String(id) === String(target._id)
+        );
+
+        if (alreadyBlocked) {
+            return res.json({
+                success: true,
+                message: "User is already blocked."
+            });
+        }
+
+        me.blockedUsers.push(target._id);
+
+        // Remove both follow relationships
+        me.following = me.following.filter(
+            username => username !== target.username
+        );
+
+        target.followers = target.followers.filter(
+            username => username !== me.username
+        );
+
+        target.following = target.following.filter(
+            username => username !== me.username
+        );
+
+        me.followers = me.followers.filter(
+            username => username !== target.username
+        );
+
+        await Promise.all([
+            me.save(),
+            target.save()
+        ]);
+
+        return res.json({
+            success: true,
+            message: "User blocked successfully."
+        });
+
+    } catch (err) {
+        console.error("BLOCK USER ERROR:", err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to block user."
+        });
+    }
+};
+
+
+// =====================================================
+// UNBLOCK USER
+// =====================================================
+
+exports.unblockUser = async (req, res) => {
+    try {
+        const targetId = req.params.userId;
+
+        if (!mongoose.Types.ObjectId.isValid(targetId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid user ID."
+            });
+        }
+
+        const me = await User.findById(req.user._id);
+
+        if (!me) {
+            return res.status(404).json({
+                success: false,
+                message: "Account not found."
+            });
+        }
+
+        me.blockedUsers = me.blockedUsers.filter(
+            id => String(id) !== String(targetId)
+        );
+
+        await me.save();
+
+        return res.json({
+            success: true,
+            message: "User unblocked successfully."
+        });
+
+    } catch (err) {
+        console.error("UNBLOCK USER ERROR:", err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to unblock user."
+        });
+    }
+};
+
+
+// =====================================================
+// GET BLOCKED USERS
+// =====================================================
+
+exports.getBlockedUsers = async (req, res) => {
+    try {
+        const me = await User.findById(req.user._id)
+            .populate(
+                "blockedUsers",
+                "username avatar bio"
+            );
+
+        if (!me) {
+            return res.status(404).json({
+                success: false,
+                message: "Account not found."
+            });
+        }
+
+        return res.json({
+            success: true,
+            users: me.blockedUsers
+        });
+
+    } catch (err) {
+        console.error("GET BLOCKED USERS ERROR:", err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to load blocked users."
+        });
+    }
+};
+
