@@ -814,12 +814,14 @@ function setupShortPlayerControls() {
         });
 
         video.addEventListener("play", () => {
-            updateShortPlayIcon(id);
-        });
+    updateShortPlayIcon(id);
+    showShortControls(id);
+});
 
-        video.addEventListener("pause", () => {
-            updateShortPlayIcon(id);
-        });
+video.addEventListener("pause", () => {
+    updateShortPlayIcon(id);
+    showShortControls(id);
+});
 
     });
 }
