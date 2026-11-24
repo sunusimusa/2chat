@@ -77,6 +77,23 @@ if (!receiverUser) {
     });
 }
 
+// =========================================
+// BLOCK PROTECTION
+// =========================================
+
+const blocked = await isBlockedBetweenUsers(
+    sender,
+    receiver
+);
+
+if (blocked) {
+    return res.status(403).json({
+        success: false,
+        blocked: true,
+        message: "You cannot send messages to this user."
+    });
+}    
+
 let image = "";
 
 if(req.file){
