@@ -40,6 +40,7 @@ router.get(
 
 router.get(
     "/search/:keyword",
+    protect,
     searchUsers
 );
 
@@ -50,9 +51,9 @@ router.get(
 
 router.get(
     "/all",
+    protect,
     getAllUsers
 );
-
     
 // =========================================
 // BLOCK / UNBLOCK USER
