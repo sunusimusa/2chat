@@ -280,7 +280,24 @@ if (!receiverUser) {
         success: false,
         message: "Receiver account not found."
     });
-}  
+} 
+
+// =========================================
+// BLOCK PROTECTION
+// =========================================
+
+const blocked = await isBlockedBetweenUsers(
+    sender,
+    receiver
+);
+
+if (blocked) {
+    return res.status(403).json({
+        success: false,
+        blocked: true,
+        message: "You cannot send voice messages to this user."
+    });
+}    
 
 if(!req.file){
 
