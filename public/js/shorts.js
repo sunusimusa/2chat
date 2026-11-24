@@ -1843,6 +1843,117 @@ async function saveEditedShort() {
 } 
 
 
+async function confirmDeleteShort() {
+
+    if (!deletingShortId) return;
+
+    const videoId = deletingShortId;
+
+    const video = window.videos?.find(
+        item => String(item._id) === String(videoId)
+    );
+
+    if (
+        !video ||
+        !user ||
+        !video.userId ||
+        String(video.userId) !== String(user._id)
+    ) {
+        alert("You are not authorized to delete this Short.");
+        return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        alert("Please log in again.");
+        return;
+    }
+
+    const deleteBtn = document.getElementById(
+        "confirmDeleteShortBtn"
+    );
+
+    try {
+
+        deleteBtn.disabled = true;
+        deleteBtn.innerText = "Deleting...";
+
+        const response = await fetch(
+            `/api/shorts/${encodeURIComponent(videoId)}`,
+            {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.message || "Unable to delete Short."
+            );
+        }
+
+        // Remove from local video list
+        window.videos = (window.videos || []).filter(
+            item => String(item._id) !== String(videoId)
+        );
+
+        // Remove video element from page
+        const videoElement = document.getElementById(
+            "video-" + videoId
+        );
+
+        const shortElement = videoElement?.closest(".short");
+
+        if (shortElement) {
+            shortElement.remove();
+        }
+
+        // Clear current video references
+        if (String(currentVisibleVideoId) === String(videoId)) {
+            currentVisibleVideoId = null;
+        }
+
+        if (String(currentVideoId) === String(videoId)) {
+            currentVideoId = null;
+        }
+
+        closeDeleteShortModal();
+
+        document.getElementById("shortsMenu")
+            ?.classList.remove("show");
+
+        // Scroll to another remaining Short
+        const remainingShort = document.querySelector(
+            "#shortsContainer .short"
+        );
+
+        if (remainingShort) {
+            remainingShort.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+
+        alert("Your Short has been deleted successfully.");
+
+    } catch (error) {
+
+        console.error("DELETE SHORT ERROR:", error);
+        alert(error.message || "Unable to delete Short.");
+
+    } finally {
+
+        deleteBtn.disabled = false;
+        deleteBtn.innerText = "Delete Short";
+
+    }
+}
+
 // ================= LOAD =================
 
 loadVideos();
