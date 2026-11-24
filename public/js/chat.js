@@ -429,10 +429,15 @@ async function loadChatUser() {
 
     try {
 
-        const res =
-            await fetch(
-                `/api/users/profile/${encodeURIComponent(receiver)}`
-            );
+        const res = await fetch(
+    `/api/users/profile/${encodeURIComponent(receiver)}`,
+    {
+        method: "GET",
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("token")
+        }
+    }
+);
 
         if (!res.ok) return;
 
