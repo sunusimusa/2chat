@@ -293,8 +293,108 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
 
 </div>
 
+     
+
+<!-- =====================================
+     EDIT SHORT MODAL
+===================================== -->
+
+<div id="editShortModal" class="edit-short-modal">
+
+    <div class="edit-short-box">
+
+        <div class="edit-short-header">
+            <h3><i class="fa-solid fa-pen-to-square"></i> Edit My Short</h3>
+
+            <button type="button" onclick="closeEditShortModal()">
+                &times;
+            </button>
+        </div>
+
+        <label for="editShortCaption">Caption</label>
+
+        <textarea
+            id="editShortCaption"
+            maxlength="1000"
+            placeholder="Write your caption..."
+        ></textarea>
+
+        <label for="editShortHashtags">Hashtags</label>
+
+        <input
+            type="text"
+            id="editShortHashtags"
+            placeholder="#2chat #shorts"
+        >
+
+        <p class="edit-short-hint">
+            Add up to 20 hashtags.
+        </p>
+
+        <div class="edit-short-actions">
+
+            <button
+                type="button"
+                class="edit-cancel-btn"
+                onclick="closeEditShortModal()">
+                Cancel
+            </button>
+
+            <button
+                type="button"
+                id="saveEditedShortBtn"
+                class="edit-save-btn"
+                onclick="saveEditedShort()">
+                Save Changes
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
 
+<!-- =====================================
+     DELETE SHORT CONFIRMATION
+===================================== -->
+
+<div id="deleteShortModal" class="delete-short-modal">
+
+    <div class="delete-short-box">
+
+        <div class="delete-short-icon">
+            <i class="fa-solid fa-trash"></i>
+        </div>
+
+        <h3>Delete this Short?</h3>
+
+        <p>
+            This video will be permanently deleted.
+            You cannot undo this action.
+        </p>
+
+        <div class="delete-short-actions">
+
+            <button
+                type="button"
+                onclick="closeDeleteShortModal()">
+                Cancel
+            </button>
+
+            <button
+                type="button"
+                id="confirmDeleteShortBtn"
+                onclick="confirmDeleteShort()">
+                Delete Short
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+     
 <!-- ==================================================
      MENU SCRIPT
 ================================================== -->
