@@ -2482,8 +2482,11 @@ function touchEnd() {
 
 function showMessageMenu(e, bubble) {
 
-    e.preventDefault();
+    if (e.target.closest(".message-text")) {
+        return true;
+    }
 
+    e.preventDefault();
 
     selectedMsg = null;
 
