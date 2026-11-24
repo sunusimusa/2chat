@@ -3711,6 +3711,16 @@ async function blockCurrentUser() {
     }
 }
 
+               
+function openChatUserProfile() {
+    if (!receiver) {
+        alert("User profile not found.");
+        return;
+    }
+
+    window.location.href =
+        "/profile.html?username=" + encodeURIComponent(receiver);
+}
 
 /* ==========================================================
    FINISHED
