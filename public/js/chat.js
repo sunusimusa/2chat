@@ -160,7 +160,16 @@ function renderMessage(msg) {
 
     const text =
         escapeHTML(msg.text || "");
-
+   const linkifiedText = text.replace(
+    /(https?:\/\/[^\s<]+)/g,
+    (url) => {
+        return `<a href="${url}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="message-link">${url}</a>`;
+    }
+);
+   
     const replyText =
         escapeHTML(msg.replyText || "Message");
 
@@ -278,11 +287,11 @@ function renderMessage(msg) {
 
     else if (msg.text) {
 
-        content += `
-            <div class="message-text">
-                ${text}
-            </div>
-        `;
+    content += `
+        <div class="message-text">
+            ${linkifiedText}
+        </div>
+    `;
 
     }
 
