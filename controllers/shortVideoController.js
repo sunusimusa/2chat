@@ -119,7 +119,8 @@ exports.uploadVideo = async (req, res) => {
     caption,
     category: category || "general",
     hashtags: tags,
-    video: uploadResult.secure_url
+    video: uploadResult.secure_url,
+    videoPublicId: uploadResult.public_id
 });
 
         return res.status(201).json({
