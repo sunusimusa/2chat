@@ -592,6 +592,7 @@ if (giftData) {
 // ================= AUTO PLAY =================
 
 function autoPlayVideos() {
+    setupShortPlayerControls();
 
     const videos = document.querySelectorAll(
         "#shortsContainer video"
