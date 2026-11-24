@@ -1413,3 +1413,23 @@ button {
 .message-link:hover {
     color: #dbeafe !important;
 }
+
+/* CHAT USER PROFILE CLICK */
+
+.chat-user {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.chat-user img,
+.chat-user h3 {
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.chat-user:active {
+    opacity: 0.85;
+}
