@@ -370,9 +370,10 @@ exports.getUserProfile = async (req, res) => {
 // GET ALL USERS
 // =====================================================
 
-
 exports.getAllUsers = async (req, res) => {
     try {
+        const myId = req.user._id;
+
         const page = Math.max(
             1,
             parseInt(req.query.page, 10) || 1
@@ -385,9 +386,35 @@ exports.getAllUsers = async (req, res) => {
 
         const skip = (page - 1) * limit;
 
+        // Find users who blocked me
+        const blockedMe = await User.distinct(
+            "_id",
+            { blockedUsers: myId }
+        );
+
+        const me = await User.findById(myId)
+            .select("blockedUsers");
+
+        if (!me) {
+            return res.status(404).json({
+                success: false,
+                message: "Account not found."
+            });
+        }
+
+        const excludedIds = [
+            myId,
+            ...(me.blockedUsers || []),
+            ...blockedMe
+        ];
+
+        const filter = {
+            _id: { $nin: excludedIds }
+        };
+
         const [users, totalUsers] = await Promise.all([
             User.find(
-                {},
+                filter,
                 "username avatar online lastSeen"
             )
             .sort({ username: 1 })
@@ -395,7 +422,7 @@ exports.getAllUsers = async (req, res) => {
             .limit(limit)
             .lean(),
 
-            User.countDocuments({})
+            User.countDocuments(filter)
         ]);
 
         return res.json({
@@ -419,7 +446,7 @@ exports.getAllUsers = async (req, res) => {
         });
     }
 };
-            
+
 // =====================================================
 // SEARCH USERS
 // =====================================================
