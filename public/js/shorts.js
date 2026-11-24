@@ -585,6 +585,7 @@ function autoPlayVideos() {
                 videoElement.pause();
                 if (currentVisibleVideoId === id) {
                 currentVisibleVideoId = null;
+                updateShortOwnerMenu();
                 }
 
                 // Lissafa lokacin da aka kalla
