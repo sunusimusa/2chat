@@ -1396,3 +1396,20 @@ button {
     }
 
    }
+
+/* CLICKABLE MESSAGE LINKS */
+
+.message-link {
+    color: #ffffff !important;
+    text-decoration: underline;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.message-link:visited {
+    color: #ffffff !important;
+}
+
+.message-link:hover {
+    color: #dbeafe !important;
+}
