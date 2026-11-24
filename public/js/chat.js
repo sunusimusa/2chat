@@ -1288,18 +1288,26 @@ async function startRecording() {
 
         mediaRecorder.ondataavailable = function(event) {
 
-            if (event.data && event.data.size > 0) {
-                audioChunks.push(event.data);
-            }
+    console.log("VOICE DATA:", event.data?.size);
 
-        };
+    if (event.data && event.data.size > 0) {
+        audioChunks.push(event.data);
+    }
+
+    console.log("TOTAL AUDIO CHUNKS:", audioChunks.length);
+
+};
 
         mediaRecorder.onstop = function() {
 
-            if (!audioChunks.length) {
-                cleanupRecording();
-                return;
-            }
+            console.log("RECORDING STOPPED");
+console.log("AUDIO CHUNKS:", audioChunks.length);
+
+if (!audioChunks.length) {
+    alert("Voice recording is empty. No audio data was received.");
+    cleanupRecording();
+    return;
+}
 
             audioBlob = new Blob(audioChunks, {
                 type: mediaRecorder.mimeType || "audio/webm"
