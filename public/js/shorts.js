@@ -21,10 +21,82 @@ function setupShortsMenuActions() {
         return;
     }
 
+    // SHORT OWNER OPTIONS HEADING
+    const ownerHeading = document.createElement("div");
+
+    ownerHeading.id = "shortOwnerMenuHeading";
+    ownerHeading.className = "shorts-menu-section";
+    ownerHeading.innerText = "SHORT OWNER OPTIONS";
+
+    // EDIT MY SHORT BUTTON
+    const editBtn = document.createElement("button");
+
+    editBtn.id = "shortEditMenuBtn";
+    editBtn.type = "button";
+    editBtn.innerHTML = `
+        <i class="fa-solid fa-pen-to-square"></i>
+        <span>Edit My Short</span>
+    `;
+
+    editBtn.addEventListener("click", function () {
+
+        const video = window.videos?.find(
+            item => String(item._id) === String(currentVisibleVideoId)
+        );
+
+        if (
+            !user ||
+            !video ||
+            !video.userId ||
+            String(video.userId) !== String(user._id)
+        ) {
+            alert("You can only edit your own Short.");
+            return;
+        }
+
+        menu.classList.remove("show");
+        openEditShortModal(video);
+
+    });
+
+    // DELETE MY SHORT BUTTON
+    const deleteBtn = document.createElement("button");
+
+    deleteBtn.id = "shortDeleteMenuBtn";
+    deleteBtn.type = "button";
+
+    deleteBtn.innerHTML = `
+        <i class="fa-solid fa-trash"></i>
+        <span>Delete My Short</span>
+    `;
+
+    deleteBtn.addEventListener("click", function () {
+
+        const video = window.videos?.find(
+            item => String(item._id) === String(currentVisibleVideoId)
+        );
+
+        if (
+            !user ||
+            !video ||
+            !video.userId ||
+            String(video.userId) !== String(user._id)
+        ) {
+            alert("You can only delete your own Short.");
+            return;
+        }
+
+        menu.classList.remove("show");
+        openDeleteShortModal(video);
+
+    });
+
+    // REPORT BUTTON
     const reportBtn = document.createElement("button");
 
     reportBtn.id = "shortReportMenuBtn";
     reportBtn.type = "button";
+
     reportBtn.innerHTML = `
         <i class="fa-solid fa-flag"></i>
         <span>Report this Short</span>
@@ -33,7 +105,7 @@ function setupShortsMenuActions() {
     reportBtn.addEventListener("click", function () {
 
         const video = window.videos?.find(
-            item => item._id === currentVisibleVideoId
+            item => String(item._id) === String(currentVisibleVideoId)
         );
 
         if (!video) return;
@@ -48,6 +120,7 @@ function setupShortsMenuActions() {
 
     });
 
+    // VIEWS BUTTON
     const viewsBtn = document.createElement("button");
 
     viewsBtn.id = "shortViewsMenuBtn";
@@ -61,7 +134,7 @@ function setupShortsMenuActions() {
     viewsBtn.addEventListener("click", function () {
 
         const video = window.videos?.find(
-            item => item._id === currentVisibleVideoId
+            item => String(item._id) === String(currentVisibleVideoId)
         );
 
         if (!video) return;
@@ -71,18 +144,22 @@ function setupShortsMenuActions() {
         );
 
         if (viewsText) {
-            viewsText.innerText =
-                "Views: " + video.views;
+            viewsText.innerText = "Views: " + video.views;
         }
 
     });
 
+    menu.appendChild(ownerHeading);
+    menu.appendChild(editBtn);
+    menu.appendChild(deleteBtn);
     menu.appendChild(reportBtn);
     menu.appendChild(viewsBtn);
+
+    updateShortOwnerMenu();
 }
 
 setupShortsMenuActions();
-
+            
 async function getCreator(username){
 
     if(creatorCache[username]){
