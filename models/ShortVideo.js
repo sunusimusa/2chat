@@ -39,6 +39,11 @@ username: {
         required: true
     },
 
+    videoPublicId: {
+    type: String,
+    default: ""
+},
+
     // ==============================
     // CONTENT MODERATION
     // ==============================
