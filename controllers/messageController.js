@@ -831,6 +831,21 @@ exports.clearChat = async (req, res) => {
             });
         }
 
+        // =========================================
+// VALIDATE CHAT PARTICIPANT
+// =========================================
+
+const otherUser = await User.findOne({
+    username: user2
+});
+
+if (!otherUser) {
+    return res.status(404).json({
+        success: false,
+        message: "Chat user not found."
+    });
+}
+
         const result = await Message.updateMany(
             {
                 $or: [
