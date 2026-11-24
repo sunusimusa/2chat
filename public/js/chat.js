@@ -3651,6 +3651,57 @@ document.addEventListener(
     }
 );
 
+// =========================================
+// BLOCK CURRENT CHAT USER
+// =========================================
+
+async function blockCurrentUser() {
+
+    if (!receiverUserId) {
+        alert("User information is not ready.");
+        return;
+    }
+
+    const confirmed = confirm(
+        `Are you sure you want to block ${receiver}?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+
+        const res = await fetch(
+            `/api/users/block/${encodeURIComponent(receiverUserId)}`,
+            {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("token")
+                }
+            }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+            alert(data.message || "Failed to block user.");
+            return;
+        }
+
+        alert("User blocked successfully.");
+
+        hideElement("chatMenu");
+
+        history.back();
+
+    } catch (err) {
+
+        console.error("BLOCK USER ERROR:", err);
+
+        alert("Network error. Could not block user.");
+
+    }
+}
+
 
 /* ==========================================================
    FINISHED
