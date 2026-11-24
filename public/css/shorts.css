@@ -72,7 +72,7 @@ body {
     width: 100%;
     height: 100%;
     display: block;
-    object-fit: cover;
+    object-fit: contain;
     background: #000;
     -webkit-tap-highlight-color: transparent;
 }
@@ -1192,3 +1192,69 @@ body {
     cursor: not-allowed;
    }
        
+/* ==============================
+   SHORTS VIDEO PLAYER CONTROLS
+============================== */
+
+.short-player-controls {
+    position: absolute;
+    left: 12px;
+    right: 78px;
+    bottom: 190px;
+    z-index: 2500;
+    padding: 10px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+}
+
+.short-player-time {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    margin-bottom: 6px;
+    color: #fff;
+}
+
+.short-progress {
+    display: block;
+    width: 100%;
+    height: 5px;
+    margin: 5px 0 10px;
+    cursor: pointer;
+    accent-color: #fff;
+    touch-action: pan-y;
+}
+
+.short-player-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 28px;
+}
+
+.short-player-buttons button {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+.short-player-buttons button span {
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.short-player-buttons button:active {
+    transform: scale(0.92);
+   }
