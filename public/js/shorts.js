@@ -349,8 +349,9 @@ onended="playNextVideo('${video._id}')">
 
 <!-- VIDEO PLAYER CONTROLS -->
 <div class="short-player-controls"
-     onclick="event.stopPropagation()">
-
+     onclick="event.stopPropagation()"
+     onpointerdown="showShortControls('${video._id}')">
+     
     <div class="short-player-time">
         <span id="currentTime-${video._id}">00:00</span>
         <span id="duration-${video._id}">00:00</span>
