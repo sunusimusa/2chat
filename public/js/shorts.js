@@ -336,6 +336,7 @@ videos.forEach(video => {
 
 <div class="short">
 
+
 <video
 id="video-${video._id}"
 src="${video.video}"
@@ -345,6 +346,56 @@ ondblclick="doubleLike('${video._id}')"
 onclick="togglePlay('${video._id}')"
 onended="playNextVideo('${video._id}')">
 </video>
+
+<!-- VIDEO PLAYER CONTROLS -->
+<div class="short-player-controls"
+     onclick="event.stopPropagation()">
+
+    <div class="short-player-time">
+        <span id="currentTime-${video._id}">00:00</span>
+        <span id="duration-${video._id}">00:00</span>
+    </div>
+
+    <input
+        type="range"
+        class="short-progress"
+        id="progress-${video._id}"
+        min="0"
+        max="1000"
+        value="0"
+        step="1"
+        aria-label="Video progress"
+        oninput="seekShort('${video._id}', this.value)"
+    >
+
+    <div class="short-player-buttons">
+
+        <button
+            type="button"
+            onclick="rewindShort(event, '${video._id}')"
+            aria-label="Rewind 10 seconds">
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>10</span>
+        </button>
+
+        <button
+            type="button"
+            onclick="togglePlay('${video._id}')"
+            aria-label="Play or pause">
+            <i class="fa-solid fa-play"
+               id="playIcon-${video._id}"></i>
+        </button>
+
+        <button
+            type="button"
+            onclick="forwardShort(event, '${video._id}')"
+            aria-label="Forward 10 seconds">
+            <i class="fa-solid fa-rotate-right"></i>
+            <span>10</span>
+        </button>
+
+    </div>
+</div>
 
 <div id="heart-${video._id}" class="heart-animation">
 ❤️
