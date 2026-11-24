@@ -556,9 +556,13 @@ function autoPlayVideos() {
 
             if (entry.isIntersecting) {
 
-                // Ajiye ID na Short da ake kallo
-                currentVisibleVideoId = id;
+            // Ajiye ID na Short da ake kallo
+             currentVisibleVideoId = id;
 
+              // Sabunta Owner Menu
+              updateShortOwnerMenu();
+
+    
                 // Kunna video
                 videoElement.play().catch(err => {
                     console.log("Video autoplay error:", err);
