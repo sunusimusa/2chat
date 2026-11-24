@@ -123,7 +123,9 @@ border:2px solid #1877f2;
 
 .user-info{
 flex:1;
-}
+min-width:0;
+overflow:hidden;
+  }
 
 .user-info h3{
 margin:0;
