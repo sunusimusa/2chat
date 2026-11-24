@@ -509,6 +509,30 @@ message: "User not found"
 });
 }
 
+// =========================================
+// GET USERS WHO BLOCKED ME
+// =========================================
+
+const blockedMe = await User.distinct(
+    "_id",
+    { blockedUsers: me._id }
+);
+
+const blockedIds = new Set([
+    String(me._id),
+    ...(me.blockedUsers || []).map(id => String(id)),
+    ...blockedMe.map(id => String(id))
+]);
+
+// Convert blocked IDs to usernames
+const blockedUsers = await User.find({
+    _id: { $in: Array.from(blockedIds) }
+}).select("username");
+
+const blockedUsernames = new Set(
+    blockedUsers.map(user => user.username)
+);    
+
 // Duk messages
 const messages = await Message.find({
     $and: [
@@ -527,6 +551,8 @@ const messages = await Message.find({
 const chats = {};
 
 for (const friend of me.friends || []) {
+    
+if (blockedUsernames.has(friend)) continue;
 
 const user = await User.findOne({ username: friend });
 
@@ -550,6 +576,8 @@ const otherUser =
 msg.sender === username
 ? msg.receiver
 : msg.sender;
+
+if (blockedUsernames.has(otherUser)) continue;    
 
 // Idan babu user a chats
 if (!chats[otherUser]) {
