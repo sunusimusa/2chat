@@ -1641,6 +1641,115 @@ function playNextVideo(currentId) {
     }, 500);
 }
 
+
+function updateShortOwnerMenu() {
+
+    const video = window.videos?.find(
+        item => String(item._id) === String(currentVisibleVideoId)
+    );
+
+    const isOwner = !!(
+        user &&
+        video &&
+        video.userId &&
+        user._id &&
+        String(video.userId) === String(user._id)
+    );
+
+    const heading = document.getElementById("shortOwnerMenuHeading");
+    const editBtn = document.getElementById("shortEditMenuBtn");
+    const deleteBtn = document.getElementById("shortDeleteMenuBtn");
+
+    [heading, editBtn, deleteBtn].forEach(element => {
+        if (element) {
+            element.style.display = isOwner ? "" : "none";
+        }
+    });
+}
+
+
+// ========================================
+// OPEN EDIT SHORT MODAL
+// ========================================
+
+let editingShortId = null;
+let deletingShortId = null;
+
+function openEditShortModal(video) {
+
+    if (
+        !video ||
+        !user ||
+        !video.userId ||
+        String(video.userId) !== String(user._id)
+    ) {
+        alert("You can only edit your own Short.");
+        return;
+    }
+
+    editingShortId = video._id;
+
+    document.getElementById("editShortCaption").value =
+        video.caption || "";
+
+    document.getElementById("editShortHashtags").value =
+        Array.isArray(video.hashtags)
+            ? video.hashtags.map(tag => "#" + tag).join(" ")
+            : "";
+
+    document.getElementById("editShortModal").classList.add("show");
+}
+
+
+// ========================================
+// CLOSE EDIT SHORT MODAL
+// ========================================
+
+function closeEditShortModal() {
+
+    document.getElementById("editShortModal")
+        ?.classList.remove("show");
+
+    editingShortId = null;
+}
+
+
+// ========================================
+// OPEN DELETE SHORT MODAL
+// ========================================
+
+function openDeleteShortModal(video) {
+
+    if (
+        !video ||
+        !user ||
+        !video.userId ||
+        String(video.userId) !== String(user._id)
+    ) {
+        alert("You can only delete your own Short.");
+        return;
+    }
+
+    deletingShortId = video._id;
+
+    document.getElementById("deleteShortModal")
+        .classList.add("show");
+}
+
+
+// ========================================
+// CLOSE DELETE SHORT MODAL
+// ========================================
+
+function closeDeleteShortModal() {
+
+    document.getElementById("deleteShortModal")
+        ?.classList.remove("show");
+
+    deletingShortId = null;
+}
+
+
 // ================= LOAD =================
 
 loadVideos();
