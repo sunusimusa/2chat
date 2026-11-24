@@ -31,7 +31,9 @@ const {
     getCreatorLevel,
     getCreatorBadge,
     searchShorts,
-    getShortById
+    getShortById,
+    editMyShort,
+    deleteMyShort
 } = require("../controllers/shortVideoController");
 
 // Upload Short Video
@@ -124,5 +126,11 @@ searchShorts
 
 // Get Single Short by ID
 router.get("/video/:id",getShortById);
+
+// Edit My Short
+router.put("/:id", protect, editMyShort);
+
+// Delete My Short
+router.delete("/:id", protect, deleteMyShort);
 
 module.exports = router;
