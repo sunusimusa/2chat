@@ -18,7 +18,7 @@ async function loadBlockedUsers() {
             return;
         }
 
-        const users = data.blockedUsers || [];
+        const users = data.users || [];
 
         blockedUsersList.innerHTML = "";
 
