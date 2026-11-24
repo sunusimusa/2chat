@@ -39,6 +39,7 @@ let startX = 0;
 
 let mediaRecorder = null;
 let mediaStream = null;
+let usingNativeVoiceRecorder = false;
 
 let audioChunks = [];
 let audioBlob = null;
