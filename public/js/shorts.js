@@ -1750,6 +1750,99 @@ function closeDeleteShortModal() {
 }
 
 
+async function saveEditedShort() {
+
+    if (!editingShortId) return;
+
+    const video = window.videos?.find(
+        item => String(item._id) === String(editingShortId)
+    );
+
+    if (
+        !video ||
+        !user ||
+        !video.userId ||
+        String(video.userId) !== String(user._id)
+    ) {
+        alert("You are not authorized to edit this Short.");
+        return;
+    }
+
+    const caption = document.getElementById("editShortCaption").value.trim();
+    const hashtags = document.getElementById("editShortHashtags").value.trim();
+
+    if (caption.length > 1000) {
+        alert("Caption must not exceed 1000 characters.");
+        return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        alert("Please log in again.");
+        return;
+    }
+
+    const saveBtn = document.getElementById("saveEditedShortBtn");
+
+    try {
+
+        saveBtn.disabled = true;
+        saveBtn.innerText = "Saving...";
+
+        const response = await fetch(
+            `/api/shorts/${encodeURIComponent(editingShortId)}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    caption,
+                    hashtags
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Unable to update Short.");
+        }
+
+        video.caption = data.video.caption;
+        video.hashtags = data.video.hashtags;
+
+        const videoElement = document.getElementById(
+            "video-" + editingShortId
+        );
+
+        const shortElement = videoElement?.closest(".short");
+        const captionElement = shortElement?.querySelector(".overlay p");
+
+        if (captionElement) {
+            captionElement.textContent = video.caption;
+        }
+
+        closeEditShortModal();
+
+        alert("Short updated successfully.");
+
+    } catch (error) {
+
+        console.error("EDIT SHORT ERROR:", error);
+        alert(error.message || "Unable to update Short.");
+
+    } finally {
+
+        saveBtn.disabled = false;
+        saveBtn.innerText = "Save Changes";
+
+    }
+} 
+
+
 // ================= LOAD =================
 
 loadVideos();
