@@ -6,9 +6,11 @@ const {
     followUser,
     getUserProfile,
     getAllUsers,
-    searchUsers
+    searchUsers,
+    blockUser,
+    unblockUser,
+    getBlockedUsers
 } = require("../controllers/userController");
-
 
 // =========================================
 // FOLLOW / UNFOLLOW USER
@@ -51,5 +53,27 @@ router.get(
     getAllUsers
 );
 
+    
+// =========================================
+// BLOCK / UNBLOCK USER
+// =========================================
+
+router.post(
+    "/block/:userId",
+    protect,
+    blockUser
+);
+
+router.delete(
+    "/block/:userId",
+    protect,
+    unblockUser
+);
+
+router.get(
+    "/blocked",
+    protect,
+    getBlockedUsers
+);
 
 module.exports = router;
