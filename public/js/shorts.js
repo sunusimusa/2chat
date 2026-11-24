@@ -668,20 +668,138 @@ function autoPlayVideos() {
 
 // ================= PLAY / PAUSE =================
 
+function formatShortTime(seconds) {
+    if (!Number.isFinite(seconds)) return "00:00";
+
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+
+    return String(mins).padStart(2, "0") + ":" +
+           String(secs).padStart(2, "0");
+}
+
+
+function updateShortPlayer(id) {
+    const video = document.getElementById("video-" + id);
+    const currentTime = document.getElementById("currentTime-" + id);
+    const duration = document.getElementById("duration-" + id);
+    const progress = document.getElementById("progress-" + id);
+
+    if (!video) return;
+
+    if (currentTime) {
+        currentTime.textContent = formatShortTime(video.currentTime);
+    }
+
+    if (duration) {
+        duration.textContent = formatShortTime(video.duration);
+    }
+
+    if (progress && Number.isFinite(video.duration) && video.duration > 0) {
+        progress.value = (video.currentTime / video.duration) * 1000;
+    }
+}
+
+
+function updateShortPlayIcon(id) {
+    const video = document.getElementById("video-" + id);
+    const icon = document.getElementById("playIcon-" + id);
+
+    if (!video || !icon) return;
+
+    icon.className = video.paused
+        ? "fa-solid fa-play"
+        : "fa-solid fa-pause";
+}
+
+
 function togglePlay(id) {
+    const video = document.getElementById("video-" + id);
+
+    if (!video) return;
+
+    if (video.paused) {
+        video.play().catch(error => console.log(error));
+    } else {
+        video.pause();
+    }
+
+    updateShortPlayIcon(id);
+}
+
+
+function seekShort(id, value) {
+    const video = document.getElementById("video-" + id);
+
+    if (!video || !Number.isFinite(video.duration)) return;
+
+    video.currentTime = (Number(value) / 1000) * video.duration;
+
+    updateShortPlayer(id);
+}
+
+
+function rewindShort(event, id) {
+    event.stopPropagation();
 
     const video = document.getElementById("video-" + id);
 
-    if (video.paused) {
+    if (!video) return;
 
-        video.play();
+    video.currentTime = Math.max(0, video.currentTime - 10);
 
-    } else {
+    updateShortPlayer(id);
+}
 
-        video.pause();
 
-    }
+function forwardShort(event, id) {
+    event.stopPropagation();
 
+    const video = document.getElementById("video-" + id);
+
+    if (!video) return;
+
+    if (!Number.isFinite(video.duration)) return;
+
+    video.currentTime = Math.min(
+        video.duration,
+        video.currentTime + 10
+    );
+
+    updateShortPlayer(id);
+}
+
+
+function setupShortPlayerControls() {
+    document.querySelectorAll(".short video").forEach(video => {
+
+        if (video.dataset.controlsBound === "true") return;
+
+        video.dataset.controlsBound = "true";
+
+        const id = video.id.replace("video-", "");
+
+        video.addEventListener("timeupdate", () => {
+            updateShortPlayer(id);
+        });
+
+        video.addEventListener("loadedmetadata", () => {
+            updateShortPlayer(id);
+        });
+
+        video.addEventListener("durationchange", () => {
+            updateShortPlayer(id);
+        });
+
+        video.addEventListener("play", () => {
+            updateShortPlayIcon(id);
+        });
+
+        video.addEventListener("pause", () => {
+            updateShortPlayIcon(id);
+        });
+
+    });
 }
 
 // ================= LIKE =================
