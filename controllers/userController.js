@@ -453,6 +453,8 @@ exports.getAllUsers = async (req, res) => {
 
 exports.searchUsers = async (req, res) => {
     try {
+        const myId = req.user._id;
+
         const keyword = String(
             req.params.keyword || ""
         ).trim();
@@ -472,8 +474,32 @@ exports.searchUsers = async (req, res) => {
             "\\$&"
         );
 
+        const [me, blockedMe] = await Promise.all([
+            User.findById(myId).select("blockedUsers"),
+
+            User.distinct(
+                "_id",
+                { blockedUsers: myId }
+            )
+        ]);
+
+        if (!me) {
+            return res.status(404).json({
+                success: false,
+                message: "Account not found."
+            });
+        }
+
+        const excludedIds = [
+            myId,
+            ...(me.blockedUsers || []),
+            ...blockedMe
+        ];
+
         const users = await User.find(
             {
+                _id: { $nin: excludedIds },
+
                 username: {
                     $regex: safeKeyword,
                     $options: "i"
@@ -499,8 +525,6 @@ exports.searchUsers = async (req, res) => {
         });
     }
 };
-
-
 
 // =====================================================
 // BLOCK USER
