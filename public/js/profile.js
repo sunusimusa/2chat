@@ -1437,6 +1437,14 @@ if (avatarFileInput) {
    LOAD PROFILE VIDEOS
 ===================================================== */
 
+
+/* =====================================
+   2CHAT PROFILE VIDEO GALLERY
+===================================== */
+
+let profileVideos = [];
+let currentProfileVideo = 0;
+
 async function loadMyVideos() {
 
     try {
@@ -1463,16 +1471,18 @@ async function loadMyVideos() {
             data.videos.length === 0
         ) {
             myVideos.innerHTML = `
-                <p style="text-align:center;">
+                <p style="text-align:center; grid-column:1/-1;">
                     No videos published yet.
                 </p>
             `;
             return;
         }
 
+        profileVideos = data.videos;
+
         let html = "";
 
-        data.videos.forEach(video => {
+        profileVideos.forEach((video, index) => {
 
             const videoUrl = String(video.video || "")
                 .replace(/&/g, "&amp;")
@@ -1484,36 +1494,44 @@ async function loadMyVideos() {
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;");
 
+            const views = Number(video.views) || 0;
+
+            const likes = Array.isArray(video.likes)
+                ? video.likes.length
+                : 0;
+
             html += `
-                <div class="post">
+                <div
+                    class="post video-gallery-item"
+                    data-video-index="${index}"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Play video ${index + 1}"
+                >
 
                     <video
                         src="${videoUrl}"
-                        controls
                         playsinline
+                        muted
                         preload="metadata"
-                        style="
-                            width:100%;
-                            max-height:400px;
-                            object-fit:contain;
-                            border-radius:10px;
-                            background:#000;
-                        ">
+                        class="video-gallery-thumbnail">
                     </video>
 
-                    <p>${caption}</p>
+                    <div class="video-gallery-play">
+                        <i class="fa-solid fa-play"></i>
+                    </div>
 
-                    <small>
-                        👁️ ${Number(video.views) || 0} Views
+                    <div class="video-gallery-stats">
+                        <span>
+                            <i class="fa-solid fa-eye"></i>
+                            ${views}
+                        </span>
 
-                        &nbsp;&nbsp;
-
-                        ❤️ ${
-                            Array.isArray(video.likes)
-                                ? video.likes.length
-                                : 0
-                        } Likes
-                    </small>
+                        <span>
+                            <i class="fa-solid fa-heart"></i>
+                            ${likes}
+                        </span>
+                    </div>
 
                 </div>
             `;
@@ -1528,8 +1546,7 @@ async function loadMyVideos() {
 
     }
 
-}
-                            
+}                           
 
 // =====================================================
 // START
