@@ -836,65 +836,37 @@ async function uploadAvatar() {
 // LOAD MY POSTS
 // =====================================================
 
+
 async function loadMyPosts() {
 
     try {
 
-        const res =
-            await fetch(
-                "/api/posts/user/" +
-                encodeURIComponent(
-                    profileUsername
-                )
-            );
+        const res = await fetch(
+            "/api/posts/user/" +
+            encodeURIComponent(profileUsername)
+        );
 
-
-        const data =
-            await res.json();
-
+        const data = await res.json();
 
         if (!data.success) {
+            console.error("LOAD POSTS ERROR:", data.message);
             return;
         }
 
-
-        const postsCount =
-            document.getElementById(
-                "postsCount"
-            );
-
+        const postsCount = document.getElementById("postsCount");
 
         if (postsCount) {
-
-            postsCount.innerText =
-                data.count || 0;
-
+            postsCount.innerText = data.count || 0;
         }
 
+        const myPosts = document.getElementById("myPosts");
 
-        const myPosts =
-            document.getElementById(
-                "myPosts"
-            );
+        if (!myPosts) return;
 
-
-        if (!myPosts) {
-            return;
-        }
-
-
-        let html = "";
-
-
-        if (
-            !Array.isArray(
-                data.posts
-            ) ||
-            data.posts.length === 0
-        ) {
+        if (!Array.isArray(data.posts) || data.posts.length === 0) {
 
             myPosts.innerHTML = `
-                <p style="text-align:center;">
+                <p class="posts-empty">
                     No posts yet.
                 </p>
             `;
@@ -902,71 +874,475 @@ async function loadMyPosts() {
             return;
         }
 
-
-        data.posts.forEach(
-            post => {
-
-                html += `
-                    <div class="post">
-
-                        ${
-                            post.image
-                            ?
-                            `
-                            <img
-                                src="${post.image}"
-                                style="
-                                    width:100%;
-                                    border-radius:10px;
-                                "
-                            >
-                            `
-                            :
-                            ""
-                        }
-
-                        <p>
-                            ${
-                                post.text ||
-                                ""
-                            }
-                        </p>
-
-                        <small>
-                            ❤️ ${
-                                post.likes?.length ||
-                                0
-                            }
-
-                            &nbsp;&nbsp;
-
-                            💬 ${
-                                post.comments?.length ||
-                                0
-                            }
-                        </small>
-
-                    </div>
-                `;
-
-            }
+        const currentUser = JSON.parse(
+            localStorage.getItem("user") || "null"
         );
 
+        const currentUsername = currentUser?.username || "";
 
-        myPosts.innerHTML =
-            html;
+        let html = "";
+
+        data.posts.forEach(post => {
+
+            const postId = String(post._id || "");
+
+            const username = String(post.username || "User");
+
+            const avatar = String(
+                post.avatar || "/images/default.png"
+            );
+
+            const text = String(post.text || "");
+
+            const safeText = text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+
+            const safeUsername = username.replace(
+                /\\/g, "\\\\"
+            ).replace(/'/g, "\\'");
+
+            const isOwner =
+                currentUser &&
+                post.userId &&
+                String(post.userId) === String(currentUser._id);
+
+            const likes = Array.isArray(post.likes)
+                ? post.likes.length
+                : 0;
+
+            const comments = Array.isArray(post.comments)
+                ? post.comments.length
+                : 0;
+
+            const liked = Array.isArray(post.likes) &&
+                post.likes.includes(currentUsername);
+
+            const date = post.createdAt
+                ? new Date(post.createdAt).toLocaleString()
+                : "";
+
+            let media = "";
+
+            if (post.image) {
+
+                const imageUrl = String(post.image)
+                    .replace(/&/g, "&amp;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/</g, "&lt;");
+
+                media += `
+                    <img
+                        class="profile-post-media"
+                        src="${imageUrl}"
+                        alt="Post image"
+                        loading="lazy"
+                    >
+                `;
+            }
+
+            if (post.video) {
+
+                const videoUrl = String(post.video)
+                    .replace(/&/g, "&amp;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/</g, "&lt;");
+
+                media += `
+                    <video
+                        class="profile-post-media"
+                        src="${videoUrl}"
+                        controls
+                        playsinline
+                        preload="metadata">
+                    </video>
+                `;
+            }
+
+            html += `
+                <article class="profile-post-card">
+
+                    <div class="profile-post-header">
+
+                        <img
+                            class="profile-post-avatar"
+                            src="${avatar.replace(/"/g, "&quot;")}"
+                            alt="${username.replace(/"/g, "&quot;")}"
+                            onclick="openProfile('${safeUsername}')"
+                            onerror="this.src='/images/default.png'"
+                        >
+
+                        <div class="profile-post-user">
+
+                            <a
+                                href="/profile.html?user=${encodeURIComponent(username)}"
+                                class="profile-post-username">
+                                ${username}
+                            </a>
+
+                            <small class="profile-post-date">
+                                ${date}
+                            </small>
+
+                        </div>
+
+                        ${
+                            isOwner
+                            ? `
+                                <button
+                                    class="profile-post-menu"
+                                    type="button"
+                                    onclick="openProfilePostMenu('${postId}')"
+                                    aria-label="Post options">
+                                    <i class="fa-solid fa-ellipsis"></i>
+                                </button>
+                            `
+                            : ""
+                        }
+
+                    </div>
+
+                    ${
+                        safeText
+                        ? `
+                            <div class="profile-post-text">
+                                ${safeText}
+                            </div>
+                        `
+                        : ""
+                    }
+
+                    ${media}
+
+                    <div class="profile-post-stats">
+
+                        <span>
+                            ❤️ ${likes}
+                        </span>
+
+                        <span>
+                            💬 ${comments}
+                        </span>
+
+                    </div>
+
+                    <div class="profile-post-actions">
+
+                        <button
+                            type="button"
+                            onclick="profileLikePost('${postId}')">
+
+                            <i class="${liked ? "fa-solid" : "fa-regular"} fa-heart"></i>
+                            Like
+
+                        </button>
+
+                        <button
+                            type="button"
+                            onclick="profileToggleComment('${postId}')">
+
+                            <i class="fa-regular fa-comment"></i>
+                            Comment
+
+                        </button>
+
+                    </div>
+
+                    <div
+                        class="comment-box"
+                        id="profile-comment-box-${postId}"
+                        style="display:none;">
+
+                        <input
+                            type="text"
+                            id="profile-comment-${postId}"
+                            placeholder="Write comment...">
+
+                        <button
+                            type="button"
+                            onclick="profileCommentPost('${postId}')">
+
+                            <i class="fa-solid fa-paper-plane"></i>
+
+                        </button>
+
+                    </div>
+
+                </article>
+            `;
+
+        });
+
+        myPosts.innerHTML = html;
 
     } catch (err) {
 
-        console.error(
-            "LOAD POSTS ERROR:",
-            err
-        );
+        console.error("LOAD POSTS ERROR:", err);
 
     }
 
 }
 
+
+// =====================================
+// PROFILE POST MENU
+// =====================================
+
+function openProfilePostMenu(postId) {
+
+    const choice = prompt(
+        "Post options:\n1. Edit Post\n2. Delete Post\n\nEnter 1 or 2:"
+    );
+
+    if (choice === "1") {
+
+        const post = document.querySelector(
+            `#myPosts [onclick*="${postId}"]`
+        );
+
+        const card = document.querySelector(
+            `#myPosts .profile-post-card`
+        );
+
+        // Find the selected post from the loaded data
+        profileEditPost(postId);
+
+    } else if (choice === "2") {
+
+        profileDeletePost(postId);
+
+    }
+
+}
+
+
+// =====================================
+// EDIT PROFILE POST
+// =====================================
+
+async function profileEditPost(postId) {
+
+    const textElement = document.querySelector(
+        `#myPosts .profile-post-card [data-post-text="${postId}"]`
+    );
+
+    const card = Array.from(
+        document.querySelectorAll("#myPosts .profile-post-card")
+    ).find(card =>
+        card.querySelector(
+            `.profile-post-menu[onclick*="${postId}"]`
+        )
+    );
+
+    if (!card) return;
+
+    const textBox = card.querySelector(".profile-post-text");
+
+    const currentText = textBox
+        ? textBox.innerText
+        : "";
+
+    const newText = prompt(
+        "Edit your post:",
+        currentText
+    );
+
+    if (newText === null || !newText.trim()) return;
+
+    try {
+
+        const token = localStorage.getItem("token");
+
+        const res = await fetch("/api/posts/edit", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                ...(token ? {
+                    "Authorization": "Bearer " + token
+                } : {})
+            },
+            body: JSON.stringify({
+                postId,
+                text: newText.trim()
+            })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+            alert(data.message || "Unable to edit post.");
+            return;
+        }
+
+        await loadMyPosts();
+
+    } catch (err) {
+
+        console.error("PROFILE EDIT POST ERROR:", err);
+        alert("Failed to edit post.");
+
+    }
+
+}
+
+
+// =====================================
+// DELETE PROFILE POST
+// =====================================
+
+async function profileDeletePost(postId) {
+
+    if (!confirm("Are you sure you want to delete this post?")) {
+        return;
+    }
+
+    try {
+
+        const token = localStorage.getItem("token");
+
+        const res = await fetch("/api/posts/delete", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                ...(token ? {
+                    "Authorization": "Bearer " + token
+                } : {})
+            },
+            body: JSON.stringify({
+                postId
+            })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+            alert(data.message || "Unable to delete post.");
+            return;
+        }
+
+        await loadMyPosts();
+
+    } catch (err) {
+
+        console.error("PROFILE DELETE POST ERROR:", err);
+        alert("Failed to delete post.");
+
+    }
+
+}
+
+
+// =====================================
+// PROFILE LIKE POST
+// =====================================
+
+async function profileLikePost(postId) {
+
+    try {
+
+        const token = localStorage.getItem("token");
+
+        const res = await fetch("/api/posts/like", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                ...(token ? {
+                    "Authorization": "Bearer " + token
+                } : {})
+            },
+            body: JSON.stringify({
+                postId
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            await loadMyPosts();
+        }
+
+    } catch (err) {
+
+        console.error("PROFILE LIKE ERROR:", err);
+
+    }
+
+}
+
+
+// =====================================
+// PROFILE COMMENT TOGGLE
+// =====================================
+
+function profileToggleComment(postId) {
+
+    const box = document.getElementById(
+        "profile-comment-box-" + postId
+    );
+
+    if (!box) return;
+
+    box.style.display =
+        box.style.display === "flex"
+        ? "none"
+        : "flex";
+
+}
+
+
+// =====================================
+// PROFILE COMMENT POST
+// =====================================
+
+async function profileCommentPost(postId) {
+
+    const input = document.getElementById(
+        "profile-comment-" + postId
+    );
+
+    if (!input) return;
+
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    try {
+
+        const token = localStorage.getItem("token");
+
+        const res = await fetch("/api/posts/comment", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                ...(token ? {
+                    "Authorization": "Bearer " + token
+                } : {})
+            },
+            body: JSON.stringify({
+                postId,
+                text
+            })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+            alert(data.message || "Comment failed.");
+            return;
+        }
+
+        await loadMyPosts();
+
+    } catch (err) {
+
+        console.error("PROFILE COMMENT ERROR:", err);
+
+    }
+
+}        
 
 // =====================================================
 // FOLLOW BUTTON UI
