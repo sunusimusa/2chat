@@ -346,9 +346,9 @@ exports.editPost = async (req, res) => {
 
 // GET MY POSTS
 
+
 exports.getUserPosts = async (req, res) => {
     try {
-
         const username = String(
             req.params.username || ""
         ).trim();
@@ -362,8 +362,8 @@ exports.getUserPosts = async (req, res) => {
 
         const posts = await Post.find({
             username,
-            moderationStatus: "approved",
-            isRemoved: { $ne: true }
+            isRemoved: { $ne: true },
+            moderationStatus: { $nin: ["rejected", "removed"] }
         })
         .sort({ createdAt: -1 })
         .lean();
@@ -375,16 +375,15 @@ exports.getUserPosts = async (req, res) => {
         });
 
     } catch (err) {
-
         console.error("GET USER POSTS ERROR:", err);
 
         return res.status(500).json({
             success: false,
             message: "Failed to load user posts."
         });
-
     }
 };
+
 
 exports.getSinglePost = async (req,res)=>{
 
