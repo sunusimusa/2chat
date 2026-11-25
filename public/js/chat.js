@@ -3396,7 +3396,6 @@ socket.on(
             return;
         }
 
-
         const status =
             document.getElementById(
                 "status"
