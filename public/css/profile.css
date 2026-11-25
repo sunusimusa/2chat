@@ -979,3 +979,20 @@ button:active {
     text-decoration: none;
     cursor: pointer;
    }
+
+
+/* Match Home Page Post Text Layout */
+#myPosts .profile-post-card .profile-post-text {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin: 18px 0;
+    padding: 0;
+    text-align: start !important;
+    direction: ltr;
+    line-height: 1.6;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    box-sizing: border-box;
+}
+
