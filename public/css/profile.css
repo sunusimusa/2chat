@@ -753,3 +753,77 @@ button:active {
     font-size: 12px;
 }
 
+
+/* =====================================
+   2CHAT VIDEO GALLERY THUMBNAILS
+===================================== */
+
+.video-gallery-item {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    cursor: pointer;
+    background: #101827 !important;
+    border: none !important;
+    border-radius: 12px;
+}
+
+#myVideos .video-gallery-thumbnail {
+    display: block;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    object-fit: cover !important;
+    background: #101827;
+    border-radius: 12px;
+    pointer-events: none;
+}
+
+.video-gallery-play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: rgba(16, 24, 39, .65);
+    color: white;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.video-gallery-stats {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
+    padding: 18px 7px 7px;
+    background: linear-gradient(
+        transparent,
+        rgba(0, 0, 0, .8)
+    );
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    pointer-events: none;
+}
+
+.video-gallery-stats span {
+    white-space: nowrap;
+}
+
+.video-gallery-stats i {
+    margin-right: 3px;
+}
+
+.video-gallery-item:active {
+    transform: scale(.97);
+   }
+   
