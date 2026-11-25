@@ -1315,67 +1315,56 @@ socket.on(
         // =================================================
 
         socket.on(
-            "disconnect",
-            async () => {
+    "disconnect",
+    async () => {
 
-                try {
+        try {
 
-                    if (
-                        socket.username
-                    ) {
+            if (socket.username) {
 
-                        await mongoose
-                            .model("User")
-                            .updateOne(
+                // Check remaining active connections
+                const remainingSockets = await io
+                    .in(socket.username)
+                    .fetchSockets();
 
-                                {
-                                    username:
-                                        socket.username
-                                },
+                // Only mark offline if no connection remains
+                if (remainingSockets.length === 0) {
 
-                                {
-                                    online:
-                                        false,
-
-                                    lastSeen:
-                                        new Date()
-                                }
-
-                            );
-
-
-                        io.emit(
-                            "userOffline",
-                            socket.username
+                    await mongoose
+                        .model("User")
+                        .updateOne(
+                            {
+                                username: socket.username
+                            },
+                            {
+                                online: false,
+                                lastSeen: new Date()
+                            }
                         );
 
-                    }
-
-
-                    console.log(
-                        "🔴 User Disconnected"
-                    );
-
-
-                } catch (err) {
-
-                    console.error(
-                        "SOCKET DISCONNECT ERROR:",
-                        err
+                    io.emit(
+                        "userOffline",
+                        socket.username
                     );
 
                 }
 
             }
-        );
+
+            console.log("🔴 User Disconnected");
+
+        } catch (err) {
+
+            console.error(
+                "SOCKET DISCONNECT ERROR:",
+                err
+            );
+
+        }
 
     }
 );
 
-
-// =====================================================
-// AUTO SEED COIN PACKAGES
-// =====================================================
 
 // =====================================================
 // AUTO SEED COIN PACKAGES
