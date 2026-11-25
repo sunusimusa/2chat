@@ -1423,9 +1423,9 @@ exports.deleteMyShort = async (req, res) => {
     }
 };
                     
-
 // ========================================
 // GET PUBLIC SHORTS BY PROFILE USERNAME
+// CURSOR PAGINATION
 // ========================================
 
 exports.getUserShorts = async (req, res) => {
@@ -1441,18 +1441,100 @@ exports.getUserShorts = async (req, res) => {
             });
         }
 
-        const videos = await ShortVideo.find({
+        // Maximum 24 videos per request
+        const requestedLimit = Number(req.query.limit) || 12;
+
+        const limit = Math.min(
+            Math.max(requestedLimit, 1),
+            24
+        );
+
+        const filter = {
             username,
             moderationStatus: "approved"
-        })
-        .select(
-            "username avatar caption video views likes comments shares saves createdAt"
-        )
-        .sort({ createdAt: -1 });
+        };
+
+        // Validate pagination cursor
+        if (req.query.cursor) {
+            let cursor;
+
+            try {
+                cursor = JSON.parse(
+                    Buffer.from(
+                        String(req.query.cursor),
+                        "base64url"
+                    ).toString("utf8")
+                );
+            } catch {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid pagination cursor."
+                });
+            }
+
+            if (
+                !cursor ||
+                typeof cursor.createdAt !== "string" ||
+                !/^[a-fA-F0-9]{24}$/.test(cursor.id) ||
+                Number.isNaN(Date.parse(cursor.createdAt))
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid pagination cursor."
+                });
+            }
+
+            const cursorDate = new Date(cursor.createdAt);
+
+            filter.$or = [
+                {
+                    createdAt: {
+                        $lt: cursorDate
+                    }
+                },
+                {
+                    createdAt: cursorDate,
+                    _id: {
+                        $lt: cursor.id
+                    }
+                }
+            ];
+        }
+
+        // Fetch one extra video to detect more results
+        const videos = await ShortVideo.find(filter)
+            .select(
+                "username avatar caption video views likes comments shares saves createdAt"
+            )
+            .sort({
+                createdAt: -1,
+                _id: -1
+            })
+            .limit(limit + 1)
+            .lean();
+
+        const hasMore = videos.length > limit;
+
+        if (hasMore) {
+            videos.pop();
+        }
+
+        const lastVideo = videos[videos.length - 1];
+
+        const nextCursor = hasMore && lastVideo
+            ? Buffer.from(
+                JSON.stringify({
+                    createdAt: lastVideo.createdAt.toISOString(),
+                    id: lastVideo._id.toString()
+                })
+            ).toString("base64url")
+            : null;
 
         return res.json({
             success: true,
             count: videos.length,
+            hasMore,
+            nextCursor,
             videos
         });
 
@@ -1468,3 +1550,4 @@ exports.getUserShorts = async (req, res) => {
         });
     }
 };
+                               
