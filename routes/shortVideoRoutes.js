@@ -32,6 +32,7 @@ const {
     getCreatorBadge,
     searchShorts,
     getShortById,
+    getUserShorts,
     editMyShort,
     deleteMyShort
 } = require("../controllers/shortVideoController");
@@ -126,6 +127,12 @@ searchShorts
 
 // Get Single Short by ID
 router.get("/video/:id",getShortById);
+
+// Get public Shorts by profile username
+router.get(
+    "/user/:username",
+    getUserShorts
+);
 
 // Edit My Short
 router.put("/:id", protect, editMyShort);
