@@ -1433,6 +1433,104 @@ if (avatarFileInput) {
 }
 
 
+/* =====================================================
+   LOAD PROFILE VIDEOS
+===================================================== */
+
+async function loadMyVideos() {
+
+    try {
+
+        const res = await fetch(
+            "/api/shorts/user/" +
+            encodeURIComponent(profileUsername)
+        );
+
+        const data = await res.json();
+
+        const myVideos = document.getElementById("myVideos");
+
+        if (!myVideos) return;
+
+        if (!res.ok || !data.success) {
+            myVideos.innerHTML =
+                "<p>Unable to load videos.</p>";
+            return;
+        }
+
+        if (
+            !Array.isArray(data.videos) ||
+            data.videos.length === 0
+        ) {
+            myVideos.innerHTML = `
+                <p style="text-align:center;">
+                    No videos published yet.
+                </p>
+            `;
+            return;
+        }
+
+        let html = "";
+
+        data.videos.forEach(video => {
+
+            const videoUrl = String(video.video || "")
+                .replace(/&/g, "&amp;")
+                .replace(/"/g, "&quot;")
+                .replace(/</g, "&lt;");
+
+            const caption = String(video.caption || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+
+            html += `
+                <div class="post">
+
+                    <video
+                        src="${videoUrl}"
+                        controls
+                        playsinline
+                        preload="metadata"
+                        style="
+                            width:100%;
+                            max-height:400px;
+                            object-fit:contain;
+                            border-radius:10px;
+                            background:#000;
+                        ">
+                    </video>
+
+                    <p>${caption}</p>
+
+                    <small>
+                        👁️ ${Number(video.views) || 0} Views
+
+                        &nbsp;&nbsp;
+
+                        ❤️ ${
+                            Array.isArray(video.likes)
+                                ? video.likes.length
+                                : 0
+                        } Likes
+                    </small>
+
+                </div>
+            `;
+
+        });
+
+        myVideos.innerHTML = html;
+
+    } catch (err) {
+
+        console.error("LOAD PROFILE VIDEOS ERROR:", err);
+
+    }
+
+}
+                            
+
 // =====================================================
 // START
 // =====================================================
@@ -1440,5 +1538,7 @@ if (avatarFileInput) {
 loadProfile();
 
 loadMyPosts();
+
+loadMyVideos();
 
 loadCreatorBadge();
