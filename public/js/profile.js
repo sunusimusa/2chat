@@ -2340,6 +2340,49 @@ function setupProfileVideoViewer() {
 }
 
 
+/* =====================================
+   2CHAT PROFILE TAB SWITCHING
+===================================== */
+
+function switchProfileTab(tab) {
+
+    const postsTab = document.getElementById("postsTab");
+    const videosTab = document.getElementById("videosTab");
+
+    const postsPanel = document.getElementById("postsPanel");
+    const videosPanel = document.getElementById("videosPanel");
+
+    if (
+        !postsTab ||
+        !videosTab ||
+        !postsPanel ||
+        !videosPanel
+    ) {
+        console.error("PROFILE TABS: Required elements not found.");
+        return;
+    }
+
+    if (tab === "posts") {
+
+        postsTab.classList.add("active");
+        videosTab.classList.remove("active");
+
+        postsPanel.hidden = false;
+        videosPanel.hidden = true;
+
+    } else if (tab === "videos") {
+
+        videosTab.classList.add("active");
+        postsTab.classList.remove("active");
+
+        videosPanel.hidden = false;
+        postsPanel.hidden = true;
+
+    }
+
+}
+
+
 // =====================================================
 // START
 // =====================================================
