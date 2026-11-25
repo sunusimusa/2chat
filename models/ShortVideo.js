@@ -230,5 +230,14 @@ shortVideoSchema.index({
     moderationNextAttemptAt: 1
 });
 
+
+shortVideoSchema.index({
+    username: 1,
+    moderationStatus: 1,
+    createdAt: -1,
+    _id: -1
+});
+        
+
 module.exports = mongoose.model("ShortVideo", shortVideoSchema);
             
