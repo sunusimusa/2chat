@@ -346,33 +346,44 @@ exports.editPost = async (req, res) => {
 
 // GET MY POSTS
 
-exports.getUserPosts = async (req,res)=>{
+exports.getUserPosts = async (req, res) => {
+    try {
 
-try{
+        const username = String(
+            req.params.username || ""
+        ).trim();
 
-const { username } = req.params;
+        if (!username || username.length > 30) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid username."
+            });
+        }
 
-const posts = await Post.find({
-username
-}).sort({
-createdAt:-1
-});
+        const posts = await Post.find({
+            username,
+            moderationStatus: "approved",
+            isRemoved: { $ne: true }
+        })
+        .sort({ createdAt: -1 })
+        .lean();
 
-res.json({
-success:true,
-count:posts.length,
-posts
-});
+        return res.json({
+            success: true,
+            count: posts.length,
+            posts
+        });
 
-}catch(err){
+    } catch (err) {
 
-res.status(500).json({
-success:false,
-message:err.message
-});
+        console.error("GET USER POSTS ERROR:", err);
 
-}
+        return res.status(500).json({
+            success: false,
+            message: "Failed to load user posts."
+        });
 
+    }
 };
 
 exports.getSinglePost = async (req,res)=>{
