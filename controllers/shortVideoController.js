@@ -1423,3 +1423,48 @@ exports.deleteMyShort = async (req, res) => {
     }
 };
                     
+
+// ========================================
+// GET PUBLIC SHORTS BY PROFILE USERNAME
+// ========================================
+
+exports.getUserShorts = async (req, res) => {
+    try {
+        const username = String(
+            req.params.username || ""
+        ).trim();
+
+        if (!username || username.length > 30) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid username."
+            });
+        }
+
+        const videos = await ShortVideo.find({
+            username,
+            moderationStatus: "approved"
+        })
+        .select(
+            "username avatar caption video views likes comments shares saves createdAt"
+        )
+        .sort({ createdAt: -1 });
+
+        return res.json({
+            success: true,
+            count: videos.length,
+            videos
+        });
+
+    } catch (err) {
+        console.error(
+            "GET USER SHORTS ERROR:",
+            err
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to load user Shorts."
+        });
+    }
+};
