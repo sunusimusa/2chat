@@ -561,13 +561,21 @@ button:active {
 }
 
 /* Post text */
-#myPosts .profile-post-text {
+
+/* Post text — Match Home Page */
+#myPosts .profile-post-card .profile-post-text {
+    display: block;
+    width: 100%;
     margin: 0 0 12px;
+    padding: 0;
     color: #172033;
     font-size: 14px;
     line-height: 1.65;
+    text-align: left !important;
+    direction: ltr !important;
     overflow-wrap: anywhere;
     white-space: pre-wrap;
+    box-sizing: border-box;
 }
 
 /* Post media */
