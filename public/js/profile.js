@@ -1442,6 +1442,12 @@ if (avatarFileInput) {
    2CHAT PROFILE VIDEO GALLERY
 ===================================== */
 
+
+/* =====================================
+   2CHAT PROFILE VIDEO GALLERY
+   AUTOMATIC INFINITE SCROLL
+===================================== */
+
 let profileVideos = [];
 let currentProfileVideo = 0;
 
@@ -1451,24 +1457,92 @@ let profileVideosLoading = false;
 let profileVideosObserver = null;
 
 
+// =====================================
+// INITIAL VIDEO LOAD
+// =====================================
+
 async function loadMyVideos() {
+
+    const myVideos = document.getElementById("myVideos");
+
+    if (!myVideos) return;
+
+    // Reset pagination
+    profileVideos = [];
+    profileVideosCursor = null;
+    profileVideosHasMore = true;
+    profileVideosLoading = false;
+
+    if (profileVideosObserver) {
+        profileVideosObserver.disconnect();
+        profileVideosObserver = null;
+    }
+
+    myVideos.innerHTML = `
+        <p style="text-align:center; grid-column:1/-1;">
+            Loading videos...
+        </p>
+    `;
+
+    await loadMoreProfileVideos(true);
+}
+
+
+// =====================================
+// LOAD NEXT VIDEO PAGE
+// =====================================
+
+async function loadMoreProfileVideos(isFirstLoad = false) {
+
+    const myVideos = document.getElementById("myVideos");
+
+    if (
+        !myVideos ||
+        profileVideosLoading ||
+        !profileVideosHasMore
+    ) {
+        return;
+    }
+
+    profileVideosLoading = true;
 
     try {
 
-        const res = await fetch(
+        const url = new URL(
             "/api/shorts/user/" +
-            encodeURIComponent(profileUsername)
+            encodeURIComponent(profileUsername),
+            window.location.origin
         );
+
+        url.searchParams.set("limit", "12");
+
+        if (profileVideosCursor) {
+            url.searchParams.set(
+                "cursor",
+                profileVideosCursor
+            );
+        }
+
+        const res = await fetch(url.toString());
 
         const data = await res.json();
 
-        const myVideos = document.getElementById("myVideos");
-
-        if (!myVideos) return;
-
         if (!res.ok || !data.success) {
-            myVideos.innerHTML =
-                "<p>Unable to load videos.</p>";
+
+            console.error(
+                "PROFILE VIDEOS API ERROR:",
+                data.message
+            );
+
+            if (isFirstLoad) {
+                myVideos.innerHTML = `
+                    <p style="text-align:center; grid-column:1/-1;">
+                        Unable to load videos.
+                    </p>
+                `;
+            }
+
+            profileVideosHasMore = false;
             return;
         }
 
@@ -1476,85 +1550,235 @@ async function loadMyVideos() {
             !Array.isArray(data.videos) ||
             data.videos.length === 0
         ) {
-            myVideos.innerHTML = `
-                <p style="text-align:center; grid-column:1/-1;">
-                    No videos published yet.
-                </p>
-            `;
+
+            profileVideosHasMore = false;
+
+            if (
+                isFirstLoad &&
+                profileVideos.length === 0
+            ) {
+                myVideos.innerHTML = `
+                    <p style="text-align:center; grid-column:1/-1;">
+                        No videos published yet.
+                    </p>
+                `;
+            }
+
+            const oldSentinel = document.getElementById(
+                "profileVideosSentinel"
+            );
+
+            if (oldSentinel) {
+                oldSentinel.remove();
+            }
+
             return;
         }
 
-        profileVideos = data.videos;
+        // Remember the starting index
+        const startIndex = profileVideos.length;
 
-        let html = "";
+        // Add newly loaded videos
+        profileVideos.push(...data.videos);
 
-        profileVideos.forEach((video, index) => {
+        // Save pagination cursor
+        profileVideosCursor = data.nextCursor || null;
 
-            const videoUrl = String(video.video || "")
-                .replace(/&/g, "&amp;")
-                .replace(/"/g, "&quot;")
-                .replace(/</g, "&lt;");
+        profileVideosHasMore =
+            data.hasMore === true &&
+            Boolean(profileVideosCursor);
 
-            const caption = String(video.caption || "")
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;");
+        // Render only the new videos
+        renderProfileVideos(
+            data.videos,
+            startIndex
+        );
 
-            const views = Number(video.views) || 0;
-
-            const likes = Array.isArray(video.likes)
-                ? video.likes.length
-                : 0;
-
-            html += `
-                <div
-                    class="post video-gallery-item"
-                    data-video-index="${index}"
-                    role="button"
-                    tabindex="0"
-                    aria-label="Play video ${index + 1}"
-                >
-
-                    <video
-                        src="${videoUrl}"
-                        playsinline
-                        muted
-                        preload="metadata"
-                        class="video-gallery-thumbnail">
-                    </video>
-
-                    <div class="video-gallery-play">
-                        <i class="fa-solid fa-play"></i>
-                    </div>
-
-                    <div class="video-gallery-stats">
-                        <span>
-                            <i class="fa-solid fa-eye"></i>
-                            ${views}
-                        </span>
-
-                        <span>
-                            <i class="fa-solid fa-heart"></i>
-                            ${likes}
-                        </span>
-                    </div>
-
-                </div>
-            `;
-
-        });
-
-        myVideos.innerHTML = html;
+        // Keep existing viewer controls
         setupProfileVideoViewer();
+
+        // Watch for automatic loading
+        observeProfileVideos();
 
     } catch (err) {
 
-        console.error("LOAD PROFILE VIDEOS ERROR:", err);
+        console.error(
+            "LOAD MORE PROFILE VIDEOS ERROR:",
+            err
+        );
+
+        if (isFirstLoad) {
+            myVideos.innerHTML = `
+                <p style="text-align:center; grid-column:1/-1;">
+                    Unable to load videos.
+                </p>
+            `;
+        }
+
+    } finally {
+
+        profileVideosLoading = false;
 
     }
+}
 
-} 
 
+// =====================================
+// RENDER NEW VIDEOS
+// =====================================
+
+function renderProfileVideos(videos, startIndex) {
+
+    const myVideos = document.getElementById("myVideos");
+
+    if (!myVideos) return;
+
+    // Remove old loading sentinel
+    const oldSentinel = document.getElementById(
+        "profileVideosSentinel"
+    );
+
+    if (oldSentinel) {
+        oldSentinel.remove();
+    }
+
+    let html = "";
+
+    videos.forEach((video, offset) => {
+
+        const index = startIndex + offset;
+
+        const videoUrl = String(video.video || "")
+            .replace(/&/g, "&amp;")
+            .replace(/"/g, "&quot;")
+            .replace(/</g, "&lt;");
+
+        const views = Number(video.views) || 0;
+
+        const likes = Array.isArray(video.likes)
+            ? video.likes.length
+            : 0;
+
+        html += `
+            <div
+                class="post video-gallery-item"
+                data-video-index="${index}"
+                role="button"
+                tabindex="0"
+                aria-label="Play video ${index + 1}"
+            >
+
+                <video
+                    src="${videoUrl}"
+                    playsinline
+                    muted
+                    preload="metadata"
+                    class="video-gallery-thumbnail">
+                </video>
+
+                <div class="video-gallery-play">
+                    <i class="fa-solid fa-play"></i>
+                </div>
+
+                <div class="video-gallery-stats">
+
+                    <span>
+                        <i class="fa-solid fa-eye"></i>
+                        ${views}
+                    </span>
+
+                    <span>
+                        <i class="fa-solid fa-heart"></i>
+                        ${likes}
+                    </span>
+
+                </div>
+
+            </div>
+        `;
+
+    });
+
+    // Append without deleting previous videos
+    myVideos.insertAdjacentHTML(
+        "beforeend",
+        html
+    );
+
+    // Add a new sentinel if more videos exist
+    if (profileVideosHasMore) {
+
+        const sentinel = document.createElement("div");
+
+        sentinel.id = "profileVideosSentinel";
+        sentinel.style.gridColumn = "1 / -1";
+        sentinel.style.height = "20px";
+        sentinel.setAttribute("aria-hidden", "true");
+
+        myVideos.appendChild(sentinel);
+    }
+}
+
+
+// =====================================
+// AUTOMATIC SCROLL OBSERVER
+// =====================================
+
+function observeProfileVideos() {
+
+    const sentinel = document.getElementById(
+        "profileVideosSentinel"
+    );
+
+    if (!sentinel || !profileVideosHasMore) {
+
+        if (profileVideosObserver) {
+            profileVideosObserver.disconnect();
+            profileVideosObserver = null;
+        }
+
+        return;
+    }
+
+    if (!("IntersectionObserver" in window)) {
+        console.error(
+            "IntersectionObserver is not supported by this browser."
+        );
+        return;
+    }
+
+    if (profileVideosObserver) {
+        profileVideosObserver.disconnect();
+    }
+
+    profileVideosObserver = new IntersectionObserver(
+        (entries) => {
+
+            entries.forEach((entry) => {
+
+                if (entry.isIntersecting) {
+
+                    profileVideosObserver.unobserve(
+                        entry.target
+                    );
+
+                    loadMoreProfileVideos(false);
+
+                }
+
+            });
+
+        },
+        {
+            root: null,
+            rootMargin: "500px 0px",
+            threshold: 0
+        }
+    );
+
+    profileVideosObserver.observe(sentinel);
+ }
+        
 
 /* =====================================
    2CHAT VIDEO VIEWER CONTROLS
