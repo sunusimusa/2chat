@@ -1094,20 +1094,11 @@ async function loadMyPosts() {
 function openProfilePostMenu(postId) {
 
     const choice = prompt(
-        "Post options:\n1. Edit Post\n2. Delete Post\n\nEnter 1 or 2:"
+        "Post options:\n\n1. Edit Post\n2. Delete Post\n\nEnter 1 or 2:"
     );
 
     if (choice === "1") {
 
-        const post = document.querySelector(
-            `#myPosts [onclick*="${postId}"]`
-        );
-
-        const card = document.querySelector(
-            `#myPosts .profile-post-card`
-        );
-
-        // Find the selected post from the loaded data
         profileEditPost(postId);
 
     } else if (choice === "2") {
@@ -1123,23 +1114,33 @@ function openProfilePostMenu(postId) {
 // EDIT PROFILE POST
 // =====================================
 
+
 async function profileEditPost(postId) {
 
-    const textElement = document.querySelector(
-        `#myPosts .profile-post-card [data-post-text="${postId}"]`
-    );
-
     const card = Array.from(
-        document.querySelectorAll("#myPosts .profile-post-card")
-    ).find(card =>
-        card.querySelector(
-            `.profile-post-menu[onclick*="${postId}"]`
+        document.querySelectorAll(
+            "#myPosts .profile-post-card"
         )
+    ).find(item => {
+
+        const menu = item.querySelector(
+            ".profile-post-menu"
+        );
+
+        return menu &&
+            menu.getAttribute("onclick") ===
+            `openProfilePostMenu('${postId}')`;
+
+    });
+
+    if (!card) {
+        alert("Post not found.");
+        return;
+    }
+
+    const textBox = card.querySelector(
+        ".profile-post-text"
     );
-
-    if (!card) return;
-
-    const textBox = card.querySelector(".profile-post-text");
 
     const currentText = textBox
         ? textBox.innerText
@@ -1150,44 +1151,64 @@ async function profileEditPost(postId) {
         currentText
     );
 
-    if (newText === null || !newText.trim()) return;
+    if (newText === null) return;
+
+    if (!newText.trim()) {
+        alert("Post text cannot be empty.");
+        return;
+    }
 
     try {
 
         const token = localStorage.getItem("token");
 
-        const res = await fetch("/api/posts/edit", {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                ...(token ? {
-                    "Authorization": "Bearer " + token
-                } : {})
-            },
-            body: JSON.stringify({
-                postId,
-                text: newText.trim()
-            })
-        });
+        const res = await fetch(
+            "/api/posts/edit",
+            {
+                method: "PUT",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? {
+                        "Authorization": "Bearer " + token
+                    } : {})
+                },
+
+                body: JSON.stringify({
+                    postId,
+                    text: newText.trim()
+                })
+            }
+        );
 
         const data = await res.json();
 
         if (!res.ok || !data.success) {
-            alert(data.message || "Unable to edit post.");
+
+            alert(
+                data.message ||
+                "Unable to edit post."
+            );
+
             return;
         }
+
+        alert("Post updated successfully.");
 
         await loadMyPosts();
 
     } catch (err) {
 
-        console.error("PROFILE EDIT POST ERROR:", err);
+        console.error(
+            "PROFILE EDIT POST ERROR:",
+            err
+        );
+
         alert("Failed to edit post.");
 
     }
 
-}
-
+  }
 
 // =====================================
 // DELETE PROFILE POST
