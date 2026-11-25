@@ -451,7 +451,14 @@ async function loadChatUser() {
     }
 );
 
-        if (!res.ok) return;
+        if (!res.ok) {
+    console.error(
+        "PROFILE API ERROR:",
+        res.status,
+        await res.text()
+    );
+    return;
+        }
 
         const data =
             await res.json();
