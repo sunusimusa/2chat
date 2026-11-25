@@ -672,3 +672,84 @@ button:active {
         gap: 12px;
     }
  }
+
+
+/* =====================================
+   2CHAT VIDEO VIEWER
+===================================== */
+
+.video-viewer[hidden] {
+    display: none !important;
+}
+
+.video-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(5, 10, 20, .97);
+    padding: 55px 12px 100px;
+}
+
+#viewerVideo {
+    width: 100%;
+    max-width: 500px;
+    max-height: 100%;
+    aspect-ratio: 9 / 16;
+    object-fit: contain;
+    background: #000;
+    border-radius: 14px;
+}
+
+.video-viewer-close,
+.video-viewer-prev,
+.video-viewer-next {
+    position: absolute;
+    z-index: 2;
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255,255,255,.15);
+    color: white;
+    font-size: 18px;
+}
+
+.video-viewer-close {
+    top: 15px;
+    right: 15px;
+}
+
+.video-viewer-prev {
+    left: 12px;
+    top: 50%;
+}
+
+.video-viewer-next {
+    right: 12px;
+    top: 50%;
+}
+
+.video-viewer-info {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 25px;
+    color: white;
+    text-align: center;
+}
+
+.video-viewer-info p {
+    font-size: 14px;
+    margin-bottom: 7px;
+    overflow-wrap: anywhere;
+}
+
+.video-viewer-info small {
+    color: #cbd5e1;
+    font-size: 12px;
+}
+
