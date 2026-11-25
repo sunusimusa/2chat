@@ -979,3 +979,15 @@ button:active {
     text-decoration: none;
     cursor: pointer;
    }
+
+
+/* Center text inside Profile Posts */
+#myPosts .profile-post-text {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin: 18px auto;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
