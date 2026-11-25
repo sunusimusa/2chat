@@ -500,17 +500,62 @@ async function loadChatUser() {
 
         if (status) {
 
-            status.innerHTML =
-                chatUser.online
-                    ? '<i class="fa-solid fa-circle online-dot"></i> Online'
-                    : '<i class="fa-regular fa-clock"></i> Offline';
+    if (chatUser.online) {
+
+        status.innerHTML =
+            '<i class="fa-solid fa-circle online-dot"></i> Online';
+
+    } else if (chatUser.lastSeen) {
+
+        const lastSeenDate = new Date(chatUser.lastSeen);
+
+        const now = new Date();
+
+        const diffSeconds = Math.floor(
+            (now - lastSeenDate) / 1000
+        );
+
+        let lastSeenText = "";
+
+        if (diffSeconds < 60) {
+
+            lastSeenText = "just now";
+
+        } else if (diffSeconds < 3600) {
+
+            const minutes = Math.floor(diffSeconds / 60);
+
+            lastSeenText = `${minutes} minutes ago`;
+
+        } else if (diffSeconds < 86400) {
+
+            const hours = Math.floor(diffSeconds / 3600);
+
+            lastSeenText = `${hours} hours ago`;
+
+        } else {
+
+            lastSeenText = lastSeenDate.toLocaleString([], {
+                day: "numeric",
+                month: "short",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
 
         }
 
+        status.innerHTML =
+            `<i class="fa-regular fa-clock"></i> Last seen ${lastSeenText}`;
+
+    } else {
+
+        status.innerHTML =
+            '<i class="fa-regular fa-clock"></i> Offline';
+
     }
 
-    catch (err) {
-
+       }
+    }catch (err) {
         console.error(
             "Load Chat User Error:",
             err
