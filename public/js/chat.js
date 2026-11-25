@@ -3396,22 +3396,9 @@ socket.on(
             return;
         }
 
-        const status =
-            document.getElementById(
-                "status"
-            );
-
-
-        if (status) {
-
-            status.innerHTML =
-                '<i class="fa-solid fa-circle online-dot"></i> Online';
-
-        }
-
+        // Do not change online status here.
     }
 );
-
 
 /* ==========================================================
    ONLINE
