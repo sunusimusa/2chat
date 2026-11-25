@@ -965,46 +965,36 @@ async function loadMyPosts() {
             html += `
                 <article class="profile-post-card">
 
-                    <div class="profile-post-header">
+                    
+                 <div class="profile-post-header">
 
-                        <img
-                            class="profile-post-avatar"
-                            src="${avatar.replace(/"/g, "&quot;")}"
-                            alt="${username.replace(/"/g, "&quot;")}"
-                            onclick="openProfile('${safeUsername}')"
-                            onerror="this.src='/images/default.png'"
-                        >
+               <a
+                  href="/profile.html?user=${encodeURIComponent(username)}"
+                  class="profile-post-avatar-link"
+                  aria-label="Open ${username}'s profile">
 
-                        <div class="profile-post-user">
+              <img
+                  class="profile-post-avatar"
+                  src="${avatar.replace(/"/g, "&quot;")}"
+                  alt="${username.replace(/"/g, "&quot;")}"
+                  onerror="this.src='/images/default.png'"
+               >
 
-                        
-<a
-    href="/profile.html?user=${encodeURIComponent(username)}"
-    class="profile-post-avatar-link"
-    aria-label="Open ${username}'s profile">
+          </a>
 
-    <img
-        class="profile-post-avatar"
-        src="${avatar.replace(/"/g, "&quot;")}"
-        alt="${username.replace(/"/g, "&quot;")}"
-        onerror="this.src='/images/default.png'"
-    >
+           <div class="profile-post-user">
 
-</a>
+                 <a
+                   href="/profile.html?user=${encodeURIComponent(username)}"
+                   class="profile-post-username">
+                  ${username}
+              </a>
 
-<div class="profile-post-user">
+        <small class="profile-post-date">${date}</small>
 
-    <a
-        href="/profile.html?user=${encodeURIComponent(username)}"
-        class="profile-post-username">
-        ${username}
-    </a>
-
-    <small class="profile-post-date">
-        ${date}
-    </small>
-
+    </div>
 </div>
+        
 
 
                             <small class="profile-post-date">
