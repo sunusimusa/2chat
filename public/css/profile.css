@@ -618,3 +618,57 @@ button:active {
 
    }
    
+
+/* =====================================
+   2CHAT — MY VIDEOS GALLERY
+===================================== */
+
+#myVideos {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 16px;
+}
+
+#myVideos .post {
+    min-width: 0;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    background: #f1f5f9;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+#myVideos .post video {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    max-height: none !important;
+    object-fit: cover !important;
+    background: #101827;
+    border-radius: 11px;
+}
+
+#myVideos .post p {
+    padding: 7px;
+    font-size: 11px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+#myVideos .post small {
+    display: block;
+    padding: 0 7px 9px;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+/* Desktop */
+@media (min-width: 700px) {
+    #myVideos {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+ }
