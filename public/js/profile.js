@@ -1018,9 +1018,16 @@ async function loadMyPosts() {
                     ${
                         safeText
                         ? `
-                            <div class="profile-post-text">
-                                ${safeText}
+                            <div
+                                class="profile-post-text"
+                                style="text-align: left !
+                            important; direction: ltr !
+                            important; width: 100%;">
+
+                               ${safeText}
+
                             </div>
+
                         `
                         : ""
                     }
