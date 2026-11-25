@@ -979,18 +979,3 @@ button:active {
     text-decoration: none;
     cursor: pointer;
    }
-
-/* 2CHAT PROFILE POST TEXT ALIGNMENT */
-#myPosts .profile-post-card .profile-post-text {
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    margin: 18px 0;
-    padding: 0 5px;
-    text-align: center !important;
-    line-height: 1.6;
-    overflow-wrap: anywhere;
-    white-space: pre-wrap;
-    box-sizing: border-box;
-   }
-
