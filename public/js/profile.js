@@ -1539,6 +1539,7 @@ async function loadMyVideos() {
         });
 
         myVideos.innerHTML = html;
+        setupProfileVideoViewer();
 
     } catch (err) {
 
@@ -1546,7 +1547,159 @@ async function loadMyVideos() {
 
     }
 
-}                           
+} 
+
+
+/* =====================================
+   2CHAT VIDEO VIEWER CONTROLS
+===================================== */
+
+function openProfileVideo(index) {
+
+    if (
+        index < 0 ||
+        index >= profileVideos.length
+    ) return;
+
+    currentProfileVideo = index;
+
+    const video = profileVideos[index];
+
+    const viewer = document.getElementById("videoViewer");
+    const player = document.getElementById("viewerVideo");
+    const caption = document.getElementById("viewerCaption");
+    const views = document.getElementById("viewerViews");
+
+    if (!viewer || !player) return;
+
+    player.pause();
+    player.src = video.video || "";
+    player.load();
+
+    if (caption) {
+        caption.textContent = video.caption || "";
+    }
+
+    if (views) {
+        views.textContent =
+            "👁️ " + (Number(video.views) || 0) + " Views";
+    }
+
+    viewer.hidden = false;
+    document.body.style.overflow = "hidden";
+
+    player.play().catch(err => {
+        console.log("Video playback requires user interaction:", err);
+    });
+}
+
+
+/* NEXT VIDEO */
+
+function nextProfileVideo() {
+
+    if (!profileVideos.length) return;
+
+    const nextIndex =
+        (currentProfileVideo + 1) % profileVideos.length;
+
+    openProfileVideo(nextIndex);
+}
+
+
+/* PREVIOUS VIDEO */
+
+function previousProfileVideo() {
+
+    if (!profileVideos.length) return;
+
+    const previousIndex =
+        (currentProfileVideo - 1 + profileVideos.length) %
+        profileVideos.length;
+
+    openProfileVideo(previousIndex);
+}
+
+
+/* CLOSE VIDEO VIEWER */
+
+function closeProfileVideo() {
+
+    const viewer = document.getElementById("videoViewer");
+    const player = document.getElementById("viewerVideo");
+
+    if (!viewer || !player) return;
+
+    player.pause();
+    player.removeAttribute("src");
+    player.load();
+
+    viewer.hidden = true;
+    document.body.style.overflow = "";
+}
+
+
+/* CONNECT VIEWER BUTTONS */
+
+function setupProfileVideoViewer() {
+
+    const gallery = document.getElementById("myVideos");
+
+    if (!gallery || gallery.dataset.viewerBound) return;
+
+    gallery.dataset.viewerBound = "true";
+
+    gallery.addEventListener("click", function(e) {
+
+        const item = e.target.closest(".video-gallery-item");
+
+        if (!item) return;
+
+        openProfileVideo(
+            Number(item.dataset.videoIndex)
+        );
+
+    });
+
+    gallery.addEventListener("keydown", function(e) {
+
+        if (e.key !== "Enter" && e.key !== " ") return;
+
+        const item = e.target.closest(".video-gallery-item");
+
+        if (!item) return;
+
+        e.preventDefault();
+
+        openProfileVideo(
+            Number(item.dataset.videoIndex)
+        );
+
+    });
+
+    document.getElementById("closeVideoViewer")
+        ?.addEventListener("click", closeProfileVideo);
+
+    document.getElementById("nextVideo")
+        ?.addEventListener("click", nextProfileVideo);
+
+    document.getElementById("previousVideo")
+        ?.addEventListener("click", previousProfileVideo);
+
+    document.addEventListener("keydown", function(e) {
+
+        const viewer = document.getElementById("videoViewer");
+
+        if (!viewer || viewer.hidden) return;
+
+        if (e.key === "Escape") {
+            closeProfileVideo();
+        }
+
+    });
+
+}
+
 
 // =====================================================
 // START
