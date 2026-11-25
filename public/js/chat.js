@@ -630,11 +630,10 @@ async function loadMessages(
 
         }
 
-    });
+     });
 
-}
-              
-    catch (err) {
+        }
+    } catch (err) {
 
         console.error(
             "Load Messages Error:",
