@@ -329,6 +329,48 @@
 
 </div>
 
+ 
+<!-- 2CHAT VIDEO VIEWER -->
+<div id="videoViewer" class="video-viewer" hidden>
+
+    <button
+        type="button"
+        id="closeVideoViewer"
+        class="video-viewer-close"
+        aria-label="Close video">
+        <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <button
+        type="button"
+        id="previousVideo"
+        class="video-viewer-prev"
+        aria-label="Previous video">
+        <i class="fa-solid fa-chevron-left"></i>
+    </button>
+
+    <video
+        id="viewerVideo"
+        playsinline
+        controls
+        preload="metadata">
+    </video>
+
+    <button
+        type="button"
+        id="nextVideo"
+        class="video-viewer-next"
+        aria-label="Next video">
+        <i class="fa-solid fa-chevron-right"></i>
+    </button>
+
+    <div class="video-viewer-info">
+        <p id="viewerCaption"></p>
+        <small id="viewerViews"></small>
+    </div>
+
+</div>    
+
 <!-- BOTTOM NAVIGATION -->
 <nav class="bottom-nav">
 
