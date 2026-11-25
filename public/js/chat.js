@@ -601,27 +601,32 @@ async function loadMessages(
            Mark incoming messages as seen.
         */
 
-        messages.forEach(msg => {
+        if (
+    document.visibilityState === "visible" &&
+    document.hasFocus()
+) {
 
-            if (
-                msg.receiver === user.username &&
-                !msg.seen
-            ) {
+    messages.forEach(msg => {
 
-                socket.emit(
-                    "messageSeen",
-                    {
-                        sender: msg.sender,
-                        messageId: msg._id
-                    }
-                );
+        if (
+            msg.receiver === user.username &&
+            !msg.seen
+        ) {
 
-            }
+            socket.emit(
+                "messageSeen",
+                {
+                    sender: msg.sender,
+                    messageId: msg._id
+                }
+            );
 
-        });
+        }
 
-    }
+    });
 
+}
+              
     catch (err) {
 
         console.error(
