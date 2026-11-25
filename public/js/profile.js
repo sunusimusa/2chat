@@ -977,11 +977,35 @@ async function loadMyPosts() {
 
                         <div class="profile-post-user">
 
-                            <a
-                                href="/profile.html?user=${encodeURIComponent(username)}"
-                                class="profile-post-username">
-                                ${username}
-                            </a>
+                        
+<a
+    href="/profile.html?user=${encodeURIComponent(username)}"
+    class="profile-post-avatar-link"
+    aria-label="Open ${username}'s profile">
+
+    <img
+        class="profile-post-avatar"
+        src="${avatar.replace(/"/g, "&quot;")}"
+        alt="${username.replace(/"/g, "&quot;")}"
+        onerror="this.src='/images/default.png'"
+    >
+
+</a>
+
+<div class="profile-post-user">
+
+    <a
+        href="/profile.html?user=${encodeURIComponent(username)}"
+        class="profile-post-username">
+        ${username}
+    </a>
+
+    <small class="profile-post-date">
+        ${date}
+    </small>
+
+</div>
+
 
                             <small class="profile-post-date">
                                 ${date}
