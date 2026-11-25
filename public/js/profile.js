@@ -880,6 +880,17 @@ async function loadMyPosts() {
 
         const currentUsername = currentUser?.username || "";
 
+        // Escape HTML safely
+        const escapeHTML = (value) => {
+            return String(value ?? "").replace(/[&<>"']/g, char => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[char]);
+        };
+
         let html = "";
 
         data.posts.forEach(post => {
@@ -888,22 +899,19 @@ async function loadMyPosts() {
 
             const username = String(post.username || "User");
 
+            const safeUsername = escapeHTML(username);
+
+            const safeProfileUsername = encodeURIComponent(username);
+
             const avatar = String(
                 post.avatar || "/images/default.png"
             );
 
+            const safeAvatar = escapeHTML(avatar);
+
             const text = String(post.text || "");
 
-            const safeText = text
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#39;");
-
-            const safeUsername = username.replace(
-                /\\/g, "\\\\"
-            ).replace(/'/g, "\\'");
+            const safeText = escapeHTML(text);
 
             const isOwner =
                 currentUser &&
@@ -929,10 +937,7 @@ async function loadMyPosts() {
 
             if (post.image) {
 
-                const imageUrl = String(post.image)
-                    .replace(/&/g, "&amp;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/</g, "&lt;");
+                const imageUrl = escapeHTML(post.image);
 
                 media += `
                     <img
@@ -946,10 +951,7 @@ async function loadMyPosts() {
 
             if (post.video) {
 
-                const videoUrl = String(post.video)
-                    .replace(/&/g, "&amp;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/</g, "&lt;");
+                const videoUrl = escapeHTML(post.video);
 
                 media += `
                     <video
@@ -965,37 +967,29 @@ async function loadMyPosts() {
             html += `
                 <article class="profile-post-card">
 
-                    
-                 <div class="profile-post-header">
+                    <div class="profile-post-header">
 
-               <a
-                  href="/profile.html?user=${encodeURIComponent(username)}"
-                  class="profile-post-avatar-link"
-                  aria-label="Open ${username}'s profile">
+                        <a
+                            href="/profile.html?user=${safeProfileUsername}"
+                            class="profile-post-avatar-link"
+                            aria-label="Open ${safeUsername}'s profile">
 
-              <img
-                  class="profile-post-avatar"
-                  src="${avatar.replace(/"/g, "&quot;")}"
-                  alt="${username.replace(/"/g, "&quot;")}"
-                  onerror="this.src='/images/default.png'"
-               >
+                            <img
+                                class="profile-post-avatar"
+                                src="${safeAvatar}"
+                                alt="${safeUsername}"
+                                onerror="this.src='/images/default.png'"
+                            >
 
-          </a>
+                        </a>
 
-           <div class="profile-post-user">
+                        <div class="profile-post-user">
 
-                 <a
-                   href="/profile.html?user=${encodeURIComponent(username)}"
-                   class="profile-post-username">
-                  ${username}
-              </a>
-
-        <small class="profile-post-date">${date}</small>
-
-    </div>
-</div>
-        
-
+                            <a
+                                href="/profile.html?user=${safeProfileUsername}"
+                                class="profile-post-username">
+                                ${safeUsername}
+                            </a>
 
                             <small class="profile-post-date">
                                 ${date}
@@ -1009,9 +1003,11 @@ async function loadMyPosts() {
                                 <button
                                     class="profile-post-menu"
                                     type="button"
-                                    onclick="openProfilePostMenu('${postId}')"
+                                    onclick="openProfilePostMenu('${escapeHTML(postId)}')"
                                     aria-label="Post options">
+
                                     <i class="fa-solid fa-ellipsis"></i>
+
                                 </button>
                             `
                             : ""
@@ -1033,13 +1029,9 @@ async function loadMyPosts() {
 
                     <div class="profile-post-stats">
 
-                        <span>
-                            ❤️ ${likes}
-                        </span>
+                        <span>❤️ ${likes}</span>
 
-                        <span>
-                            💬 ${comments}
-                        </span>
+                        <span>💬 ${comments}</span>
 
                     </div>
 
@@ -1047,7 +1039,7 @@ async function loadMyPosts() {
 
                         <button
                             type="button"
-                            onclick="profileLikePost('${postId}')">
+                            onclick="profileLikePost('${escapeHTML(postId)}')">
 
                             <i class="${liked ? "fa-solid" : "fa-regular"} fa-heart"></i>
                             Like
@@ -1056,7 +1048,7 @@ async function loadMyPosts() {
 
                         <button
                             type="button"
-                            onclick="profileToggleComment('${postId}')">
+                            onclick="profileToggleComment('${escapeHTML(postId)}')">
 
                             <i class="fa-regular fa-comment"></i>
                             Comment
@@ -1067,17 +1059,17 @@ async function loadMyPosts() {
 
                     <div
                         class="comment-box"
-                        id="profile-comment-box-${postId}"
+                        id="profile-comment-box-${escapeHTML(postId)}"
                         style="display:none;">
 
                         <input
                             type="text"
-                            id="profile-comment-${postId}"
+                            id="profile-comment-${escapeHTML(postId)}"
                             placeholder="Write comment...">
 
                         <button
                             type="button"
-                            onclick="profileCommentPost('${postId}')">
+                            onclick="profileCommentPost('${escapeHTML(postId)}')">
 
                             <i class="fa-solid fa-paper-plane"></i>
 
@@ -1099,8 +1091,7 @@ async function loadMyPosts() {
     }
 
 }
-
-
+           
 // =====================================
 // PROFILE POST MENU
 // =====================================
