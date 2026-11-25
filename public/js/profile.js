@@ -1445,6 +1445,12 @@ if (avatarFileInput) {
 let profileVideos = [];
 let currentProfileVideo = 0;
 
+let profileVideosCursor = null;
+let profileVideosHasMore = true;
+let profileVideosLoading = false;
+let profileVideosObserver = null;
+
+
 async function loadMyVideos() {
 
     try {
