@@ -3648,18 +3648,28 @@ function hideElement(id) {
    INITIAL LOAD
 ========================================================== */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function() {
+function initializeChat() {
 
-        loadChatUser();
+    loadChatUser();
 
-        loadMessages(true);
+    loadMessages(true);
 
-        updateSendButton();
+    updateSendButton();
 
-    }
-);
+}
+
+if (document.readyState === "loading") {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        initializeChat
+    );
+
+} else {
+
+    initializeChat();
+
+}
 
 // =========================================
 // BLOCK CURRENT CHAT USER
