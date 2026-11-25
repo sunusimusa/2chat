@@ -1004,3 +1004,75 @@ button:active {
     box-sizing: border-box;
 }
 
+
+/* =====================================
+   2CHAT PROFILE CONTENT TABS
+===================================== */
+
+.profile-content-section {
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+/* Tabs navigation */
+.profile-content-tabs {
+    display: flex;
+    width: 100%;
+    border-bottom: 1px solid #e5eaf1;
+    background: #ffffff;
+}
+
+.profile-content-tab {
+    flex: 1;
+    min-width: 0;
+    min-height: 52px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 6px;
+    background: transparent;
+    color: #778196;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.profile-content-tab i {
+    font-size: 16px;
+}
+
+.profile-content-tab.active {
+    color: #2563eb;
+    border-bottom-color: #2563eb;
+    background: #eff6ff;
+}
+
+/* Content panels */
+.profile-content-panel {
+    padding: 16px;
+}
+
+.profile-content-panel[hidden] {
+    display: none !important;
+}
+
+.profile-content-panel .section-heading {
+    margin-bottom: 15px;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+
+    .profile-content-tab {
+        min-height: 50px;
+        font-size: 13px;
+        gap: 6px;
+    }
+
+    .profile-content-panel {
+        padding: 13px;
+    }
+
+}
