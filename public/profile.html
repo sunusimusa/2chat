@@ -292,43 +292,72 @@
             </button>
 
         </section>
-
         
-<!-- MY VIDEOS -->
-<section class="my-posts">
+<!-- PROFILE CONTENT TABS -->
+<section class="my-posts profile-content-section">
 
-    <div class="section-heading">
-        <div>
-            <h2>
-                <i class="fa-solid fa-clapperboard"></i>
-                My Videos
-            </h2>
-            <p>Short videos published on 2Chat</p>
-        </div>
+    <!-- TABS -->
+    <div class="profile-content-tabs">
+
+        <button
+            type="button"
+            class="profile-content-tab active"
+            id="postsTab"
+            onclick="switchProfileTab('posts')">
+
+            <i class="fa-solid fa-images"></i>
+            My Posts
+
+        </button>
+
+        <button
+            type="button"
+            class="profile-content-tab"
+            id="videosTab"
+            onclick="switchProfileTab('videos')">
+
+            <i class="fa-solid fa-clapperboard"></i>
+            My Videos
+
+        </button>
+
     </div>
 
-    <div id="myVideos"></div>
+    <!-- MY POSTS PANEL -->
+    <div
+        id="postsPanel"
+        class="profile-content-panel">
+
+        <div class="section-heading">
+            <div>
+                <h2>My Posts</h2>
+                <p>Your shared moments on 2Chat</p>
+            </div>
+        </div>
+
+        <div id="myPosts"></div>
+
+    </div>
+
+    <!-- MY VIDEOS PANEL -->
+    <div
+        id="videosPanel"
+        class="profile-content-panel"
+        hidden>
+
+        <div class="section-heading">
+            <div>
+                <h2>My Videos</h2>
+                <p>Short videos published on 2Chat</p>
+            </div>
+        </div>
+
+        <div id="myVideos"></div>
+
+    </div>
 
 </section>
         
-
-        <!-- MY POSTS -->
-        <section class="my-posts">
-
-            <div class="section-heading">
-                <div>
-                    <h2>
-                        <i class="fa-solid fa-images"></i>
-                        My Posts
-                    </h2>
-                    <p>Your shared moments on 2Chat</p>
-                </div>
-            </div>
-
-            <div id="myPosts"></div>
-
-        </section>
-
     </main>
 
 </div>
