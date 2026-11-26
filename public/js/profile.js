@@ -832,15 +832,15 @@ async function uploadAvatar() {
 }
 
 
-
 function profileFormatPostText(value) {
 
     let text = String(value ?? "");
 
-    // Decode old HTML entities
     const decoder = document.createElement("textarea");
 
-    for (let i = 0; i < 3; i++) {
+    // Decode HTML entities repeatedly
+    for (let i = 0; i < 5; i++) {
+
         decoder.innerHTML = text;
 
         const decoded = decoder.value;
@@ -850,12 +850,29 @@ function profileFormatPostText(value) {
         text = decoded;
     }
 
-    // Remove old saved anchor HTML safely
+    // Extract visible text from valid anchor HTML
     if (/<a\b/i.test(text)) {
+
         const parser = new DOMParser();
-        const doc = parser.parseFromString(text, "text/html");
+
+        const doc = parser.parseFromString(
+            text,
+            "text/html"
+        );
+
         text = doc.body.textContent || "";
     }
+
+    // Remove leftover anchor attributes
+    text = text
+        .replace(/href\s*=\s*["'][^"']*["']/gi, "")
+        .replace(/target\s*=\s*["'][^"']*["']/gi, "")
+        .replace(/rel\s*=\s*["'][^"']*["']/gi, "")
+        .replace(/class\s*=\s*["'][^"']*["']/gi, "")
+        .replace(/<\/?a\b[^>]*>/gi, "")
+        .replace(/^\s*>\s*/gm, "")
+        .replace(/&nbsp;/gi, " ")
+        .trim();
 
     const escapeHTML = value =>
         String(value).replace(/[&<>"']/g, char => ({
@@ -866,7 +883,8 @@ function profileFormatPostText(value) {
             "'": "&#39;"
         })[char]);
 
-    const urlPattern = /https?:\/\/[^\s<>"']+|www\.[^\s<>"']+/gi;
+    const urlPattern =
+        /https?:\/\/[^\s<>"']+|www\.[^\s<>"']+/gi;
 
     let result = "";
     let lastIndex = 0;
@@ -880,7 +898,9 @@ function profileFormatPostText(value) {
         let ending = "";
 
         while (/[.,!?;:)\]}]$/.test(cleanURL)) {
+
             ending = cleanURL.slice(-1) + ending;
+
             cleanURL = cleanURL.slice(0, -1);
         }
 
@@ -893,21 +913,27 @@ function profileFormatPostText(value) {
             : cleanURL;
 
         try {
+
             const parsed = new URL(href);
 
             if (
                 parsed.protocol === "https:" ||
                 parsed.protocol === "http:"
             ) {
-                result += `<a href="${escapeHTML(parsed.href)}"
+
+                result += `<a
+                    href="${escapeHTML(parsed.href)}"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="post-link">${escapeHTML(cleanURL)}</a>`;
+
             } else {
+
                 result += escapeHTML(originalURL);
             }
 
         } catch {
+
             result += escapeHTML(originalURL);
         }
 
@@ -916,11 +942,13 @@ function profileFormatPostText(value) {
         lastIndex = match.index + originalURL.length;
     }
 
-    result += escapeHTML(text.slice(lastIndex));
+    result += escapeHTML(
+        text.slice(lastIndex)
+    );
 
     return result.replace(/\r\n|\r|\n/g, "<br>");
 }
-    
+
 
 // =====================================================
 // LOAD MY POSTS
