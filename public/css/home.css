@@ -1,1512 +1,1356 @@
 /* =====================================================
-   2CHAT HOME
+   2CHAT HOME PAGE — MODERN UI
+   Compatible with existing home.html and home.js
 ===================================================== */
-*{
-    box-sizing:border-box;
+
+:root {
+    --primary: #1877f2;
+    --primary-dark: #1264d8;
+    --background: #f0f2f5;
+    --surface: #ffffff;
+    --text: #1c1e21;
+    --muted: #65676b;
+    --border: #e4e6eb;
+    --success: #31a24c;
+    --danger: #e41e3f;
+    --bottom-nav: #ffffff;
+    --shadow: 0 2px 10px rgba(0,0,0,.07);
 }
 
-html,
-body{
-    margin:0;
-    padding:0;
-    width:100%;
-    min-height:100%;
-    font-family:Arial,Helvetica,sans-serif;
-    background:#f0f2f5;
-    color:#111;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-body{
-    padding-bottom:82px;
+html {
+    width: 100%;
+    min-height: 100%;
+    scroll-behavior: smooth;
+}
+
+body {
+    width: 100%;
+    min-height: 100vh;
+    padding-bottom: 82px;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: var(--background);
+    color: var(--text);
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+button,
+input,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+img,
+video {
+    max-width: 100%;
 }
 
 /* =====================================================
-   HEADER
+   TOP HEADER
 ===================================================== */
-.app-header{
 
-    position:sticky;
-    top:0;
-    z-index:1000;
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 
-    width:100%;
+    width: 100%;
+    height: 62px;
 
-    height:64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
+    padding: 0 16px;
 
-    padding:0 15px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
 
-    background:#fff;
-
-    border-bottom:1px solid #ddd;
-
-    box-shadow:0 1px 4px rgba(0,0,0,.08);
+    box-shadow: 0 1px 5px rgba(0,0,0,.05);
 }
 
+.header-logo {
+    font-size: 29px;
+    font-weight: 900;
+    letter-spacing: -1.5px;
 
-.header-logo{
-
-    font-size:28px;
-
-    font-weight:800;
-
-    color:#1877f2;
-
-    letter-spacing:-1px;
+    color: var(--primary);
 }
 
-
-.header-actions{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:9px;
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
+.header-actions button {
+    width: 42px;
+    height: 42px;
 
-.header-actions button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    width:42px;
-    height:42px;
+    border: none;
+    border-radius: 50%;
 
-    border:none;
+    background: #f0f2f5;
+    color: var(--text);
 
-    border-radius:50%;
+    font-size: 18px;
 
-    background:#eef0f3;
-
-    color:#111;
-
-    font-size:19px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    cursor:pointer;
-
-    transition:.2s;
+    transition: .2s;
 }
 
-
-.header-actions button:active{
-
-    transform:scale(.92);
+.header-actions button:hover {
+    background: #e4e6eb;
+    color: var(--primary);
 }
 
-
-.header-actions button:hover{
-
-    background:#dfe3e8;
+.header-actions button:active {
+    transform: scale(.92);
 }
-
 
 /* =====================================================
-   QUICK NAV
+   QUICK NAVIGATION
 ===================================================== */
 
-.quick-nav{
+.quick-nav {
+    position: sticky;
+    top: 62px;
+    z-index: 999;
 
-    position:sticky;
+    width: 100%;
+    height: 54px;
 
-    top:64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
 
-    z-index:999;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
 
-    height:55px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-around;
-
-    background:#fff;
-
-    border-bottom:1px solid #ddd;
-
-    box-shadow:0 1px 3px rgba(0,0,0,.06);
+    box-shadow: 0 1px 4px rgba(0,0,0,.04);
 }
 
+.quick-item {
+    position: relative;
 
-.quick-item{
+    flex: 1;
+    height: 54px;
 
-    position:relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    flex:1;
+    color: var(--muted);
+    text-decoration: none;
 
-    height:55px;
+    font-size: 21px;
 
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    color:#65676b;
-
-    text-decoration:none;
-
-    font-size:22px;
+    transition: .2s;
 }
 
-
-.quick-item.active{
-
-    color:#1877f2;
+.quick-item:hover,
+.quick-item.active {
+    color: var(--primary);
 }
 
+.quick-item.active::after {
+    content: "";
 
-.quick-item.active::after{
+    position: absolute;
+    bottom: 0;
 
-    content:"";
+    width: 55%;
+    height: 3px;
 
-    position:absolute;
-
-    bottom:0;
-
-    left:18%;
-
-    width:64%;
-
-    height:3px;
-
-    background:#1877f2;
-
-    border-radius:5px 5px 0 0;
+    background: var(--primary);
+    border-radius: 5px 5px 0 0;
 }
 
-
-.notification-item{
-
-    position:relative;
+.notification-item {
+    position: relative;
 }
 
+#notificationCount {
+    position: absolute;
+    top: 3px;
+    right: 20%;
 
-#notificationCount{
+    min-width: 18px;
+    height: 18px;
 
-    position:absolute;
+    padding: 0 5px;
 
-    top:5px;
-    right:25%;
+    display: none;
+    align-items: center;
+    justify-content: center;
 
-    min-width:18px;
+    background: var(--danger);
+    color: white;
 
-    height:18px;
+    border-radius: 20px;
 
-    padding:0 5px;
-
-    display:none;
-
-    align-items:center;
-
-    justify-content:center;
-
-    background:#e41e3f;
-
-    color:#fff;
-
-    border-radius:20px;
-
-    font-size:10px;
-
-    font-weight:bold;
+    font-size: 10px;
+    font-weight: bold;
 }
-
 
 /* =====================================================
-   SEARCH
+   SEARCH PANEL
 ===================================================== */
 
-.search-panel{
+.search-panel {
+    display: none;
 
-    display:none;
+    position: sticky;
+    top: 116px;
+    z-index: 998;
 
-    position:sticky;
+    padding: 10px 14px;
 
-    top:119px;
-
-    z-index:998;
-
-    background:#fff;
-
-    padding:10px 12px;
-
-    border-bottom:1px solid #ddd;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
 }
 
-
-.search-panel.active{
-
-    display:block;
+.search-panel.active {
+    display: block;
 }
 
+.search-inner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 
-.search-inner{
+    padding: 5px 10px;
 
-    display:flex;
-
-    align-items:center;
-
-    gap:8px;
-
-    background:#f0f2f5;
-
-    border-radius:30px;
-
-    padding:5px 10px;
+    background: #f0f2f5;
+    border-radius: 30px;
 }
 
+.search-inner button {
+    width: 38px;
+    height: 38px;
 
-.search-inner button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    width:38px;
-    height:38px;
+    border: none;
+    background: transparent;
 
-    border:none;
-
-    background:none;
-
-    font-size:18px;
-
-    color:#555;
-
-    cursor:pointer;
+    color: var(--muted);
+    font-size: 17px;
 }
 
+#searchInput {
+    flex: 1;
+    min-width: 0;
 
-#searchInput{
+    padding: 10px;
 
-    flex:1;
+    border: none;
+    outline: none;
 
-    border:none;
+    background: transparent;
+    color: var(--text);
 
-    outline:none;
-
-    background:transparent;
-
-    font-size:16px;
-
-    padding:10px;
+    font-size: 16px;
 }
-
 
 /* =====================================================
    SIDE MENU
 ===================================================== */
 
-.menu-overlay{
+.menu-overlay {
+    position: fixed;
+    inset: 0;
 
-    position:fixed;
+    z-index: 2000;
 
-    inset:0;
+    display: none;
 
-    background:rgba(0,0,0,.5);
-
-    z-index:2000;
-
-    display:none;
+    background: rgba(0,0,0,.5);
+    backdrop-filter: blur(2px);
 }
 
-
-.menu-overlay.active{
-
-    display:block;
+.menu-overlay.active {
+    display: block;
 }
 
+.side-menu {
+    position: fixed;
+    top: 0;
+    left: -310px;
 
-.side-menu{
+    z-index: 2100;
 
-    position:fixed;
+    width: 290px;
+    max-width: 85vw;
+    height: 100vh;
+    height: 100dvh;
 
-    top:0;
+    overflow-y: auto;
 
-    left:-310px;
+    background: var(--surface);
 
-    width:290px;
+    box-shadow: 5px 0 20px rgba(0,0,0,.2);
 
-    height:100vh;
-
-    background:#fff;
-
-    z-index:2100;
-
-    transition:left .28s ease;
-
-    overflow-y:auto;
-
-    box-shadow:5px 0 20px rgba(0,0,0,.2);
+    transition: left .28s ease;
 }
 
-
-.side-menu.active{
-
-    left:0;
+.side-menu.active {
+    left: 0;
 }
 
+.menu-header {
+    min-height: 85px;
 
-.menu-header{
+    padding: 18px;
 
-    height:85px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-    padding:18px;
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    background:#1877f2;
-
-    color:#fff;
+    background: var(--primary);
+    color: white;
 }
 
-
-.menu-header strong{
-
-    display:block;
-
-    font-size:25px;
+.menu-header strong {
+    display: block;
+    font-size: 25px;
 }
 
-
-.menu-header small{
-
-    display:block;
-
-    margin-top:3px;
-
-    opacity:.85;
+.menu-header small {
+    display: block;
+    margin-top: 4px;
+    opacity: .85;
 }
 
+.menu-header button {
+    width: 40px;
+    height: 40px;
 
-.menu-header button{
+    border: none;
+    border-radius: 50%;
 
-    width:40px;
-    height:40px;
+    background: rgba(255,255,255,.2);
+    color: white;
 
-    border:none;
-
-    border-radius:50%;
-
-    background:rgba(255,255,255,.18);
-
-    color:#fff;
-
-    font-size:20px;
-
-    cursor:pointer;
+    font-size: 20px;
 }
 
+.menu-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 
-.menu-user{
+    padding: 18px;
 
-    display:flex;
-
-    align-items:center;
-
-    gap:12px;
-
-    padding:18px;
-
-    border-bottom:1px solid #eee;
+    border-bottom: 1px solid var(--border);
 }
 
+.menu-avatar {
+    width: 48px;
+    height: 48px;
 
-.menu-avatar{
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    width:48px;
-    height:48px;
+    border-radius: 50%;
 
-    border-radius:50%;
+    background: #eef5ff;
+    color: var(--primary);
 
-    background:#eef5ff;
-
-    color:#1877f2;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-size:22px;
+    font-size: 22px;
 }
 
-
-.menu-user b{
-
-    display:block;
-
-    font-size:16px;
+.menu-user b {
+    display: block;
+    font-size: 16px;
 }
 
-
-.menu-user small{
-
-    display:block;
-
-    color:#777;
-
-    margin-top:3px;
+.menu-user small {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
 }
 
+.side-menu a {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 
-.side-menu a{
+    padding: 15px 20px;
 
-    display:flex;
+    color: var(--text);
+    text-decoration: none;
 
-    align-items:center;
+    font-size: 15px;
 
-    gap:15px;
+    border-bottom: 1px solid #f4f4f4;
 
-    padding:15px 20px;
-
-    color:#222;
-
-    text-decoration:none;
-
-    font-size:16px;
-
-    border-bottom:1px solid #f4f4f4;
+    transition: .2s;
 }
 
-
-.side-menu a:hover{
-
-    background:#f0f5ff;
-
-    color:#1877f2;
+.side-menu a:hover {
+    background: #f0f5ff;
+    color: var(--primary);
 }
 
+.side-menu a i {
+    width: 25px;
+    text-align: center;
 
-.side-menu a i{
-
-    width:25px;
-
-    text-align:center;
-
-    font-size:19px;
-
-    color:#1877f2;
+    color: var(--primary);
+    font-size: 19px;
 }
 
+.menu-notification {
+    margin-left: auto;
 
-.menu-notification{
+    padding: 2px 7px;
 
-    margin-left:auto;
+    background: var(--danger);
+    color: white;
 
-    background:#e41e3f;
+    border-radius: 20px;
 
-    color:#fff;
-
-    border-radius:20px;
-
-    padding:2px 7px;
-
-    font-size:11px;
-
-    display:none;
+    font-size: 11px;
+    display: none;
 }
-
 
 /* =====================================================
    CREATE POST
 ===================================================== */
 
-.create-post{
+.create-post {
+    width: 100%;
+    max-width: 650px;
 
-    margin:12px 0;
+    margin: 14px auto;
+    padding: 16px;
 
-    background:#fff;
+    background: var(--surface);
 
-    padding:14px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
 
-    border-top:1px solid #ddd;
-
-    border-bottom:1px solid #ddd;
+    box-shadow: var(--shadow);
 }
 
-
-.create-user-row{
-
-    display:flex;
-
-    align-items:flex-start;
-
-    gap:10px;
+.create-user-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
 }
 
+.create-avatar {
+    flex: none;
 
-.create-avatar{
+    width: 48px;
+    height: 48px;
 
-    flex:none;
+    overflow: hidden;
 
-    width:44px;
-    height:44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    border-radius:50%;
+    border-radius: 50%;
 
-    background:#eef0f3;
-
-    color:#1877f2;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-size:19px;
+    background: #eef5ff;
 }
 
+.create-avatar img {
+    display: block;
 
-#postText{
+    width: 100%;
+    height: 100%;
 
-    flex:1;
-
-    width:100%;
-
-    min-height:48px;
-
-    max-height:130px;
-
-    resize:none;
-
-    border:none;
-
-    outline:none;
-
-    background:#f0f2f5;
-
-    border-radius:25px;
-
-    padding:14px 17px;
-
-    font-size:15px;
+    object-fit: cover;
 }
 
+#postText {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
 
-.create-actions{
+    min-height: 50px;
+    max-height: 150px;
 
-    display:flex;
+    resize: vertical;
 
-    align-items:center;
+    padding: 15px 17px;
 
-    gap:8px;
+    border: 1px solid transparent;
+    outline: none;
+    border-radius: 25px;
 
-    margin-top:12px;
+    background: #f0f2f5;
+    color: var(--text);
 
-    padding-top:10px;
+    font-size: 15px;
+    line-height: 1.5;
 
-    border-top:1px solid #eee;
+    transition: .2s;
 }
 
-
-.create-action{
-
-    flex:1;
-
-    border:none;
-
-    background:none;
-
-    color:#555;
-
-    padding:9px 5px;
-
-    border-radius:8px;
-
-    font-size:14px;
-
-    cursor:pointer;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    gap:6px;
+#postText:focus {
+    border-color: #b7d3ff;
+    background: #f8faff;
 }
 
-
-.create-action:hover{
-
-    background:#f0f2f5;
+#postText::placeholder {
+    color: var(--muted);
 }
 
+/* =====================================================
+   CREATE POST ACTIONS
+===================================================== */
 
-.photo-action{
+#createPostSection .post-actions {
+    display: flex;
+    align-items: center;
+    gap: 9px;
 
-    color:#31a24c;
+    margin-top: 14px;
+    padding-top: 12px;
 
-    cursor:pointer;
+    border-top: 1px solid var(--border);
 }
 
+#createPostSection .post-actions label {
+    position: relative;
+    z-index: 21;
 
-.post-submit{
+    flex: 1;
+    min-height: 44px;
 
-    border:none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 
-    background:#1877f2;
+    padding: 10px;
 
-    color:#fff;
+    border-radius: 25px;
 
-    border-radius:20px;
+    background: #f0f2f5;
 
-    padding:9px 18px;
+    font-size: 14px;
+    font-weight: bold;
 
-    font-weight:bold;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 
-    cursor:pointer;
+    transition: .2s;
 }
 
-
-.post-preview{
-
-    position:relative;
-
-    margin-top:12px;
-
-    background:#f0f2f5;
-
-    border-radius:12px;
-
-    overflow:hidden;
+#createPostSection .post-actions label i {
+    pointer-events: none;
+    font-size: 17px;
 }
 
+#createPostSection .post-actions label:hover {
+    background: #e4e6eb;
+}
 
+#createPostSection .post-actions label:active {
+    transform: scale(.97);
+}
 
-/* =====================================
-   2CHAT CREATE POST MEDIA PREVIEW
-===================================== */
+#createPostSection .post-actions .image-btn {
+    color: var(--success);
+}
 
-.post-preview{
-    width:100%;
-    height:360px;
-    margin-top:12px;
-    overflow:hidden;
-    border-radius:14px;
-    background:#000;
+#createPostSection .post-actions .video-btn {
+    color: var(--primary);
+}
+
+#postBtn {
+    flex: 1;
+
+    min-height: 44px;
+
+    padding: 10px 15px;
+
+    border: none;
+    border-radius: 25px;
+
+    background: var(--primary);
+    color: white;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    transition: .2s;
+}
+
+#postBtn:hover {
+    background: var(--primary-dark);
+}
+
+#postBtn:active {
+    transform: scale(.97);
+}
+
+/* REAL FILE INPUTS */
+
+#postImage,
+#postVideo {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* =====================================================
+   MEDIA PREVIEW
+===================================================== */
+
+.post-preview {
+    position: relative;
+
+    width: 100%;
+    height: 340px;
+
+    margin-top: 14px;
+
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: #111;
 }
 
 .post-preview img,
-.post-preview video{
-    display:block;
-    width:100%;
-    height:100%;
-    max-height:100%;
-    object-fit:contain;
-    background:#000;
+.post-preview video {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+
+    object-fit: contain;
+    background: #000;
 }
 
-@media(max-width:600px){
-    .post-preview{
-        height:360px;
-    }
+.post-preview button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+
+    margin: 0;
+    padding: 9px 13px;
+
+    border: none;
+    border-radius: 25px;
+
+    background: var(--danger);
+    color: white;
+
+    font-size: 13px;
+    font-weight: bold;
+
+    z-index: 5;
 }
-
-
-.post-preview button{
-
-    border:none;
-
-    background:#e41e3f;
-
-    color:#fff;
-
-    padding:8px 12px;
-
-    margin:8px;
-
-    border-radius:20px;
-
-    cursor:pointer;
-}
-
 
 /* =====================================================
-   STATUS
+   FRIENDS STATUS
 ===================================================== */
 
-.friends-status{
+.friends-status {
+    width: 100%;
+    max-width: 650px;
 
-    display:flex;
+    margin: 12px auto;
 
-    gap:10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
 
-    overflow-x:auto;
+    overflow-x: auto;
 
-    padding:10px 12px;
+    padding: 14px;
 
-    background:#fff;
+    background: var(--surface);
 
-    border-bottom:1px solid #ddd;
+    border: 1px solid var(--border);
+    border-radius: 14px;
 
-    scrollbar-width:none;
+    box-shadow: var(--shadow);
+
+    scrollbar-width: none;
 }
 
-
-.friends-status::-webkit-scrollbar{
-
-    display:none;
+.friends-status::-webkit-scrollbar {
+    display: none;
 }
 
+.friend-status {
+    flex: 0 0 68px;
+    min-width: 68px;
 
-.friend-status{
+    text-align: center;
 
-    min-width:68px;
-
-    text-align:center;
-
-    cursor:pointer;
+    cursor: pointer;
 }
 
+.friend-status img {
+    width: 58px;
+    height: 58px;
 
-.friend-status img{
+    padding: 2px;
 
-    width:54px;
-    height:54px;
+    border: 3px solid var(--primary);
+    border-radius: 50%;
 
-    border-radius:50%;
-
-    object-fit:cover;
-
-    border:3px solid #1877f2;
+    object-fit: cover;
 }
 
+.friend-status p {
+    margin-top: 6px;
 
-.friend-status p{
+    color: var(--text);
 
-    margin:4px 0 0;
+    font-size: 11px;
 
-    font-size:11px;
-
-    white-space:nowrap;
-
-    overflow:hidden;
-
-    text-overflow:ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-
 
 /* =====================================================
    FEED
 ===================================================== */
 
-#feed{
+#feed {
+    width: 100%;
+    max-width: 650px;
 
-    width:100%;
-
-    max-width:650px;
-
-    margin:auto;
+    margin: 0 auto;
+    padding-bottom: 15px;
 }
 
+.loading {
+    padding: 40px 15px;
 
-.loading{
+    text-align: center;
+    color: var(--muted);
 
-    text-align:center;
-
-    padding:40px;
-
-    color:#777;
+    font-size: 14px;
 }
-
 
 /* =====================================================
    POST CARD
 ===================================================== */
 
-.post-card{
+.post-card {
+    width: 100%;
 
-    background:#fff;
+    margin: 12px 0;
 
-    margin:10px 0;
+    overflow: hidden;
 
-    border-top:1px solid #ddd;
+    background: var(--surface);
 
-    border-bottom:1px solid #ddd;
+    border: 1px solid var(--border);
+    border-radius: 14px;
 
-    overflow:hidden;
+    box-shadow: var(--shadow);
 }
 
+/* =====================================================
+   POST HEADER
+===================================================== */
 
-.post-header{
+.post-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    padding:12px 14px;
+    padding: 14px;
 }
 
+.post-user {
+    min-width: 0;
 
-.post-user{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:10px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
 }
 
+.post-avatar {
+    flex: none;
 
-.post-avatar{
+    width: 46px;
+    height: 46px;
 
-    width:46px;
-    height:46px;
+    border: 2px solid #e0edff;
+    border-radius: 50%;
 
-    border-radius:50%;
+    object-fit: cover;
 
-    object-fit:cover;
-
-    border:2px solid #1877f2;
-
-    cursor:pointer;
+    cursor: pointer;
 }
 
+.post-user h4 {
+    margin: 0;
 
-.post-user h4{
+    color: var(--text);
 
-    margin:0;
+    font-size: 15px;
+    font-weight: bold;
 
-    font-size:15px;
-
-    color:#111;
-
-    cursor:pointer;
+    cursor: pointer;
 }
 
+.post-user small {
+    display: block;
+    margin-top: 4px;
 
-.post-user small{
-
-    display:block;
-
-    color:#65676b;
-
-    margin-top:3px;
-
-    font-size:11px;
+    color: var(--muted);
+    font-size: 11px;
 }
 
-
-.post-menu{
-
-    display:flex;
-
-    gap:3px;
+.post-menu {
+    display: flex;
+    gap: 5px;
 }
 
+.post-menu button {
+    width: 36px;
+    height: 36px;
 
-.post-menu button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    width:36px;
-    height:36px;
+    border: none;
+    border-radius: 50%;
 
-    border:none;
+    background: #f0f2f5;
+    color: var(--muted);
 
-    border-radius:50%;
-
-    background:#f0f2f5;
-
-    color:#555;
-
-    cursor:pointer;
+    font-size: 14px;
 }
 
-
-.post-menu button:hover{
-
-    background:#e4e6eb;
+.post-menu button:hover {
+    background: #e4e6eb;
+    color: var(--primary);
 }
 
+/* =====================================================
+   POST TEXT
+===================================================== */
 
-.post-text{
+.post-text {
+    padding: 0 15px 14px;
 
-    padding:0 14px 14px;
+    color: var(--text);
 
-    font-size:16px;
+    font-size: 16px;
+    line-height: 1.6;
 
-    line-height:1.5;
-
-    word-break:break-word;
+    overflow-wrap: anywhere;
 }
 
+.post-text a.post-link {
+    color: var(--primary);
 
-.post-image{
+    text-decoration: underline;
 
-    width:100%;
+    cursor: pointer;
+    pointer-events: auto;
 
-    margin:0;
+    overflow-wrap: anywhere;
 }
 
+/* =====================================================
+   POST IMAGE
+===================================================== */
 
-.post-image img{
+.post-image {
+    width: 100%;
+    margin: 0;
 
-    width:100%;
-
-    max-height:600px;
-
-    display:block;
-
-    object-fit:cover;
-
-    cursor:pointer;
+    overflow: hidden;
+    background: #000;
 }
 
+.post-image img {
+    display: block;
+
+    width: 100%;
+    max-height: 600px;
+
+    object-fit: contain;
+    background: #000;
+
+    cursor: pointer;
+}
+
+/* =====================================================
+   POST VIDEO
+===================================================== */
+
+.post-video {
+    width: 100%;
+    margin: 0;
+
+    overflow: hidden;
+    background: #000;
+}
+
+.post-video video {
+    display: block;
+
+    width: 100%;
+    height: auto;
+    max-height: 75vh;
+
+    object-fit: contain;
+    background: #000;
+}
 
 /* =====================================================
    POST STATS
 ===================================================== */
 
-.post-stats{
+.post-stats {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-    display:flex;
+    padding: 11px 15px;
 
-    justify-content:space-between;
+    color: var(--muted);
+    font-size: 13px;
 
-    padding:9px 14px;
-
-    color:#65676b;
-
-    font-size:13px;
-
-    border-bottom:1px solid #eee;
+    border-bottom: 1px solid var(--border);
 }
-
 
 /* =====================================================
    POST ACTIONS
 ===================================================== */
 
-.post-actions{
+.post-card .post-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
 
-    display:flex;
+    gap: 5px;
 
-    align-items:center;
-
-    justify-content:space-around;
-
-    padding:4px 8px;
+    padding: 5px 8px;
 }
 
+.post-card .post-actions button {
+    flex: 1;
 
-.post-actions button{
+    min-width: 0;
 
-    flex:1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 
-    border:none;
+    padding: 12px 5px;
 
-    background:none;
+    border: none;
+    border-radius: 9px;
 
-    color:#65676b;
+    background: transparent;
+    color: var(--muted);
 
-    padding:10px;
+    font-size: 14px;
+    font-weight: 600;
 
-    font-size:17px;
-
-    border-radius:8px;
-
-    cursor:pointer;
+    transition: .2s;
 }
 
-
-.post-actions button:hover{
-
-    background:#f0f2f5;
+.post-card .post-actions button:hover {
+    background: #f0f2f5;
+    color: var(--primary);
 }
 
-
-.post-actions button:active{
-
-    transform:scale(.96);
+.post-card .post-actions button:active {
+    transform: scale(.96);
 }
-
 
 /* =====================================================
-   COMMENTS
+   COMMENT INPUT
 ===================================================== */
 
-.comment-box{
+.comment-box {
+    display: none;
 
-    display:none;
+    align-items: center;
+    gap: 9px;
 
-    gap:8px;
+    padding: 12px 14px;
 
-    padding:10px 14px;
-
-    border-top:1px solid #eee;
+    border-top: 1px solid var(--border);
 }
 
+.comment-box input {
+    flex: 1;
+    min-width: 0;
 
-.comment-box input{
+    height: 42px;
 
-    flex:1;
+    padding: 10px 15px;
 
-    min-width:0;
+    border: 1px solid transparent;
+    outline: none;
+    border-radius: 25px;
 
-    border:none;
+    background: #f0f2f5;
 
-    outline:none;
-
-    background:#f0f2f5;
-
-    border-radius:22px;
-
-    padding:11px 15px;
+    font-size: 14px;
 }
 
-
-.comment-box button{
-
-    width:42px;
-    height:42px;
-
-    flex:none;
-
-    border:none;
-
-    border-radius:50%;
-
-    background:#1877f2;
-
-    color:#fff;
-
-    cursor:pointer;
+.comment-box input:focus {
+    border-color: #b7d3ff;
+    background: #fff;
 }
 
+.comment-box button {
+    flex: none;
 
-.comments-list{
+    width: 42px;
+    height: 42px;
 
-    padding:4px 14px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 50%;
+
+    background: var(--primary);
+    color: white;
 }
 
+/* =====================================================
+   COMMENTS LIST
+===================================================== */
 
-.comment-item{
-
-    display:flex;
-
-    gap:8px;
-
-    margin-top:10px;
+.comments-list {
+    padding: 5px 14px 14px;
 }
 
+.comment-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
 
-.comment-avatar{
-
-    width:34px;
-    height:34px;
-
-    border-radius:50%;
-
-    object-fit:cover;
+    margin-top: 11px;
 }
 
+.comment-avatar {
+    flex: none;
 
-.comment-body{
+    width: 35px;
+    height: 35px;
 
-    background:#f0f2f5;
+    border-radius: 50%;
 
-    padding:8px 12px;
-
-    border-radius:15px;
-
-    max-width:85%;
+    object-fit: cover;
 }
 
+.comment-body {
+    max-width: 88%;
 
-.comment-body b{
+    padding: 9px 13px;
 
-    display:block;
+    border-radius: 15px;
 
-    font-size:13px;
+    background: #f0f2f5;
 
-    margin-bottom:3px;
+    overflow-wrap: anywhere;
 }
 
+.comment-body b {
+    display: block;
 
-.comment-body p{
+    margin-bottom: 4px;
 
-    margin:0;
-
-    font-size:14px;
-
-    word-break:break-word;
+    color: var(--text);
+    font-size: 13px;
 }
 
+.comment-body p {
+    margin: 0;
 
-.no-comment{
+    color: var(--text);
 
-    display:block;
-
-    color:#999;
-
-    padding:8px 0;
+    font-size: 14px;
+    line-height: 1.5;
 }
 
+.comment-body a {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+.no-comment {
+    display: block;
+
+    padding: 9px 0;
+
+    color: var(--muted);
+    font-size: 12px;
+}
 
 /* =====================================================
    BOTTOM NAVIGATION
 ===================================================== */
 
-.bottom-nav{
+.bottom-nav {
+    position: fixed;
+    left: 0;
+    bottom: 0;
 
-    position:fixed;
+    z-index: 1500;
 
-    bottom:0;
+    width: 100%;
+    height: 68px;
 
-    left:0;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
 
-    width:100%;
+    padding-bottom: env(safe-area-inset-bottom);
 
-    height:68px;
+    background: var(--bottom-nav);
 
-    z-index:1500;
+    border-top: 1px solid var(--border);
 
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-around;
-
-    background:#111;
-
-    box-shadow:0 -2px 10px rgba(0,0,0,.25);
+    box-shadow: 0 -2px 10px rgba(0,0,0,.07);
 }
 
+.bottom-nav a {
+    flex: 1;
+    height: 100%;
 
-.bottom-nav a{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
-    flex:1;
+    gap: 5px;
 
-    height:100%;
+    color: #8a8d91;
+    text-decoration: none;
 
-    display:flex;
+    font-size: 11px;
 
-    flex-direction:column;
-
-    justify-content:center;
-
-    align-items:center;
-
-    gap:4px;
-
-    color:#aaa;
-
-    text-decoration:none;
-
-    font-size:11px;
+    transition: .2s;
 }
 
-
-.bottom-nav a i{
-
-    font-size:20px;
+.bottom-nav a i {
+    font-size: 20px;
 }
 
-
-.bottom-nav a.active{
-
-    color:#2196f3;
+.bottom-nav a.active {
+    color: var(--primary);
 }
 
-
-.bottom-nav a:active{
-
-    transform:scale(.94);
+.bottom-nav a:active {
+    transform: scale(.93);
 }
-
 
 /* =====================================================
-   MOBILE
+   RESPONSIVE — MOBILE
 ===================================================== */
 
-@media(max-width:600px){
+@media (max-width: 600px) {
 
-    .app-header{
-
-        height:58px;
-
-        padding:0 12px;
+    body {
+        padding-bottom: 78px;
     }
 
-    .header-logo{
-
-        font-size:25px;
+    .app-header {
+        height: 58px;
+        padding: 0 12px;
     }
 
-    .header-actions button{
-
-        width:39px;
-        height:39px;
+    .header-logo {
+        font-size: 26px;
     }
 
-    .quick-nav{
-
-        top:58px;
-
-        height:52px;
+    .header-actions {
+        gap: 7px;
     }
 
-    .quick-item{
-
-        height:52px;
-
-        font-size:20px;
+    .header-actions button {
+        width: 39px;
+        height: 39px;
+        font-size: 17px;
     }
 
-    .post-card{
-
-        margin:8px 0;
+    .quick-nav {
+        top: 58px;
+        height: 51px;
     }
 
-    .post-image img{
+    .quick-item {
+        height: 51px;
+        font-size: 19px;
+    }
 
-        max-height:520px;
+    .search-panel {
+        top: 109px;
+    }
+
+    .create-post {
+        margin: 10px 0;
+        padding: 14px 12px;
+
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    .post-preview {
+        height: 300px;
+    }
+
+    .friends-status {
+        margin: 10px 0;
+
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    .post-card {
+        margin: 9px 0;
+
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    .post-header {
+        padding: 12px;
+    }
+
+    .post-text {
+        padding: 0 13px 13px;
+        font-size: 15px;
+    }
+
+    .post-image img {
+        max-height: 520px;
+    }
+
+    .post-card .post-actions button {
+        gap: 5px;
+        padding: 12px 3px;
+        font-size: 12px;
+    }
+
+    .bottom-nav {
+        height: 65px;
+    }
+
+    .bottom-nav a {
+        font-size: 10px;
+    }
+
+    .bottom-nav a i {
+        font-size: 19px;
     }
 
 }
 
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (min-width: 601px) and (max-width: 899px) {
+
+    #feed,
+    .create-post,
+    .friends-status {
+        max-width: 620px;
+    }
+
+}
 
 /* =====================================================
    DESKTOP
 ===================================================== */
+@media (min-width: 900px) {
 
-@media(min-width:700px){
-
-    .create-post{
-
-        max-width:650px;
-
-        margin:14px auto;
-
-        border:1px solid #ddd;
-
-        border-radius:10px;
+    body {
+        padding-bottom: 25px;
     }
 
-    .post-card{
-
-        border:1px solid #ddd;
-
-        border-radius:10px;
-
-        margin:12px;
+    .app-header {
+        padding: 0 max(20px, calc((100% - 1100px) / 2));
     }
 
+    .quick-nav {
+        max-width: 650px;
+        margin: 0 auto;
+        border-radius: 0 0 12px 12px;
     }
 
+    #feed,
+    .create-post,
+    .friends-status {
+        max-width: 650px;
+    }
 
-/* 2CHAT FACEBOOK-STYLE HOME VIDEO */
+    .bottom-nav {
+        display: none;
+    }
 
-.post-video {
-    width: 100%;
-    margin: 0;
-    overflow: hidden;
-    background: #000;
-    border-radius: 0;
 }
-
-.post-video video {
-    display: block;
-    width: 100%;
-    height: auto;
-    max-height: 75vh;
-    object-fit: contain;
-    background: #000;
-}
-
-.video-btn{
-    display:flex;
-    align-items:center;
-    gap:8px;
-
-    background:#f1f1f1;
-    color:#333;
-
-    padding:10px 18px;
-    border-radius:30px;
-
-    cursor:pointer;
-    font-weight:bold;
-}
-
-.video-btn i{
-    font-size:18px;
-       }
-
-/* ==========================
-CREATE POST USER AVATAR
-========================== */
-
-.create-user-row{
-    display:flex;
-    align-items:flex-start;
-    gap:12px;
-}
-
-.create-avatar{
-    width:48px;
-    height:48px;
-    min-width:48px;
-    border-radius:50%;
-    overflow:hidden;
-    background:#eef5ff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-
-.create-avatar img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-   }
 
 /* =====================================================
-   FIX HOME PHOTO + VIDEO BUTTONS
+   ACCESSIBILITY & MOTION
 ===================================================== */
 
-#createPostSection .post-actions{
-    position:relative;
-    z-index:20;
-    display:flex;
-    align-items:center;
-    gap:8px;
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
 }
 
-#createPostSection .post-actions label{
-    position:relative;
-    z-index:21;
+@media (prefers-reduced-motion: reduce) {
 
-    flex:1;
-
-    min-height:44px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:7px;
-
-    padding:10px 12px;
-
-    border:none;
-    border-radius:22px;
-
-    background:#f0f2f5;
-
-    color:#333;
-
-    font-size:14px;
-    font-weight:bold;
-
-    cursor:pointer;
-
-    user-select:none;
-
-    -webkit-tap-highlight-color:transparent;
-}
-
-#createPostSection .post-actions label i{
-    pointer-events:none;
-}
-
-#createPostSection .post-actions label:hover{
-    background:#e4e6eb;
-}
-
-#createPostSection .post-actions label:active{
-    transform:scale(.97);
-}
-
-/* PHOTO */
-#createPostSection .post-actions .image-btn{
-    color:#31a24c;
-}
-
-/* VIDEO */
-#createPostSection .post-actions .video-btn{
-    color:#1877f2;
-}
-
-/* REAL FILE INPUT */
-#postImage,
-#postVideo{
-    position:absolute;
-
-    width:1px;
-    height:1px;
-
-    opacity:0;
-
-    pointer-events:none;
-   }
-
-
-
-/* =========================================
-   2CHAT CREATE POST VIDEO PREVIEW
-========================================= */
-
-.post-preview{
-    width:100%;
-    max-height:360px;
-    overflow:hidden;
-    border-radius:14px;
-    background:#000;
-}
-
-.post-preview video,
-#postPreviewVideo{
-    display:block;
-    width:100%;
-    height:320px;
-    max-height:320px;
-    object-fit:contain;
-    background:#000;
-}
-
-@media(max-width:600px){
-
-    .post-preview{
-        max-height:320px;
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
     }
 
-    .post-preview video,
-    #postPreviewVideo{
-        height:280px;
-        max-height:280px;
-    }
-
-}
-
-/* =====================================
-   HOME POST CLICKABLE LINKS
-===================================== */
-
-.post-text a.post-link {
-    color: #1877f2;
-    text-decoration: underline;
-    cursor: pointer;
-    pointer-events: auto;
-    position: relative;
-    z-index: 2;
-    word-break: break-word;
-}
-
-.post-text a.post-link:active {
-    opacity: 0.7;
 }
