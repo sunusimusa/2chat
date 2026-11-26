@@ -832,56 +832,77 @@ async function uploadAvatar() {
 }
 
 
-function profileFormatPostText(value) {
 
-    let text = String(value ?? "");
+function profileFormatPostText(text) {
+
+    let cleanText = String(text || "");
+
+    // =====================================
+    // 1. DECODE HTML ENTITIES
+    // =====================================
 
     const decoder = document.createElement("textarea");
 
-    // Decode HTML entities repeatedly
     for (let i = 0; i < 5; i++) {
 
-        decoder.innerHTML = text;
+        decoder.innerHTML = cleanText;
 
         const decoded = decoder.value;
 
-        if (decoded === text) break;
+        if (decoded === cleanText) break;
 
-        text = decoded;
+        cleanText = decoded;
     }
 
-    // Extract visible text from valid anchor HTML
-    if (/<a\b/i.test(text)) {
+    // =====================================
+    // 2. REMOVE COMPLETE ANCHOR TAGS
+    // =====================================
 
-        const parser = new DOMParser();
+    const parser = new DOMParser();
+
+    if (/<a\b|<\/a>/i.test(cleanText)) {
 
         const doc = parser.parseFromString(
-            text,
+            cleanText,
             "text/html"
         );
 
-        text = doc.body.textContent || "";
+        cleanText = doc.body.textContent || "";
+
     }
 
-    // Remove leftover anchor attributes
-    text = text
-        .replace(/href\s*=\s*["'][^"']*["']/gi, "")
-        .replace(/target\s*=\s*["'][^"']*["']/gi, "")
-        .replace(/rel\s*=\s*["'][^"']*["']/gi, "")
-        .replace(/class\s*=\s*["'][^"']*["']/gi, "")
-        .replace(/<\/?a\b[^>]*>/gi, "")
-        .replace(/^\s*>\s*/gm, "")
-        .replace(/&nbsp;/gi, " ")
-        .trim();
+    // =====================================
+    // 3. REMOVE LEFTOVER ANCHOR ATTRIBUTES
+    // =====================================
 
-    const escapeHTML = value =>
-        String(value).replace(/[&<>"']/g, char => ({
+    cleanText = cleanText
+        .replace(
+            /\b(?:href|target|rel|class)\s*=\s*("[^"]*"|'[^']*'|[^\s>]*)/gi,
+            ""
+        )
+        .replace(/<\/?a\b[^>]*>/gi, "")
+        .replace(/^\s*>+|>+\s*$/g, "")
+        .replace(/[ \t]{2,}/g, " ");
+
+    // =====================================
+    // 4. ESCAPE HTML SAFELY
+    // =====================================
+
+    function escapeHTML(value) {
+
+        return String(value).replace(/[&<>"']/g, char => ({
             "&": "&amp;",
             "<": "&lt;",
             ">": "&gt;",
             '"': "&quot;",
             "'": "&#39;"
         })[char]);
+
+    }
+
+    // =====================================
+    // 5. CREATE CLICKABLE URLS
+    // =====================================
 
     const urlPattern =
         /https?:\/\/[^\s<>"']+|www\.[^\s<>"']+/gi;
@@ -890,7 +911,7 @@ function profileFormatPostText(value) {
     let lastIndex = 0;
     let match;
 
-    while ((match = urlPattern.exec(text)) !== null) {
+    while ((match = urlPattern.exec(cleanText)) !== null) {
 
         const originalURL = match[0];
 
@@ -905,7 +926,7 @@ function profileFormatPostText(value) {
         }
 
         result += escapeHTML(
-            text.slice(lastIndex, match.index)
+            cleanText.slice(lastIndex, match.index)
         );
 
         const href = cleanURL.startsWith("www.")
@@ -921,29 +942,27 @@ function profileFormatPostText(value) {
                 parsed.protocol === "http:"
             ) {
 
-                result += `<a
-                    href="${escapeHTML(parsed.href)}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="post-link">${escapeHTML(cleanURL)}</a>`;
+                result +=
+                    `<a href="${escapeHTML(parsed.href)}" target="_blank" rel="noopener noreferrer" class="post-link">${escapeHTML(cleanURL)}</a>` +
+                    escapeHTML(ending);
 
             } else {
 
                 result += escapeHTML(originalURL);
+
             }
 
-        } catch {
+        } catch (error) {
 
             result += escapeHTML(originalURL);
-        }
 
-        result += escapeHTML(ending);
+        }
 
         lastIndex = match.index + originalURL.length;
     }
 
     result += escapeHTML(
-        text.slice(lastIndex)
+        cleanText.slice(lastIndex)
     );
 
     return result.replace(/\r\n|\r|\n/g, "<br>");
