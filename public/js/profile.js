@@ -1103,9 +1103,8 @@ async function loadMyPosts() {
 
                     </div>
 
-                       
 ${
-    safeText
+    text.trim()
     ? `
         <div
             class="profile-post-text"
@@ -1117,6 +1116,7 @@ ${
     `
     : ""
 }
+
 
 
 
