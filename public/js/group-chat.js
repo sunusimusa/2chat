@@ -735,6 +735,8 @@ function appendMessage(msg){
     // TEXT
     // ==========================
 
+    console.log("GROUP MESSAGE RAW TEXT:", msg.text);
+
     let textHTML = "";
 
 if(msg.text){
