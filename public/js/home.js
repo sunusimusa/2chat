@@ -1792,6 +1792,28 @@ function toggleComment(postId){
 
 }
 
+
+function toggleComments(postId){
+
+    const comments = document.getElementById(
+        `commentsList-${postId}`
+    );
+
+    if(!comments) return;
+
+    if(comments.style.display === "none"){
+
+        comments.style.display = "block";
+
+    }else{
+
+        comments.style.display = "none";
+
+    }
+
+}
+
+
 // =====================================================
 // MEDIA PREVIEW
 // =====================================================
