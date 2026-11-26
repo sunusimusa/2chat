@@ -1721,7 +1721,7 @@ async function sharePost(
 // TOGGLE COMMENT
 // =====================================================
 
-function toggleComment(postId){
+function toggleComment(postId) {
 
     const box = document.getElementById(
         `commentBox-${postId}`
@@ -1731,16 +1731,21 @@ function toggleComment(postId){
         `commentsList-${postId}`
     );
 
-    if(!box || !comments) return;
+    if (!box || !comments) return;
 
     const isOpen = box.style.display === "flex";
 
-    if(isOpen){
+    // Rufe comments na sauran posts
+    document.querySelectorAll(".comment-box").forEach(item => {
+        item.style.display = "none";
+    });
 
-        box.style.display = "none";
-        comments.style.display = "none";
+    document.querySelectorAll(".comments-list").forEach(item => {
+        item.style.display = "none";
+    });
 
-    }else{
+    // Buɗe ko rufe wanda aka danna
+    if (!isOpen) {
 
         box.style.display = "flex";
         comments.style.display = "block";
@@ -1749,7 +1754,7 @@ function toggleComment(postId){
             `comment-${postId}`
         );
 
-        if(input){
+        if (input) {
             setTimeout(() => input.focus(), 50);
         }
 
@@ -1758,26 +1763,57 @@ function toggleComment(postId){
 }
 
 
-function toggleComments(postId){
+function toggleComments(postId) {
 
     const comments = document.getElementById(
         `commentsList-${postId}`
     );
 
-    if(!comments) return;
+    if (!comments) return;
 
-    if(comments.style.display === "none"){
-
-        comments.style.display = "block";
-
-    }else{
-
-        comments.style.display = "none";
-
-    }
+    comments.style.display =
+        comments.style.display === "none"
+            ? "block"
+            : "none";
 
 }
 
+
+// =====================================
+// AUTO CLOSE COMMENTS WHEN TAPPING OUTSIDE
+// =====================================
+
+document.addEventListener("click", function(event) {
+
+    const clickedInsideComments = event.target.closest(
+        ".comment-box, .comments-list"
+    );
+
+    const clickedCommentButton = event.target.closest(
+        '[onclick*="toggleComment"]'
+    );
+
+    const clickedCommentCount = event.target.closest(
+        ".comment-count"
+    );
+
+    if (
+        clickedInsideComments ||
+        clickedCommentButton ||
+        clickedCommentCount
+    ) {
+        return;
+    }
+
+    document.querySelectorAll(".comment-box").forEach(box => {
+        box.style.display = "none";
+    });
+
+    document.querySelectorAll(".comments-list").forEach(list => {
+        list.style.display = "none";
+    });
+
+});
 
 // =====================================================
 // MEDIA PREVIEW
