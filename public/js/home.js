@@ -1783,37 +1783,39 @@ function toggleComments(postId) {
 // AUTO CLOSE COMMENTS WHEN TAPPING OUTSIDE
 // =====================================
 
-document.addEventListener("click", function(event) {
 
-    const clickedInsideComments = event.target.closest(
-        ".comment-box, .comments-list"
-    );
+document.addEventListener("pointerdown", function(event) {
 
-    const clickedCommentButton = event.target.closest(
-        '[onclick*="toggleComment"]'
-    );
+    const target = event.target;
 
-    const clickedCommentCount = event.target.closest(
-        ".comment-count"
-    );
-
+    // Kada a rufe idan an taɓa cikin comments
     if (
-        clickedInsideComments ||
-        clickedCommentButton ||
-        clickedCommentCount
+        target.closest(".comment-box") ||
+        target.closest(".comments-list")
     ) {
         return;
     }
 
+    // Kada a rufe lokacin danna Comment button
+    if (
+        target.closest('[onclick*="toggleComment"]') ||
+        target.closest(".comment-count")
+    ) {
+        return;
+    }
+
+    // Rufe dukkan comment boxes
     document.querySelectorAll(".comment-box").forEach(box => {
         box.style.display = "none";
     });
 
+    // Rufe dukkan comments lists
     document.querySelectorAll(".comments-list").forEach(list => {
         list.style.display = "none";
     });
 
-});
+}, true);
+            
 
 // =====================================================
 // MEDIA PREVIEW
