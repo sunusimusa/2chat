@@ -960,34 +960,19 @@ function formatPostText(text) {
 // LOAD POSTS
 // =====================================================
 
-async function loadPosts(){
+async function loadPosts() {
 
-    const feed =
-        document.getElementById(
-            "feed"
-        );
+    const feed = document.getElementById("feed");
 
+    if (!feed) return;
 
-    if(!feed){
+    try {
 
-        return;
+        const res = await fetch("/api/posts");
 
-    }
+        const data = await res.json();
 
-
-    try{
-
-        const res =
-            await fetch(
-                "/api/posts"
-            );
-
-
-        const data =
-            await res.json();
-
-
-        if(!data.posts){
+        if (!data.posts || !data.posts.length) {
 
             feed.innerHTML = `
                 <div class="loading">
@@ -996,75 +981,135 @@ async function loadPosts(){
             `;
 
             return;
-
         }
 
+        // Safely escape user-generated text
+        const escapeHTML = (value) => {
+
+            return String(value ?? "").replace(/[&<>"']/g, char => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[char]);
+
+        };
 
         let html = "";
 
+        data.posts.forEach(post => {
 
-        data.posts.forEach(
-            post => {
+            const liked =
+                Array.isArray(post.likes) &&
+                post.likes.includes(user.username);
 
-                const liked =
-                    post.likes &&
-                    post.likes.includes(
-                        user.username
-                    );
+            const comments = Array.isArray(post.comments)
+                ? post.comments
+                : [];
 
+            const likes = Array.isArray(post.likes)
+                ? post.likes
+                : [];
 
-                const safeText =
-                    String(
-                        post.text || ""
-                    )
-                    .replace(
-                        /`/g,
-                        "\\`"
-                    );
+            const safeText = String(post.text || "")
+                .replace(/`/g, "\\`");
 
+            const username = escapeHTML(post.username || "User");
 
-                html += `
+            const postDate = post.createdAt
+                ? new Date(post.createdAt).toLocaleString()
+                : "";
 
-                <article
-                class="post-card">
+            const avatar = escapeHTML(
+                post.avatar || "/images/default.png"
+            );
 
-                    <div
-                    class="post-header">
+            const postId = escapeHTML(post._id);
 
-                        <div
-                        class="post-user">
+            const imageURL = post.image
+                ? escapeHTML(post.image)
+                : "";
+
+            const videoURL = post.video
+                ? escapeHTML(post.video)
+                : "";
+
+            // =====================================
+            // COMMENTS HTML
+            // =====================================
+
+            const commentsHTML = comments.length
+
+                ? comments.map(comment => {
+
+                    return `
+
+                        <div class="comment-item">
 
                             <img
-                            class="post-avatar"
-                            src="${
-                                post.avatar ||
-                                "/images/default.png"
-                            }"
-                            onclick="openProfile(
-                                '${post.username}'
-                            )">
+                                class="comment-avatar"
+                                src="${escapeHTML(
+                                    comment.avatar || "/images/default.png"
+                                )}"
+                                alt="Avatar">
+
+                            <div class="comment-body">
+
+                                <b>
+                                    ${escapeHTML(comment.username || "User")}
+                                </b>
+
+                                <p>
+                                    ${formatPostText(comment.text || "")}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }).join("")
+
+                : `
+                    <small class="no-comment">
+                        No comments yet
+                    </small>
+                `;
+
+
+            // =====================================
+            // POST HTML
+            // =====================================
+
+            html += `
+
+                <article class="post-card">
+
+                    <!-- POST HEADER -->
+
+                    <div class="post-header">
+
+                        <div class="post-user">
+
+                            <img
+                                class="post-avatar"
+                                src="${avatar}"
+                                alt="Profile"
+                                onclick="openProfile('${escapeHTML(post.username)}')">
 
                             <div>
 
                                 <h4
-                                onclick="openProfile(
-                                    '${post.username}'
-                                )">
+                                    onclick="openProfile('${escapeHTML(post.username)}')">
 
-                                    ${
-                                        post.username
-                                    }
+                                    ${username}
 
                                 </h4>
 
                                 <small>
-
-                                    ${
-                                        new Date(
-                                            post.createdAt
-                                        ).toLocaleString()
-                                    }
-
+                                    ${escapeHTML(postDate)}
                                 </small>
 
                             </div>
@@ -1073,152 +1118,139 @@ async function loadPosts(){
 
 
                         ${
-                            post.username ===
-                            user.username
-
+                            post.username === user.username
                             ?
 
                             `
 
-                            <div
-                            class="post-menu">
+                                <div class="post-menu">
 
-                                <button
-                                onclick="editPost(
-                                    '${post._id}',
-                                    \`${safeText}\`
-                                )">
+                                    <button
+                                        onclick="editPost(
+                                            '${postId}',
+                                            \`${safeText}\`
+                                        )">
 
-                                    <i
-                                    class="fa-solid fa-pen">
-                                    </i>
+                                        <i class="fa-solid fa-pen"></i>
 
-                                </button>
+                                    </button>
 
+                                    <button
+                                        onclick="deletePost('${postId}')">
 
-                                <button
-                                onclick="deletePost(
-                                    '${post._id}'
-                                )">
+                                        <i class="fa-solid fa-trash"></i>
 
-                                    <i
-                                    class="fa-solid fa-trash">
-                                    </i>
+                                    </button>
 
-                                </button>
-
-                            </div>
+                                </div>
 
                             `
 
-                            :
-
-                            ""
+                            : ""
 
                         }
 
                     </div>
 
-                    
-${
-    post.text
-    ?
-    `
-        <div class="post-text">
-            ${formatPostText(post.text)}
-        </div>
-    `
-    :
-    ""
-}
+
+                    <!-- POST TEXT -->
+
+                    ${
+                        post.text
+                        ?
+                        `
+                            <div class="post-text">
+                                ${formatPostText(post.text)}
+                            </div>
+                        `
+                        : ""
+                    }
 
 
+                    <!-- POST IMAGE -->
+
+                    ${
+                        imageURL
+                        ?
+                        `
+
+                            <div class="post-image">
+
+                                <img
+                                    src="${imageURL}"
+                                    alt="Post image"
+                                    onclick="window.open('${imageURL}','_blank')">
+
+                            </div>
+
+                        `
+                        : ""
+                    }
 
 
+                    <!-- POST VIDEO -->
 
-                    ${post.image ?
-`
-<div class="post-image">
+                    ${
+                        videoURL
+                        ?
+                        `
 
-<img
-src="${post.image}"
-onclick="window.open('${post.image}','_blank')">
+                            <div class="post-video">
 
-</div>
-`
-:
-``
-}
+                                <video
+                                    src="${videoURL}"
+                                    controls
+                                    playsinline
+                                    preload="metadata">
 
-${post.video ?
-`
-<div class="post-video">
+                                    Your browser does not support video.
 
-<video
-src="${post.video}"
-controls
-playsinline
-preload="metadata">
+                                </video>
 
-Your browser does not support video.
+                            </div>
 
-</video>
-
-</div>
-`
-:
-``
-}
+                        `
+                        : ""
+                    }
 
 
-                    <div
-                    class="post-stats">
+                    <!-- POST STATS -->
+
+                    <div class="post-stats">
 
                         <span>
 
-                            ❤️
-                            ${
-                                post.likes
-                                ?
-                                post.likes.length
-                                :
-                                0
-                            }
+                            ❤️ ${likes.length}
 
                         </span>
 
-                        <span>
 
-                            💬
-                            ${
-                                post.comments
-                                ?
-                                post.comments.length
-                                :
-                                0
-                            }
+                        <span
+                            class="comment-count"
+                            role="button"
+                            tabindex="0"
+                            onclick="toggleComments('${postId}')"
+                            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleComments('${postId}')}">
+
+                            💬 ${comments.length}
 
                         </span>
 
                     </div>
 
-                    <div
-                    class="post-actions">
+
+                    <!-- POST ACTIONS -->
+
+                    <div class="post-actions">
 
                         <button
-                        onclick="likePost(
-                            '${post._id}'
-                        )">
+                            onclick="likePost('${postId}')">
 
-                            <i
-                            class="${
+                            <i class="${
                                 liked
-                                ?
-                                "fa-solid"
-                                :
-                                "fa-regular"
-                            } fa-heart">
-                            </i>
+                                ? "fa-solid"
+                                : "fa-regular"
+                            } fa-heart"></i>
 
                             <span>Like</span>
 
@@ -1226,13 +1258,9 @@ Your browser does not support video.
 
 
                         <button
-                        onclick="toggleComment(
-                            '${post._id}'
-                        )">
+                            onclick="toggleComment('${postId}')">
 
-                            <i
-                            class="fa-regular fa-comment">
-                            </i>
+                            <i class="fa-regular fa-comment"></i>
 
                             <span>Comment</span>
 
@@ -1240,13 +1268,9 @@ Your browser does not support video.
 
 
                         <button
-                        onclick="sharePost(
-                            '${post._id}'
-                        )">
+                            onclick="sharePost('${postId}')">
 
-                            <i
-                            class="fa-solid fa-share">
-                            </i>
+                            <i class="fa-solid fa-share"></i>
 
                             <span>Share</span>
 
@@ -1255,107 +1279,49 @@ Your browser does not support video.
                     </div>
 
 
+                    <!-- COMMENT INPUT -->
+
                     <div
-                    class="comment-box"
-                    id="commentBox-${post._id}">
+                        class="comment-box"
+                        id="commentBox-${postId}">
 
                         <input
-                        id="comment-${post._id}"
-                        type="text"
-                        placeholder="Write comment...">
+                            id="comment-${postId}"
+                            type="text"
+                            placeholder="Write comment...">
 
                         <button
-                        onclick="commentPost(
-                            '${post._id}'
-                        )">
+                            onclick="commentPost('${postId}')">
 
-                            <i
-                            class="fa-solid fa-paper-plane">
-                            </i>
+                            <i class="fa-solid fa-paper-plane"></i>
 
                         </button>
 
                     </div>
 
 
+                    <!-- COMMENTS LIST: HIDDEN BY DEFAULT -->
+
                     <div
-                    class="comments-list">
+                        class="comments-list"
+                        id="commentsList-${postId}"
+                        style="display:none;">
 
-                        ${
-                            post.comments &&
-                            post.comments.length
-
-                            ?
-
-                            post.comments.map(
-                                comment => `
-
-                                <div
-                                class="comment-item">
-
-                                    <img
-                                    class="comment-avatar"
-                                    src="${
-                                        comment.avatar ||
-                                        "/images/default.png"
-                                    }">
-
-                                    <div
-                                    class="comment-body">
-
-                                        <b>
-                                            ${
-                                                comment.username
-                                            }
-                                        </b>
-
-                                        <p>
-                                            ${
-                                                comment.text
-                                            }
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                                `
-                            ).join("")
-
-                            :
-
-                            `
-                            <small
-                            class="no-comment">
-
-                                No comments yet
-
-                            </small>
-                            `
-
-                        }
+                        ${commentsHTML}
 
                     </div>
 
                 </article>
 
-                `;
+            `;
 
-            }
-        );
+        });
 
+        feed.innerHTML = html;
 
-        feed.innerHTML =
-            html;
+    } catch (err) {
 
-
-    }catch(err){
-
-        console.error(
-            "LOAD POSTS ERROR:",
-            err
-        );
-
+        console.error("LOAD POSTS ERROR:", err);
 
         feed.innerHTML = `
 
@@ -1373,8 +1339,7 @@ Your browser does not support video.
 
 
 loadPosts();
-
-
+                                                                       
 // =====================================================
 // IMAGE PREVIEW
 // =====================================================
