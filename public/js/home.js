@@ -873,6 +873,61 @@ setInterval(
 );
 
 
+
+function formatPostText(text) {
+
+    const escapeHTML = (value) => {
+        return String(value).replace(/[&<>"']/g, char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[char]);
+    };
+
+    const safeText = escapeHTML(text || "");
+
+    const urlPattern = /\b(?:https?:\/\/|www\.)[^\s<]+/gi;
+
+    return safeText.replace(urlPattern, (url) => {
+
+        let cleanUrl = url;
+        let ending = "";
+
+        // Remove punctuation that usually follows a URL
+        while (/[.,!?;:)\]}]$/.test(cleanUrl)) {
+            ending = cleanUrl.slice(-1) + ending;
+            cleanUrl = cleanUrl.slice(0, -1);
+        }
+
+        const href = cleanUrl.startsWith("www.")
+            ? "https://" + cleanUrl
+            : cleanUrl;
+
+        try {
+            const parsed = new URL(href);
+
+            if (!["http:", "https:"].includes(parsed.protocol)) {
+                return url;
+            }
+
+            return `
+                <a
+                    href="${escapeHTML(parsed.href)}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="post-link">
+                    ${cleanUrl}
+                </a>${ending}`;
+
+        } catch (err) {
+            return url;
+        }
+
+    }).replace(/\n/g, "<br>");
+}
+
 // =====================================================
 // LOAD POSTS
 // =====================================================
@@ -1036,28 +1091,21 @@ async function loadPosts(){
 
                     </div>
 
+                    
+${
+    post.text
+    ?
+    `
+        <div class="post-text">
+            ${formatPostText(post.text)}
+        </div>
+    `
+    :
+    ""
+}
 
-                    ${
-                        post.text
 
-                        ?
 
-                        `
-
-                        <div
-                        class="post-text">
-
-                            ${post.text}
-
-                        </div>
-
-                        `
-
-                        :
-
-                        ""
-
-                    }
 
 
                     ${post.image ?
