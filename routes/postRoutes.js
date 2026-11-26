@@ -5,6 +5,7 @@ const {
     getPosts,
     likePost,
     commentPost,
+    replyToComment,
     editPost,
     deletePost,
     getUserPosts,
@@ -26,6 +27,8 @@ router.post(
 router.put("/like", protect, likePost);
 
 router.put("/comment", protect, commentPost);
+
+router.put("/reply", protect, replyToComment);
 
 router.put("/edit", protect, editPost);
 
