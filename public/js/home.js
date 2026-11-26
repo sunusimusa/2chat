@@ -892,16 +892,15 @@ function formatPostText(text) {
         if (decoded === cleanText) break;
 
         cleanText = decoded;
-
     }
 
     // =====================================
-    // 2. REMOVE OLD SAVED ANCHOR HTML
+    // 2. REMOVE COMPLETE ANCHOR TAGS
     // =====================================
 
-    if (/<a\b|<\/a>/i.test(cleanText)) {
+    const parser = new DOMParser();
 
-        const parser = new DOMParser();
+    if (/<a\b|<\/a>/i.test(cleanText)) {
 
         const doc = parser.parseFromString(
             cleanText,
@@ -913,7 +912,20 @@ function formatPostText(text) {
     }
 
     // =====================================
-    // 3. ESCAPE HTML SAFELY
+    // 3. REMOVE LEFTOVER ANCHOR ATTRIBUTES
+    // =====================================
+
+    cleanText = cleanText
+        .replace(
+            /\b(?:href|target|rel|class)\s*=\s*("[^"]*"|'[^']*'|[^\s>]*)/gi,
+            ""
+        )
+        .replace(/<\/?a\b[^>]*>/gi, "")
+        .replace(/^\s*>+|>+\s*$/g, "")
+        .replace(/[ \t]{2,}/g, " ");
+
+    // =====================================
+    // 4. ESCAPE HTML SAFELY
     // =====================================
 
     function escapeHTML(value) {
@@ -929,7 +941,7 @@ function formatPostText(text) {
     }
 
     // =====================================
-    // 4. DETECT URLS
+    // 5. CREATE CLICKABLE URLS
     // =====================================
 
     const urlPattern =
@@ -939,85 +951,63 @@ function formatPostText(text) {
     let lastIndex = 0;
     let match;
 
-    while (
-        (match = urlPattern.exec(cleanText)) !== null
-    ) {
+    while ((match = urlPattern.exec(cleanText)) !== null) {
 
         const originalURL = match[0];
 
         let cleanURL = originalURL;
         let ending = "";
 
-        // Keep punctuation outside the link
         while (/[.,!?;:)\]}]$/.test(cleanURL)) {
 
             ending = cleanURL.slice(-1) + ending;
 
             cleanURL = cleanURL.slice(0, -1);
-
         }
 
         result += escapeHTML(
             cleanText.slice(lastIndex, match.index)
         );
 
-        if (!cleanURL) {
+        const href = cleanURL.startsWith("www.")
+            ? "https://" + cleanURL
+            : cleanURL;
 
-            result += escapeHTML(originalURL);
+        try {
 
-        } else {
+            const parsed = new URL(href);
 
-            const href = cleanURL.startsWith("www.")
-                ? "https://" + cleanURL
-                : cleanURL;
+            if (
+                parsed.protocol === "https:" ||
+                parsed.protocol === "http:"
+            ) {
 
-            try {
+                result +=
+                    `<a href="${escapeHTML(parsed.href)}" target="_blank" rel="noopener noreferrer" class="post-link">${escapeHTML(cleanURL)}</a>` +
+                    escapeHTML(ending);
 
-                const parsed = new URL(href);
-
-                if (
-                    parsed.protocol === "https:" ||
-                    parsed.protocol === "http:"
-                ) {
-
-                    result +=
-                        `<a href="${escapeHTML(parsed.href)}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="post-link">${escapeHTML(cleanURL)}</a>` +
-                        escapeHTML(ending);
-
-                } else {
-
-                    result += escapeHTML(originalURL);
-
-                }
-
-            } catch (error) {
+            } else {
 
                 result += escapeHTML(originalURL);
 
             }
 
+        } catch (error) {
+
+            result += escapeHTML(originalURL);
+
         }
 
         lastIndex = match.index + originalURL.length;
-
     }
-
-    // =====================================
-    // 5. ADD REMAINING TEXT
-    // =====================================
 
     result += escapeHTML(
         cleanText.slice(lastIndex)
     );
 
-    // Preserve line breaks
     return result.replace(/\r\n|\r|\n/g, "<br>");
-
 }
-        
+
 
 // =====================================================
 // LOAD POSTS
