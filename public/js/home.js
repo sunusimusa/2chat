@@ -873,8 +873,13 @@ setInterval(
 );
 
 
-
 function formatPostText(text) {
+
+    // Convert previously saved anchor HTML back to plain text
+    let cleanText = String(text || "").replace(
+        /<a\b[^>]*>([\s\S]*?)<\/a>/gi,
+        "$1"
+    );
 
     const escapeHTML = (value) => {
         return String(value).replace(/[&<>"']/g, char => ({
@@ -886,7 +891,7 @@ function formatPostText(text) {
         })[char]);
     };
 
-    const safeText = escapeHTML(text || "");
+    const safeText = escapeHTML(cleanText);
 
     const urlPattern = /\b(?:https?:\/\/|www\.)[^\s<]+/gi;
 
@@ -895,7 +900,6 @@ function formatPostText(text) {
         let cleanUrl = url;
         let ending = "";
 
-        // Remove punctuation that usually follows a URL
         while (/[.,!?;:)\]}]$/.test(cleanUrl)) {
             ending = cleanUrl.slice(-1) + ending;
             cleanUrl = cleanUrl.slice(0, -1);
@@ -912,14 +916,10 @@ function formatPostText(text) {
                 return url;
             }
 
-            return `
-                <a
-                    href="${escapeHTML(parsed.href)}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="post-link">
-                    ${cleanUrl}
-                </a>${ending}`;
+            return `<a href="${escapeHTML(parsed.href)}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="post-link">${cleanUrl}</a>${ending}`;
 
         } catch (err) {
             return url;
