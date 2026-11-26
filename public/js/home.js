@@ -875,11 +875,17 @@ setInterval(
 
 function formatPostText(text) {
 
-    // Convert previously saved anchor HTML back to plain text
-    let cleanText = String(text || "").replace(
-        /<a\b[^>]*>([\s\S]*?)<\/a>/gi,
-        "$1"
-    );
+    let cleanText = String(text || "");
+
+    // Remove real HTML anchor opening and closing tags
+    cleanText = cleanText
+        .replace(/<a\b[^>]*>/gi, "")
+        .replace(/<\/a\s*>/gi, "");
+
+    // Also remove HTML-escaped anchor tags
+    cleanText = cleanText
+        .replace(/&lt;a\b[\s\S]*?&gt;/gi, "")
+        .replace(/&lt;\/a\s*&gt;/gi, "");
 
     const escapeHTML = (value) => {
         return String(value).replace(/[&<>"']/g, char => ({
@@ -926,7 +932,7 @@ function formatPostText(text) {
         }
 
     }).replace(/\n/g, "<br>");
-}
+    }
 
 // =====================================================
 // LOAD POSTS
