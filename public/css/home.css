@@ -1492,3 +1492,21 @@ CREATE POST USER AVATAR
     }
 
 }
+
+/* =====================================
+   HOME POST CLICKABLE LINKS
+===================================== */
+
+.post-text a.post-link {
+    color: #1877f2;
+    text-decoration: underline;
+    cursor: pointer;
+    pointer-events: auto;
+    position: relative;
+    z-index: 2;
+    word-break: break-word;
+}
+
+.post-text a.post-link:active {
+    opacity: 0.7;
+}
