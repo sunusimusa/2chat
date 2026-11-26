@@ -4,6 +4,9 @@ const cloudinary = require("../config/cloudinary");
 const Notification =
 require("../models/Notification");
 
+const { sendPushNotification } =
+require("../services/notificationService");
+
 // CREATE POST
 
 
@@ -215,12 +218,25 @@ exports.commentPost = async (req, res) => {
         await post.save();
 
         if (post.username !== username) {
+            const notificationText =
+                username + " commented on your post 💬";
+
             await Notification.create({
                 receiver: post.username,
                 sender: username,
                 type: "comment",
                 postId: post._id,
-                text: username + " commented on your post 💬"
+                text: notificationText
+            });
+
+            await sendPushNotification({
+                recipientUsername: post.username,
+                title: "New Comment",
+                body: notificationText,
+                data: {
+                    type: "comment",
+                    postId: post._id.toString()
+                }
             });
         }
 
@@ -235,6 +251,98 @@ exports.commentPost = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: "Failed to comment on post."
+        });
+    }
+};
+
+
+// REPLY TO COMMENT
+
+exports.replyToComment = async (req, res) => {
+    try {
+        const { postId, commentId, text } = req.body;
+        const username = req.user.username;
+
+        if (
+            !postId ||
+            !commentId ||
+            typeof text !== "string" ||
+            !text.trim()
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Post ID, comment ID and reply text are required."
+            });
+        }
+
+        const post = await Post.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: "Post not found."
+            });
+        }
+
+        const comment = post.comments.id(commentId);
+
+        if (!comment) {
+            return res.status(404).json({
+                success: false,
+                message: "Comment not found."
+            });
+        }
+
+        if (!Array.isArray(comment.replies)) {
+            comment.replies = [];
+        }
+
+        comment.replies.push({
+            username,
+            text: text.trim()
+        });
+
+        await post.save();
+
+        const commentOwner = comment.username;
+
+        if (commentOwner && commentOwner !== username) {
+            const notificationText =
+                username + " replied to your comment 💬";
+
+            await Notification.create({
+                receiver: commentOwner,
+                sender: username,
+                type: "reply",
+                postId: post._id,
+                commentId: comment._id,
+                text: notificationText
+            });
+
+            await sendPushNotification({
+                recipientUsername: commentOwner,
+                title: "New Reply",
+                body: notificationText,
+                data: {
+                    type: "reply",
+                    postId: post._id.toString(),
+                    commentId: comment._id.toString()
+                }
+            });
+        }
+
+        return res.json({
+            success: true,
+            commentId: comment._id,
+            replies: comment.replies
+        });
+
+    } catch (err) {
+        console.error("REPLY TO COMMENT ERROR:", err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to reply to comment."
         });
     }
 };
