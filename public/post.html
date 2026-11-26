@@ -1,35 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width,initial-scale=1">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-<title>2Chat Post</title>
+    <meta name="theme-color" content="#1877f2">
 
-<link rel="stylesheet"
-href="/css/post.css">
+    <meta name="description"
+        content="View posts, photos, videos and comments on 2Chat.">
+
+    <title>Post | 2Chat</title>
+
+    <link rel="stylesheet" href="/css/post.css">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 </head>
 
 <body>
 
-<div class="header">
+    <!-- PAGE HEADER -->
+    <header class="header">
 
-<button onclick="history.back()">
-⬅ Back
-</button>
+        <button
+            type="button"
+            onclick="history.back()"
+            aria-label="Go back">
 
-<h2>Post</h2>
+            <i class="fa-solid fa-arrow-left"></i>
 
-</div>
+        </button>
 
-<div id="post"></div>
+        <h2>Post</h2>
 
-<script src="/js/post.js"></script>
+    </header>
+
+
+    <!-- POST CONTENT -->
+    <main id="post" aria-live="polite">
+
+        <div class="loading">
+            Loading post...
+        </div>
+
+    </main>
+
+
+    <!-- POST JAVASCRIPT -->
+    <script src="/js/post.js" defer></script>
 
 </body>
 
