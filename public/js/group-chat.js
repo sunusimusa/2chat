@@ -495,6 +495,126 @@ async function markMessageAsSeen(messageElement){
 }
 
 
+function formatGroupMessageText(value) {
+
+    let text = String(value ?? "");
+
+    // Decode HTML entities
+    const decoder = document.createElement("textarea");
+
+    for (let i = 0; i < 5; i++) {
+
+        decoder.innerHTML = text;
+
+        const decoded = decoder.value;
+
+        if (decoded === text) break;
+
+        text = decoded;
+    }
+
+    // Extract visible text from old anchor HTML
+    if (/<a\b|<\/a>/i.test(text)) {
+
+        const parser = new DOMParser();
+
+        const doc = parser.parseFromString(
+            text,
+            "text/html"
+        );
+
+        text = doc.body.textContent || "";
+    }
+
+    // Remove leftover anchor attributes
+    text = text
+        .replace(
+            /\b(?:href|target|rel|class)\s*=\s*("[^"]*"|'[^']*'|[^\s>]*)/gi,
+            ""
+        )
+        .replace(/<\/?a\b[^>]*>/gi, "")
+        .replace(/^\s*>+|>+\s*$/g, "")
+        .replace(/[ \t]{2,}/g, " ");
+
+    // Escape HTML safely
+    function escapeHTML(value) {
+
+        return String(value).replace(/[&<>"']/g, char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[char]);
+
+    }
+
+    // Detect URLs
+    const urlPattern =
+        /https?:\/\/[^\s<>"']+|www\.[^\s<>"']+/gi;
+
+    let result = "";
+    let lastIndex = 0;
+    let match;
+
+    while ((match = urlPattern.exec(text)) !== null) {
+
+        const originalURL = match[0];
+
+        let cleanURL = originalURL;
+        let ending = "";
+
+        while (/[.,!?;:)\]}]$/.test(cleanURL)) {
+
+            ending = cleanURL.slice(-1) + ending;
+            cleanURL = cleanURL.slice(0, -1);
+        }
+
+        result += escapeHTML(
+            text.slice(lastIndex, match.index)
+        );
+
+        const href = cleanURL.startsWith("www.")
+            ? "https://" + cleanURL
+            : cleanURL;
+
+        try {
+
+            const parsed = new URL(href);
+
+            if (
+                parsed.protocol === "https:" ||
+                parsed.protocol === "http:"
+            ) {
+
+                result += `<a
+                    href="${escapeHTML(parsed.href)}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="group-message-link"
+                >${escapeHTML(cleanURL)}</a>`;
+
+            } else {
+
+                result += escapeHTML(originalURL);
+            }
+
+        } catch {
+
+            result += escapeHTML(originalURL);
+        }
+
+        result += escapeHTML(ending);
+
+        lastIndex = match.index + originalURL.length;
+    }
+
+    result += escapeHTML(text.slice(lastIndex));
+
+    return result.replace(/\r\n|\r|\n/g, "<br>");
+}
+
+
 /* ==========================
 APPEND MESSAGE
 ========================== */
@@ -617,15 +737,15 @@ function appendMessage(msg){
 
     let textHTML = "";
 
-    if(msg.text){
+if(msg.text){
 
-        textHTML = `
-            <div class="message-text">
-                ${msg.text}
-            </div>
-        `;
+    textHTML = `
+        <div class="message-text">
+            ${formatGroupMessageText(msg.text)}
+        </div>
+    `;
 
-    }
+}
 
     // ==========================
 // REPLY
