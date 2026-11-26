@@ -395,6 +395,70 @@ async function commentPost(postId){
 
 
 // =====================================================
+// REPLY TO COMMENT
+// =====================================================
+
+function toggleReplyForm(postId, commentId) {
+
+    const form = document.getElementById(
+        `replyForm-${postId}-${commentId}`
+    );
+
+    if (!form) return;
+
+    form.style.display =
+        form.style.display === "flex" ? "none" : "flex";
+
+    const input = form.querySelector("input");
+
+    if (input && form.style.display === "flex") {
+        input.focus();
+    }
+}
+
+
+async function replyToComment(postId, commentId) {
+
+    const input = document.getElementById(
+        `replyInput-${postId}-${commentId}`
+    );
+
+    if (!input) return;
+
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    try {
+
+        const res = await fetch("/api/posts/reply", {
+            method: "PUT",
+            headers: getAuthHeaders({
+                "Content-Type": "application/json"
+            }),
+            body: JSON.stringify({
+                postId,
+                commentId,
+                text
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            loadPosts();
+        } else {
+            alert(data.message || "Reply failed.");
+        }
+
+    } catch (err) {
+        console.error("REPLY ERROR:", err);
+        alert("Failed to send reply.");
+    }
+}
+
+
+// =====================================================
 // EDIT POST
 // =====================================================
 
@@ -1096,9 +1160,23 @@ async function loadPosts() {
 
                 ? comments.map(comment => {
 
+                    const commentId = escapeHTML(comment._id || "");
+                    const replies = Array.isArray(comment.replies)
+                        ? comment.replies
+                        : [];
+
+                    const repliesHTML = replies.map(reply => `
+                        <div style="display:flex;gap:8px;margin:8px 0 0 28px;padding:8px 10px;background:rgba(127,127,127,0.08);border-radius:10px;">
+                            <div style="min-width:0;">
+                                <b>${escapeHTML(reply.username || "User")}</b>
+                                <p style="margin:3px 0 0;">${formatPostText(reply.text || "")}</p>
+                            </div>
+                        </div>
+                    `).join("");
+
                     return `
 
-                        <div class="comment-item">
+                        <div class="comment-item" style="margin-bottom:12px;">
 
                             <img
                                 class="comment-avatar"
@@ -1116,6 +1194,38 @@ async function loadPosts() {
                                 <p>
                                     ${formatPostText(comment.text || "")}
                                 </p>
+
+                                <button
+                                    type="button"
+                                    onclick="toggleReplyForm('${postId}','${commentId}')"
+                                    style="margin-top:5px;border:0;background:none;color:#1877f2;cursor:pointer;padding:4px 0;">
+                                    Reply
+                                </button>
+
+                                <div
+                                    id="replyForm-${postId}-${commentId}"
+                                    class="reply-form"
+                                    style="display:none;gap:6px;margin-top:7px;">
+
+                                    <input
+                                        id="replyInput-${postId}-${commentId}"
+                                        type="text"
+                                        maxlength="1000"
+                                        placeholder="Write a reply..."
+                                        style="flex:1;min-width:0;padding:8px 10px;border:1px solid #ccc;border-radius:18px;">
+
+                                    <button
+                                        type="button"
+                                        onclick="replyToComment('${postId}','${commentId}')"
+                                        style="border:0;border-radius:18px;padding:7px 12px;background:#1877f2;color:white;cursor:pointer;">
+                                        Send
+                                    </button>
+
+                                </div>
+
+                                <div class="comment-replies">
+                                    ${repliesHTML}
+                                </div>
 
                             </div>
 
