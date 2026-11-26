@@ -102,7 +102,7 @@ async function readNotification(id, type, postId) {
             throw new Error(data.message || "Unable to mark notification as read.");
         }
 
-        if (type === "like" || type === "comment") {
+        if (type === "like" || type === "comment" || type === "reply") {
 
             if (postId) {
                 location.href = "/post.html?id=" + encodeURIComponent(postId);
