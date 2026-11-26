@@ -1,187 +1,426 @@
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
+/* =========================================
+   2CHAT POST PAGE - MODERN DESIGN
+========================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
 }
 
-body{
+:root {
+    --primary: #1877f2;
+    --background: #f0f2f5;
+    --card: #ffffff;
+    --text: #1c1e21;
+    --muted: #65676b;
+    --border: #e4e6eb;
+}
 
-background:#f2f2f2;
+body {
+    background: var(--background);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    background: var(--card);
+    color: var(--text);
+
+    padding: 14px 18px;
+
+    box-shadow: 0 1px 5px rgba(0,0,0,.12);
+}
+
+.header h2 {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.header button {
+    background: #f0f2f5;
+    color: var(--primary);
+
+    border: none;
+    border-radius: 50%;
+
+    width: 40px;
+    height: 40px;
+
+    padding: 0;
+    margin: 0;
+
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* =========================================
+   MAIN CONTAINER
+========================================= */
+
+#post {
+    width: 100%;
+    max-width: 700px;
+
+    margin: 20px auto;
+    padding: 0 12px 30px;
+}
+
+/* =========================================
+   POST CARD
+========================================= */
+
+.post-card {
+    background: var(--card);
+
+    border: 1px solid var(--border);
+    border-radius: 14px;
+
+    padding: 16px;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+
+/* =========================================
+   POST HEADER
+========================================= */
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    margin-bottom: 15px;
+}
+
+.post-header img {
+    width: 50px;
+    height: 50px;
+
+    border-radius: 50%;
+    object-fit: cover;
+
+    border: 2px solid #e4e6eb;
+}
+
+.post-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.post-header small {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+/* =========================================
+   POST MENU
+========================================= */
+
+.post-menu {
+    margin-left: auto;
+
+    display: flex;
+    gap: 7px;
+}
+
+.post-menu button {
+    width: 38px;
+    height: 38px;
+
+    margin: 0;
+    padding: 0;
+
+    border-radius: 50%;
+    background: #f0f2f5;
+    color: #555;
+
+    font-size: 15px;
+}
+
+.post-menu button:hover {
+    background: #e4e6eb;
+}
+
+/* =========================================
+   POST TEXT
+========================================= */
+
+.post-text {
+    font-size: 17px;
+    line-height: 1.65;
+
+    color: var(--text);
+
+    white-space: normal;
+    overflow-wrap: anywhere;
+
+    margin: 12px 0 18px;
+}
+
+.post-text a,
+.post-link {
+    color: var(--primary);
+    text-decoration: underline;
+    overflow-wrap: anywhere;
+}
+
+/* =========================================
+   POST MEDIA
+========================================= */
+
+.post-card > img,
+.post-card video {
+    display: block;
+
+    width: 100%;
+    max-height: 600px;
+
+    object-fit: contain;
+
+    border-radius: 12px;
+    background: #000;
+
+    margin: 12px 0;
+}
+
+.post-card video {
+    aspect-ratio: auto;
+}
+
+/* =========================================
+   STATS
+========================================= */
+
+.stats {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+
+    padding: 12px 2px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+/* =========================================
+   POST ACTIONS
+========================================= */
+
+.post-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 8px 0;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.post-actions button {
+    flex: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    margin: 0;
+    padding: 12px 5px;
+
+    border-radius: 8px;
+
+    background: transparent;
+    color: var(--muted);
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.post-actions button:hover {
+    background: #f0f2f5;
+    color: var(--primary);
+}
+
+/* =========================================
+   COMMENTS
+========================================= */
+
+#comments-list {
+    margin-top: 12px;
+}
+
+.comment {
+    background: #f0f2f5;
+
+    padding: 12px 14px;
+    border-radius: 14px;
+
+    margin: 10px 0;
+
+    overflow-wrap: anywhere;
+}
+
+.comment b {
+    display: block;
+
+    color: var(--text);
+    font-size: 14px;
+
+    margin-bottom: 5px;
+}
+
+.comment small {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.comment p {
+    font-size: 14px;
+    line-height: 1.5;
+
+    margin: 5px 0 0;
+}
+
+.comment a {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+/* =========================================
+   COMMENT FORM
+========================================= */
+
+.comment-form {
+    margin-top: 15px;
+}
+
+.comment-form textarea {
+    display: block;
+
+    width: 100%;
+    min-height: 75px;
+
+    resize: vertical;
+
+    padding: 12px;
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    background: #f7f8fa;
+
+    font-size: 15px;
+    outline: none;
+}
+
+.comment-form textarea:focus {
+    border-color: var(--primary);
+    background: #fff;
+}
+
+.comment-form button {
+    margin-top: 10px;
+
+    padding: 11px 20px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: var(--primary);
+    color: #fff;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.comment-form button:hover {
+    background: #166fe5;
+}
+
+/* =========================================
+   GENERAL BUTTONS
+========================================= */
+
+button {
+    cursor: pointer;
+    transition: background .2s ease;
+}
+
+/* =========================================
+   RESPONSIVE - MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+
+    .header {
+        padding: 12px 14px;
+    }
+
+    .header h2 {
+        font-size: 18px;
+    }
+
+    #post {
+        margin: 12px auto;
+        padding: 0 8px 25px;
+    }
+
+    .post-card {
+        padding: 13px;
+        border-radius: 12px;
+    }
+
+    .post-text {
+        font-size: 16px;
+    }
+
+    .post-actions button {
+        font-size: 12px;
+        gap: 5px;
+        padding: 12px 2px;
+    }
+
+    .post-card video {
+        max-height: 450px;
+    }
 
 }
 
-.header{
+/* =========================================
+   DESKTOP
+========================================= */
 
-position:sticky;
-top:0;
+@media (min-width: 900px) {
 
-display:flex;
-align-items:center;
-gap:15px;
+    #post {
+        margin-top: 30px;
+    }
 
-background:#1877f2;
+    .post-card {
+        padding: 20px;
+    }
 
-color:white;
-
-padding:15px;
-
-box-shadow:0 2px 10px rgba(0,0,0,.2);
-
-z-index:100;
-
-}
-
-.header button{
-
-background:white;
-
-color:#1877f2;
-
-border:none;
-
-padding:8px 15px;
-
-border-radius:8px;
-
-cursor:pointer;
-
-font-weight:bold;
-
-}
-
-#post{
-
-max-width:700px;
-
-margin:20px auto;
-
-padding:15px;
-
-}
-
-.post-card{
-
-background:white;
-
-border-radius:12px;
-
-padding:15px;
-
-box-shadow:0 2px 8px rgba(0,0,0,.12);
-
-}
-
-.post-card h3{
-
-margin:5px 0;
-
-}
-
-.post-card p{
-
-margin:15px 0;
-
-font-size:18px;
-
-line-height:1.5;
-
-word-break:break-word;
-
-}
-
-.post-card img{
-
-width:100%;
-
-border-radius:12px;
-
-margin:15px 0;
-
-object-fit:cover;
-
-}
-
-.comment{
-
-background:#f7f7f7;
-
-padding:12px;
-
-border-radius:10px;
-
-margin:10px 0;
-
-}
-
-.comment b{
-
-color:#1877f2;
-
-}
-
-input{
-
-width:100%;
-
-padding:12px;
-
-margin-top:15px;
-
-border:1px solid #ccc;
-
-border-radius:10px;
-
-font-size:16px;
-
-}
-
-button{
-
-padding:12px 20px;
-
-margin-top:15px;
-
-background:#1877f2;
-
-color:white;
-
-border:none;
-
-border-radius:10px;
-
-font-size:16px;
-
-cursor:pointer;
-
-}
-
-button:hover{
-
-background:#166fe5;
-
-}
-
-.stats{
-
-display:flex;
-
-justify-content:space-between;
-
-margin:15px 0;
-
-font-weight:bold;
-
-color:#555;
-
-}
-
-hr{
-
-margin:20px 0;
-
-border:none;
-
-border-top:1px solid #ddd;
-
-}
+      }
+  
