@@ -929,6 +929,9 @@ const messageActionMenu =
 const replyAction =
     document.getElementById("replyAction");
 
+const copyAction =
+    document.getElementById("copyAction");
+
 const editAction =
     document.getElementById("editAction");
 
@@ -1143,6 +1146,93 @@ messageActionMenu
         });
 
     });
+
+/* ==========================
+   COPY MESSAGE
+========================== */
+
+if(copyAction){
+
+    copyAction.addEventListener("click", async function(e){
+
+        e.stopPropagation();
+
+        if(!selectedMessageForAction){
+            return;
+        }
+
+        let messageText = "";
+
+        try{
+
+            messageText = decodeURIComponent(
+                selectedMessageForAction.dataset.text || ""
+            );
+
+        }catch(error){
+
+            console.error("COPY MESSAGE DECODE ERROR:", error);
+            alert("Could not copy this message.");
+            return;
+
+        }
+
+        if(!messageText.trim()){
+
+            alert("This message has no text to copy.");
+            return;
+
+        }
+
+        try{
+
+            if(navigator.clipboard && window.isSecureContext){
+
+                await navigator.clipboard.writeText(messageText);
+
+            }else{
+
+                const temporaryInput =
+                    document.createElement("textarea");
+
+                temporaryInput.value = messageText;
+                temporaryInput.setAttribute("readonly", "");
+                temporaryInput.style.position = "fixed";
+                temporaryInput.style.opacity = "0";
+                temporaryInput.style.left = "-9999px";
+
+                document.body.appendChild(temporaryInput);
+
+                temporaryInput.select();
+                temporaryInput.setSelectionRange(
+                    0,
+                    temporaryInput.value.length
+                );
+
+                const copied =
+                    document.execCommand("copy");
+
+                temporaryInput.remove();
+
+                if(!copied){
+                    throw new Error("Clipboard copy was not successful.");
+                }
+
+            }
+
+            closeMessageActionMenu();
+            alert("Message copied.");
+
+        }catch(error){
+
+            console.error("COPY MESSAGE ERROR:", error);
+            alert("Unable to copy message. Please try again.");
+
+        }
+
+    });
+
+}
 
 /* ==========================
    LONG PRESS
