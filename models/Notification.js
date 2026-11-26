@@ -17,6 +17,7 @@ type:String,
 enum:[
 "like",
 "comment",
+"reply",
 "follow",
 "message"
 ],
@@ -26,6 +27,11 @@ required:true
 postId:{
 type:mongoose.Schema.Types.ObjectId,
 ref:"Post",
+default:null
+},
+
+commentId:{
+type:mongoose.Schema.Types.ObjectId,
 default:null
 },
 
