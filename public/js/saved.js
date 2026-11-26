@@ -1,47 +1,83 @@
-const user = JSON.parse(localStorage.getItem("user"));
+const container = document.getElementById("savedContainer");
 
-const container =
-document.getElementById("savedContainer");
+async function loadSaved() {
 
-async function loadSaved(){
+    if (!container) {
+        console.error("Saved videos container not found.");
+        return;
+    }
 
-const res = await fetch(
-"/api/shorts/saved/" + user.username
-);
+    const token = localStorage.getItem("token");
 
-const data = await res.json();
+    if (!token) {
+        container.textContent = "Please log in to view your saved videos.";
+        return;
+    }
 
-if(!data.success){
+    container.textContent = "Loading saved videos...";
 
-return;
+    try {
 
-}
+        const res = await fetch("/api/shorts/saved", {
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
 
-container.innerHTML="";
+        const data = await res.json();
 
-data.videos.forEach(video=>{
+        if (!res.ok || !data.success) {
+            container.textContent =
+                data.message || "Unable to load saved videos.";
+            return;
+        }
 
-container.innerHTML += `
+        const videos = Array.isArray(data.videos)
+            ? data.videos
+            : [];
 
-<div class="video-card">
+        container.innerHTML = "";
 
-<video
+        if (videos.length === 0) {
+            container.textContent = "You have no saved videos yet.";
+            return;
+        }
 
-src="${video.video}"
+        videos.forEach(video => {
 
-controls
+            if (!video || !video.video) {
+                return;
+            }
 
-poster="${video.avatar}">
+            const card = document.createElement("div");
+            card.className = "video-card";
 
-</video>
+            const player = document.createElement("video");
+            player.src = video.video;
+            player.controls = true;
+            player.preload = "metadata";
+            player.playsInline = true;
 
-<p>${video.caption}</p>
+            const caption = document.createElement("p");
+            caption.textContent = video.caption || "";
 
-</div>
+            card.appendChild(player);
+            card.appendChild(caption);
+            container.appendChild(card);
 
-`;
+        });
 
-});
+        if (!container.children.length) {
+            container.textContent = "No playable saved videos were found.";
+        }
+
+    } catch (error) {
+
+        console.error("LOAD SAVED VIDEOS ERROR:", error);
+        container.textContent = "Unable to load saved videos. Please try again.";
+
+    }
 
 }
 
