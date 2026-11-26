@@ -873,14 +873,15 @@ setInterval(
 );
 
 
-
 function formatPostText(text) {
 
     let cleanText = String(text || "");
 
-    // Extract readable text from HTML, including escaped HTML
+    // Decode escaped HTML entities and extract readable text.
     for (let i = 0; i < 2; i++) {
+
         const parser = new DOMParser();
+
         const doc = parser.parseFromString(
             cleanText,
             "text/html"
@@ -889,7 +890,15 @@ function formatPostText(text) {
         cleanText = doc.body.textContent || "";
     }
 
+    // Remove leftover anchor attributes from legacy malformed posts.
+    cleanText = cleanText.replace(
+        /\b(?:target|rel|class)\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)\s*>?/gi,
+        ""
+    );
+
+    // Escape text before inserting it into HTML.
     const escapeHTML = (value) => {
+
         return String(value).replace(/[&<>"']/g, char => ({
             "&": "&amp;",
             "<": "&lt;",
@@ -897,45 +906,74 @@ function formatPostText(text) {
             '"': "&quot;",
             "'": "&#39;"
         })[char]);
+
     };
 
-    const safeText = escapeHTML(cleanText);
+    // Convert URLs into safe clickable links.
+    const urlPattern = /(?:https?:\/\/|www\.)[^\s<]+/gi;
 
-    const urlPattern = /\b(?:https?:\/\/|www\.)[^\s<]+/gi;
+    const parts = cleanText.split(urlPattern);
 
-    return safeText.replace(urlPattern, (url) => {
+    const urls = cleanText.match(urlPattern) || [];
 
-        let cleanUrl = url;
-        let ending = "";
+    let result = "";
 
-        while (/[.,!?;:)\]}]$/.test(cleanUrl)) {
-            ending = cleanUrl.slice(-1) + ending;
-            cleanUrl = cleanUrl.slice(0, -1);
-        }
+    for (let i = 0; i < parts.length; i++) {
 
-        const href = cleanUrl.startsWith("www.")
-            ? "https://" + cleanUrl
-            : cleanUrl;
+        result += escapeHTML(parts[i]);
 
-        try {
-            const parsed = new URL(href);
+        if (urls[i]) {
 
-            if (!["http:", "https:"].includes(parsed.protocol)) {
-                return url;
+            let cleanUrl = urls[i];
+            let ending = "";
+
+            while (/[.,!?;:)\]}]$/.test(cleanUrl)) {
+
+                ending = cleanUrl.slice(-1) + ending;
+
+                cleanUrl = cleanUrl.slice(0, -1);
+
             }
 
-            return `<a href="${escapeHTML(parsed.href)}"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="post-link">${cleanUrl}</a>${ending}`;
+            const href = cleanUrl.startsWith("www.")
+                ? "https://" + cleanUrl
+                : cleanUrl;
 
-        } catch (err) {
-            return url;
+            try {
+
+                const parsed = new URL(href);
+
+                if (
+                    parsed.protocol === "https:" ||
+                    parsed.protocol === "http:"
+                ) {
+
+                    result += `
+                        <a
+                            href="${escapeHTML(parsed.href)}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="post-link"
+                        >${escapeHTML(cleanUrl)}</a>${escapeHTML(ending)}`;
+
+                } else {
+
+                    result += escapeHTML(urls[i]);
+
+                }
+
+            } catch {
+
+                result += escapeHTML(urls[i]);
+
+            }
+
         }
 
-    }).replace(/\n/g, "<br>");
- }
-                    
+    }
+
+    return result.replace(/\n/g, "<br>");
+  }
 
 // =====================================================
 // LOAD POSTS
