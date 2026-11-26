@@ -832,6 +832,96 @@ async function uploadAvatar() {
 }
 
 
+
+function profileFormatPostText(value) {
+
+    let text = String(value ?? "");
+
+    // Decode old HTML entities
+    const decoder = document.createElement("textarea");
+
+    for (let i = 0; i < 3; i++) {
+        decoder.innerHTML = text;
+
+        const decoded = decoder.value;
+
+        if (decoded === text) break;
+
+        text = decoded;
+    }
+
+    // Remove old saved anchor HTML safely
+    if (/<a\b/i.test(text)) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, "text/html");
+        text = doc.body.textContent || "";
+    }
+
+    const escapeHTML = value =>
+        String(value).replace(/[&<>"']/g, char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[char]);
+
+    const urlPattern = /https?:\/\/[^\s<>"']+|www\.[^\s<>"']+/gi;
+
+    let result = "";
+    let lastIndex = 0;
+    let match;
+
+    while ((match = urlPattern.exec(text)) !== null) {
+
+        const originalURL = match[0];
+
+        let cleanURL = originalURL;
+        let ending = "";
+
+        while (/[.,!?;:)\]}]$/.test(cleanURL)) {
+            ending = cleanURL.slice(-1) + ending;
+            cleanURL = cleanURL.slice(0, -1);
+        }
+
+        result += escapeHTML(
+            text.slice(lastIndex, match.index)
+        );
+
+        const href = cleanURL.startsWith("www.")
+            ? "https://" + cleanURL
+            : cleanURL;
+
+        try {
+            const parsed = new URL(href);
+
+            if (
+                parsed.protocol === "https:" ||
+                parsed.protocol === "http:"
+            ) {
+                result += `<a href="${escapeHTML(parsed.href)}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="post-link">${escapeHTML(cleanURL)}</a>`;
+            } else {
+                result += escapeHTML(originalURL);
+            }
+
+        } catch {
+            result += escapeHTML(originalURL);
+        }
+
+        result += escapeHTML(ending);
+
+        lastIndex = match.index + originalURL.length;
+    }
+
+    result += escapeHTML(text.slice(lastIndex));
+
+    return result.replace(/\r\n|\r|\n/g, "<br>");
+}
+    
+
 // =====================================================
 // LOAD MY POSTS
 // =====================================================
@@ -910,8 +1000,6 @@ async function loadMyPosts() {
             const safeAvatar = escapeHTML(avatar);
 
             const text = String(post.text || "");
-
-            const safeText = escapeHTML(text);
 
             const isOwner =
                 currentUser &&
@@ -1023,7 +1111,7 @@ ${
             class="profile-post-text"
             style="text-align: left !important; direction: ltr !important; width: 100%;">
 
-            ${safeText}
+            ${profileFormatPostText(text)}
 
         </div>
     `
