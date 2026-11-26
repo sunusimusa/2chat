@@ -1354,3 +1354,23 @@ textarea:focus-visible {
     }
 
 }
+
+
+/* =====================================
+   COMMENTS PREVIEW
+===================================== */
+
+.comment-count {
+    cursor: pointer;
+    user-select: none;
+    transition: color .2s ease;
+}
+
+.comment-count:hover {
+    color: #1877f2;
+}
+
+.comments-list {
+    display: none;
+}
+
