@@ -1756,49 +1756,36 @@ async function sharePost(
 // TOGGLE COMMENT
 // =====================================================
 
-function toggleComment(
-    postId
-){
+function toggleComment(postId){
 
-    const box =
-        document.getElementById(
-            `commentBox-${postId}`
-        );
+    const box = document.getElementById(
+        `commentBox-${postId}`
+    );
 
+    const comments = document.getElementById(
+        `commentsList-${postId}`
+    );
 
-    if(!box){
+    if(!box || !comments) return;
 
-        return;
+    const isOpen = box.style.display === "flex";
 
-    }
+    if(isOpen){
 
-
-    if(
-        box.style.display ===
-        "flex"
-    ){
-
-        box.style.display =
-            "none";
+        box.style.display = "none";
+        comments.style.display = "none";
 
     }else{
 
-        box.style.display =
-            "flex";
+        box.style.display = "flex";
+        comments.style.display = "block";
 
-        const input =
-            document.getElementById(
-                `comment-${postId}`
-            );
-
+        const input = document.getElementById(
+            `comment-${postId}`
+        );
 
         if(input){
-
-            setTimeout(
-                () => input.focus(),
-                50
-            );
-
+            setTimeout(() => input.focus(), 50);
         }
 
     }
