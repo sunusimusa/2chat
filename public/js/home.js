@@ -873,37 +873,15 @@ setInterval(
 );
 
 
+
 function formatPostText(text) {
 
-    let cleanText = String(text || "");
+    const cleanText = String(text || "");
 
-    // Decode HTML entities repeatedly.
-    const decoder = document.createElement("textarea");
+    // Escape normal text safely
+    function escapeHTML(value) {
 
-    for (let i = 0; i < 6; i++) {
-
-        decoder.innerHTML = cleanText;
-
-        const decoded = decoder.value;
-
-        if (decoded === cleanText) break;
-
-        cleanText = decoded;
-    }
-
-    // Extract visible text from actual HTML anchors.
-    const parser = new DOMParser();
-
-    const doc = parser.parseFromString(
-        cleanText,
-        "text/html"
-    );
-
-    cleanText = doc.body.textContent || "";
-
-    // Escape all normal text safely.
-    const escapeHTML = value =>
-        String(value).replace(/[&<>"']/g, char => ({
+        return String(value).replace(/[&<>"']/g, char => ({
             "&": "&amp;",
             "<": "&lt;",
             ">": "&gt;",
@@ -911,50 +889,91 @@ function formatPostText(text) {
             "'": "&#39;"
         })[char]);
 
-    // Convert plain URLs into clickable links.
-    const urlPattern = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi;
+    }
 
-    return cleanText.replace(urlPattern, url => {
+    // Detect normal HTTP and HTTPS URLs
+    const urlPattern = /https?:\/\/[^\s<>"']+|www\.[^\s<>"']+/gi;
 
-        let cleanUrl = url;
+    let result = "";
+    let lastIndex = 0;
+    let match;
+
+    while ((match = urlPattern.exec(cleanText)) !== null) {
+
+        const originalURL = match[0];
+
+        let cleanURL = originalURL;
         let ending = "";
 
-        while (/[.,!?;:)\]}]$/.test(cleanUrl)) {
-            ending = cleanUrl.slice(-1) + ending;
-            cleanUrl = cleanUrl.slice(0, -1);
+        // Keep punctuation outside the link
+        while (/[.,!?;:)\]}]$/.test(cleanURL)) {
+
+            ending = cleanURL.slice(-1) + ending;
+            cleanURL = cleanURL.slice(0, -1);
+
         }
 
-        const href = cleanUrl.startsWith("www.")
-            ? "https://" + cleanUrl
-            : cleanUrl;
+        // Escape text before the URL
+        result += escapeHTML(
+            cleanText.slice(lastIndex, match.index)
+        );
 
-        try {
+        if (!cleanURL) {
 
-            const parsed = new URL(href);
+            result += escapeHTML(originalURL);
 
-            if (
-                parsed.protocol !== "https:" &&
-                parsed.protocol !== "http:"
-            ) {
-                return escapeHTML(url);
+        } else {
+
+            const href = cleanURL.startsWith("www.")
+                ? "https://" + cleanURL
+                : cleanURL;
+
+            try {
+
+                const parsed = new URL(href);
+
+                if (
+                    parsed.protocol === "https:" ||
+                    parsed.protocol === "http:"
+                ) {
+
+                    result += `
+                        <a
+                            href="${escapeHTML(parsed.href)}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="post-link"
+                        >${escapeHTML(cleanURL)}</a>${escapeHTML(ending)}
+                    `;
+
+                } else {
+
+                    result += escapeHTML(originalURL);
+
+                }
+
+            } catch (error) {
+
+                result += escapeHTML(originalURL);
+
             }
 
-            return `<a
-                href="${escapeHTML(parsed.href)}"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="post-link"
-            >${escapeHTML(cleanUrl)}</a>${escapeHTML(ending)}`;
-
-        } catch {
-
-            return escapeHTML(url);
-
         }
 
-    }).replace(/\n/g, "<br>");
+        lastIndex = match.index + originalURL.length;
+
+    }
+
+    // Add remaining text
+    result += escapeHTML(
+        cleanText.slice(lastIndex)
+    );
+
+    // Preserve line breaks
+    return result.replace(/\r\n|\r|\n/g, "<br>");
+
 }
-               
+    
 
 // =====================================================
 // LOAD POSTS
