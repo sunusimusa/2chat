@@ -873,12 +873,49 @@ setInterval(
 );
 
 
-
 function formatPostText(text) {
 
-    const cleanText = String(text || "");
+    let cleanText = String(text || "");
 
-    // Escape normal text safely
+    // =====================================
+    // 1. DECODE HTML ENTITIES
+    // =====================================
+
+    const decoder = document.createElement("textarea");
+
+    for (let i = 0; i < 5; i++) {
+
+        decoder.innerHTML = cleanText;
+
+        const decoded = decoder.value;
+
+        if (decoded === cleanText) break;
+
+        cleanText = decoded;
+
+    }
+
+    // =====================================
+    // 2. REMOVE OLD SAVED ANCHOR HTML
+    // =====================================
+
+    if (/<a\b|<\/a>/i.test(cleanText)) {
+
+        const parser = new DOMParser();
+
+        const doc = parser.parseFromString(
+            cleanText,
+            "text/html"
+        );
+
+        cleanText = doc.body.textContent || "";
+
+    }
+
+    // =====================================
+    // 3. ESCAPE HTML SAFELY
+    // =====================================
+
     function escapeHTML(value) {
 
         return String(value).replace(/[&<>"']/g, char => ({
@@ -891,14 +928,20 @@ function formatPostText(text) {
 
     }
 
-    // Detect normal HTTP and HTTPS URLs
-    const urlPattern = /https?:\/\/[^\s<>"']+|www\.[^\s<>"']+/gi;
+    // =====================================
+    // 4. DETECT URLS
+    // =====================================
+
+    const urlPattern =
+        /https?:\/\/[^\s<>"']+|www\.[^\s<>"']+/gi;
 
     let result = "";
     let lastIndex = 0;
     let match;
 
-    while ((match = urlPattern.exec(cleanText)) !== null) {
+    while (
+        (match = urlPattern.exec(cleanText)) !== null
+    ) {
 
         const originalURL = match[0];
 
@@ -909,11 +952,11 @@ function formatPostText(text) {
         while (/[.,!?;:)\]}]$/.test(cleanURL)) {
 
             ending = cleanURL.slice(-1) + ending;
+
             cleanURL = cleanURL.slice(0, -1);
 
         }
 
-        // Escape text before the URL
         result += escapeHTML(
             cleanText.slice(lastIndex, match.index)
         );
@@ -937,14 +980,12 @@ function formatPostText(text) {
                     parsed.protocol === "http:"
                 ) {
 
-                    result += `
-                        <a
-                            href="${escapeHTML(parsed.href)}"
+                    result +=
+                        `<a href="${escapeHTML(parsed.href)}"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="post-link"
-                        >${escapeHTML(cleanURL)}</a>${escapeHTML(ending)}
-                    `;
+                            class="post-link">${escapeHTML(cleanURL)}</a>` +
+                        escapeHTML(ending);
 
                 } else {
 
@@ -964,7 +1005,10 @@ function formatPostText(text) {
 
     }
 
-    // Add remaining text
+    // =====================================
+    // 5. ADD REMAINING TEXT
+    // =====================================
+
     result += escapeHTML(
         cleanText.slice(lastIndex)
     );
@@ -973,7 +1017,7 @@ function formatPostText(text) {
     return result.replace(/\r\n|\r|\n/g, "<br>");
 
 }
-    
+        
 
 // =====================================================
 // LOAD POSTS
