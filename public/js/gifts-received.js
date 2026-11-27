@@ -20,7 +20,7 @@ function formatCoins(amount) {
 
 function escapeHtml(value) {
 
-    return String(value ?? "")
+    return String(value == null ? "" : value)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -453,8 +453,7 @@ async function loadReceivedGifts() {
 
         const giftsReceived =
             Number(
-                data.giftsReceived ??
-                gifts.length
+                (data.giftsReceived != null ? data.giftsReceived : gifts.length)
             );
 
 
