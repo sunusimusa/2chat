@@ -72,7 +72,7 @@ function setupShortsMenuActions() {
 
     deleteBtn.addEventListener("click", function () {
 
-        const video = window.videos?.find(
+        const video = (window.videos || []).find(
             item => String(item._id) === String(currentVisibleVideoId)
         );
 
@@ -104,7 +104,7 @@ function setupShortsMenuActions() {
 
     reportBtn.addEventListener("click", function () {
 
-        const video = window.videos?.find(
+        const video = (window.videos || []).find(
             item => String(item._id) === String(currentVisibleVideoId)
         );
 
@@ -133,7 +133,7 @@ function setupShortsMenuActions() {
 
     viewsBtn.addEventListener("click", function () {
 
-        const video = window.videos?.find(
+        const video = (window.videos || []).find(
             item => String(item._id) === String(currentVisibleVideoId)
         );
 
@@ -987,7 +987,7 @@ async function addView(id) {
             return;
         }
 
-        const video = window.videos?.find(
+        const video = (window.videos || []).find(
             item => String(item._id) === String(id)
         );
 
@@ -1062,7 +1062,7 @@ function renderComments(comments) {
 
 function loadComments(id) {
 
-    const video = window.videos?.find(
+    const video = (window.videos || []).find(
         v => String(v._id) === String(id)
     );
 
@@ -1126,7 +1126,7 @@ async function sendComment() {
 
         renderComments(data.comments);
 
-        const video = window.videos?.find(
+        const video = (window.videos || []).find(
             v => String(v._id) === String(currentVideoId)
         );
 
@@ -1842,7 +1842,7 @@ function playNextVideo(currentId) {
 
 function updateShortOwnerMenu() {
 
-    const video = window.videos?.find(
+    const video = (window.videos || []).find(
         item => String(item._id) === String(currentVisibleVideoId)
     );
 
@@ -1952,7 +1952,7 @@ async function saveEditedShort() {
 
     if (!editingShortId) return;
 
-    const video = window.videos?.find(
+    const video = (window.videos || []).find(
         item => String(item._id) === String(editingShortId)
     );
 
@@ -2017,7 +2017,7 @@ async function saveEditedShort() {
         );
 
         const shortElement = (videoElement ? videoElement.closest(".short") : null);
-        const captionElement = shortElement?.querySelector(".overlay p");
+        const captionElement = (shortElement ? shortElement.querySelector(".overlay p") : null);
 
         if (captionElement) {
             captionElement.textContent = video.caption;
@@ -2047,7 +2047,7 @@ async function confirmDeleteShort() {
 
     const videoId = deletingShortId;
 
-    const video = window.videos?.find(
+    const video = (window.videos || []).find(
         item => String(item._id) === String(videoId)
     );
 
@@ -2105,7 +2105,7 @@ async function confirmDeleteShort() {
             "video-" + videoId
         );
 
-        const shortElement = videoElement?.closest(".short");
+        const shortElement = (videoElement ? videoElement.closest(".short") : null);
 
         if (shortElement) {
             shortElement.remove();
