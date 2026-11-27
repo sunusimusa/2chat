@@ -506,6 +506,7 @@ app.get(
 const Call = require("./models/Call");
 const callPresence = new Map();
 const pendingCallTimers = new Map();
+const callPresenceGraceTimers = new Map();
 
 function clearPendingCallTimer(callId) {
     const timer = pendingCallTimers.get(String(callId));
@@ -558,13 +559,24 @@ io.on(
             else ids.delete(socket.id);
             if (ids.size) {
                 callPresence.set(socket.username, ids);
+                const graceTimer = callPresenceGraceTimers.get(socket.username);
+                if (graceTimer) clearTimeout(graceTimer);
+                callPresenceGraceTimers.delete(socket.username);
             } else {
                 callPresence.delete(socket.username);
-                // If the callee leaves the foreground while ringing, stop
-                // the ring and record this attempt as a missed call.
-                Call.find({ receiver: socket.username, status: "ringing" })
-                    .then(calls => Promise.all(calls.map(markCallMissed)))
-                    .catch(error => console.error("CALL PRESENCE ERROR:", error.message));
+                // A short grace period prevents normal page-to-page navigation
+                // from being mistaken for leaving the app.
+                const existingTimer = callPresenceGraceTimers.get(socket.username);
+                if (existingTimer) clearTimeout(existingTimer);
+                const graceTimer = setTimeout(() => {
+                    callPresenceGraceTimers.delete(socket.username);
+                    const current = callPresence.get(socket.username);
+                    if (current && current.size) return;
+                    Call.find({ receiver: socket.username, status: "ringing" })
+                        .then(calls => Promise.all(calls.map(markCallMissed)))
+                        .catch(error => console.error("CALL PRESENCE ERROR:", error.message));
+                }, 4000);
+                callPresenceGraceTimers.set(socket.username, graceTimer);
             }
         });
 
