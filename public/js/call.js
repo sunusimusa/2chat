@@ -305,5 +305,17 @@
         button.innerHTML = '<i class="fa-solid fa-phone"></i>';
         button.addEventListener("click", () => window.start2ChatVoiceCall(receiver));
         headerActions.prepend(button);
+
+        const historyLink = document.createElement("button");
+        historyLink.type = "button";
+        historyLink.title = "Call history";
+        historyLink.setAttribute("aria-label", "Call history");
+        historyLink.id = "twochat-call-history-button";
+        historyLink.innerHTML = '<i class="fa-solid fa-clock-rotate-left"></i>';
+        historyLink.style.cssText = "border:0;background:transparent;color:inherit;font-size:18px;padding:8px;cursor:pointer";
+        historyLink.addEventListener("click", () => {
+            location.href = "/call-history.html";
+        });
+        headerActions.prepend(historyLink);
     }
 })();
