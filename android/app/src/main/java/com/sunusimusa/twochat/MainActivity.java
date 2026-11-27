@@ -918,10 +918,22 @@ private void deliverFcmToken() {
 
         if (webView != null) {
             webView.post(() -> webView.evaluateJavascript(
+                    "if (window.twoChatSetForeground) { window.twoChatSetForeground(true); }" +
                     "if (window.refreshHomeIfNeeded) { window.refreshHomeIfNeeded(); }",
                     null
             ));
         }
+    }
+
+    @Override
+    protected void onPause() {
+        if (webView != null) {
+            webView.evaluateJavascript(
+                    "if (window.twoChatSetForeground) { window.twoChatSetForeground(false); }",
+                    null
+            );
+        }
+        super.onPause();
     }
 
     // ==========================================
