@@ -21,6 +21,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.view.ViewGroup;
 import android.widget.Toast;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -106,6 +107,10 @@ static final String ACTION_FCM_TOKEN_REFRESHED =
         public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
 
+            if (swipeRefreshLayout != null) {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+
             fcmRetryCount = 0;
             deliverFcmToken();
         }
@@ -181,9 +186,9 @@ static final String ACTION_FCM_TOKEN_REFRESHED =
 
         swipeRefreshLayout.addView(
                 webView,
-                new SwipeRefreshLayout.LayoutParams(
-                        SwipeRefreshLayout.LayoutParams.MATCH_PARENT,
-                        SwipeRefreshLayout.LayoutParams.MATCH_PARENT
+                new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
                 )
         );
 
