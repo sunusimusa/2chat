@@ -264,9 +264,9 @@ function renderGroup() {
         "memberCount"
     ).innerText =
 
-        currentGroup.memberCount ??
-        currentGroup.members?.length ??
-        0;
+        (currentGroup.memberCount != null
+            ? currentGroup.memberCount
+            : (currentGroup.members ? currentGroup.members.length : 0));
 
 
     /* ==========================================
