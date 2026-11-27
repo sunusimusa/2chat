@@ -580,7 +580,7 @@ async function initializeCoinPayment(
 
             throw new Error(
 
-                result?.message ||
+                (result && result.message) ||
                 "Payment initialization failed."
 
             );
