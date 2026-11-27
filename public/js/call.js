@@ -16,6 +16,8 @@
     let ringInterval = null;
     let callState = "idle";
     let pendingIceCandidates = [];
+    let configuredIceServers = [{ urls: "stun:stun.l.google.com:19302" }];
+    let iceConfigPromise = null;
 
     const style = document.createElement("style");
     style.textContent = `
@@ -102,8 +104,9 @@
     async function ensurePeer() {
         if (peerConnection) return peerConnection;
         localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        if (iceConfigPromise) await iceConfigPromise;
         peerConnection = new RTCPeerConnection({
-            iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+            iceServers: configuredIceServers
         });
         localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
         peerConnection.ontrack = event => {
@@ -158,9 +161,23 @@
         socket.emit("call:start", { receiver });
     };
 
+    socket.on("call:ice-config", data => {
+        if (data && Array.isArray(data.iceServers) && data.iceServers.length) {
+            configuredIceServers = data.iceServers;
+        }
+    });
+
     socket.on("connect", () => {
         socket.emit("join");
         socket.emit("call:presence", document.visibilityState === "visible" && document.hasFocus());
+        iceConfigPromise = new Promise(resolve => {
+            const fallback = setTimeout(resolve, 2500);
+            socket.emit("call:ice-config");
+            socket.once("call:ice-config", () => {
+                clearTimeout(fallback);
+                resolve();
+            });
+        });
     });
 
     const updatePresence = () => {
