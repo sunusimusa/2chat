@@ -2026,9 +2026,7 @@ document.addEventListener(
 
 
         const icon =
-            (box && box.querySelector)(
-                ".voice-play i"
-            );
+            (box ? box.querySelector(".voice-play i") : null);
 
 
         if (icon) {
@@ -2060,9 +2058,7 @@ document.addEventListener(
 
 
         const icon =
-            (box && box.querySelector)(
-                ".voice-play i"
-            );
+            (box ? box.querySelector(".voice-play i") : null);
 
 
         if (icon) {
@@ -2094,14 +2090,10 @@ document.addEventListener(
 
 
         const icon =
-            (box && box.querySelector)(
-                ".voice-play i"
-            );
+            (box ? box.querySelector(".voice-play i") : null);
 
         const progress =
-            (box && box.querySelector)(
-                ".voice-progress"
-            );
+            (box ? box.querySelector(".voice-progress") : null);
 
 
         if (icon) {
