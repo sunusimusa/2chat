@@ -445,6 +445,8 @@ async function replyToComment(postId, commentId) {
 
         const data = await res.json();
 
+        lastHomePostsRefresh = Date.now();
+
         if (data.success) {
             loadPosts();
         } else {
@@ -1077,11 +1079,16 @@ function formatPostText(text) {
 // LOAD POSTS
 // =====================================================
 
+var homePostsLoading = false;
+var lastHomePostsRefresh = 0;
+
 async function loadPosts() {
 
     const feed = document.getElementById("feed");
 
-    if (!feed) return;
+    if (!feed || homePostsLoading) return;
+
+    homePostsLoading = true;
 
     try {
 
@@ -1496,9 +1503,50 @@ async function loadPosts() {
 
         `;
 
+    } finally {
+
+        homePostsLoading = false;
+
     }
 
 }
+
+
+// Refresh Home after returning to the app and periodically while visible.
+window.refreshHomeIfNeeded = function () {
+
+    if (document.visibilityState && document.visibilityState !== "visible") {
+        return;
+    }
+
+    // Do not replace the feed while the user is typing or watching a post video.
+    const activeElement = document.activeElement;
+    if (activeElement && (
+        activeElement.tagName === "INPUT" ||
+        activeElement.tagName === "TEXTAREA"
+    )) {
+        return;
+    }
+
+    const playingVideo = document.querySelector("#feed video:not([paused])");
+    if (playingVideo && !playingVideo.paused) {
+        return;
+    }
+
+    if (!homePostsLoading && Date.now() - lastHomePostsRefresh >= 30000) {
+        loadPosts();
+    }
+};
+
+document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible") {
+        window.refreshHomeIfNeeded();
+    }
+});
+
+setInterval(function () {
+    window.refreshHomeIfNeeded();
+}, 60000);
 
 
 loadPosts();
