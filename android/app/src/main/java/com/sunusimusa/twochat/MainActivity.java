@@ -22,6 +22,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.File;
@@ -39,6 +40,7 @@ static final String ACTION_FCM_TOKEN_REFRESHED =
     private boolean fcmTokenReceiverRegistered = false;
 
     private WebView webView;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private ValueCallback<Uri[]> filePathCallback;
 
     private String pendingFcmToken;
@@ -63,6 +65,7 @@ static final String ACTION_FCM_TOKEN_REFRESHED =
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        swipeRefreshLayout = new SwipeRefreshLayout(this);
         webView = new WebView(this);
 
         WebSettings settings = webView.getSettings();
@@ -157,7 +160,34 @@ static final String ACTION_FCM_TOKEN_REFRESHED =
 
         });
 
-        setContentView(webView);
+        swipeRefreshLayout.setColorSchemeResources(
+                android.R.color.holo_blue_bright,
+                android.R.color.holo_blue_dark,
+                android.R.color.holo_green_dark
+        );
+
+        swipeRefreshLayout.setOnChildScrollUpCallback(
+                (parent, child) -> webView != null
+                        && webView.canScrollVertically(-1)
+        );
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            if (webView != null) {
+                webView.reload();
+            } else {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
+        swipeRefreshLayout.addView(
+                webView,
+                new SwipeRefreshLayout.LayoutParams(
+                        SwipeRefreshLayout.LayoutParams.MATCH_PARENT,
+                        SwipeRefreshLayout.LayoutParams.MATCH_PARENT
+                )
+        );
+
+        setContentView(swipeRefreshLayout);
 
         registerFcmTokenReceiver();
 
@@ -877,6 +907,18 @@ private void deliverFcmToken() {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (webView != null) {
+            webView.post(() -> webView.evaluateJavascript(
+                    "if (window.refreshHomeIfNeeded) { window.refreshHomeIfNeeded(); }",
+                    null
+            ));
+        }
+    }
+
     // ==========================================
     // DESTROY
     // ==========================================
@@ -908,6 +950,10 @@ private void deliverFcmToken() {
             );
 
             webView.stopLoading();
+            if (swipeRefreshLayout != null) {
+                swipeRefreshLayout.setOnRefreshListener(null);
+                swipeRefreshLayout.removeView(webView);
+            }
             webView.destroy();
             webView = null;
         }
