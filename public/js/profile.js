@@ -517,7 +517,7 @@ async function saveProfile() {
         }
 
         const updatedUsername =
-            data.user?.username || username;
+            (data.user && data.user.username) || username;
 
         alert("✅ Profile Updated");
 
@@ -721,7 +721,7 @@ async function uploadAvatar() {
 
 
     const file =
-        avatarFile?.files?.[0];
+        (avatarFile && avatarFile.files && avatarFile.files[0]);
 
 
     if (!file) {
@@ -1015,11 +1015,11 @@ async function loadMyPosts() {
             localStorage.getItem("user") || "null"
         );
 
-        const currentUsername = currentUser?.username || "";
+        const currentUsername = (currentUser && currentUser.username) || "";
 
         // Escape HTML safely
         const escapeHTML = (value) => {
-            return String(value ?? "").replace(/[&<>"']/g, char => ({
+            return String(value == null ? "" : value).replace(/[&<>"']/g, char => ({
                 "&": "&amp;",
                 "<": "&lt;",
                 ">": "&gt;",
@@ -1711,7 +1711,7 @@ async function uploadCover() {
 
 
     const file =
-        coverFile?.files?.[0];
+        (coverFile && coverFile.files && coverFile.files[0]);
 
 
     if (!file) {
@@ -2452,14 +2452,14 @@ function setupProfileVideoViewer() {
 
     });
 
-    document.getElementById("closeVideoViewer")
-        ?.addEventListener("click", closeProfileVideo);
+    var closeVideoViewerButton = document.getElementById("closeVideoViewer");
+    if (closeVideoViewerButton) closeVideoViewerButton.addEventListener("click", closeProfileVideo);
 
-    document.getElementById("nextVideo")
-        ?.addEventListener("click", nextProfileVideo);
+    var nextVideoButton = document.getElementById("nextVideo");
+    if (nextVideoButton) nextVideoButton.addEventListener("click", nextProfileVideo);
 
-    document.getElementById("previousVideo")
-        ?.addEventListener("click", previousProfileVideo);
+    var previousVideoButton = document.getElementById("previousVideo");
+    if (previousVideoButton) previousVideoButton.addEventListener("click", previousProfileVideo);
 
     document.addEventListener("keydown", function(e) {
 
