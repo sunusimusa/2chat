@@ -183,6 +183,10 @@
     const updatePresence = () => {
         socket.emit("call:presence", document.visibilityState === "visible" && document.hasFocus());
     };
+
+    window.twoChatSetForeground = active => {
+        socket.emit("call:presence", active === true);
+    };
     document.addEventListener("visibilitychange", updatePresence);
     window.addEventListener("focus", updatePresence);
     window.addEventListener("blur", updatePresence);
