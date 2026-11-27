@@ -328,12 +328,16 @@ if (!isMember) {
 // GROUP PUSH NOTIFICATIONS
 // ==================================================
 
+const senderKey = String(sender || "").trim().toLowerCase();
+
 const recipients = [
     ...new Set([
-        ...group.members,
+        ...(group.members || []),
         group.owner
-    ])
-].filter(username => username !== sender);
+    ].filter(Boolean))
+].filter(username =>
+    String(username).trim().toLowerCase() !== senderKey
+);
 
 const notificationTitle = `New message in ${group.name}`;
 const notificationBody = `You have a new message from ${sender}`;
