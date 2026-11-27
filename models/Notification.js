@@ -19,7 +19,8 @@ enum:[
 "comment",
 "reply",
 "follow",
-"message"
+"message",
+"missed_call"
 ],
 required:true
 },
