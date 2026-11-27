@@ -1534,7 +1534,7 @@ function stopMediaStream() {
             try {
                 track.stop();
             }
-            catch {}
+            catch (error) {}
 
         });
 
@@ -1595,9 +1595,9 @@ function updateRecordTime() {
 
 
     recordTime.textContent =
-        String(minutes).padStart(2, "0") +
+        ("0" + minutes).slice(-2) +
         ":" +
-        String(seconds).padStart(2, "0");
+        ("0" + seconds).slice(-2);
 
 }
 
@@ -1697,7 +1697,7 @@ function cancelRecording() {
 
         try {
             mediaRecorder.stop();
-        } catch {}
+        } catch (error) {}
 
     }
 
@@ -1858,9 +1858,9 @@ function stopAllMessageVoices(except = null) {
     if (!chat) return;
 
 
-    chat
-        .querySelectorAll(".voice-audio")
-        .forEach(player => {
+    Array.prototype.forEach.call(
+        chat.querySelectorAll(".voice-audio"),
+        player => {
 
             if (player !== except) {
 
@@ -2443,7 +2443,7 @@ function touchStart(e, bubble) {
 
         }
 
-        catch {
+        catch (error) {
 
             swipeMessage =
                 null;
@@ -2585,7 +2585,7 @@ function showMessageMenu(e, bubble) {
 
         }
 
-        catch {}
+        catch (error) {}
 
     }
 
