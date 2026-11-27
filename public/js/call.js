@@ -101,11 +101,49 @@
         } catch (_) {}
     }
 
+    function getMicrophoneStream() {
+        var constraints = { audio: true, video: false };
+
+        if (navigator.mediaDevices &&
+                typeof navigator.mediaDevices.getUserMedia === "function") {
+            return navigator.mediaDevices.getUserMedia(constraints);
+        }
+
+        // Older Android System WebView versions expose the legacy callback API.
+        var legacyGetUserMedia = navigator.getUserMedia ||
+            navigator.webkitGetUserMedia ||
+            navigator.mozGetUserMedia;
+
+        if (typeof legacyGetUserMedia === "function") {
+            return new Promise(function(resolve, reject) {
+                legacyGetUserMedia.call(navigator, constraints, resolve, reject);
+            });
+        }
+
+        return Promise.reject(new Error(
+            "This Android WebView does not support microphone capture. Update Android System WebView or Chrome."
+        ));
+    }
+
     async function ensurePeer() {
         if (peerConnection) return peerConnection;
-        localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+
         if (iceConfigPromise) await iceConfigPromise;
-        peerConnection = new RTCPeerConnection({
+
+        localStream = await getMicrophoneStream();
+
+        var PeerConnectionClass = window.RTCPeerConnection ||
+            window.webkitRTCPeerConnection;
+
+        if (typeof PeerConnectionClass !== "function") {
+            localStream.getTracks().forEach(function(track) {
+                track.stop();
+            });
+            localStream = null;
+            throw new Error("This Android WebView does not support WebRTC voice calls.");
+        }
+
+        peerConnection = new PeerConnectionClass({
             iceServers: configuredIceServers
         });
         localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
@@ -246,7 +284,8 @@
                 } catch (error) {
                     socket.emit("call:decline", { callId: activeCallId });
                     await cleanup(false);
-                    alert("Microphone permission is required to answer a voice call.");
+                    var reason = error && error.message ? error.message : "Microphone permission was denied.";
+                    alert("Could not access microphone: " + reason);
                 }
             }},
             { text: "✕", label: "Decline call", end: true, action: async () => {
