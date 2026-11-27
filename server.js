@@ -532,6 +532,9 @@ async function markCallMissed(call) {
         callId: String(call._id),
         caller: call.caller
     });
+    io.to(call.receiver).emit("call:no-answer", {
+        callId: String(call._id)
+    });
 }
 
 // =====================================================
@@ -553,8 +556,16 @@ io.on(
             const ids = callPresence.get(socket.username) || new Set();
             if (visible === true) ids.add(socket.id);
             else ids.delete(socket.id);
-            if (ids.size) callPresence.set(socket.username, ids);
-            else callPresence.delete(socket.username);
+            if (ids.size) {
+                callPresence.set(socket.username, ids);
+            } else {
+                callPresence.delete(socket.username);
+                // If the callee leaves the foreground while ringing, stop
+                // the ring and record this attempt as a missed call.
+                Call.find({ receiver: socket.username, status: "ringing" })
+                    .then(calls => Promise.all(calls.map(markCallMissed)))
+                    .catch(error => console.error("CALL PRESENCE ERROR:", error.message));
+            }
         });
 
 
