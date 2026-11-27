@@ -1161,6 +1161,168 @@ socket.on(
 );
 
 
+        const authenticatedUsername = socket.username;
+
+            socket.on("call:start", async (data = {}) => {
+                try {
+                    const receiver = String(data.receiver || "").trim();
+                    if (!receiver || receiver === authenticatedUsername) {
+                        socket.emit("call:error", { message: "Invalid call recipient." });
+                        return;
+                    }
+
+                    const User = mongoose.model("User");
+                    const target = await User.findOne({ authenticatedUsername: receiver }).select("_id authenticatedUsername");
+                    if (!target) {
+                        socket.emit("call:error", { message: "User not found." });
+                        return;
+                    }
+
+                    const activeIds = callPresence.get(receiver);
+                    const targetSockets = activeIds ? [...activeIds] : [];
+                    const active = targetSockets.some(id => {
+                        const peer = io.sockets.sockets.get(id);
+                        return peer && peer.connected;
+                    });
+
+                    if (!active) {
+                        const missed = await Call.create({
+                            caller: authenticatedUsername,
+                            receiver,
+                            status: "missed",
+                            endedAt: new Date()
+                        });
+                        const Notification = mongoose.model("Notification");
+                        await Notification.create({
+                            receiver,
+                            sender: authenticatedUsername,
+                            type: "missed_call",
+                            text: "Missed voice call from " + authenticatedUsername
+                        });
+                        socket.emit("call:unavailable", {
+                            callId: String(missed._id),
+                            receiver,
+                            message: "User is not active in 2Chat."
+                        });
+                        return;
+                    }
+
+                    const call = await Call.create({
+                        caller: authenticatedUsername,
+                        receiver,
+                        status: "ringing"
+                    });
+
+                    const timer = setTimeout(() => {
+                        markCallMissed(call).catch(err =>
+                            console.error("CALL TIMEOUT ERROR:", err.message)
+                        );
+                        socket.emit("call:no-answer", { callId: String(call._id) });
+                    }, 30000);
+                    pendingCallTimers.set(String(call._id), timer);
+
+                    io.to(receiver).emit("call:incoming", {
+                        callId: String(call._id),
+                        caller: authenticatedUsername
+                    });
+                    socket.emit("call:outgoing", {
+                        callId: String(call._id),
+                        receiver
+                    });
+                } catch (error) {
+                    console.error("CALL START ERROR:", error.message);
+                    socket.emit("call:error", { message: "Unable to start call." });
+                }
+            });
+
+            socket.on("call:accept", async ({ callId } = {}) => {
+                try {
+                    const call = await Call.findOne({
+                        _id: callId, receiver: authenticatedUsername, status: "ringing"
+                    });
+                    if (!call) return;
+                    call.status = "accepted";
+                    call.answeredAt = new Date();
+                    await call.save();
+                    clearPendingCallTimer(call._id);
+                    io.to(call.caller).emit("call:accepted", { callId: String(call._id) });
+                } catch (error) {
+                    console.error("CALL ACCEPT ERROR:", error.message);
+                }
+            });
+
+            socket.on("call:decline", async ({ callId } = {}) => {
+                try {
+                    const call = await Call.findOne({
+                        _id: callId, receiver: authenticatedUsername, status: "ringing"
+                    });
+                    if (!call) return;
+                    call.status = "declined";
+                    call.endedAt = new Date();
+                    await call.save();
+                    clearPendingCallTimer(call._id);
+                    io.to(call.caller).emit("call:declined", { callId: String(call._id) });
+                } catch (error) {
+                    console.error("CALL DECLINE ERROR:", error.message);
+                }
+            });
+
+            socket.on("call:cancel", async ({ callId } = {}) => {
+                try {
+                    const call = await Call.findOne({
+                        _id: callId, caller: authenticatedUsername, status: "ringing"
+                    });
+                    if (!call) return;
+                    call.status = "cancelled";
+                    call.endedAt = new Date();
+                    await call.save();
+                    clearPendingCallTimer(call._id);
+                    io.to(call.receiver).emit("call:cancelled", { callId: String(call._id) });
+                } catch (error) {
+                    console.error("CALL CANCEL ERROR:", error.message);
+                }
+            });
+
+            socket.on("call:signal", async (data = {}) => {
+                try {
+                    const call = await Call.findOne({
+                        _id: data.callId,
+                        status: "accepted",
+                        $or: [{ caller: authenticatedUsername }, { receiver: authenticatedUsername }]
+                    }).lean();
+                    if (!call || !data.signal || !["offer", "answer", "ice-candidate"].includes(data.kind)) return;
+                    const peer = call.caller === authenticatedUsername ? call.receiver : call.caller;
+                    io.to(peer).emit("call:signal", {
+                        callId: String(call._id),
+                        kind: data.kind,
+                        signal: data.signal
+                    });
+                } catch (error) {
+                    console.error("CALL SIGNAL ERROR:", error.message);
+                }
+            });
+
+            socket.on("call:end", async ({ callId } = {}) => {
+                try {
+                    const call = await Call.findOne({
+                        _id: callId,
+                        status: "accepted",
+                        $or: [{ caller: authenticatedUsername }, { receiver: authenticatedUsername }]
+                    });
+                    if (!call) return;
+                    call.status = "ended";
+                    call.endedAt = new Date();
+                    if (call.answeredAt) {
+                        call.durationSeconds = Math.max(0, Math.floor((call.endedAt - call.answeredAt) / 1000));
+                    }
+                    await call.save();
+                    const peer = call.caller === authenticatedUsername ? call.receiver : call.caller;
+                    io.to(peer).emit("call:ended", { callId: String(call._id) });
+                } catch (error) {
+                    console.error("CALL END ERROR:", error.message);
+                }
+            });
+
         // =================================================
         // USER JOIN
         // =================================================
@@ -1197,165 +1359,7 @@ socket.on(
                 username
             );
 
-            socket.on("call:start", async (data = {}) => {
-                try {
-                    const receiver = String(data.receiver || "").trim();
-                    if (!receiver || receiver === username) {
-                        socket.emit("call:error", { message: "Invalid call recipient." });
-                        return;
-                    }
 
-                    const User = mongoose.model("User");
-                    const target = await User.findOne({ username: receiver }).select("_id username");
-                    if (!target) {
-                        socket.emit("call:error", { message: "User not found." });
-                        return;
-                    }
-
-                    const activeIds = callPresence.get(receiver);
-                    const targetSockets = activeIds ? [...activeIds] : [];
-                    const active = targetSockets.some(id => {
-                        const peer = io.sockets.sockets.get(id);
-                        return peer && peer.connected;
-                    });
-
-                    if (!active) {
-                        const missed = await Call.create({
-                            caller: username,
-                            receiver,
-                            status: "missed",
-                            endedAt: new Date()
-                        });
-                        const Notification = mongoose.model("Notification");
-                        await Notification.create({
-                            receiver,
-                            sender: username,
-                            type: "missed_call",
-                            text: "Missed voice call from " + username
-                        });
-                        socket.emit("call:unavailable", {
-                            callId: String(missed._id),
-                            receiver,
-                            message: "User is not active in 2Chat."
-                        });
-                        return;
-                    }
-
-                    const call = await Call.create({
-                        caller: username,
-                        receiver,
-                        status: "ringing"
-                    });
-
-                    const timer = setTimeout(() => {
-                        markCallMissed(call).catch(err =>
-                            console.error("CALL TIMEOUT ERROR:", err.message)
-                        );
-                        socket.emit("call:no-answer", { callId: String(call._id) });
-                    }, 30000);
-                    pendingCallTimers.set(String(call._id), timer);
-
-                    io.to(receiver).emit("call:incoming", {
-                        callId: String(call._id),
-                        caller: username
-                    });
-                    socket.emit("call:outgoing", {
-                        callId: String(call._id),
-                        receiver
-                    });
-                } catch (error) {
-                    console.error("CALL START ERROR:", error.message);
-                    socket.emit("call:error", { message: "Unable to start call." });
-                }
-            });
-
-            socket.on("call:accept", async ({ callId } = {}) => {
-                try {
-                    const call = await Call.findOne({
-                        _id: callId, receiver: username, status: "ringing"
-                    });
-                    if (!call) return;
-                    call.status = "accepted";
-                    call.answeredAt = new Date();
-                    await call.save();
-                    clearPendingCallTimer(call._id);
-                    io.to(call.caller).emit("call:accepted", { callId: String(call._id) });
-                } catch (error) {
-                    console.error("CALL ACCEPT ERROR:", error.message);
-                }
-            });
-
-            socket.on("call:decline", async ({ callId } = {}) => {
-                try {
-                    const call = await Call.findOne({
-                        _id: callId, receiver: username, status: "ringing"
-                    });
-                    if (!call) return;
-                    call.status = "declined";
-                    call.endedAt = new Date();
-                    await call.save();
-                    clearPendingCallTimer(call._id);
-                    io.to(call.caller).emit("call:declined", { callId: String(call._id) });
-                } catch (error) {
-                    console.error("CALL DECLINE ERROR:", error.message);
-                }
-            });
-
-            socket.on("call:cancel", async ({ callId } = {}) => {
-                try {
-                    const call = await Call.findOne({
-                        _id: callId, caller: username, status: "ringing"
-                    });
-                    if (!call) return;
-                    call.status = "cancelled";
-                    call.endedAt = new Date();
-                    await call.save();
-                    clearPendingCallTimer(call._id);
-                    io.to(call.receiver).emit("call:cancelled", { callId: String(call._id) });
-                } catch (error) {
-                    console.error("CALL CANCEL ERROR:", error.message);
-                }
-            });
-
-            socket.on("call:signal", async (data = {}) => {
-                try {
-                    const call = await Call.findOne({
-                        _id: data.callId,
-                        status: "accepted",
-                        $or: [{ caller: username }, { receiver: username }]
-                    }).lean();
-                    if (!call || !data.signal || !["offer", "answer", "ice-candidate"].includes(data.kind)) return;
-                    const peer = call.caller === username ? call.receiver : call.caller;
-                    io.to(peer).emit("call:signal", {
-                        callId: String(call._id),
-                        kind: data.kind,
-                        signal: data.signal
-                    });
-                } catch (error) {
-                    console.error("CALL SIGNAL ERROR:", error.message);
-                }
-            });
-
-            socket.on("call:end", async ({ callId } = {}) => {
-                try {
-                    const call = await Call.findOne({
-                        _id: callId,
-                        status: "accepted",
-                        $or: [{ caller: username }, { receiver: username }]
-                    });
-                    if (!call) return;
-                    call.status = "ended";
-                    call.endedAt = new Date();
-                    if (call.answeredAt) {
-                        call.durationSeconds = Math.max(0, Math.floor((call.endedAt - call.answeredAt) / 1000));
-                    }
-                    await call.save();
-                    const peer = call.caller === username ? call.receiver : call.caller;
-                    io.to(peer).emit("call:ended", { callId: String(call._id) });
-                } catch (error) {
-                    console.error("CALL END ERROR:", error.message);
-                }
-            });
 
             console.log(
                 username + " joined"
