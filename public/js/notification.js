@@ -45,7 +45,7 @@ async function loadNotifications() {
                 html += `
                     <div
                         class="notification ${n.read ? "" : "unread"}"
-                        onclick="readNotification('${n._id}','${n.type}','${n.postId || ""}')">
+                        onclick="readNotification('${n._id}','${n.type}','${n.postId || ""}','${encodeURIComponent(n.sender || "")}')">
 
                         <h3>${n.text}</h3>
 
@@ -78,7 +78,7 @@ async function loadNotifications() {
 }
 
 
-async function readNotification(id, type, postId) {
+async function readNotification(id, type, postId, sender) {
 
     try {
 
@@ -100,6 +100,11 @@ async function readNotification(id, type, postId) {
 
         if (!res.ok || !data.success) {
             throw new Error(data.message || "Unable to mark notification as read.");
+        }
+
+        if (type === "missed_call" && sender) {
+            location.href = "/chat.html?user=" + sender;
+            return;
         }
 
         if (type === "like" || type === "comment" || type === "reply") {
