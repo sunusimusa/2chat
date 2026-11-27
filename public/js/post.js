@@ -28,7 +28,7 @@ let currentPost = null;
 ========================================= */
 
 function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, char => ({
+    return String(value == null ? "" : value).replace(/[&<>"']/g, char => ({
         "&": "&amp;",
         "<": "&lt;",
         ">": "&gt;",
@@ -142,8 +142,8 @@ async function apiRequest(url, options = {}) {
 ========================================= */
 
 function isPostOwner(post) {
-    const postUserId = post.userId?._id || post.userId;
-    const currentUserId = user?._id || user?.id;
+    const postUserId = (post.userId && post.userId._id) || post.userId;
+    const currentUserId = (user && user._id) || (user && user.id);
 
     return Boolean(
         postUserId &&
@@ -203,7 +203,7 @@ function renderPost(post) {
     const likes = Array.isArray(post.likes) ? post.likes : [];
     const comments = Array.isArray(post.comments) ? post.comments : [];
 
-    const liked = likes.includes(user?.username);
+    const liked = likes.includes((user && user.username));
     const owner = isPostOwner(post);
 
     const createdAt = post.createdAt
@@ -345,7 +345,8 @@ function attachPostEvents() {
             }
 
             if (action === "focus-comment") {
-                document.getElementById("commentText")?.focus();
+                var commentInput = document.getElementById("commentText");
+                if (commentInput) commentInput.focus();
             }
 
             if (action === "share") {
@@ -443,7 +444,7 @@ async function sharePost() {
         return;
     }
 
-    if (navigator.clipboard?.writeText) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(shareURL);
         alert("Post link copied successfully!");
         return;
