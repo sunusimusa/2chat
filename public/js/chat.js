@@ -1006,7 +1006,7 @@ function updateSendButton() {
    TEXT INPUT
 ========================================================== */
 
-messageInput?.addEventListener(
+messageInput && messageInput.addEventListener(
     "input",
     function() {
 
@@ -1067,12 +1067,12 @@ messageInput?.addEventListener(
    IMAGE INPUT
 ========================================================== */
 
-imageInput?.addEventListener(
+imageInput && imageInput.addEventListener(
     "change",
     function() {
 
         const file =
-            imageInput.files?.[0];
+            (imageInput.files && imageInput.files[0]);
 
         if (!file) {
             updateSendButton();
@@ -1357,7 +1357,7 @@ async function startRecording() {
 
         mediaRecorder.ondataavailable = function(event) {
 
-    console.log("VOICE DATA:", event.data?.size);
+    console.log("VOICE DATA:", (event.data && event.data.size));
 
     if (event.data && event.data.size > 0) {
         audioChunks.push(event.data);
@@ -1465,8 +1465,8 @@ if (!audioChunks.length) {
 
         alert(
             "Voice Error\n\n" +
-            "Name: " + (err?.name || "Unknown") +
-            "\nMessage: " + (err?.message || "Unknown")
+            "Name: " + ((err && err.name) || "Unknown") +
+            "\nMessage: " + ((err && err.message) || "Unknown")
         );
 
     }
@@ -1775,7 +1775,7 @@ function toggleVoicePreview() {
 }
 
 
-voicePreview?.addEventListener(
+voicePreview && voicePreview.addEventListener(
     "ended",
     function() {
 
@@ -1939,9 +1939,7 @@ document.addEventListener(
     function(e) {
 
         const player =
-            e.target.closest?.(
-                ".voice-audio"
-            );
+            (e.target && e.target.closest ? e.target.closest(".voice-audio") : null);
 
         if (!player) return;
 
@@ -2030,7 +2028,7 @@ document.addEventListener(
 
 
         const icon =
-            box?.querySelector(
+            (box && box.querySelector)(
                 ".voice-play i"
             );
 
@@ -2366,7 +2364,7 @@ function startReply(msg) {
         "flex";
 
 
-    messageInput?.focus();
+    if (messageInput) messageInput.focus();
 
 }
 
@@ -2388,7 +2386,7 @@ function cancelReply() {
 
 function touchStart(e, bubble) {
 
-    if (!e.touches?.length) {
+    if (!(e.touches && e.touches.length)) {
         return;
     }
 
@@ -2402,7 +2400,7 @@ function touchStart(e, bubble) {
 
 
     const raw =
-        bubble?.dataset.message;
+        (bubble && bubble.dataset && bubble.dataset.message);
 
 
     if (raw) {
@@ -2505,7 +2503,7 @@ function touchEnd() {
         swipeMessage
     ) {
 
-        navigator.vibrate?.(30);
+        if (navigator.vibrate) navigator.vibrate(30);
 
         startReply(
             swipeMessage
@@ -2945,9 +2943,7 @@ function removeMessageFromDOM(
 
 
     const row =
-        bubble?.closest(
-            "[data-message-row]"
-        );
+        (bubble ? bubble.closest("[data-message-row]") : null);
 
 
     if (row) {
@@ -3617,9 +3613,7 @@ document.addEventListener(
    IMAGE VIEWER CLICK
 ========================================================== */
 
-document
-    .getElementById("imageViewer")
-    ?.addEventListener(
+(document.getElementById("imageViewer")) && document.getElementById("imageViewer").addEventListener(
         "click",
         function(e) {
 
