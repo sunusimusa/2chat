@@ -536,6 +536,9 @@ async function markCallMissed(call) {
     io.to(call.receiver).emit("call:no-answer", {
         callId: String(call._id)
     });
+    io.to(call.caller).emit("call:no-answer", {
+        callId: String(call._id)
+    });
 }
 
 // =====================================================
