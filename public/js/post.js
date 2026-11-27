@@ -58,7 +58,7 @@ function safeMediaURL(value) {
 ========================================= */
 
 function getPlainText(value) {
-    let text = String(value ?? "");
+    let text = String(value == null ? "" : value);
 
     // Clean legacy posts that may contain saved anchor HTML.
     if (/<a\b/i.test(text)) {
