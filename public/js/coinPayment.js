@@ -95,7 +95,7 @@ async function apiRequest(
 
         throw new Error(
 
-            data?.message ||
+            (data && data.message) ||
             "Request failed."
 
         );
@@ -187,7 +187,7 @@ async function checkPaymentStatus(
 
             throw new Error(
 
-                result?.message ||
+                (result && result.message) ||
                 "Unable to check payment status."
 
             );
@@ -645,10 +645,7 @@ async function initializeCoinPayment(
         ) {
 
             const redirectUrl =
-                payment
-                    .nextAction
-                    ?.redirect_url
-                    ?.url;
+                (payment.nextAction && payment.nextAction.redirect_url && payment.nextAction.redirect_url.url);
 
 
             if (redirectUrl) {
