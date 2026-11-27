@@ -1044,7 +1044,7 @@ messageInput && messageInput.addEventListener(
 );
 
 
-messageInput?.addEventListener(
+messageInput && messageInput.addEventListener(
     "keydown",
     function(e) {
 
@@ -1790,7 +1790,7 @@ voicePreview && voicePreview.addEventListener(
 );
 
 
-voicePreview?.addEventListener(
+voicePreview && voicePreview.addEventListener(
     "pause",
     function() {
 
@@ -2014,9 +2014,7 @@ document.addEventListener(
     function(e) {
 
         const player =
-            e.target.closest?.(
-                ".voice-audio"
-            );
+            (e.target && e.target.closest ? e.target.closest(".voice-audio") : null);
 
         if (!player) return;
 
@@ -2050,9 +2048,7 @@ document.addEventListener(
     function(e) {
 
         const player =
-            e.target.closest?.(
-                ".voice-audio"
-            );
+            (e.target && e.target.closest ? e.target.closest(".voice-audio") : null);
 
         if (!player) return;
 
@@ -2064,7 +2060,7 @@ document.addEventListener(
 
 
         const icon =
-            box?.querySelector(
+            (box && box.querySelector)(
                 ".voice-play i"
             );
 
@@ -2086,9 +2082,7 @@ document.addEventListener(
     function(e) {
 
         const player =
-            e.target.closest?.(
-                ".voice-audio"
-            );
+            (e.target && e.target.closest ? e.target.closest(".voice-audio") : null);
 
         if (!player) return;
 
@@ -2100,12 +2094,12 @@ document.addEventListener(
 
 
         const icon =
-            box?.querySelector(
+            (box && box.querySelector)(
                 ".voice-play i"
             );
 
         const progress =
-            box?.querySelector(
+            (box && box.querySelector)(
                 ".voice-progress"
             );
 
@@ -2438,7 +2432,7 @@ function touchMove(e) {
 
     if (
         !currentBubble ||
-        !e.touches?.length
+        !(e.touches && e.touches.length)
     ) {
         return;
     }
@@ -2545,7 +2539,7 @@ function showMessageMenu(e, bubble) {
     selectedMsg = null;
 
 
-    if (bubble?.dataset.message) {
+    if ((bubble && bubble.dataset && bubble.dataset.message)) {
 
         try {
 
