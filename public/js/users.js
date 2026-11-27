@@ -28,7 +28,7 @@ async function loadUsers() {
             allUsers.push(...data.users);
 
             hasNextPage =
-                data.pagination?.hasNextPage === true;
+                (data.pagination && data.pagination.hasNextPage) === true;
 
             page++;
         }
