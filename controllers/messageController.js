@@ -40,6 +40,10 @@ const isBlockedBetweenUsers = async (user1, user2) => {
 const streamifier = require("streamifier");
 const { sendPushNotification } = require("../services/notificationService");
 
+const isSameUsername = (first, second) =>
+    String(first || "").trim().toLowerCase() ===
+    String(second || "").trim().toLowerCase();
+
 // ================= SEND MESSAGE =================
 exports.sendMessage = async (req, res) => {
 
@@ -149,21 +153,23 @@ deliveredAt:new Date()
 
 });
 
-await Notification.create({
+if (!isSameUsername(sender, receiver)) {
 
-receiver,
-sender,
-type:"message",
-text:`${sender} sent you a message 📨`
+    await Notification.create({
+        receiver,
+        sender,
+        type: "message",
+        text: `${sender} sent you a message 📨`
+    });
 
-});
+    sendPushNotification({
+        recipientUsername: receiver,
+        title: sender,
+        body: `${sender} sent you a photo 📷`,
+        data: { type: "message", sender, receiver }
+    }).catch(err => console.error("Image push error:", err));
 
-sendPushNotification({
-    recipientUsername: receiver,
-    title: sender,
-    body: `${sender} sent you a photo 📷`,
-    data: { type: "message", sender, receiver }
-}).catch(err => console.error("Image push error:", err));
+}
 
 return res.json({
 
@@ -215,21 +221,23 @@ deliveredAt:new Date()
 
 });
 
-await Notification.create({
+if (!isSameUsername(sender, receiver)) {
 
-receiver,
-sender,
-type:"message",
-text:`${sender} sent you a message 📨`
+    await Notification.create({
+        receiver,
+        sender,
+        type: "message",
+        text: `${sender} sent you a message 📨`
+    });
 
-});
+    sendPushNotification({
+        recipientUsername: receiver,
+        title: sender,
+        body: `${sender} sent you a message 📨`,
+        data: { type: "message", sender, receiver }
+    }).catch(err => console.error("Chat push error:", err));
 
-sendPushNotification({
-    recipientUsername: receiver,
-    title: sender,
-    body: `${sender} sent you a message 📨`,
-    data: { type: "message", sender, receiver }
-}).catch(err => console.error("Chat push error:", err));
+}
 
 return res.json({
 
@@ -345,21 +353,23 @@ deliveredAt:new Date()
 
 });
 
-await Notification.create({
+if (!isSameUsername(sender, receiver)) {
 
-receiver,
-sender,
-type:"message",
-text:`${sender} sent you a voice message 🎤`
+    await Notification.create({
+        receiver,
+        sender,
+        type: "message",
+        text: `${sender} sent you a voice message 🎤`
+    });
 
-});
+    sendPushNotification({
+        recipientUsername: receiver,
+        title: sender,
+        body: `${sender} sent you a voice message 🎤`,
+        data: { type: "message", sender, receiver }
+    }).catch(err => console.error("Voice push error:", err));
 
-sendPushNotification({
-    recipientUsername: receiver,
-    title: sender,
-    body: `${sender} sent you a voice message 🎤`,
-    data: { type: "message", sender, receiver }
-}).catch(err => console.error("Voice push error:", err));
+}
 
 return res.json({
 
