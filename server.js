@@ -1243,7 +1243,6 @@ socket.on(
                         markCallMissed(call).catch(err =>
                             console.error("CALL TIMEOUT ERROR:", err.message)
                         );
-                        socket.emit("call:no-answer", { callId: String(call._id) });
                     }, 30000);
                     pendingCallTimers.set(String(call._id), timer);
 
@@ -1589,7 +1588,20 @@ socket.on(
                 const presence = callPresence.get(socket.username);
                 if (presence) {
                     presence.delete(socket.id);
-                    if (!presence.size) callPresence.delete(socket.username);
+                    if (!presence.size) {
+                        callPresence.delete(socket.username);
+                        const oldTimer = callPresenceGraceTimers.get(socket.username);
+                        if (oldTimer) clearTimeout(oldTimer);
+                        const graceTimer = setTimeout(() => {
+                            callPresenceGraceTimers.delete(socket.username);
+                            const current = callPresence.get(socket.username);
+                            if (current && current.size) return;
+                            Call.find({ receiver: socket.username, status: "ringing" })
+                                .then(calls => Promise.all(calls.map(markCallMissed)))
+                                .catch(error => console.error("CALL DISCONNECT ERROR:", error.message));
+                        }, 4000);
+                        callPresenceGraceTimers.set(socket.username, graceTimer);
+                    }
                 }
 
                 // Check remaining active connections
