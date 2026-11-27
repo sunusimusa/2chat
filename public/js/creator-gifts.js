@@ -123,7 +123,7 @@ const topGift =
 
             const topCoins =
                 Number(
-                    top?.coins || 0
+                    (top && top.coins) || 0
                 );
 
             return currentCoins > topCoins
