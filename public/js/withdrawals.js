@@ -28,7 +28,7 @@ function formatNaira(amount) {
 
 function escapeHTML(value) {
 
-    return String(value ?? "")
+    return String(value == null ? "" : value)
 
         .replace(/&/g, "&amp;")
 
@@ -364,8 +364,7 @@ function renderWithdrawal(withdrawal) {
 
     const lockedAmount =
         Number(
-            withdrawal.lockedAmount ??
-            amount
+            (withdrawal.lockedAmount != null ? withdrawal.lockedAmount : amount)
         );
 
 
