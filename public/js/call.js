@@ -148,11 +148,40 @@
         return [{ text: "✕", label: "End call", end: true, action: () => cleanup(true) }];
     }
 
-    window.start2ChatVoiceCall = receiver => {
-        if (!receiver || callState !== "idle" || !socket.connected) {
-            alert("Call service is not connected. Please try again.");
+    function waitForCallSocket(timeoutMs = 10000) {
+        if (socket.connected) return Promise.resolve(true);
+        return new Promise(resolve => {
+            let settled = false;
+            const finish = value => {
+                if (settled) return;
+                settled = true;
+                clearTimeout(timer);
+                socket.off("connect", onConnect);
+                resolve(value);
+            };
+            const onConnect = () => finish(true);
+            const timer = setTimeout(() => finish(false), timeoutMs);
+            socket.once("connect", onConnect);
+            // If Socket.IO is disconnected, ask it to reconnect.
+            if (!socket.active) socket.connect();
+        });
+    }
+
+    window.start2ChatVoiceCall = async receiver => {
+        if (!receiver || callState !== "idle") return;
+        callState = "connecting";
+        show(receiver, "Connecting to call service...", [{ text: "✕", label: "Cancel call", end: true, action: () => {
+            callState = "idle";
+            cleanup(false);
+        }}]);
+
+        const connected = await waitForCallSocket();
+        if (!connected || !socket.connected) {
+            await cleanup(false);
+            alert("2Chat call service could not connect. Check your internet and try again.");
             return;
         }
+
         callState = "outgoing";
         show(receiver, "Calling...", [{ text: "✕", label: "Cancel call", end: true, action: () => {
             if (activeCallId) socket.emit("call:cancel", { callId: activeCallId });
