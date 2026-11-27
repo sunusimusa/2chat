@@ -546,6 +546,17 @@ io.on(
             "🟢 User Connected"
         );
 
+        // Register before the async join handler so the first visibility
+        // update cannot be lost while the database online flag is written.
+        socket.on("call:presence", (visible) => {
+            if (!socket.username) return;
+            const ids = callPresence.get(socket.username) || new Set();
+            if (visible === true) ids.add(socket.id);
+            else ids.delete(socket.id);
+            if (ids.size) callPresence.set(socket.username, ids);
+            else callPresence.delete(socket.username);
+        });
+
 
         // =================================================
         // JOIN GROUP
@@ -1142,11 +1153,7 @@ socket.on(
 
             socket.join(username);
 
-            // Presence is tracked separately from database online status.
-            // A call rings only while at least one authenticated app page is visible.
-            const currentPresence = callPresence.get(username) || new Set();
-            currentPresence.add(socket.id);
-            callPresence.set(username, currentPresence);
+            // Foreground call presence is updated by the call client.
 
             await mongoose
                 .model("User")
@@ -1163,14 +1170,6 @@ socket.on(
                 "userOnline",
                 username
             );
-
-            socket.on("call:presence", (visible) => {
-                const ids = callPresence.get(username) || new Set();
-                if (visible === true) ids.add(socket.id);
-                else ids.delete(socket.id);
-                if (ids.size) callPresence.set(username, ids);
-                else callPresence.delete(username);
-            });
 
             socket.on("call:start", async (data = {}) => {
                 try {
