@@ -1203,7 +1203,10 @@ body {
 .image-viewer {
     position: fixed;
 
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
 
     background: rgba(0, 0, 0, .92);
 
@@ -1441,4 +1444,58 @@ button {
     -webkit-user-select: text !important;
     -webkit-touch-callout: default !important;
     cursor: text;
+}
+
+
+/* ==========================================================
+   LEGACY ANDROID WEBVIEW FALLBACKS
+========================================================== */
+
+@supports not (gap: 1px) {
+
+    .message-meta > * + * {
+        margin-left: 4px;
+    }
+
+    .message-reactions .reaction {
+        margin-right: 4px;
+        margin-bottom: 4px;
+    }
+
+    .message-composer > * + * {
+        margin-left: 8px;
+    }
+
+    .voice-composer > * + * {
+        margin-left: 8px;
+    }
+
+    .voice-status > * + * {
+        margin-left: 8px;
+    }
+
+    .voice-preview > * + * {
+        margin-left: 8px;
+    }
+
+    .preview-wave span + span {
+        margin-left: 3px;
+    }
+
+    .voice-player > * + * {
+        margin-left: 9px;
+    }
+
+    .message-menu div > * + * {
+        margin-left: 12px;
+    }
+
+    .chat-menu div > * + * {
+        margin-left: 10px;
+    }
+
+    .reaction-popup span + span {
+        margin-left: 8px;
+    }
+
 }
