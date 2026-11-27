@@ -497,7 +497,7 @@ async function markMessageAsSeen(messageElement){
 
 function formatGroupMessageText(value) {
 
-    let text = String(value ?? "");
+    let text = String(value == null ? "" : value);
 
     // Decode HTML entities
     const decoder = document.createElement("textarea");
