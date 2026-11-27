@@ -21,12 +21,12 @@
 
     const style = document.createElement("style");
     style.textContent = `
-      #twochat-call-layer{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(5,12,25,.82);font-family:Arial,sans-serif}
-      #twochat-call-card{width:min(90%,360px);padding:28px 22px;border-radius:22px;background:#142238;color:#fff;text-align:center;box-shadow:0 15px 50px #0008}
+      #twochat-call-layer{position:fixed;top:0;right:0;bottom:0;left:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(5,12,25,.82);font-family:Arial,sans-serif}
+      #twochat-call-card{width:90%;max-width:360px;padding:28px 22px;border-radius:22px;background:#142238;color:#fff;text-align:center;box-shadow:0 15px 50px #0008}
       #twochat-call-title{font-size:22px;margin:0 0 8px}
       #twochat-call-status{color:#cbd5e1;margin:0 0 24px}
-      .twochat-call-actions{display:flex;justify-content:center;gap:18px}
-      .twochat-call-actions button{border:0;border-radius:50%;width:58px;height:58px;color:#fff;font-size:21px;background:#16a34a}
+      .twochat-call-actions{display:flex;justify-content:center}
+      .twochat-call-actions button{margin:0 9px;border:0;border-radius:50%;width:58px;height:58px;color:#fff;font-size:21px;background:#16a34a}
       .twochat-call-actions button.end{background:#dc2626}
       #twochat-call-audio{display:none}
       #twochat-call-button{border:0;background:transparent;color:inherit;font-size:20px;padding:8px;cursor:pointer}
@@ -326,8 +326,35 @@
         setTimeout(() => cleanup(false), 1500);
     });
 
+    // Read query parameters without requiring URLSearchParams (older Android WebView).
+    function getCallQueryParam(name) {
+        var query = (window.location.search || "").replace(/^\\?/, "");
+        var pairs = query ? query.split("&") : [];
+
+        for (var i = 0; i < pairs.length; i++) {
+            var parts = pairs[i].split("=");
+            var key = parts.shift();
+
+            try {
+                key = decodeURIComponent(key.replace(/\\+/g, " "));
+            } catch (error) {
+                continue;
+            }
+
+            if (key === name) {
+                try {
+                    return decodeURIComponent(parts.join("=").replace(/\\+/g, " "));
+                } catch (error) {
+                    return parts.join("=");
+                }
+            }
+        }
+
+        return null;
+    }
+
     // Add the call control only on a one-to-one chat page.
-    const receiver = new URLSearchParams(location.search).get("user");
+    const receiver = getCallQueryParam("user");
     const headerActions = document.querySelector(".chat-header .header-actions");
     if (receiver && headerActions) {
         const button = document.createElement("button");
@@ -337,7 +364,11 @@
         button.setAttribute("aria-label", "Start voice call");
         button.innerHTML = '<i class="fa-solid fa-phone"></i>';
         button.addEventListener("click", () => window.start2ChatVoiceCall(receiver));
-        headerActions.prepend(button);
+        if (headerActions.firstChild) {
+            headerActions.insertBefore(button, headerActions.firstChild);
+        } else {
+            headerActions.appendChild(button);
+        }
 
         const historyLink = document.createElement("button");
         historyLink.type = "button";
@@ -349,6 +380,10 @@
         historyLink.addEventListener("click", () => {
             location.href = "/call-history.html";
         });
-        headerActions.prepend(historyLink);
+        if (headerActions.firstChild) {
+            headerActions.insertBefore(historyLink, headerActions.firstChild);
+        } else {
+            headerActions.appendChild(historyLink);
+        }
     }
 })();
