@@ -17,7 +17,7 @@ const socket = io({
 });
 
 function getChatQueryParam(name) {
-    var query = (window.location.search || "").replace(/^\\?/, "");
+    var query = (window.location.search || "").replace(/^\?/, "");
     var pairs = query ? query.split("&") : [];
 
     for (var i = 0; i < pairs.length; i++) {
@@ -25,14 +25,14 @@ function getChatQueryParam(name) {
         var key = parts.shift();
 
         try {
-            key = decodeURIComponent(key.replace(/\\+/g, " "));
+            key = decodeURIComponent(key.replace(/\+/g, " "));
         } catch (error) {
             continue;
         }
 
         if (key === name) {
             try {
-                return decodeURIComponent(parts.join("=").replace(/\\+/g, " "));
+                return decodeURIComponent(parts.join("=").replace(/\+/g, " "));
             } catch (error) {
                 return parts.join("=");
             }
