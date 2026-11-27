@@ -16,8 +16,33 @@ const socket = io({
     }
 });
 
-const params = new URLSearchParams(location.search);
-const receiver = params.get("user");
+function getChatQueryParam(name) {
+    var query = (window.location.search || "").replace(/^\\?/, "");
+    var pairs = query ? query.split("&") : [];
+
+    for (var i = 0; i < pairs.length; i++) {
+        var parts = pairs[i].split("=");
+        var key = parts.shift();
+
+        try {
+            key = decodeURIComponent(key.replace(/\\+/g, " "));
+        } catch (error) {
+            continue;
+        }
+
+        if (key === name) {
+            try {
+                return decodeURIComponent(parts.join("=").replace(/\\+/g, " "));
+            } catch (error) {
+                return parts.join("=");
+            }
+        }
+    }
+
+    return null;
+}
+
+const receiver = getChatQueryParam("user");
 
 let receiverUserId = null;
 
@@ -124,25 +149,45 @@ function scrollToBottom(smooth = false) {
     if (!chat) return;
 
     requestAnimationFrame(() => {
+        var targetTop = chat.scrollHeight;
 
-        chat.scrollTo({
-            top: chat.scrollHeight,
-            behavior: smooth ? "smooth" : "auto"
-        });
-
+        try {
+            if (typeof chat.scrollTo === "function") {
+                chat.scrollTo({
+                    top: targetTop,
+                    behavior: smooth ? "smooth" : "auto"
+                });
+            } else {
+                chat.scrollTop = targetTop;
+            }
+        } catch (error) {
+            chat.scrollTop = targetTop;
+        }
     });
 }
 
 
-function messageExists(messageId) {
+function findMessageBubble(messageId) {
 
     if (!messageId || !chat) {
-        return false;
+        return null;
     }
 
-    return !!chat.querySelector(
-        `[data-message-id="${CSS.escape(String(messageId))}"]`
-    );
+    var targetId = String(messageId);
+    var bubbles = chat.querySelectorAll("[data-message-id]");
+
+    for (var i = 0; i < bubbles.length; i++) {
+        if (bubbles[i].getAttribute("data-message-id") === targetId) {
+            return bubbles[i];
+        }
+    }
+
+    return null;
+}
+
+
+function messageExists(messageId) {
+    return !!findMessageBubble(messageId);
 }
 
 
@@ -737,9 +782,7 @@ function updateMessageStatus(
 
 
     const bubble =
-        chat.querySelector(
-            `[data-message-id="${CSS.escape(String(messageId))}"]`
-        );
+        findMessageBubble(messageId);
 
 
     if (!bubble) {
@@ -2923,9 +2966,7 @@ function removeMessageFromDOM(
 
 
     const bubble =
-        chat.querySelector(
-            `[data-message-id="${CSS.escape(String(messageId))}"]`
-        );
+        findMessageBubble(messageId);
 
 
     const row =
@@ -2953,9 +2994,7 @@ function updateDeletedMessage(
 
 
     const bubble =
-        chat.querySelector(
-            `[data-message-id="${CSS.escape(String(messageId))}"]`
-        );
+        findMessageBubble(messageId);
 
 
     if (!bubble) return;
@@ -3115,9 +3154,7 @@ function updateMessageReaction(
 
 
     const bubble =
-        chat.querySelector(
-            `[data-message-id="${CSS.escape(String(messageId))}"]`
-        );
+        findMessageBubble(messageId);
 
 
     if (!bubble) return;
