@@ -42,6 +42,9 @@ const groupMessageRoutes =
 const notificationRoutes =
     require("./routes/notificationRoutes");
 
+const callRoutes =
+    require("./routes/callRoutes");
+
 const friendRoutes =
     require("./routes/friendRoutes");
 
@@ -371,6 +374,11 @@ app.use(
 app.use(
     "/api/notifications",
     notificationRoutes
+);
+
+app.use(
+    "/api/calls",
+    callRoutes
 );
 
 
