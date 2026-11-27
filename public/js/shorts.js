@@ -40,7 +40,7 @@ function setupShortsMenuActions() {
 
     editBtn.addEventListener("click", function () {
 
-        const video = window.videos?.find(
+        const video = (window.videos || []).find(
             item => String(item._id) === String(currentVisibleVideoId)
         );
 
@@ -205,9 +205,9 @@ function isVideoLikedByUser(video) {
                    like === user._id;
         }
 
-        return like?.username === user.username ||
-               like?.user?.username === user.username ||
-               like?.user === user._id;
+        return (like && like.username) === user.username ||
+               (like && like.user && like.user.username) === user.username ||
+               (like && like.user) === user._id;
 
     });
 }
@@ -410,7 +410,7 @@ onended="playNextVideo('${video._id}')">
 
         <img
             src="${
-                creatorCache[video.username]?.avatar
+                (creatorCache[video.username] && creatorCache[video.username].avatar)
                 || "/images/default.png"
             }"
             class="short-avatar"
@@ -1542,10 +1542,10 @@ function closeReportModal(){
 async function submitReport(){
 
     const reason =
-        document.getElementById("reportReason")?.value;
+        (document.getElementById("reportReason") && document.getElementById("reportReason").value);
 
     const description =
-        document.getElementById("reportDescription")?.value.trim();
+        (document.getElementById("reportDescription") && document.getElementById("reportDescription").value.trim());
 
     if(!reportContentType || !reportContentId){
 
@@ -1905,8 +1905,8 @@ function openEditShortModal(video) {
 
 function closeEditShortModal() {
 
-    document.getElementById("editShortModal")
-        ?.classList.remove("show");
+    var editShortModalElement = document.getElementById("editShortModal");
+    if (editShortModalElement) editShortModalElement.classList.remove("show");
 
     editingShortId = null;
 }
@@ -1941,8 +1941,8 @@ function openDeleteShortModal(video) {
 
 function closeDeleteShortModal() {
 
-    document.getElementById("deleteShortModal")
-        ?.classList.remove("show");
+    var deleteShortModalElement = document.getElementById("deleteShortModal");
+    if (deleteShortModalElement) deleteShortModalElement.classList.remove("show");
 
     deletingShortId = null;
 }
@@ -2016,7 +2016,7 @@ async function saveEditedShort() {
             "video-" + editingShortId
         );
 
-        const shortElement = videoElement?.closest(".short");
+        const shortElement = (videoElement ? videoElement.closest(".short") : null);
         const captionElement = shortElement?.querySelector(".overlay p");
 
         if (captionElement) {
@@ -2122,8 +2122,8 @@ async function confirmDeleteShort() {
 
         closeDeleteShortModal();
 
-        document.getElementById("shortsMenu")
-            ?.classList.remove("show");
+        var shortsMenuElement = document.getElementById("shortsMenu");
+        if (shortsMenuElement) shortsMenuElement.classList.remove("show");
 
         // Scroll to another remaining Short
         const remainingShort = document.querySelector(
