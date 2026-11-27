@@ -15,6 +15,7 @@
     let ringtoneContext = null;
     let ringInterval = null;
     let callState = "idle";
+    let pendingIceCandidates = [];
 
     const style = document.createElement("style");
     style.textContent = `
@@ -131,6 +132,7 @@
         if (sendEnd && activeCallId) socket.emit("call:end", { callId: activeCallId });
         if (peerConnection) peerConnection.close();
         peerConnection = null;
+        pendingIceCandidates = [];
         if (localStream) localStream.getTracks().forEach(track => track.stop());
         localStream = null;
         remoteAudio.srcObject = null;
@@ -144,7 +146,10 @@
     }
 
     window.start2ChatVoiceCall = receiver => {
-        if (!receiver || callState !== "idle") return;
+        if (!receiver || callState !== "idle" || !socket.connected) {
+            alert("Call service is not connected. Please try again.");
+            return;
+        }
         callState = "outgoing";
         show(receiver, "Calling...", [{ text: "✕", label: "Cancel call", end: true, action: () => {
             if (activeCallId) socket.emit("call:cancel", { callId: activeCallId });
@@ -167,6 +172,9 @@
 
     socket.on("call:outgoing", data => {
         activeCallId = data.callId;
+        if (callState !== "outgoing") {
+            socket.emit("call:cancel", { callId: data.callId });
+        }
     });
 
     socket.on("call:incoming", data => {
@@ -226,7 +234,19 @@
             } else if (data.kind === "answer") {
                 await pc.setRemoteDescription(new RTCSessionDescription(data.signal));
             } else if (data.kind === "ice-candidate") {
-                await pc.addIceCandidate(new RTCIceCandidate(data.signal));
+                const candidate = new RTCIceCandidate(data.signal);
+                if (pc.remoteDescription && pc.remoteDescription.type) {
+                    await pc.addIceCandidate(candidate);
+                } else {
+                    pendingIceCandidates.push(candidate);
+                }
+            }
+
+            if (pc.remoteDescription && pc.remoteDescription.type && pendingIceCandidates.length) {
+                const queued = pendingIceCandidates.splice(0);
+                for (const candidate of queued) {
+                    await pc.addIceCandidate(candidate);
+                }
             }
         } catch (error) {
             console.error("2Chat call signaling error:", error);
