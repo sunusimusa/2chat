@@ -1080,13 +1080,19 @@ function formatPostText(text) {
 // =====================================================
 
 var homePostsLoading = false;
+var homePostsReloadQueued = false;
 var lastHomePostsRefresh = 0;
 
 async function loadPosts() {
 
     const feed = document.getElementById("feed");
 
-    if (!feed || homePostsLoading) return;
+    if (!feed) return;
+
+    if (homePostsLoading) {
+        homePostsReloadQueued = true;
+        return;
+    }
 
     homePostsLoading = true;
 
@@ -1487,7 +1493,34 @@ async function loadPosts() {
 
         });
 
+        const openCommentBoxes = Array.from(
+            feed.querySelectorAll(".comment-box")
+        ).filter(item => item.style.display === "flex").map(item => item.id);
+
+        const openCommentLists = Array.from(
+            feed.querySelectorAll(".comments-list")
+        ).filter(item => item.style.display === "block").map(item => item.id);
+
+        const openReplyForms = Array.from(
+            feed.querySelectorAll(".reply-form")
+        ).filter(item => item.style.display === "flex").map(item => item.id);
+
         feed.innerHTML = html;
+
+        openCommentBoxes.forEach(id => {
+            const item = document.getElementById(id);
+            if (item) item.style.display = "flex";
+        });
+
+        openCommentLists.forEach(id => {
+            const item = document.getElementById(id);
+            if (item) item.style.display = "block";
+        });
+
+        openReplyForms.forEach(id => {
+            const item = document.getElementById(id);
+            if (item) item.style.display = "flex";
+        });
 
     } catch (err) {
 
@@ -1506,6 +1539,11 @@ async function loadPosts() {
     } finally {
 
         homePostsLoading = false;
+
+        if (homePostsReloadQueued) {
+            homePostsReloadQueued = false;
+            setTimeout(loadPosts, 150);
+        }
 
     }
 
