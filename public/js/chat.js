@@ -2042,8 +2042,7 @@ document.addEventListener(
             time.textContent =
                 minutes +
                 ":" +
-                String(seconds)
-                    .padStart(2, "0");
+                ("0" + seconds).slice(-2);
 
         }
 
