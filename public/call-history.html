@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2Chat Call History</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f2f5f9;color:#172033;font-family:Arial,sans-serif}
+header{display:flex;align-items:center;gap:14px;padding:16px;background:#142238;color:#fff}
+header a{color:#fff;text-decoration:none;font-size:20px}.wrap{max-width:650px;margin:18px auto;padding:0 14px}
+.call-row{display:flex;align-items:center;gap:13px;padding:15px;background:#fff;border-radius:14px;margin-bottom:10px;box-shadow:0 2px 8px #10203010}
+.call-icon{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#e8f1ff;color:#1769d2}
+.details{flex:1;min-width:0}.name{font-weight:700}.meta{font-size:13px;color:#64748b;margin-top:5px}.status{font-size:12px;color:#64748b}.call-back{border:0;border-radius:20px;padding:9px 13px;background:#1769d2;color:#fff}
+.empty{text-align:center;padding:45px 12px;color:#64748b}
+</style>
+</head>
+<body>
+<header><a href="/messenger.html" aria-label="Back"><i class="fa-solid fa-arrow-left"></i></a><h2>Call History</h2></header>
+<main class="wrap" id="callHistory"><p class="empty">Loading call history...</p></main>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/call.js"></script>
+<script src="/js/call-history.js"></script>
+</body>
+</html>
