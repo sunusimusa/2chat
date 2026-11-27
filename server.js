@@ -1163,6 +1163,24 @@ socket.on(
 
         const authenticatedUsername = socket.username;
 
+        socket.on("call:ice-config", () => {
+            const iceServers = [
+                { urls: "stun:stun.l.google.com:19302" }
+            ];
+            if (
+                process.env.TURN_URL &&
+                process.env.TURN_USERNAME &&
+                process.env.TURN_CREDENTIAL
+            ) {
+                iceServers.push({
+                    urls: process.env.TURN_URL.split(",").map(value => value.trim()),
+                    username: process.env.TURN_USERNAME,
+                    credential: process.env.TURN_CREDENTIAL
+                });
+            }
+            socket.emit("call:ice-config", { iceServers });
+        });
+
             socket.on("call:start", async (data = {}) => {
                 try {
                     const receiver = String(data.receiver || "").trim();
@@ -1172,7 +1190,7 @@ socket.on(
                     }
 
                     const User = mongoose.model("User");
-                    const target = await User.findOne({ authenticatedUsername: receiver }).select("_id authenticatedUsername");
+                    const target = await User.findOne({ username: receiver }).select("_id username");
                     if (!target) {
                         socket.emit("call:error", { message: "User not found." });
                         return;
