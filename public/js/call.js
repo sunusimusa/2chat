@@ -86,9 +86,9 @@
 
     function activeCallButtons() {
         return [
-            { text: isMuted ? "🎙" : "🎤", label: isMuted ? "Unmute microphone" : "Mute microphone", action: toggleMute },
-            { text: speakerEnabled ? "🔊" : "🔉", label: speakerEnabled ? "Lower call volume" : "Restore call volume", action: toggleSpeaker },
-            { text: "✕", label: "End call", end: true, action: () => cleanup(true) }
+            { icon: isMuted ? '<i class="fa-solid fa-microphone-slash"></i>' : '<i class="fa-solid fa-microphone"></i>', label: isMuted ? "Unmute microphone" : "Mute microphone", action: toggleMute },
+            { icon: speakerEnabled ? '<i class="fa-solid fa-volume-high"></i>' : '<i class="fa-solid fa-volume-low"></i>', label: speakerEnabled ? "Lower call volume" : "Restore call volume", action: toggleSpeaker },
+            { icon: '<i class="fa-solid fa-phone-slash"></i>', label: "End call", end: true, action: () => cleanup(true) }
         ];
     }
 
@@ -345,7 +345,7 @@
         callState = "incoming";
         ring();
         show(data.caller, "Incoming voice call", [
-            { text: "✓", label: "Accept call", accept: true, action: async () => {
+            { icon: '<i class="fa-solid fa-phone"></i>', label: "Accept call", accept: true, action: async () => {
                 stopRingtone();
                 try {
                     await ensurePeer();
@@ -360,7 +360,7 @@
                     alert("Could not access microphone: " + reason);
                 }
             }},
-            { text: "✕", label: "Decline call", end: true, action: async () => {
+            { icon: '<i class="fa-solid fa-phone-slash"></i>', label: "Decline call", end: true, action: async () => {
                 socket.emit("call:decline", { callId: activeCallId });
                 await cleanup(false);
             }}
