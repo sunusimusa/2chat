@@ -163,6 +163,32 @@ suspendedBy: {
     ref: "User",
     default: null
 },
+
+moderationWarnings: [{
+    reason: {
+        type: String,
+        required: true,
+        maxlength: 1000
+    },
+    reportId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Report",
+        default: null
+    },
+    issuedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    acknowledgedAt: {
+        type: Date,
+        default: null
+    }
+}],
     
     // =========================================
     // CREATOR SYSTEM
