@@ -228,10 +228,10 @@ exports.register = async (req, res) => {
 
     if (birthdayNotReached) age--;
 
-    if (age < 13) {
+    if (age < 18) {
       return res.status(403).json({
         success: false,
-        message: "You must be at least 13 years old to use 2Chat."
+        message: "You must be at least 18 years old to create a 2Chat account."
       });
     }
 
@@ -257,7 +257,7 @@ exports.register = async (req, res) => {
       email: cleanEmail,
       phoneNumber: cleanPhone,
       dateOfBirth: birthDate,
-      accountType: age < 18 ? "teen" : "adult",
+      accountType: "adult",
       password: hashedPassword,
       emailVerified: false
     });
