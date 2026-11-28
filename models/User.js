@@ -97,6 +97,12 @@ accountType: {
       select: false
     },
 
+    // Optional recovery fields; legacy accounts remain unchanged.
+    recoveryKeyHash: { type:String, default:null, select:false },
+    recoveryBackupCodeHashes: { type:[String], default:[], select:false },
+    recoveryCredentialsCreatedAt: { type:Date, default:null, select:false },
+    tokenVersion: { type:Number, default:0, min:0, select:false },
+
     // =========================================
     // ACCOUNT DELETION
     // =========================================
