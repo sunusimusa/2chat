@@ -45,6 +45,8 @@ const notificationRoutes =
 const callRoutes =
     require("./routes/callRoutes");
 
+const { sendPushNotification } = require("./services/notificationService");
+
 const friendRoutes =
     require("./routes/friendRoutes");
 
@@ -1189,6 +1191,24 @@ socket.on(
             socket.emit("call:ice-config", { iceServers });
         });
 
+            socket.on("call:resume-pending", async () => {
+                try {
+                    const pendingCalls = await Call.find({
+                        receiver: authenticatedUsername,
+                        status: "ringing"
+                    }).sort({ createdAt: -1 }).limit(3).lean();
+
+                    pendingCalls.forEach(call => {
+                        socket.emit("call:incoming", {
+                            callId: String(call._id),
+                            caller: call.caller
+                        });
+                    });
+                } catch (error) {
+                    console.error("CALL RESUME ERROR:", error.message);
+                }
+            });
+
             socket.on("call:start", async (data = {}) => {
                 try {
                     const receiver = String(data.receiver || "").trim();
@@ -1212,23 +1232,34 @@ socket.on(
                     });
 
                     if (!active) {
-                        const missed = await Call.create({
+                        const pending = await Call.create({
                             caller: authenticatedUsername,
                             receiver,
-                            status: "missed",
-                            endedAt: new Date()
+                            status: "ringing"
                         });
-                        const Notification = mongoose.model("Notification");
-                        await Notification.create({
-                            receiver,
-                            sender: authenticatedUsername,
-                            type: "missed_call",
-                            text: "Missed voice call from " + authenticatedUsername
+
+                        const timer = setTimeout(() => {
+                            markCallMissed(pending).catch(err =>
+                                console.error("CALL TIMEOUT ERROR:", err.message)
+                            );
+                        }, 30000);
+                        pendingCallTimers.set(String(pending._id), timer);
+
+                        await sendPushNotification({
+                            recipientUsername: receiver,
+                            title: "Incoming 2Chat voice call",
+                            body: authenticatedUsername + " is calling you",
+                            data: {
+                                type: "incoming_call",
+                                callId: String(pending._id),
+                                caller: authenticatedUsername
+                            },
+                            dataOnly: true
                         });
-                        socket.emit("call:unavailable", {
-                            callId: String(missed._id),
-                            receiver,
-                            message: "User is not active in 2Chat."
+
+                        socket.emit("call:outgoing", {
+                            callId: String(pending._id),
+                            receiver
                         });
                         return;
                     }
