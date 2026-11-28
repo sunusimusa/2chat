@@ -499,127 +499,70 @@ function formatGroupMessageText(value) {
 
     let text = String(value == null ? "" : value);
 
-    // Decode HTML entities
+    // Decode previously escaped HTML without executing the decoded markup.
     const decoder = document.createElement("textarea");
-
-    for (let i = 0; i < 5; i++) {
-
+    for (let i = 0; i < 6; i++) {
         decoder.innerHTML = text;
-
         const decoded = decoder.value;
-
         if (decoded === text) break;
-
         text = decoded;
     }
 
-    // Extract visible text from old anchor HTML
-    if (/<a\b|<\/a>/i.test(text)) {
-
+    // Convert legacy stored anchor markup to its visible text only.
+    if (/<\s*a\b/i.test(text) || /<\/\s*a\s*>/i.test(text)) {
         const parser = new DOMParser();
-
-        const doc = parser.parseFromString(
-            text,
-            "text/html"
-        );
-
+        const doc = parser.parseFromString(text, "text/html");
         text = doc.body.textContent || "";
     }
 
-    // Remove leftover anchor attributes
+    // Remove stray anchor attributes left by older malformed messages.
     text = text
-        .replace(
-            /\b(?:href|target|rel|class)\s*=\s*("[^"]*"|'[^']*'|[^\s>]*)/gi,
-            ""
-        )
+        .replace(/\b(?:href|target|rel|class)\s*=\s*("[^"]*"|'[^']*'|[^\s>]*)/gi, "")
         .replace(/<\/?a\b[^>]*>/gi, "")
         .replace(/^\s*>+|>+\s*$/g, "")
         .replace(/[ \t]{2,}/g, " ");
 
-    // Escape HTML safely
-    function escapeHTML(value) {
+    const escapeHTML = value => String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[char]);
 
-        return String(value).replace(/[&<>"']/g, char => ({
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;"
-        })[char]);
-
-    }
-
-    // Detect URLs
-    // Match full URLs, www links, and common bare domains (e.g. example.com/path).
-    const urlPattern =
-        /https?:\/\/[^\s<>"']+|www\.[^\s<>"']+|(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}(?:\/[^\s<>"']*)?/gi;
-
+    const urlPattern = /https?:\/\/[^\s<>"']+|www\.[^\s<>"']+|(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}(?:\/[^\s<>"']*)?/gi;
     let result = "";
     let lastIndex = 0;
     let match;
 
     while ((match = urlPattern.exec(text)) !== null) {
-
         const originalURL = match[0];
-
-        // Do not turn the domain portion of an email address into a link.
-        if (match.index > 0 && text[match.index - 1] === "@") {
-            continue;
-        }
+        if (match.index > 0 && text[match.index - 1] === "@") continue;
 
         let cleanURL = originalURL;
         let ending = "";
-
         while (/[.,!?;:)\]}]$/.test(cleanURL)) {
-
             ending = cleanURL.slice(-1) + ending;
             cleanURL = cleanURL.slice(0, -1);
         }
 
-        result += escapeHTML(
-            text.slice(lastIndex, match.index)
-        );
-
-        const href = /^(https?:\/\/)/i.test(cleanURL)
-            ? cleanURL
-            : "https://" + cleanURL;
+        result += escapeHTML(text.slice(lastIndex, match.index));
+        const href = /^(https?:\/\/)/i.test(cleanURL) ? cleanURL : "https://" + cleanURL;
 
         try {
-
             const parsed = new URL(href);
-
-            if (
-                parsed.protocol === "https:" ||
-                parsed.protocol === "http:"
-            ) {
-
-                result += `<a
-                    href="${escapeHTML(parsed.href)}"
-                    target="_self"
-                    rel="noopener noreferrer"
-                    class="group-message-link"
-                >${escapeHTML(cleanURL)}</a>`;
-
+            if (parsed.protocol === "https:" || parsed.protocol === "http:") {
+                result += '<a href="' + escapeHTML(parsed.href) + '" target="_self" rel="noopener noreferrer" class="group-message-link">' + escapeHTML(cleanURL) + '</a>';
             } else {
-
                 result += escapeHTML(originalURL);
             }
-
         } catch {
-
             result += escapeHTML(originalURL);
         }
 
         result += escapeHTML(ending);
-
         lastIndex = match.index + originalURL.length;
     }
 
     result += escapeHTML(text.slice(lastIndex));
-
     return result.replace(/\r\n|\r|\n/g, "<br>");
 }
-
 
 /* ==========================
 APPEND MESSAGE

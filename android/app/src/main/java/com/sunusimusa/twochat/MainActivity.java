@@ -89,6 +89,21 @@ static final String ACTION_FCM_TOKEN_REFRESHED =
         webView.setWebViewClient(new WebViewClient() {
 
             @Override
+            public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
+                super.onPageStarted(view, url, favicon);
+
+                // Group Chat has its own scrollable message list. Disable the
+                // outer pull-to-refresh container there so scrolling to older
+                // messages never triggers a full WebView reload.
+                if (swipeRefreshLayout != null) {
+                    boolean isGroupChat = url != null
+                            && url.contains("/group-chat.html");
+                    swipeRefreshLayout.setEnabled(!isGroupChat);
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            }
+
+            @Override
             public boolean shouldOverrideUrlLoading(
                     WebView view,
                     WebResourceRequest request
