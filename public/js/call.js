@@ -172,7 +172,38 @@
         } catch (_) {}
     }
 
-    function getMicrophoneStream() {
+    function requestNativeCallMicrophonePermission() {
+        if (!window.AndroidVoiceRecorder ||
+                typeof window.AndroidVoiceRecorder.requestCallMicrophonePermission !== "function") {
+            return Promise.resolve(true);
+        }
+
+        return new Promise(resolve => {
+            let settled = false;
+            const finish = granted => {
+                if (settled) return;
+                settled = true;
+                clearTimeout(timeout);
+                window.on2ChatMicrophonePermissionResult = null;
+                resolve(granted === true);
+            };
+            const timeout = setTimeout(() => finish(false), 20000);
+            window.on2ChatMicrophonePermissionResult = finish;
+
+            try {
+                window.AndroidVoiceRecorder.requestCallMicrophonePermission();
+            } catch (_) {
+                finish(false);
+            }
+        });
+    }
+
+    async function getMicrophoneStream() {
+        const nativePermissionGranted = await requestNativeCallMicrophonePermission();
+        if (!nativePermissionGranted) {
+            throw new Error("Please allow microphone permission for 2Chat in Android Settings, then try again.");
+        }
+
         var constraints = { audio: true, video: false };
 
         if (navigator.mediaDevices &&
