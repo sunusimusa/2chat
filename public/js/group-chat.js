@@ -499,8 +499,7 @@ function formatGroupMessageText(value) {
 
     let text = String(value == null ? "" : value);
 
-    // Decode previously escaped HTML so old malformed link messages can be
-    // normalized before rendering. This does not execute the decoded markup.
+    // Decode previously escaped HTML without executing the decoded markup.
     const decoder = document.createElement("textarea");
     for (let i = 0; i < 6; i++) {
         decoder.innerHTML = text;
@@ -509,26 +508,25 @@ function formatGroupMessageText(value) {
         text = decoded;
     }
 
-    // If an older client stored a complete anchor tag as message text,
-    // preserve only its visible label, never its HTML attributes.
-    if (/<\\s*a\\b/i.test(text) || /<\\/\\s*a\\s*>/i.test(text)) {
+    // Convert legacy stored anchor markup to its visible text only.
+    if (/<\s*a\b/i.test(text) || /<\/\s*a\s*>/i.test(text)) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(text, "text/html");
         text = doc.body.textContent || "";
     }
 
-    // Remove stray anchor attributes left behind by older malformed messages.
+    // Remove stray anchor attributes left by older malformed messages.
     text = text
-        .replace(/\\b(?:href|target|rel|class)\\s*=\\s*(?:"[^"]*"|'[^']*'|[^\\s>]*)/gi, "")
-        .replace(/<\\/?a\\b[^>]*>/gi, "")
-        .replace(/^\\s*>+|>+\\s*$/g, "")
-        .replace(/[ \\t]{2,}/g, " ");
+        .replace(/\b(?:href|target|rel|class)\s*=\s*("[^"]*"|'[^']*'|[^\s>]*)/gi, "")
+        .replace(/<\/?a\b[^>]*>/gi, "")
+        .replace(/^\s*>+|>+\s*$/g, "")
+        .replace(/[ \t]{2,}/g, " ");
 
     const escapeHTML = value => String(value).replace(/[&<>"']/g, char => ({
         "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
     })[char]);
 
-    const urlPattern = /https?:\\/\\/[^\\s<>"']+|www\\.[^\\s<>"']+|(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z]{2,}(?:\\/[^\\s<>"']*)?/gi;
+    const urlPattern = /https?:\/\/[^\s<>"']+|www\.[^\s<>"']+|(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}(?:\/[^\s<>"']*)?/gi;
     let result = "";
     let lastIndex = 0;
     let match;
@@ -539,13 +537,13 @@ function formatGroupMessageText(value) {
 
         let cleanURL = originalURL;
         let ending = "";
-        while (/[.,!?;:)\\]}]$/.test(cleanURL)) {
+        while (/[.,!?;:)\]}]$/.test(cleanURL)) {
             ending = cleanURL.slice(-1) + ending;
             cleanURL = cleanURL.slice(0, -1);
         }
 
         result += escapeHTML(text.slice(lastIndex, match.index));
-        const href = /^(https?:\\/\\/)/i.test(cleanURL) ? cleanURL : "https://" + cleanURL;
+        const href = /^(https?:\/\/)/i.test(cleanURL) ? cleanURL : "https://" + cleanURL;
 
         try {
             const parsed = new URL(href);
@@ -563,7 +561,7 @@ function formatGroupMessageText(value) {
     }
 
     result += escapeHTML(text.slice(lastIndex));
-    return result.replace(/\\r\\n|\\r|\\n/g, "<br>");
+    return result.replace(/\r\n|\r|\n/g, "<br>");
 }
 
 /* ==========================
