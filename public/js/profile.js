@@ -552,6 +552,55 @@ function logout() {
 }
 
 
+
+ 
+// =====================================================
+// ACCOUNT DELETION
+// =====================================================
+
+async function requestAccountDeletion() {
+    const confirmed = confirm(
+        "Delete your 2Chat account? Your account will be restricted immediately and permanently deleted after 30 days unless you cancel."
+    );
+    if (!confirmed) return;
+
+    const password = prompt("Enter your 2Chat password to confirm account deletion:");
+    if (password === null) return;
+    if (!password) {
+        alert("Password is required.");
+        return;
+    }
+
+    const button = document.getElementById("accountDeleteBtn");
+    if (button) button.disabled = true;
+
+    try {
+        const response = await fetch("/api/users/delete-account", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({ password })
+        });
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Unable to request account deletion.");
+        }
+
+        localStorage.setItem(
+            "accountDeletionScheduledFor",
+            data.deletionScheduledFor
+        );
+        alert(data.message);
+        location.href = "/account-deletion.html";
+    } catch (error) {
+        alert(error.message);
+        if (button) button.disabled = false;
+    }
+}
+
 // =====================================================
 // HOME
 // =====================================================
