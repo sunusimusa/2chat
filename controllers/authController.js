@@ -123,8 +123,6 @@ const sendEmailOtp = async (user) => {
 // =====================================================
 
 exports.register = async (req, res) => {
-  let user = null;
-
   try {
     const {
       username,
@@ -134,7 +132,6 @@ exports.register = async (req, res) => {
       dateOfBirth
     } = req.body;
 
-    // BASIC VALIDATION
     if (
       typeof username !== "string" ||
       typeof email !== "string" ||
@@ -157,7 +154,6 @@ exports.register = async (req, res) => {
     const cleanEmail = email.trim().toLowerCase();
     const cleanPhone = phoneNumber.trim();
 
-    // USERNAME VALIDATION
     if (
       cleanUsername.length < 3 ||
       cleanUsername.length > 30 ||
@@ -169,23 +165,20 @@ exports.register = async (req, res) => {
       });
     }
 
-    // EMAIL VALIDATION
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(cleanEmail)) {
       return res.status(400).json({
         success: false,
         message: "Please enter a valid email address."
       });
     }
 
-    // PHONE VALIDATION
-    if (!/^\+[1-9]\d{7,14}$/.test(cleanPhone)) {
+    if (!/^\\+[1-9]\\d{7,14}$/.test(cleanPhone)) {
       return res.status(400).json({
         success: false,
         message: "Please enter a valid international phone number."
       });
     }
 
-    // PASSWORD VALIDATION
     if (password.length < 8 || password.length > 128) {
       return res.status(400).json({
         success: false,
@@ -193,8 +186,7 @@ exports.register = async (req, res) => {
       });
     }
 
-    // DATE OF BIRTH VALIDATION
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)) {
+    if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(dateOfBirth)) {
       return res.status(400).json({
         success: false,
         message: "Please enter a valid date of birth."
@@ -202,7 +194,6 @@ exports.register = async (req, res) => {
     }
 
     const [year, month, day] = dateOfBirth.split("-").map(Number);
-
     const birthDate = new Date(Date.UTC(year, month - 1, day));
 
     if (
@@ -217,7 +208,6 @@ exports.register = async (req, res) => {
     }
 
     const today = new Date();
-
     const todayUTC = new Date(Date.UTC(
       today.getUTCFullYear(),
       today.getUTCMonth(),
@@ -231,19 +221,12 @@ exports.register = async (req, res) => {
       });
     }
 
-    // CALCULATE AGE
     let age = todayUTC.getUTCFullYear() - year;
-
     const birthdayNotReached =
       todayUTC.getUTCMonth() < month - 1 ||
-      (
-        todayUTC.getUTCMonth() === month - 1 &&
-        todayUTC.getUTCDate() < day
-      );
+      (todayUTC.getUTCMonth() === month - 1 && todayUTC.getUTCDate() < day);
 
-    if (birthdayNotReached) {
-      age--;
-    }
+    if (birthdayNotReached) age--;
 
     if (age < 13) {
       return res.status(403).json({
@@ -252,10 +235,7 @@ exports.register = async (req, res) => {
       });
     }
 
-    const accountType = age < 18 ? "teen" : "adult";
-
-    // CHECK EXISTING USER
-    const userExists = await User.findOne({
+    const existingUser = await User.findOne({
       $or: [
         { email: cleanEmail },
         { username: cleanUsername },
@@ -263,52 +243,61 @@ exports.register = async (req, res) => {
       ]
     });
 
-    if (userExists) {
+    if (existingUser) {
       return res.status(409).json({
         success: false,
         message: "Email, username or phone number is already registered."
       });
     }
 
-    // HASH PASSWORD
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // CREATE UNVERIFIED USER
-    user = await User.create({
+    const user = await User.create({
       username: cleanUsername,
       email: cleanEmail,
       phoneNumber: cleanPhone,
       dateOfBirth: birthDate,
-      accountType,
+      accountType: age < 18 ? "teen" : "adult",
       password: hashedPassword,
       emailVerified: false
     });
 
-    // SEND EMAIL OTP
-    await sendEmailOtp(user);
+    // Create the user's wallet and sign them in immediately.
+    await createWalletIfMissing(user._id);
 
-    // WAIT FOR EMAIL VERIFICATION
+    user.online = true;
+    user.lastSeen = new Date();
+    await user.save();
+
+    const token = generateToken(user._id);
+    const safeUser = {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      dateOfBirth: user.dateOfBirth,
+      accountType: user.accountType,
+      role: user.role,
+      isCreator: user.isCreator,
+      creatorBadge: user.creatorBadge,
+      favoriteCategories: user.favoriteCategories,
+      avatar: user.avatar,
+      cover: user.cover,
+      bio: user.bio,
+      online: user.online,
+      lastSeen: user.lastSeen
+    };
+
     return res.status(201).json({
       success: true,
-      requiresEmailVerification: true,
-      message: "Verification code sent to your email address.",
-      email: user.email
+      requiresEmailVerification: false,
+      message: "Account created successfully.",
+      token,
+      user: safeUser
     });
 
   } catch (err) {
     console.error("REGISTER ERROR:", err.message);
-
-    // REMOVE NEW ACCOUNT IF OTP DELIVERY FAILS
-    if (user && user.emailVerified === false) {
-      try {
-        await User.deleteOne({
-          _id: user._id,
-          emailVerified: false
-        });
-      } catch (cleanupError) {
-        console.error("REGISTRATION CLEANUP ERROR:", cleanupError.message);
-      }
-    }
 
     if (err.code === 11000) {
       return res.status(409).json({
@@ -323,7 +312,7 @@ exports.register = async (req, res) => {
     });
   }
 };
-              
+
 // =====================================================
 // LOGIN
 // =====================================================
@@ -408,14 +397,7 @@ exports.login = async (req, res) => {
         }
 
       
-// EMAIL VERIFICATION CHECK
-if (user.emailVerified === false) {
-    return res.status(403).json({
-        success: false,
-        requiresEmailVerification: true,
-        message: "Please verify your email address before logging in."
-    });
-}
+// Email verification is optional; registration and login do not require an OTP.
 
         // ACCOUNT SUSPENSION CHECK
         if (user.isSuspended) {
