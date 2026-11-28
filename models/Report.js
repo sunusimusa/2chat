@@ -92,7 +92,10 @@ const reportSchema = new mongoose.Schema(
                         "content_restored",
                         "user_suspended",
                         "user_unsuspended",
-                        "report_dismissed"
+                        "report_dismissed",
+                        "user_warned",
+                        "user_permanently_suspended",
+                        "user_temporarily_suspended"
                     ],
                     required: true
                 },
