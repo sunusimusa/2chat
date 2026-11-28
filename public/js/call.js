@@ -343,6 +343,7 @@
 
     socket.on("connect", () => {
         socket.emit("join");
+        socket.emit("call:resume-pending");
         socket.emit("call:presence", document.visibilityState === "visible" && document.hasFocus());
         iceConfigPromise = new Promise(resolve => {
             const fallback = setTimeout(resolve, 2500);
