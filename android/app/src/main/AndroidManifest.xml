@@ -5,8 +5,12 @@
     <!-- Internet -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Microphone is optional on devices without audio hardware -->
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+
     <!-- Microphone for voice messages -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <!-- Camera permission for WebView media features -->
     <uses-permission android:name="android.permission.CAMERA" />
