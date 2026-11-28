@@ -103,7 +103,7 @@ const updateReport = async (req, res) => {
         if (targetUser && targetUser.role === "admin") {
             return res.status(403).json({ success: false, message: "The administrator account cannot be moderated through a user report." });
         }
-        if (["warn_user", "suspend_temporary", "suspend_permanent"].includes(action) && !targetUser) {
+        if (["warn_user", "suspend_temporary", "suspend_permanent", "remove_content"].includes(action) && !targetUser) {
             return res.status(400).json({ success: false, message: "This report has no valid reported user for an account action." });
         }
 
@@ -118,6 +118,12 @@ const updateReport = async (req, res) => {
         } else if (action === "mark_reviewed") {
             report.status = "reviewed";
         } else if (action === "warn_user") {
+            targetUser.moderationWarnings.push({
+                reason: note,
+                reportId: report._id,
+                issuedBy: req.admin._id
+            });
+            await targetUser.save();
             historyAction = "user_warned";
             targetType = "user";
             targetId = targetUser._id;
