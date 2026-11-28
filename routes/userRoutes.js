@@ -1,4 +1,16 @@
 const router = require("express").Router();
+const { rateLimit } = require("express-rate-limit");
+
+const deletionLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 5,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    message: {
+        success: false,
+        message: "Too many account deletion attempts. Please try again later."
+    }
+});
 
 const protect = require("../middleware/auth");
 
@@ -21,7 +33,7 @@ const {
 // ACCOUNT DELETION
 // =========================================
 
-router.post("/delete-account", protect, requestAccountDeletion);
+router.post("/delete-account", deletionLimiter, protect, requestAccountDeletion);
 router.post("/cancel-deletion", protect, cancelAccountDeletion);
 
 // =========================================
