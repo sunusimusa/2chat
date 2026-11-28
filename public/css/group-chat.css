@@ -1182,3 +1182,6 @@ cursor:pointer;
 
 }
 
+
+
+/* ==========================\n   CLICKABLE GROUP MESSAGE LINKS\n========================== */\n\n.message-text a.group-message-link{\n    color:inherit;\n    text-decoration:underline;\n    text-underline-offset:2px;\n    cursor:pointer;\n    pointer-events:auto;\n    overflow-wrap:anywhere;\n}\n\n.bubble-me .message-text a.group-message-link{\n    color:#fff;\n}\n\n.bubble-other .message-text a.group-message-link{\n    color:#0866c6;\n}\n
