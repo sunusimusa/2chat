@@ -3,6 +3,11 @@ const router = require("express").Router();
 const protect = require("../middleware/auth");
 
 const {
+    requestAccountDeletion,
+    cancelAccountDeletion
+} = require("../controllers/accountDeletionController");
+
+const {
     followUser,
     getUserProfile,
     getAllUsers,
@@ -11,6 +16,13 @@ const {
     unblockUser,
     getBlockedUsers
 } = require("../controllers/userController");
+
+// =========================================
+// ACCOUNT DELETION
+// =========================================
+
+router.post("/delete-account", protect, requestAccountDeletion);
+router.post("/cancel-deletion", protect, cancelAccountDeletion);
 
 // =========================================
 // FOLLOW / UNFOLLOW USER
