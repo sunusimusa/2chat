@@ -595,7 +595,10 @@ reportsList.addEventListener("click", async function(event){
       body:JSON.stringify({action,adminNote,checklist,suspensionDays})
     });
     const data = await response.json();
-    if(response.status === 401 || response.status === 403){ logout(); throw new Error("Admin access denied. Please login again."); }
+    if(response.status === 401){
+      logout();
+      throw new Error(data.message || "Your admin session has expired. Please login again.");
+    }
     if(!response.ok || !data.success) throw new Error(data.message || "Could not save decision.");
     dashboardMessage.textContent = data.message || "Decision saved.";
     await loadReports();
