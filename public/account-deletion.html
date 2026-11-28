@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2Chat Account Deletion</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:24px;display:grid;place-items:center;background:#f3f6fb;color:#172033;font-family:Arial,sans-serif}.card{width:100%;max-width:440px;padding:26px;background:#fff;border:1px solid #e5eaf1;border-radius:18px;box-shadow:0 12px 36px rgba(16,24,39,.08)}h1{font-size:23px;margin:0 0 12px}p{font-size:14px;line-height:1.65;color:#596579}.date{padding:14px;border-radius:12px;background:#fff7ed;color:#9a3412;font-weight:700;margin:18px 0;overflow-wrap:anywhere}.btn{width:100%;padding:14px;border:0;border-radius:11px;font-weight:700;font-size:14px;cursor:pointer}.cancel{background:#2563eb;color:white}.logout{margin-top:10px;background:#eef2f7;color:#273449}.status{font-size:13px;margin-top:14px;color:#b42318}
+</style>
+</head>
+<body>
+<main class="card">
+<h1>Account deletion scheduled</h1>
+<p>Your 2Chat account is scheduled for permanent deletion. During the 30-day grace period, your account is restricted. You can cancel the request below and restore access.</p>
+<div class="date" id="deletionDate">Loading deletion date…</div>
+<p>After deletion, your profile, posts, Shorts, statuses, messages and related social data will be removed. Certain financial and safety records may be retained where required for accounting, fraud prevention or legal compliance.</p>
+<button class="btn cancel" id="cancelButton" type="button">Cancel deletion request</button>
+<button class="btn logout" id="logoutButton" type="button">Log out</button>
+<p class="status" id="status" role="status"></p>
+</main>
+<script>
+const token=localStorage.getItem("token");
+const dateValue=localStorage.getItem("accountDeletionScheduledFor");
+const dateNode=document.getElementById("deletionDate");
+const statusNode=document.getElementById("status");
+const cancelButton=document.getElementById("cancelButton");
+if(!token){dateNode.textContent="Please log in to manage your deletion request.";cancelButton.disabled=true;}
+else if(dateValue){const date=new Date(dateValue);dateNode.textContent="Scheduled for: "+(Number.isNaN(date.getTime())?dateValue:date.toLocaleString());}
+else{dateNode.textContent="Your account deletion request is being processed.";}
+cancelButton.addEventListener("click",async()=>{
+ if(!token)return;
+ if(!confirm("Cancel your account deletion request and reactivate your 2Chat account?"))return;
+ cancelButton.disabled=true;statusNode.textContent="Cancelling…";
+ try{
+  const response=await fetch("/api/users/cancel-deletion",{method:"POST",headers:{Authorization:"Bearer "+token}});
+  const data=await response.json();
+  if(!response.ok||!data.success)throw new Error(data.message||"Unable to cancel request.");
+  localStorage.removeItem("accountDeletionScheduledFor");
+  statusNode.style.color="#16834a";statusNode.textContent=data.message||"Deletion cancelled.";
+  setTimeout(()=>location.href="/home.html",900);
+ }catch(error){statusNode.textContent=error.message;cancelButton.disabled=false;}
+});
+document.getElementById("logoutButton").addEventListener("click",()=>{
+ localStorage.removeItem("token");localStorage.removeItem("user");location.href="/login.html";
+});
+</script>
+</body>
+</html>
