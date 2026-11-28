@@ -128,6 +128,8 @@ const io =
         }
     );
 
+app.set("io", io);
+
 
 // =====================================================
 // SOCKET.IO JWT AUTHENTICATION
