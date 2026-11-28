@@ -525,23 +525,82 @@ function renderReports(){
       ? new Date(report.createdAt).toLocaleString()
       : "Unknown date";
 
+    const locked = ["action_taken", "dismissed"].includes(report.status);
     return `
-      <article class="report">
+      <article class="report" data-report-id="${escapeHTML(report._id)}">
         <div class="report-top">
           <strong>${escapeHTML(report.contentType || "Unknown content")}</strong>
           <span class="tag">${escapeHTML(report.status || "pending")}</span>
         </div>
-
         <p><b>Reason:</b> ${escapeHTML(report.reason || "Not specified")}</p>
         <p><b>Reported by:</b> ${escapeHTML(reporter)}</p>
         <p><b>Reported user:</b> ${escapeHTML(reportedUser)}</p>
         <p><b>Content ID:</b> ${escapeHTML(report.contentId || "N/A")}</p>
         <p><b>Description:</b> ${escapeHTML(report.description || "No description provided")}</p>
         <p class="meta">Submitted: ${escapeHTML(date)}</p>
+        <p><b>Investigation checklist</b></p>
+        <label><input type="checkbox" class="review-check" value="content_verified"> I verified the reported content/account.</label>
+        <label><input type="checkbox" class="review-check" value="evidence_reviewed"> I reviewed the available evidence.</label>
+        <label><input type="checkbox" class="review-check" value="policy_matched"> I matched the evidence to a 2Chat rule.</label>
+        <label><input type="checkbox" class="review-check" value="risk_assessed"> I assessed immediate safety risks.</label>
+        <label><input type="checkbox" class="review-check" value="proportional_action"> I selected a proportionate response.</label>
+        <label><input type="checkbox" class="review-check" value="decision_reason_recorded"> I will record a clear decision reason.</label>
+        <select class="moderation-action" ${locked ? "disabled" : ""}>
+          <option value="">Select decision</option>
+          <option value="mark_reviewed">Mark reviewed — no final decision</option>
+          <option value="dismiss">Dismiss report</option>
+          <option value="warn_user">Issue user warning</option>
+          <option value="remove_content">Remove reported Post / Short</option>
+          <option value="suspend_temporary">Temporary suspension</option>
+          <option value="suspend_permanent">Permanent suspension</option>
+        </select>
+        <input class="suspension-days" type="number" min="1" max="365" placeholder="Suspension days (temporary only)" ${locked ? "disabled" : ""}>
+        <textarea class="decision-note" rows="3" maxlength="1000" placeholder="Required decision reason (10–1000 characters)" ${locked ? "disabled" : ""}></textarea>
+        <button class="save-decision" data-id="${escapeHTML(report._id)}" ${locked ? "disabled" : ""}>Save moderation decision</button>
+        ${locked ? "<p class='meta'>This report is resolved and read-only.</p>" : ""}
       </article>
     `;
   }).join("");
 }
+
+
+reportsList.addEventListener("click", async function(event){
+  const button = event.target.closest(".save-decision");
+  if(!button) return;
+  const card = button.closest("[data-report-id]");
+  const action = card.querySelector(".moderation-action").value;
+  const adminNote = card.querySelector(".decision-note").value.trim();
+  const checklist = Array.from(card.querySelectorAll(".review-check:checked")).map(item => item.value);
+  const suspensionDays = Number(card.querySelector(".suspension-days").value);
+  if(!action){ alert("Select a moderation decision."); return; }
+  if(checklist.length !== 6){ alert("Complete all six investigation checks."); return; }
+  if(adminNote.length < 10){ alert("Write a clear decision reason of at least 10 characters."); return; }
+  if(action === "suspend_temporary" && (!Number.isInteger(suspensionDays) || suspensionDays < 1 || suspensionDays > 365)){
+    alert("Temporary suspension must be between 1 and 365 days."); return;
+  }
+  const warning = action === "suspend_permanent"
+    ? "Permanent suspension is irreversible through this dashboard. Confirm only after strong evidence and policy review."
+    : "Save this moderation decision?";
+  if(!confirm(warning)) return;
+  button.disabled = true;
+  button.textContent = "Saving...";
+  try{
+    const response = await fetch(API + "/api/reports/" + encodeURIComponent(button.dataset.id), {
+      method:"PUT",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer " + token},
+      body:JSON.stringify({action,adminNote,checklist,suspensionDays})
+    });
+    const data = await response.json();
+    if(response.status === 401 || response.status === 403){ logout(); throw new Error("Admin access denied. Please login again."); }
+    if(!response.ok || !data.success) throw new Error(data.message || "Could not save decision.");
+    dashboardMessage.textContent = data.message || "Decision saved.";
+    await loadReports();
+  }catch(error){
+    dashboardMessage.textContent = error.message;
+    button.disabled = false;
+    button.textContent = "Save moderation decision";
+  }
+});
 
 document.getElementById("statusFilter")
   .addEventListener("change", renderReports);
