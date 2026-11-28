@@ -497,13 +497,16 @@ async function register() {
             return;
         }
 
-        if (data.requiresEmailVerification === true) {
-            showOtpSection(data.email || email);
+        if (!data.token || !data.user) {
+            msg.innerText = "Account was created but sign-in details are missing. Please contact support.";
             return;
         }
 
-        msg.innerText =
-            "Unexpected registration response. Please contact support.";
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        msg.innerText = "Account created successfully! Redirecting...";
+        redirectAfterAuthentication();
 
     } catch (error) {
         console.error("REGISTER ERROR:", error);
