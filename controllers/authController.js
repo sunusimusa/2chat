@@ -452,7 +452,12 @@ exports.login = async (req, res) => {
         return res.json({
             success: true,
             token,
-            user: safeUser
+            user: safeUser,
+            accountDeletionPending: Boolean(
+                user.deletionScheduledFor &&
+                user.deletionScheduledFor > new Date()
+            ),
+            deletionScheduledFor: user.deletionScheduledFor || null
         });
 
     } catch (err) {
