@@ -13,9 +13,70 @@ const cloudinary = require("../config/cloudinary");
 
 let workerRunning = false;
 
+function parseCloudinaryAsset(value, expectedType) {
+    if (typeof value !== "string" || !value.startsWith("https://")) return null;
+    try {
+        const url = new URL(value);
+        if (url.hostname !== "res.cloudinary.com") return null;
+        const marker = "/upload/";
+        const markerIndex = url.pathname.indexOf(marker);
+        if (markerIndex < 0) return null;
+
+        const pathParts = url.pathname.slice(markerIndex + marker.length).split("/");
+        const versionIndex = pathParts.findIndex(part => /^v\\d+$/.test(part));
+        if (versionIndex < 0 || versionIndex === pathParts.length - 1) return null;
+
+        const publicId = pathParts.slice(versionIndex + 1).join("/")
+            .replace(/\\.[^/.]+$/, "");
+        if (!publicId) return null;
+
+        return {
+            publicId,
+            resourceType: expectedType || (
+                url.pathname.includes("/video/upload/") ? "video" : "image"
+            )
+        };
+    } catch (_) {
+        return null;
+    }
+}
+
+async function removeCloudinaryAsset(value, expectedType) {
+    const asset = parseCloudinaryAsset(value, expectedType);
+    if (!asset) return;
+    try {
+        await cloudinary.uploader.destroy(asset.publicId, {
+            resource_type: asset.resourceType,
+            invalidate: true
+        });
+    } catch (error) {
+        console.error("CLOUDINARY ACCOUNT CLEANUP ERROR:", error.message);
+    }
+}
+
 async function deleteAccountData(user) {
     const userId = user._id;
     const username = user.username;
+
+    // Remove profile, post and status media only when URLs identify assets
+    // owned by this Cloudinary account.
+    await removeCloudinaryAsset(user.avatar, "image");
+    await removeCloudinaryAsset(user.cover, "image");
+
+    const [ownedPosts, ownedStatuses] = await Promise.all([
+        Post.find({ userId }).select("image video").lean(),
+        Status.find({ username }).select("media mediaType").lean()
+    ]);
+    for (const post of ownedPosts) {
+        await removeCloudinaryAsset(post.image, "image");
+        await removeCloudinaryAsset(post.video, "video");
+    }
+    for (const status of ownedStatuses) {
+        await removeCloudinaryAsset(
+            status.media,
+            status.mediaType === "video" ? "video" : "image"
+        );
+    }
 
     // Remove the user's Shorts from Cloudinary where a stored public ID exists.
     const ownedShorts = await ShortVideo.find({
