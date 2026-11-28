@@ -20,13 +20,19 @@ const protect = async (req, res, next) => {
         );
 
         const user = await User.findById(decoded.id)
-            .select("-password");
+            .select("-password +tokenVersion");
 
         if (!user) {
             return res.status(401).json({
                 success: false,
                 message: "User not found"
             });
+        }
+
+        // Legacy JWTs remain valid while tokenVersion is zero.
+        // Password recovery increments it and invalidates older sessions.
+        if ((decoded.tokenVersion || 0) !== (user.tokenVersion || 0)) {
+            return res.status(401).json({ success:false, message:'Session expired. Please log in again.' });
         }
 
         // =========================================

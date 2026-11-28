@@ -269,7 +269,7 @@ exports.register = async (req, res) => {
     user.lastSeen = new Date();
     await user.save();
 
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user.tokenVersion || 0);
     const safeUser = {
       _id: user._id,
       username: user.username,
@@ -374,7 +374,7 @@ exports.login = async (req, res) => {
         // FIND USER
         const user = await User.findOne({
             $or: loginConditions
-        }).select("+password");
+        }).select("+password +tokenVersion");
 
         if (!user) {
             return res.status(400).json({
@@ -431,7 +431,7 @@ exports.login = async (req, res) => {
         await createWalletIfMissing(user._id);
 
         // GENERATE TOKEN
-        const token = generateToken(user._id);
+        const token = generateToken(user._id, user.tokenVersion || 0);
 
         // SAFE USER RESPONSE
         const safeUser = {
@@ -1050,7 +1050,7 @@ exports.verifyEmailOtp = async (req, res) => {
     const user = await User.findOne({
       email: cleanEmail
     }).select(
-      "+emailOtpHash +emailOtpExpires +emailOtpAttempts"
+      "+emailOtpHash +emailOtpExpires +emailOtpAttempts +tokenVersion"
     );
 
     if (!user) {
@@ -1144,7 +1144,7 @@ exports.verifyEmailOtp = async (req, res) => {
     await createWalletIfMissing(user._id);
 
     // GENERATE LOGIN TOKEN
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user.tokenVersion || 0);
 
     // SAFE USER RESPONSE
     const safeUser = {
@@ -1255,4 +1255,62 @@ exports.resendEmailOtp = async (req, res) => {
       message: "Unable to send verification code. Please try again."
     });
   }
+};
+
+
+// =====================================================
+// 2CHAT RECOVERY KEY + BACKUP CODES
+// =====================================================
+const hashRecoveryCode = (userId, value) => crypto.createHash('sha256').update('2chat-recovery-v1:' + String(userId) + ':' + value).digest('hex');
+const safeEqualHex = (left, right) => {
+  if (typeof left !== 'string' || typeof right !== 'string' || !/^[a-f0-9]{64}$/i.test(left) || !/^[a-f0-9]{64}$/i.test(right)) return false;
+  const a = Buffer.from(left, 'hex'); const b = Buffer.from(right, 'hex');
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+};
+const makeRecoveryCode = bytes => crypto.randomBytes(bytes).toString('hex').toUpperCase();
+
+exports.createRecoveryCredentials = async (req, res) => {
+  try {
+    const currentPassword = req.body && req.body.currentPassword;
+    if (typeof currentPassword !== 'string' || !currentPassword) return res.status(400).json({ success:false, message:'Enter your current password.' });
+    const user = await User.findById(req.user._id).select('+password');
+    if (!user) return res.status(404).json({ success:false, message:'Account not found.' });
+    if (!(await bcrypt.compare(currentPassword, user.password))) return res.status(400).json({ success:false, message:'Current password is incorrect.' });
+    const recoveryKey = makeRecoveryCode(24);
+    const backupCodes = Array.from({ length:5 }, () => makeRecoveryCode(8));
+    user.recoveryKeyHash = hashRecoveryCode(user._id, recoveryKey);
+    user.recoveryBackupCodeHashes = backupCodes.map(code => hashRecoveryCode(user._id, code));
+    user.recoveryCredentialsCreatedAt = new Date();
+    await user.save();
+    return res.json({ success:true, message:'Save these recovery credentials now. They will not be shown again.', recoveryKey, backupCodes });
+  } catch (err) { console.error('CREATE RECOVERY CREDENTIALS ERROR:', err); return res.status(500).json({ success:false, message:'Unable to create recovery credentials.' }); }
+};
+
+exports.resetPasswordWithRecovery = async (req, res) => {
+  try {
+    const { identifier, recoveryCode, newPassword } = req.body || {};
+    if (typeof identifier !== 'string' || !identifier.trim() || typeof recoveryCode !== 'string' || !recoveryCode.trim() || typeof newPassword !== 'string' || newPassword.length < 8 || newPassword.length > 128) return res.status(400).json({ success:false, message:'Enter your username or email, recovery code, and a password of 8-128 characters.' });
+    const cleanIdentifier = identifier.trim();
+    const user = await User.findOne({ $or:[ { email:cleanIdentifier.toLowerCase() }, { username:cleanIdentifier } ] }).select('+recoveryKeyHash +recoveryBackupCodeHashes');
+    if (!user) return res.status(400).json({ success:false, message:'Account details or recovery code are incorrect.' });
+    const normalizedCode = recoveryCode.trim().toUpperCase().replace(/[^A-F0-9]/g, '');
+    if (!/^[A-F0-9]{16,48}$/.test(normalizedCode)) return res.status(400).json({ success:false, message:'Account details or recovery code are incorrect.' });
+    const submittedHash = hashRecoveryCode(user._id, normalizedCode);
+    const isRecoveryKey = safeEqualHex(user.recoveryKeyHash, submittedHash);
+    const matchingBackupHash = (user.recoveryBackupCodeHashes || []).find(hash => safeEqualHex(hash, submittedHash));
+    if (!isRecoveryKey && !matchingBackupHash) return res.status(400).json({ success:false, message:'Account details or recovery code are incorrect.' });
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    const filter = { _id:user._id };
+    const update = { $set:{ password:hashedPassword }, $inc:{ tokenVersion:1 } };
+    if (isRecoveryKey) {
+      filter.recoveryKeyHash = user.recoveryKeyHash;
+      update.$set.recoveryKeyHash = null;
+    } else {
+      filter.recoveryBackupCodeHashes = matchingBackupHash;
+      update.$pull = { recoveryBackupCodeHashes:matchingBackupHash };
+    }
+    const updated = await User.findOneAndUpdate(filter, update, { new:true });
+    if (!updated) return res.status(409).json({ success:false, message:'This recovery code has just been used or changed. Try another code.' });
+    return res.json({ success:true, message:'Password reset successfully. Sign in with your new password.' });
+  } catch (err) { console.error('RECOVERY PASSWORD RESET ERROR:', err); return res.status(500).json({ success:false, message:'Unable to reset password. Please try again.' }); }
 };
