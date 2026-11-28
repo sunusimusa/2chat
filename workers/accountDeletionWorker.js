@@ -51,6 +51,7 @@ async function removeCloudinaryAsset(value, expectedType) {
         });
     } catch (error) {
         console.error("CLOUDINARY ACCOUNT CLEANUP ERROR:", error.message);
+        throw error;
     }
 }
 
@@ -92,6 +93,7 @@ async function deleteAccountData(user) {
             });
         } catch (mediaError) {
             console.error("SHORT MEDIA CLEANUP ERROR:", mediaError.message);
+            throw mediaError;
         }
     }
 
@@ -233,13 +235,20 @@ async function processDueAccountDeletions() {
     try {
         const dueUsers = await User.find({
             deletionScheduledFor: { $lte: new Date() }
-        }).limit(10);
+        }).sort({ deletionAttempts: 1, deletionScheduledFor: 1 }).limit(10);
 
         for (const user of dueUsers) {
             try {
                 await deleteAccountData(user);
                 console.log("ACCOUNT DELETION COMPLETED:", String(user._id));
             } catch (error) {
+                await User.updateOne(
+                    { _id: user._id },
+                    {
+                        $inc: { deletionAttempts: 1 },
+                        $set: { deletionLastAttemptAt: new Date() }
+                    }
+                );
                 console.error(
                     "ACCOUNT DELETION FAILED:",
                     String(user._id),
