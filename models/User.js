@@ -98,6 +98,33 @@ accountType: {
     },
 
     // =========================================
+    // ACCOUNT DELETION
+    // =========================================
+
+    deletionRequestedAt: {
+      type: Date,
+      default: null,
+      index: true
+    },
+
+    deletionScheduledFor: {
+      type: Date,
+      default: null,
+      index: true
+    },
+
+    deletionAttempts: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+
+    deletionLastAttemptAt: {
+      type: Date,
+      default: null
+    },
+
+    // =========================================
     // ACCOUNT ROLE
     // =========================================
 

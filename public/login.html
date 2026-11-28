@@ -318,6 +318,15 @@ async function login() {
             JSON.stringify(data.user)
         );
 
+        if (data.accountDeletionPending) {
+            localStorage.setItem(
+                "accountDeletionScheduledFor",
+                data.deletionScheduledFor || ""
+            );
+            location.href = "/account-deletion.html";
+            return;
+        }
+
         // GROUP REDIRECT
         const afterAuthRedirect =
             localStorage.getItem("afterAuthRedirect");

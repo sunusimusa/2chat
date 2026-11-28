@@ -60,6 +60,10 @@ const {
     startShortModerationWorker
 } = require("./workers/shortModerationWorker");
 
+const {
+    startAccountDeletionWorker
+} = require("./workers/accountDeletionWorker");
+
 const walletRoutes =
     require("./routes/walletRoutes");
 
@@ -124,6 +128,8 @@ const io =
         }
     );
 
+app.set("io", io);
+
 
 // =====================================================
 // SOCKET.IO JWT AUTHENTICATION
@@ -157,6 +163,14 @@ io.use(async (socket, next) => {
         if (!user) {
             return next(
                 new Error("User not found.")
+            );
+        }
+
+        if (
+            user.deletionScheduledFor
+        ) {
+            return next(
+                new Error("This account is scheduled for deletion.")
             );
         }
 
@@ -1991,6 +2005,7 @@ mongoose
          // =============================================
 
            startShortModerationWorker();
+           startAccountDeletionWorker();
 
 
           // =============================================
