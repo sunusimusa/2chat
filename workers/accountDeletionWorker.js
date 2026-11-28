@@ -64,9 +64,11 @@ async function deleteAccountData(user) {
     await removeCloudinaryAsset(user.avatar, "image");
     await removeCloudinaryAsset(user.cover, "image");
 
-    const [ownedPosts, ownedStatuses] = await Promise.all([
+    const [ownedPosts, ownedStatuses, ownedMessages, ownedGroupMessages] = await Promise.all([
         Post.find({ userId }).select("image video").lean(),
-        Status.find({ username }).select("media mediaType").lean()
+        Status.find({ username }).select("media mediaType").lean(),
+        Message.find({ sender: username }).select("image voice file type").lean(),
+        GroupMessage.find({ sender: username }).select("image voice").lean()
     ]);
     for (const post of ownedPosts) {
         await removeCloudinaryAsset(post.image, "image");
@@ -77,6 +79,18 @@ async function deleteAccountData(user) {
             status.media,
             status.mediaType === "video" ? "video" : "image"
         );
+    }
+    for (const message of ownedMessages) {
+        await removeCloudinaryAsset(message.image, "image");
+        await removeCloudinaryAsset(message.voice, "video");
+        await removeCloudinaryAsset(
+            message.file,
+            message.type === "video" ? "video" : "raw"
+        );
+    }
+    for (const message of ownedGroupMessages) {
+        await removeCloudinaryAsset(message.image, "image");
+        await removeCloudinaryAsset(message.voice, "video");
     }
 
     // Remove the user's Shorts from Cloudinary where a stored public ID exists.
