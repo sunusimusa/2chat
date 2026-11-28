@@ -155,6 +155,10 @@
         >
     </div>
 
+    <p class="legal-text">
+        2Chat is currently available to adults aged 18 and above.
+    </p>
+
     <!-- PASSWORD -->
     <div class="input-group password-group">
         <i class="fa-solid fa-lock"></i>
@@ -453,10 +457,31 @@ async function register() {
         return;
     }
 
-    const dob = new Date(dateOfBirth + "T00:00:00");
+    const dobParts = dateOfBirth.split("-").map(Number);
+    const [birthYear, birthMonth, birthDay] = dobParts;
+    const dob = new Date(birthYear, birthMonth - 1, birthDay);
+    const today = new Date();
 
-    if (Number.isNaN(dob.getTime()) || dob > new Date()) {
+    if (
+        Number.isNaN(dob.getTime()) ||
+        dob.getFullYear() !== birthYear ||
+        dob.getMonth() !== birthMonth - 1 ||
+        dob.getDate() !== birthDay ||
+        dob > today
+    ) {
         msg.innerText = "Please enter a valid date of birth.";
+        return;
+    }
+
+    let age = today.getFullYear() - birthYear;
+    const birthdayNotReached =
+        today.getMonth() < birthMonth - 1 ||
+        (today.getMonth() === birthMonth - 1 && today.getDate() < birthDay);
+
+    if (birthdayNotReached) age--;
+
+    if (age < 18) {
+        msg.innerText = "You must be at least 18 years old to create a 2Chat account.";
         return;
     }
 
