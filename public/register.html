@@ -446,6 +446,11 @@ async function register() {
         return;
     }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        msg.innerText = "Please enter a valid email address.";
+        return;
+    }
+
     if (password.length < 8 || password.length > 128) {
         msg.innerText =
             "Password must be between 8 and 128 characters.";
