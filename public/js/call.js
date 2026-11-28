@@ -107,7 +107,7 @@
 
     function show(name, message, buttons) {
         title.textContent = name || "Voice Call";
-        if (avatar) avatar.textContent = String(name || "2C").trim().split(/\\s+/).filter(Boolean).slice(0, 2).map(part => part.charAt(0).toUpperCase()).join("") || "2C";
+        if (avatar) avatar.textContent = String(name || "2C").trim().split(/\s+/).filter(Boolean).slice(0, 2).map(part => part.charAt(0).toUpperCase()).join("") || "2C";
         status.textContent = message || "";
         actions.innerHTML = "";
         buttons.forEach(item => {
@@ -345,13 +345,14 @@
         callState = "incoming";
         ring();
         show(data.caller, "Incoming voice call", [
-            { text: "✓", label: "Accept call", action: async () => {
+            { text: "✓", label: "Accept call", accept: true, action: async () => {
                 stopRingtone();
                 try {
                     await ensurePeer();
                     callState = "connected";
                     socket.emit("call:accept", { callId: activeCallId });
                     status.textContent = "Connecting audio...";
+                    show(title.textContent, "Connecting audio...", activeCallButtons());
                 } catch (error) {
                     socket.emit("call:decline", { callId: activeCallId });
                     await cleanup(false);
@@ -376,6 +377,7 @@
             socket.emit("call:signal", { callId: activeCallId, kind: "offer", signal: offer });
             callState = "connected";
             status.textContent = "Connecting audio...";
+            show(title.textContent, "Connecting audio...", activeCallButtons());
         } catch (error) {
             alert("Unable to access microphone. Check app permissions.");
             cleanup(true);
