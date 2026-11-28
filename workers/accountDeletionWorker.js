@@ -9,6 +9,7 @@ const Notification = require("../models/Notification");
 const FriendRequest = require("../models/FriendRequest");
 const Call = require("../models/Call");
 const Report = require("../models/Report");
+const cloudinary = require("../config/cloudinary");
 
 let workerRunning = false;
 
@@ -16,12 +17,51 @@ async function deleteAccountData(user) {
     const userId = user._id;
     const username = user.username;
 
+    // Remove the user's Shorts from Cloudinary where a stored public ID exists.
+    const ownedShorts = await ShortVideo.find({
+        $or: [{ userId }, { username }]
+    }).select("videoPublicId").lean();
+
+    for (const short of ownedShorts) {
+        if (!short.videoPublicId) continue;
+        try {
+            await cloudinary.uploader.destroy(short.videoPublicId, {
+                resource_type: "video",
+                invalidate: true
+            });
+        } catch (mediaError) {
+            console.error("SHORT MEDIA CLEANUP ERROR:", mediaError.message);
+        }
+    }
+
+    const ownedShortIds = ownedShorts.map(item => item._id);
+
     // Remove user-generated public content and private communications.
     await Promise.all([
         Post.deleteMany({ userId }),
+        Post.updateMany({}, {
+            $pull: {
+                likes: username,
+                comments: { username }
+            }
+        }),
+        Post.updateMany(
+            { "comments.replies.username": username },
+            { $pull: { "comments.$[].replies": { username } } }
+        ),
         ShortVideo.deleteMany({
             $or: [{ userId }, { username }]
         }),
+        ShortVideo.updateMany({}, {
+            $pull: {
+                likes: username,
+                comments: { username }
+            }
+        }),
+        User.updateMany(
+            { _id: { $ne: userId } },
+            { $pull: { savedVideos: { $in: ownedShortIds } } }
+        ),
         Status.deleteMany({ username }),
         Message.deleteMany({
             $or: [{ sender: username }, { receiver: username }]
@@ -62,7 +102,7 @@ async function deleteAccountData(user) {
     }
 
     await Group.updateMany(
-        { owner: { $ne: username } },
+        { owner: { $ne: username }, members: username },
         {
             $pull: {
                 members: username,
@@ -89,6 +129,13 @@ async function deleteAccountData(user) {
             }
         }
     );
+
+    await GroupMessage.updateMany({}, {
+        $pull: {
+            reactions: { username },
+            seenBy: { username }
+        }
+    });
 
     // Keep moderation reports as safety/audit records; the deleted User ID
     // is no longer resolvable to a profile after the user document is removed.
