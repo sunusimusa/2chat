@@ -221,7 +221,10 @@ static final String ACTION_FCM_TOKEN_REFRESHED =
                     deliverFcmToken();
                 });
 
-        webView.loadUrl(APP_URL + "/home.html");
+        openIncomingCallFromIntent(getIntent());
+        if (getIntent() == null || getIntent().getStringExtra("twochat_incoming_caller") == null) {
+            webView.loadUrl(APP_URL + "/home.html");
+        }
     }
 
 
@@ -943,6 +946,25 @@ private void deliverFcmToken() {
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        openIncomingCallFromIntent(intent);
+    }
+
+    private void openIncomingCallFromIntent(Intent intent) {
+        if (intent == null || webView == null) return;
+        String caller = intent.getStringExtra("twochat_incoming_caller");
+        String callId = intent.getStringExtra("twochat_incoming_call_id");
+        if (caller == null || caller.trim().isEmpty()) return;
+
+        String targetUrl = APP_URL + "/chat.html?user=" + Uri.encode(caller.trim());
+        webView.post(() -> webView.loadUrl(targetUrl));
+        intent.removeExtra("twochat_incoming_caller");
+        intent.removeExtra("twochat_incoming_call_id");
     }
 
     @Override
