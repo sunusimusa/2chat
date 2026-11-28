@@ -560,7 +560,7 @@ function logout() {
 
 async function requestAccountDeletion() {
     const confirmed = confirm(
-        "Delete your 2Chat account? Your account will be restricted immediately and permanently deleted after 30 days unless you cancel."
+        "Delete your 2Chat account? Your account will be restricted immediately and permanently deleted after 30 days unless you cancel. Any unused coins may become inaccessible and are not automatically refunded."
     );
     if (!confirmed) return;
 
