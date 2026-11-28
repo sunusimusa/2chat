@@ -153,7 +153,8 @@ async function sendPushNotification({
     recipientUsername,
     title,
     body,
-    data = {}
+    data = {},
+    dataOnly = false
 }) {
 
     try {
@@ -244,22 +245,26 @@ if (!user.fcmTokens?.length) {
 
             const batch = tokens.slice(i, i + 500);
 
-            const response =
-        await getMessaging().sendEachForMulticast({
-                    tokens: batch,
+            const message = {
+                tokens: batch,
+                data: {
+                    ...safeData,
+                    title: String(title || "2Chat"),
+                    body: String(body || "")
+                },
+                android: {
+                    priority: "high"
+                }
+            };
 
-                    notification: {
-                        title: String(title || "2Chat"),
-                        body: String(body || "")
-                    },
+            if (!dataOnly) {
+                message.notification = {
+                    title: String(title || "2Chat"),
+                    body: String(body || "")
+                };
+            }
 
-                    data: safeData,
-
-                    android: {
-                        priority: "high"
-                    }
-
-                });
+            const response = await getMessaging().sendEachForMulticast(message);
 
             successCount += response.successCount;
             failureCount += response.failureCount;
