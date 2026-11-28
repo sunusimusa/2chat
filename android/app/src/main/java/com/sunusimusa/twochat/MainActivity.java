@@ -101,6 +101,24 @@ static final String ACTION_FCM_TOKEN_REFRESHED =
                     return false;
                 }
 
+                // Open external HTTP(S) links in the device browser.
+                // Other schemes are blocked to avoid launching unsafe intents.
+                String scheme = uri.getScheme();
+                if (request.isForMainFrame()
+                        && ("https".equalsIgnoreCase(scheme)
+                        || "http".equalsIgnoreCase(scheme))) {
+                    try {
+                        Intent externalIntent = new Intent(Intent.ACTION_VIEW, uri);
+                        startActivity(externalIntent);
+                    } catch (Exception e) {
+                        Toast.makeText(
+                                MainActivity.this,
+                                "No app available to open this link.",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                }
+
                 return true;
             }
             

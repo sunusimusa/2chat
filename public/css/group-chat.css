@@ -1182,3 +1182,25 @@ cursor:pointer;
 
 }
 
+
+
+/* ==========================
+   CLICKABLE GROUP MESSAGE LINKS
+========================== */
+
+.message-text a.group-message-link{
+    color:inherit;
+    text-decoration:underline;
+    text-underline-offset:2px;
+    cursor:pointer;
+    pointer-events:auto;
+    overflow-wrap:anywhere;
+}
+
+.bubble-me .message-text a.group-message-link{
+    color:#fff;
+}
+
+.bubble-other .message-text a.group-message-link{
+    color:#0866c6;
+}
