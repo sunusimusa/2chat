@@ -25,6 +25,8 @@ register,
 login,
 verifyEmailOtp,
 resendEmailOtp,
+createRecoveryCredentials,
+resetPasswordWithRecovery,
 updateProfile,
 uploadAvatar,
 uploadCover,
@@ -45,6 +47,10 @@ authLimiter, register);
 // Login
 router.post("/login",
 authLimiter, login);
+
+// Recovery credentials and password reset
+router.post("/recovery/setup", protect, authLimiter, createRecoveryCredentials);
+router.post("/recovery/reset", authLimiter, resetPasswordWithRecovery);
 
 // Verify Email OTP
 router.post(
