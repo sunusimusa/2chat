@@ -75,6 +75,16 @@ exports.requestAccountDeletion = async (req, res) => {
         user.lastSeen = requestedAt;
         await user.save();
 
+        // Immediately terminate any existing realtime sessions for this account.
+        const io = req.app.get("io");
+        if (io) {
+            for (const socket of io.sockets.sockets.values()) {
+                if (String(socket.userId) === String(user._id)) {
+                    socket.disconnect(true);
+                }
+            }
+        }
+
         return res.status(202).json({
             success: true,
             deletionRequestedAt: requestedAt,
