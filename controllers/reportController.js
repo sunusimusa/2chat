@@ -103,7 +103,10 @@ const updateReport = async (req, res) => {
         if (targetUser && targetUser.role === "admin") {
             return res.status(403).json({ success: false, message: "The administrator account cannot be moderated through a user report." });
         }
-        if (["warn_user", "suspend_temporary", "suspend_permanent", "remove_content"].includes(action) && !targetUser) {
+        // Account-level actions require a resolved target account.
+        // Content removal can safely resolve its owner from the reported content ID,
+        // because some Shorts reports arrive without reportedUser populated.
+        if (["warn_user", "suspend_temporary", "suspend_permanent"].includes(action) && !targetUser) {
             return res.status(400).json({ success: false, message: "This report has no valid reported user for an account action." });
         }
 
@@ -151,9 +154,13 @@ const updateReport = async (req, res) => {
             if (report.contentType === "post") {
                 const post = await Post.findById(report.contentId);
                 if (!post) return res.status(404).json({ success: false, message: "Reported Post no longer exists." });
+                if (!post.userId) return res.status(409).json({ success: false, message: "Cannot verify the reported Post owner; removal was blocked." });
                 if (targetUser && String(post.userId) !== String(targetUser._id)) {
                     return res.status(409).json({ success: false, message: "Reported Post owner does not match the reported account." });
                 }
+                const postOwner = await User.findById(post.userId).select("role");
+                if (!postOwner) return res.status(409).json({ success: false, message: "Reported Post owner could not be verified." });
+                if (postOwner.role === "admin") return res.status(403).json({ success: false, message: "Content belonging to an administrator cannot be removed through ordinary user reports." });
                 post.isRemoved = true;
                 post.moderationStatus = "removed";
                 post.moderationReason = note;
@@ -163,9 +170,13 @@ const updateReport = async (req, res) => {
             } else {
                 const short = await ShortVideo.findById(report.contentId);
                 if (!short) return res.status(404).json({ success: false, message: "Reported Short no longer exists." });
+                if (!short.userId) return res.status(409).json({ success: false, message: "Cannot verify the reported Short owner; removal was blocked." });
                 if (targetUser && String(short.userId) !== String(targetUser._id)) {
                     return res.status(409).json({ success: false, message: "Reported Short owner does not match the reported account." });
                 }
+                const shortOwner = await User.findById(short.userId).select("role");
+                if (!shortOwner) return res.status(409).json({ success: false, message: "Reported Short owner could not be verified." });
+                if (shortOwner.role === "admin") return res.status(403).json({ success: false, message: "Content belonging to an administrator cannot be removed through ordinary user reports." });
                 short.moderationStatus = "removed";
                 short.moderationReason = note;
                 short.reviewedBy = req.admin._id;
