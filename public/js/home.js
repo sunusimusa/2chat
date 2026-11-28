@@ -272,16 +272,9 @@ function performSearch(){
 
     }
 
-    /*
-     * Idan kana da search.html,
-     * za mu iya tura query zuwa can.
-     */
-
     location.href =
-        "/users.html?search=" +
-        encodeURIComponent(
-            query
-        );
+        "/search.html?type=users&q=" +
+        encodeURIComponent(query);
 
 }
 
