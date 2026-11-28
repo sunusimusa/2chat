@@ -21,26 +21,47 @@
 
     const style = document.createElement("style");
     style.textContent = `
-      #twochat-call-layer{position:fixed;top:0;right:0;bottom:0;left:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(5,12,25,.82);font-family:Arial,sans-serif}
-      #twochat-call-card{width:90%;max-width:360px;padding:28px 22px;border-radius:22px;background:#142238;color:#fff;text-align:center;box-shadow:0 15px 50px #0008}
-      #twochat-call-title{font-size:22px;margin:0 0 8px}
-      #twochat-call-status{color:#cbd5e1;margin:0 0 24px}
-      .twochat-call-actions{display:flex;justify-content:center}
-      .twochat-call-actions button{margin:0 9px;border:0;border-radius:50%;width:58px;height:58px;color:#fff;font-size:21px;background:#16a34a}
-      .twochat-call-actions button.end{background:#dc2626}
+      #twochat-call-layer{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;overflow-y:auto;background:radial-gradient(ellipse at 50% 22%,#1d4165 0%,#101d35 42%,#07111f 100%);font-family:Inter,Arial,sans-serif;color:#fff;padding:24px 20px;box-sizing:border-box}
+      #twochat-call-card{width:100%;max-width:520px;min-height:min(720px,calc(100dvh - 48px));display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:28px;padding:clamp(28px,7vh,64px) 20px 26px;box-sizing:border-box;border:1px solid rgba(255,255,255,.09);border-radius:32px;background:linear-gradient(160deg,rgba(27,48,76,.88),rgba(10,22,40,.94));box-shadow:0 28px 90px rgba(0,0,0,.42);text-align:center}
+      .twochat-call-top{width:100%;display:flex;justify-content:center;align-items:center}
+      .twochat-call-label{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#91a9c6}
+      .twochat-call-profile{display:flex;flex-direction:column;align-items:center;gap:18px;width:100%}
+      #twochat-call-avatar{width:clamp(112px,31vw,154px);height:clamp(112px,31vw,154px);display:grid;place-items:center;border-radius:50%;font-size:clamp(38px,10vw,54px);font-weight:750;color:#fff;background:linear-gradient(145deg,#3998df,#6258d9);border:5px solid rgba(255,255,255,.13);box-shadow:0 0 0 12px rgba(91,153,220,.08),0 18px 50px rgba(0,0,0,.25)}
+      #twochat-call-title{font-size:clamp(25px,7vw,34px);font-weight:750;line-height:1.2;margin:4px 0 0;overflow-wrap:anywhere}
+      #twochat-call-status{font-size:16px;color:#b9c9dc;margin:0;min-height:24px}
+      #twochat-call-timer{font-size:16px;font-variant-numeric:tabular-nums;letter-spacing:2px;color:#e8f1fb;min-height:20px}
+      .twochat-call-wave{height:38px;display:flex;align-items:center;justify-content:center;gap:5px;opacity:.9}
+      .twochat-call-wave span{display:block;width:4px;height:9px;border-radius:5px;background:#60b8f5;animation:twochat-wave .85s ease-in-out infinite alternate}
+      .twochat-call-wave span:nth-child(2n){animation-delay:.18s}.twochat-call-wave span:nth-child(3n){animation-delay:.34s}.twochat-call-wave span:nth-child(4n){animation-delay:.5s}
+      #twochat-call-layer:not(.is-active) .twochat-call-wave span{animation-play-state:paused;opacity:.35}
+      @keyframes twochat-wave{from{height:7px}to{height:32px}}
+      .twochat-call-actions{width:100%;display:flex;justify-content:center;align-items:center;gap:22px;flex-wrap:wrap}
+      .twochat-call-actions button{width:68px;height:68px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.15);border-radius:50%;background:#263c57;color:#fff;font-size:25px;box-shadow:0 8px 24px rgba(0,0,0,.25);cursor:pointer;transition:transform .15s,filter .15s}
+      .twochat-call-actions button:active{transform:scale(.94)}
+      .twochat-call-actions button.accept{background:linear-gradient(145deg,#24c875,#119b58)}
+      .twochat-call-actions button.end{background:linear-gradient(145deg,#ff5b62,#d92338)}
+      .twochat-call-actions button:focus-visible{outline:3px solid #8bd0ff;outline-offset:4px}
       #twochat-call-audio{display:none}
       #twochat-call-button{border:0;background:transparent;color:inherit;font-size:20px;padding:8px;cursor:pointer}
+      @media(max-height:560px){#twochat-call-card{min-height:0;padding:20px;gap:12px}.twochat-call-profile{gap:8px}#twochat-call-avatar{width:76px;height:76px;font-size:30px}.twochat-call-actions button{width:56px;height:56px}}
+      @media(prefers-reduced-motion:reduce){.twochat-call-wave span{animation:none}}
     `;
     document.head.appendChild(style);
 
     const layer = document.createElement("div");
     layer.id = "twochat-call-layer";
     layer.innerHTML = `
-      <section id="twochat-call-card" role="dialog" aria-modal="true">
-        <h2 id="twochat-call-title">Voice Call</h2>
-        <p id="twochat-call-status">Connecting...</p>
+      <section id="twochat-call-card" role="dialog" aria-modal="true" aria-labelledby="twochat-call-title">
+        <div class="twochat-call-top"><span class="twochat-call-label">2CHAT VOICE CALL</span></div>
+        <div class="twochat-call-profile">
+          <div id="twochat-call-avatar" aria-hidden="true">2C</div>
+          <h2 id="twochat-call-title">Voice Call</h2>
+          <p id="twochat-call-status">Connecting...</p>
+          <div id="twochat-call-timer"> </div>
+          <div class="twochat-call-wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        </div>
         <div class="twochat-call-actions" id="twochat-call-actions"></div>
-        <audio id="twochat-call-audio" autoplay></audio>
+        <audio id="twochat-call-audio" autoplay playsinline></audio>
       </section>`;
     document.body.appendChild(layer);
 
@@ -48,26 +69,76 @@
     const status = layer.querySelector("#twochat-call-status");
     const actions = layer.querySelector("#twochat-call-actions");
     const remoteAudio = layer.querySelector("#twochat-call-audio");
+    const avatar = layer.querySelector("#twochat-call-avatar");
+    const timerDisplay = layer.querySelector("#twochat-call-timer");
+    let callStartedAt = null;
+    let callTimerInterval = null;
+    let microphoneMuted = false;
 
     function show(name, message, buttons) {
         title.textContent = name || "Voice Call";
         status.textContent = message || "";
+        const initials = String(name || "2Chat").trim().split(/\\s+/).slice(0, 2).map(part => part.charAt(0)).join("").toUpperCase();
+        avatar.textContent = initials || "2C";
         actions.innerHTML = "";
         buttons.forEach(item => {
             const button = document.createElement("button");
-            button.className = item.end ? "end" : "";
+            button.className = item.end ? "end" : item.accept ? "accept" : "";
             button.type = "button";
-            button.textContent = item.text;
+            button.innerHTML = item.icon || item.text || "";
             button.setAttribute("aria-label", item.label);
             button.addEventListener("click", item.action);
             actions.appendChild(button);
         });
         layer.style.display = "flex";
+        layer.classList.toggle("is-active", /connected|connecting audio/i.test(message || ""));
+    }
+
+    function stopCallTimer() {
+        if (callTimerInterval) clearInterval(callTimerInterval);
+        callTimerInterval = null;
+        callStartedAt = null;
+        timerDisplay.textContent = "";
+    }
+
+    function startCallTimer() {
+        if (callTimerInterval) return;
+        callStartedAt = Date.now();
+        const tick = () => {
+            const seconds = Math.floor((Date.now() - callStartedAt) / 1000);
+            const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
+            const ss = String(seconds % 60).padStart(2, "0");
+            timerDisplay.textContent = mm + ":" + ss;
+        };
+        tick();
+        callTimerInterval = setInterval(tick, 1000);
+    }
+
+    function activeCallButtons() {
+        return [
+            { icon: '<i class="fa-solid fa-microphone-slash"></i>', text: "Mute", label: microphoneMuted ? "Unmute microphone" : "Mute microphone", action: () => {
+                microphoneMuted = !microphoneMuted;
+                if (localStream) localStream.getAudioTracks().forEach(track => { track.enabled = !microphoneMuted; });
+                const muteButton = actions.querySelector("button:not(.end)");
+                if (muteButton) {
+                    muteButton.innerHTML = microphoneMuted ? '<i class="fa-solid fa-microphone"></i>' : '<i class="fa-solid fa-microphone-slash"></i>';
+                    muteButton.setAttribute("aria-label", microphoneMuted ? "Unmute microphone" : "Mute microphone");
+                }
+            }},
+            { icon: '<i class="fa-solid fa-phone-slash"></i>', text: "End", label: "End call", end: true, action: () => cleanup(true) }
+        ];
+    }
+
+    function showActiveCall(message) {
+        show(title.textContent, message || "Call connected", activeCallButtons());
     }
 
     function hide() {
         layer.style.display = "none";
+        layer.classList.remove("is-active");
         actions.innerHTML = "";
+        stopCallTimer();
+        microphoneMuted = false;
     }
 
     function stopRingtone() {
@@ -163,6 +234,9 @@
         peerConnection.onconnectionstatechange = () => {
             if (peerConnection && peerConnection.connectionState === "connected") {
                 status.textContent = "Call connected";
+                layer.classList.add("is-active");
+                startCallTimer();
+                showActiveCall("Call connected");
             }
         };
         return peerConnection;
@@ -177,6 +251,8 @@
         if (localStream) localStream.getTracks().forEach(track => track.stop());
         localStream = null;
         remoteAudio.srcObject = null;
+        stopCallTimer();
+        microphoneMuted = false;
         activeCallId = null;
         callState = "idle";
         hide();
@@ -274,13 +350,13 @@
         callState = "incoming";
         ring();
         show(data.caller, "Incoming voice call", [
-            { text: "✓", label: "Accept call", action: async () => {
+            { icon: '<i class="fa-solid fa-phone"></i>', text: "Accept", label: "Accept call", accept: true, action: async () => {
                 stopRingtone();
                 try {
                     await ensurePeer();
                     callState = "connected";
                     socket.emit("call:accept", { callId: activeCallId });
-                    status.textContent = "Connecting audio...";
+                    showActiveCall("Connecting audio...");
                 } catch (error) {
                     socket.emit("call:decline", { callId: activeCallId });
                     await cleanup(false);
@@ -304,7 +380,7 @@
             await pc.setLocalDescription(offer);
             socket.emit("call:signal", { callId: activeCallId, kind: "offer", signal: offer });
             callState = "connected";
-            status.textContent = "Connecting audio...";
+            showActiveCall("Connecting audio...");
         } catch (error) {
             alert("Unable to access microphone. Check app permissions.");
             cleanup(true);
