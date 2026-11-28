@@ -552,7 +552,7 @@ function formatGroupMessageText(value) {
     // Detect URLs
     // Match full URLs, www links, and common bare domains (e.g. example.com/path).
     const urlPattern =
-        /https?:\\/\\/[^\\s<>"']+|www\\.[^\\s<>"']+|(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z]{2,}(?:\\/[^\\s<>"']*)?/gi;
+        /https?:\/\/[^\s<>"']+|www\.[^\s<>"']+|(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}(?:\/[^\s<>"']*)?/gi;
 
     let result = "";
     let lastIndex = 0;
@@ -580,7 +580,7 @@ function formatGroupMessageText(value) {
             text.slice(lastIndex, match.index)
         );
 
-        const href = /^(https?:\\/\\/)/i.test(cleanURL)
+        const href = /^(https?:\/\/)/i.test(cleanURL)
             ? cleanURL
             : "https://" + cleanURL;
 
@@ -595,7 +595,7 @@ function formatGroupMessageText(value) {
 
                 result += `<a
                     href="${escapeHTML(parsed.href)}"
-                    target="_blank"
+                    target="_self"
                     rel="noopener noreferrer"
                     class="group-message-link"
                 >${escapeHTML(cleanURL)}</a>`;
