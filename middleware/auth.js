@@ -57,6 +57,20 @@ const protect = async (req, res, next) => {
             }
         }
 
+        // Pending deletion accounts may only cancel their own request.
+        if (
+            user.deletionScheduledFor &&
+            user.deletionScheduledFor > new Date() &&
+            !(req.method === "POST" && req.path === "/cancel-deletion")
+        ) {
+            return res.status(403).json({
+                success: false,
+                accountDeletionPending: true,
+                deletionScheduledFor: user.deletionScheduledFor,
+                message: "This account is scheduled for deletion. Cancel the request to continue using 2Chat."
+            });
+        }
+
         req.user = user;
         next();
 
