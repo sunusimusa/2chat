@@ -165,8 +165,7 @@ io.use(async (socket, next) => {
         }
 
         if (
-            user.deletionScheduledFor &&
-            user.deletionScheduledFor > new Date()
+            user.deletionScheduledFor
         ) {
             return next(
                 new Error("This account is scheduled for deletion.")
