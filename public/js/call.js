@@ -343,8 +343,9 @@
 
     socket.on("connect", () => {
         socket.emit("join");
-        socket.emit("call:resume-pending");
-        socket.emit("call:presence", document.visibilityState === "visible" && document.hasFocus());
+        const foreground = document.visibilityState === "visible" && document.hasFocus();
+        socket.emit("call:presence", foreground);
+        if (foreground) socket.emit("call:resume-pending");
         iceConfigPromise = new Promise(resolve => {
             const fallback = setTimeout(resolve, 2500);
             socket.emit("call:ice-config");
@@ -356,7 +357,9 @@
     });
 
     const updatePresence = () => {
-        socket.emit("call:presence", document.visibilityState === "visible" && document.hasFocus());
+        const foreground = document.visibilityState === "visible" && document.hasFocus();
+        socket.emit("call:presence", foreground);
+        if (foreground && socket.connected) socket.emit("call:resume-pending");
     };
 
     window.twoChatSetForeground = active => {
