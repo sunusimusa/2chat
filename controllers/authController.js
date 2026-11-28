@@ -269,7 +269,7 @@ exports.register = async (req, res) => {
     user.lastSeen = new Date();
     await user.save();
 
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user.tokenVersion || 0);
     const safeUser = {
       _id: user._id,
       username: user.username,
@@ -374,7 +374,7 @@ exports.login = async (req, res) => {
         // FIND USER
         const user = await User.findOne({
             $or: loginConditions
-        }).select("+password");
+        }).select("+password +tokenVersion");
 
         if (!user) {
             return res.status(400).json({
@@ -431,7 +431,7 @@ exports.login = async (req, res) => {
         await createWalletIfMissing(user._id);
 
         // GENERATE TOKEN
-        const token = generateToken(user._id);
+        const token = generateToken(user._id, user.tokenVersion || 0);
 
         // SAFE USER RESPONSE
         const safeUser = {
@@ -1050,7 +1050,7 @@ exports.verifyEmailOtp = async (req, res) => {
     const user = await User.findOne({
       email: cleanEmail
     }).select(
-      "+emailOtpHash +emailOtpExpires +emailOtpAttempts"
+      "+emailOtpHash +emailOtpExpires +emailOtpAttempts +tokenVersion"
     );
 
     if (!user) {
@@ -1144,7 +1144,7 @@ exports.verifyEmailOtp = async (req, res) => {
     await createWalletIfMissing(user._id);
 
     // GENERATE LOGIN TOKEN
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user.tokenVersion || 0);
 
     // SAFE USER RESPONSE
     const safeUser = {
