@@ -1302,8 +1302,13 @@ exports.resetPasswordWithRecovery = async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 12);
     const filter = { _id:user._id };
     const update = { $set:{ password:hashedPassword }, $inc:{ tokenVersion:1 } };
-    if (isRecoveryKey) filter.recoveryKeyHash = user.recoveryKeyHash;
-    else { filter.recoveryBackupCodeHashes = matchingBackupHash; update.$pull = { recoveryBackupCodeHashes:matchingBackupHash }; }
+    if (isRecoveryKey) {
+      filter.recoveryKeyHash = user.recoveryKeyHash;
+      update.$set.recoveryKeyHash = null;
+    } else {
+      filter.recoveryBackupCodeHashes = matchingBackupHash;
+      update.$pull = { recoveryBackupCodeHashes:matchingBackupHash };
+    }
     const updated = await User.findOneAndUpdate(filter, update, { new:true });
     if (!updated) return res.status(409).json({ success:false, message:'This recovery code has just been used or changed. Try another code.' });
     return res.json({ success:true, message:'Password reset successfully. Sign in with your new password.' });
