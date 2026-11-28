@@ -1076,3 +1076,16 @@ button:active {
     }
 
 }
+
+
+/* Account deletion action */
+#accountDeleteBtn {
+    width: 100%;
+    margin-top: 12px;
+    background: #fff0f0;
+    color: #b42318;
+    border: 1px solid #fecaca;
+}
+#accountDeleteBtn:hover {
+    background: #fee2e2;
+}
