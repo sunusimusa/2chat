@@ -1184,4 +1184,23 @@ cursor:pointer;
 
 
 
-/* ==========================\n   CLICKABLE GROUP MESSAGE LINKS\n========================== */\n\n.message-text a.group-message-link{\n    color:inherit;\n    text-decoration:underline;\n    text-underline-offset:2px;\n    cursor:pointer;\n    pointer-events:auto;\n    overflow-wrap:anywhere;\n}\n\n.bubble-me .message-text a.group-message-link{\n    color:#fff;\n}\n\n.bubble-other .message-text a.group-message-link{\n    color:#0866c6;\n}\n
+/* ==========================
+   CLICKABLE GROUP MESSAGE LINKS
+========================== */
+
+.message-text a.group-message-link{
+    color:inherit;
+    text-decoration:underline;
+    text-underline-offset:2px;
+    cursor:pointer;
+    pointer-events:auto;
+    overflow-wrap:anywhere;
+}
+
+.bubble-me .message-text a.group-message-link{
+    color:#fff;
+}
+
+.bubble-other .message-text a.group-message-link{
+    color:#0866c6;
+}
