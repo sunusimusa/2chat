@@ -1,4 +1,5 @@
-let searchType = "shorts";
+const searchParams = new URLSearchParams(window.location.search);
+let searchType = searchParams.get("type") === "users" ? "users" : "shorts";
 let searchRequestId = 0;
 
 // ===============================
@@ -128,9 +129,20 @@ async function searchShorts(keyword, requestId) {
 // ===============================
 async function searchUsers(keyword, requestId) {
     try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            window.location.href = "/login.html";
+            return;
+        }
+
         const res = await fetch(
             "/api/users/search/" +
-            encodeURIComponent(keyword)
+            encodeURIComponent(keyword),
+            {
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            }
         );
 
         if (requestId !== searchRequestId) return;
@@ -509,6 +521,16 @@ if (clearSearch && searchInput && results) {
 // ===============================
 // ENTER TO SEARCH
 // ===============================
+
+if (searchType === "users") {
+    switchSearchType("users");
+}
+
+const initialQuery = searchParams.get("q");
+if (initialQuery && searchInput) {
+    searchInput.value = initialQuery;
+    performSearch();
+}
 
 if (searchInput) {
     searchInput.addEventListener("keydown", event => {
