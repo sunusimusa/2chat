@@ -60,7 +60,6 @@ const protect = async (req, res, next) => {
         // Pending deletion accounts may only cancel their own request.
         if (
             user.deletionScheduledFor &&
-            user.deletionScheduledFor > new Date() &&
             !(req.method === "POST" && req.path === "/cancel-deletion")
         ) {
             return res.status(403).json({
