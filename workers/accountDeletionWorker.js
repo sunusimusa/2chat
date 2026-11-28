@@ -124,6 +124,9 @@ async function deleteAccountData(user) {
             { $pull: { savedVideos: { $in: ownedShortIds } } }
         ),
         Status.deleteMany({ username }),
+        Status.updateMany({}, {
+            $pull: { views: { username } }
+        }),
         Message.deleteMany({
             $or: [{ sender: username }, { receiver: username }]
         }),
@@ -197,6 +200,17 @@ async function deleteAccountData(user) {
             seenBy: { username }
         }
     });
+    await GroupMessage.updateMany(
+        { replyUser: username },
+        {
+            $set: {
+                replyTo: null,
+                replyUser: "",
+                replyText: "",
+                replyImage: ""
+            }
+        }
+    );
 
     // Keep moderation reports as safety/audit records; the deleted User ID
     // is no longer resolvable to a profile after the user document is removed.
