@@ -16,6 +16,10 @@
     let ringInterval = null;
     let callState = "idle";
     let pendingIceCandidates = [];
+    let callTimerInterval = null;
+    let callStartedAt = null;
+    let isMuted = false;
+    let speakerEnabled = true;
     let configuredIceServers = [{ urls: "stun:stun.l.google.com:19302" }];
     let iceConfigPromise = null;
 
@@ -46,8 +50,54 @@
 
     const title = layer.querySelector("#twochat-call-title");
     const status = layer.querySelector("#twochat-call-status");
+    const timerDisplay = layer.querySelector("#twochat-call-timer");
+    const avatar = layer.querySelector("#twochat-call-avatar");
     const actions = layer.querySelector("#twochat-call-actions");
     const remoteAudio = layer.querySelector("#twochat-call-audio");
+
+    function formatCallDuration(seconds) {
+        const minutes = String(Math.floor(seconds / 60)).padStart(2, "0");
+        const remainder = String(seconds % 60).padStart(2, "0");
+        return minutes + ":" + remainder;
+    }
+
+    function stopCallTimer() {
+        if (callTimerInterval) clearInterval(callTimerInterval);
+        callTimerInterval = null;
+        callStartedAt = null;
+        if (timerDisplay) timerDisplay.textContent = "";
+    }
+
+    function startCallTimer() {
+        if (callTimerInterval) return;
+        callStartedAt = Date.now();
+        const update = () => {
+            if (callStartedAt && timerDisplay) timerDisplay.textContent = formatCallDuration(Math.floor((Date.now() - callStartedAt) / 1000));
+        };
+        update();
+        callTimerInterval = setInterval(update, 1000);
+    }
+
+    function activeCallButtons() {
+        return [
+            { text: isMuted ? "🎙" : "🎤", label: isMuted ? "Unmute microphone" : "Mute microphone", action: toggleMute },
+            { text: speakerEnabled ? "🔊" : "🔉", label: speakerEnabled ? "Lower call volume" : "Restore call volume", action: toggleSpeaker },
+            { text: "✕", label: "End call", end: true, action: () => cleanup(true) }
+        ];
+    }
+
+    function toggleMute() {
+        if (!localStream) return;
+        isMuted = !isMuted;
+        localStream.getAudioTracks().forEach(track => { track.enabled = !isMuted; });
+        show(title.textContent, status.textContent, activeCallButtons());
+    }
+
+    function toggleSpeaker() {
+        speakerEnabled = !speakerEnabled;
+        remoteAudio.volume = speakerEnabled ? 1 : 0.35;
+        show(title.textContent, status.textContent, activeCallButtons());
+    }
 
     function show(name, message, buttons) {
         title.textContent = name || "Voice Call";
@@ -68,6 +118,7 @@
     function hide() {
         layer.style.display = "none";
         actions.innerHTML = "";
+        stopCallTimer();
     }
 
     function stopRingtone() {
@@ -173,6 +224,10 @@
         if (sendEnd && activeCallId) socket.emit("call:end", { callId: activeCallId });
         if (peerConnection) peerConnection.close();
         peerConnection = null;
+        stopCallTimer();
+        isMuted = false;
+        speakerEnabled = true;
+        remoteAudio.volume = 1;
         pendingIceCandidates = [];
         if (localStream) localStream.getTracks().forEach(track => track.stop());
         localStream = null;
