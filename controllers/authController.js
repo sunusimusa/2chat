@@ -165,14 +165,14 @@ exports.register = async (req, res) => {
       });
     }
 
-    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(cleanEmail)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
       return res.status(400).json({
         success: false,
         message: "Please enter a valid email address."
       });
     }
 
-    if (!/^\\+[1-9]\\d{7,14}$/.test(cleanPhone)) {
+    if (!/^\+[1-9]\d{7,14}$/.test(cleanPhone)) {
       return res.status(400).json({
         success: false,
         message: "Please enter a valid international phone number."
@@ -186,7 +186,7 @@ exports.register = async (req, res) => {
       });
     }
 
-    if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(dateOfBirth)) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)) {
       return res.status(400).json({
         success: false,
         message: "Please enter a valid date of birth."
