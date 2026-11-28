@@ -23,11 +23,11 @@ function parseCloudinaryAsset(value, expectedType) {
         if (markerIndex < 0) return null;
 
         const pathParts = url.pathname.slice(markerIndex + marker.length).split("/");
-        const versionIndex = pathParts.findIndex(part => /^v\\d+$/.test(part));
+        const versionIndex = pathParts.findIndex(part => /^v\d+$/.test(part));
         if (versionIndex < 0 || versionIndex === pathParts.length - 1) return null;
 
         const publicId = pathParts.slice(versionIndex + 1).join("/")
-            .replace(/\\.[^/.]+$/, "");
+            .replace(/\.[^/.]+$/, "");
         if (!publicId) return null;
 
         return {
