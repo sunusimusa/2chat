@@ -113,7 +113,7 @@ const updateReport = async (req, res) => {
         let status = "reviewed";
 
         if (action === "dismiss") {
-            report.status = "dismissed";
+            status = "dismissed";
             historyAction = "report_dismissed";
         } else if (action === "mark_reviewed") {
             report.status = "reviewed";
