@@ -377,6 +377,7 @@
     });
 
     socket.on("call:incoming", data => {
+        if (data && data.callId && activeCallId === data.callId) return;
         if (callState !== "idle" || document.visibilityState !== "visible" || !document.hasFocus()) {
             socket.emit("call:decline", { callId: data.callId });
             return;
