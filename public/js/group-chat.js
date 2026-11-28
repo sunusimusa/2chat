@@ -550,8 +550,9 @@ function formatGroupMessageText(value) {
     }
 
     // Detect URLs
+    // Match full URLs, www links, and common bare domains (e.g. example.com/path).
     const urlPattern =
-        /https?:\/\/[^\s<>"']+|www\.[^\s<>"']+/gi;
+        /https?:\\/\\/[^\\s<>"']+|www\\.[^\\s<>"']+|(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z]{2,}(?:\\/[^\\s<>"']*)?/gi;
 
     let result = "";
     let lastIndex = 0;
@@ -560,6 +561,11 @@ function formatGroupMessageText(value) {
     while ((match = urlPattern.exec(text)) !== null) {
 
         const originalURL = match[0];
+
+        // Do not turn the domain portion of an email address into a link.
+        if (match.index > 0 && text[match.index - 1] === "@") {
+            continue;
+        }
 
         let cleanURL = originalURL;
         let ending = "";
@@ -574,9 +580,9 @@ function formatGroupMessageText(value) {
             text.slice(lastIndex, match.index)
         );
 
-        const href = cleanURL.startsWith("www.")
-            ? "https://" + cleanURL
-            : cleanURL;
+        const href = /^(https?:\\/\\/)/i.test(cleanURL)
+            ? cleanURL
+            : "https://" + cleanURL;
 
         try {
 
