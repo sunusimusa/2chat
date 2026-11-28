@@ -50,6 +50,7 @@ static final String ACTION_FCM_TOKEN_REFRESHED =
     private static final int PERMISSION_REQUEST = 1002;
     private static final int NATIVE_AUDIO_PERMISSION_REQUEST = 1003;
     private static final int NOTIFICATION_PERMISSION_REQUEST = 1004;
+    private static final int CALL_AUDIO_PERMISSION_REQUEST = 1005;
     
     private static final String APP_URL =
             "https://twochat-vg3s.onrender.com";
@@ -460,6 +461,27 @@ private void deliverFcmToken() {
     private class NativeVoiceBridge {
 
         @JavascriptInterface
+        public void requestCallMicrophonePermission() {
+            runOnUiThread(() -> {
+                if (isFinishing() || isDestroyed()) {
+                    callJavascript("window.on2ChatMicrophonePermissionResult && window.on2ChatMicrophonePermissionResult(false);");
+                    return;
+                }
+
+                if (checkSelfPermission(Manifest.permission.RECORD_AUDIO)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    callJavascript("window.on2ChatMicrophonePermissionResult && window.on2ChatMicrophonePermissionResult(true);");
+                    return;
+                }
+
+                requestPermissions(
+                        new String[]{Manifest.permission.RECORD_AUDIO},
+                        CALL_AUDIO_PERMISSION_REQUEST
+                );
+            });
+        }
+
+        @JavascriptInterface
         public void startRecording() {
 
             runOnUiThread(() -> startNativeRecording());
@@ -769,6 +791,17 @@ private void deliverFcmToken() {
                 );
             }
 
+            return;
+        }
+
+        if (requestCode == CALL_AUDIO_PERMISSION_REQUEST) {
+            boolean granted = checkSelfPermission(
+                    Manifest.permission.RECORD_AUDIO
+            ) == PackageManager.PERMISSION_GRANTED;
+            callJavascript(
+                    "window.on2ChatMicrophonePermissionResult && " +
+                    "window.on2ChatMicrophonePermissionResult(" + granted + ");"
+            );
             return;
         }
 
