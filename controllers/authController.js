@@ -454,8 +454,7 @@ exports.login = async (req, res) => {
             token,
             user: safeUser,
             accountDeletionPending: Boolean(
-                user.deletionScheduledFor &&
-                user.deletionScheduledFor > new Date()
+                user.deletionScheduledFor
             ),
             deletionScheduledFor: user.deletionScheduledFor || null
         });
